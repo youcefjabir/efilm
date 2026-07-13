@@ -1,0 +1,6 @@
+numpy>=2.0
+opencv-python-headless>=4.10
+pillow>=10.4
+requests>=2.32
+onnxruntime>=1.19 ; platform_machine == "x86_64" or platform_machine == "arm64"
+jsonschema>=4.23

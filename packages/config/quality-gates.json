@@ -1,0 +1,45 @@
+{
+  "$comment": "Measurable pass criteria from the FAS 1 reference analysis (section 4). Applied by the worker's quality module to every rendered shot before it may be approved.",
+  "version": 1,
+  "camera_motion": {
+    "anchor_psnr_min_db": 48.0,
+    "color_mean_delta_e_max": 1.5,
+    "color_drift_max_delta_e_per_s": 0.3,
+    "line_max_bend_fraction": 0.003,
+    "line_max_angle_deviation_deg": 0.15,
+    "disocclusion_max_fraction_per_frame": 0.005,
+    "disocclusion_max_contiguous_hole_fraction": 0.0005,
+    "temporal_residual_median_max_fraction": 0.0015,
+    "trajectory_tolerance_fraction": 0.25,
+    "acceleration_peak_max_ratio": 2.0,
+    "duration_tolerance_frames": 1
+  },
+  "scene_life": {
+    "global_flow_max_fraction_per_s": 0.0003,
+    "outside_mask_pixel_diff_max": 0,
+    "mask_leakage_ratio_max": 0.002,
+    "energy_uniformity_tolerance": 0.3,
+    "edge_anchor_max_shift_px": 0.5
+  },
+  "retry_policy": {
+    "max_render_attempts": 4,
+    "camera_motion_fallback_chain": ["reduce_strength_half", "safer_template", "stabilized_near_static", "skip"],
+    "scene_life_fallback_chain": ["reduce_strength_half", "shrink_mask", "disable_effect_use_camera_motion", "skip"]
+  },
+  "shot_durations": {
+    "detail": 3.0,
+    "interior": 3.0,
+    "hero_interior": 6.0,
+    "exterior": 4.0,
+    "opening": 4.0,
+    "closing": 4.0,
+    "aerial_hero": 6.0
+  },
+  "auto_length": {
+    "min_total_seconds": 10,
+    "max_total_seconds": 75,
+    "few_images_target": [10, 20],
+    "normal_target": [25, 45],
+    "large_target": [45, 70]
+  }
+}

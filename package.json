@@ -1,0 +1,17 @@
+{
+  "name": "property-motion-studio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Private owner-only web app that turns professional property still photos into calm, photorealistic premium films.",
+  "scripts": {
+    "dev": "pnpm --filter @pms/web dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "worker": "cd services/worker && python3 -m pms_worker.loop",
+    "lint": "pnpm -r lint"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  }
+}

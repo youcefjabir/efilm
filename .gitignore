@@ -1,0 +1,31 @@
+# deps
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+
+# builds
+.next/
+dist/
+out/
+*.tsbuildinfo
+
+# runtime data (local mode)
+var/
+!var/.gitkeep
+
+# env
+.env
+.env.local
+.env*.local
+
+# models (downloaded at setup, never committed)
+services/worker/models/*
+!services/worker/models/README.md
+
+# large generated test artifacts (curated outputs under reference/ ARE committed)
+evals/output/
+
+# misc
+.DS_Store
+*.log
