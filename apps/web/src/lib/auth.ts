@@ -56,6 +56,7 @@ export function verifySessionToken(token: string | undefined | null): SessionPay
 // ---------- current user ----------
 
 export async function currentUserEmail(): Promise<string | null> {
+  if (env.authDisabled) return env.ownerEmail;
   if (env.authProvider === "supabase") {
     const { supabaseUserEmail } = await import("./supabase");
     return supabaseUserEmail();

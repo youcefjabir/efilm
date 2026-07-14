@@ -22,6 +22,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  if (env.authDisabled) {
+    if (pathname === "/") return NextResponse.redirect(new URL("/projects", req.nextUrl.origin));
+    return NextResponse.next();
+  }
+
   let email: string | null = null;
   if (env.authProvider === "supabase") {
     // Supabase session cookie check happens in requireOwner (server components);

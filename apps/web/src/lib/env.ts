@@ -18,6 +18,10 @@ export const env = {
 
   ownerOnlyMode: bool("OWNER_ONLY_MODE", true),
   publicSignupEnabled: bool("PUBLIC_SIGNUP_ENABLED", false),
+  // Temporary bypass for preview testing: every request is treated as
+  // OWNER_EMAIL, no login required. The URL itself is the only barrier, so
+  // this must be off before sharing the link beyond the owner.
+  authDisabled: bool("AUTH_DISABLED", false),
   billingEnabled: bool("BILLING_ENABLED", false),
   ownerEmail: (process.env.OWNER_EMAIL ?? "youcefjabir8@live.se").toLowerCase(),
 
