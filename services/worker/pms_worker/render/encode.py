@@ -76,27 +76,62 @@ class FrameEncoder:
             raise RuntimeError(f"ffmpeg failed (rc={rc}): {err[-2000:]}")
 
 
-def concat_mp4s(clip_paths: list[str | Path], out_path: str | Path) -> None:
-    """Losslessly concatenate identically-encoded MP4 clips (cuts only)."""
+def concat_with_crossfade(
+    clip_paths: list[str | Path],
+    out_path: str | Path,
+    crossfade_seconds: float = 0.5,
+    crf: int = 17,
+    preset: str = "medium",
+) -> None:
+    """Join clips with a short video dissolve at each cut instead of a hard
+    cut, so the final film reads as one continuous tour through the property
+    rather than a slideshow of independent clips. Requires re-encoding (xfade
+    needs a filter graph, unlike the stream-copy concat demuxer)."""
+    clip_paths = [Path(p) for p in clip_paths]
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    list_file = out_path.with_suffix(".concat.txt")
-    with open(list_file, "w") as f:
-        for p in clip_paths:
-            f.write(f"file '{Path(p).resolve()}'\n")
+    if len(clip_paths) <= 1:
+        if clip_paths:
+            shutil.copyfile(clip_paths[0], out_path)
+        return
+
+    durations = [float(probe(p)["format"]["duration"]) for p in clip_paths]
+
+    inputs: list[str] = []
+    for p in clip_paths:
+        inputs += ["-i", str(p)]
+
+    filter_parts = []
+    running_dur = durations[0]
+    prev_label = "0:v"
+    for i in range(1, len(clip_paths)):
+        # Never overlap more than ~40% of either adjacent clip so a run of
+        # short shots can't collapse into each other.
+        d = max(0.1, min(crossfade_seconds, durations[i - 1] * 0.4, durations[i] * 0.4))
+        offset = max(running_dur - d, 0.0)
+        out_label = f"v{i}" if i < len(clip_paths) - 1 else "vout"
+        filter_parts.append(
+            f"[{prev_label}][{i}:v]xfade=transition=fade:duration={d:.3f}:offset={offset:.3f}[{out_label}]"
+        )
+        running_dur = running_dur + durations[i] - d
+        prev_label = out_label
+
     cmd = [
         ffmpeg_bin(),
         "-y",
         "-loglevel", "error",
-        "-f", "concat",
-        "-safe", "0",
-        "-i", str(list_file),
-        "-c", "copy",
+        *inputs,
+        "-filter_complex", ";".join(filter_parts),
+        "-map", f"[{prev_label}]",
+        "-c:v", "libx264",
+        "-profile:v", "high",
+        "-preset", preset,
+        "-crf", str(crf),
+        "-pix_fmt", "yuv420p",
         "-movflags", "+faststart",
         str(out_path),
     ]
     subprocess.run(cmd, check=True, capture_output=True)
-    list_file.unlink(missing_ok=True)
 
 
 def probe(path: str | Path) -> dict:

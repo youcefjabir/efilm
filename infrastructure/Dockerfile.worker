@@ -11,6 +11,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY services/worker/pms_worker ./pms_worker
 COPY packages/config ./config
+COPY scripts/fetch_models.py ./fetch_models.py
 
 ENV PMS_CONFIG_DIR=/app/config
+ENV PMS_MODELS_DIR=/app/models
+
+# Neural depth model (~99 MB). Falls back to the deterministic geometric
+# provider at runtime if the network is unavailable at build time.
+RUN python3 fetch_models.py
+
 CMD ["python3", "-m", "pms_worker.jobs.loop"]

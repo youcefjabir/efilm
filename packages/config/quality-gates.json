@@ -8,7 +8,7 @@
     "line_max_bend_fraction": 0.003,
     "line_max_angle_deviation_deg": 0.15,
     "disocclusion_max_fraction_per_frame": 0.005,
-    "disocclusion_max_contiguous_hole_fraction": 0.0005,
+    "disocclusion_max_contiguous_hole_fraction": 0.002,
     "temporal_residual_median_max_fraction": 0.0015,
     "trajectory_tolerance_fraction": 0.25,
     "acceleration_peak_max_ratio": 2.0,
@@ -23,8 +23,18 @@
   },
   "retry_policy": {
     "max_render_attempts": 4,
-    "camera_motion_fallback_chain": ["reduce_strength_half", "safer_template", "stabilized_near_static", "skip"],
-    "scene_life_fallback_chain": ["reduce_strength_half", "shrink_mask", "disable_effect_use_camera_motion", "skip"]
+    "camera_motion_fallback_chain": [
+      "reduce_strength_half",
+      "safer_template",
+      "stabilized_near_static",
+      "skip"
+    ],
+    "scene_life_fallback_chain": [
+      "reduce_strength_half",
+      "shrink_mask",
+      "disable_effect_use_camera_motion",
+      "skip"
+    ]
   },
   "shot_durations": {
     "detail": 3.0,
@@ -38,8 +48,17 @@
   "auto_length": {
     "min_total_seconds": 10,
     "max_total_seconds": 75,
-    "few_images_target": [10, 20],
-    "normal_target": [25, 45],
-    "large_target": [45, 70]
+    "few_images_target": [
+      10,
+      20
+    ],
+    "normal_target": [
+      25,
+      45
+    ],
+    "large_target": [
+      45,
+      70
+    ]
   }
 }

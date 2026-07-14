@@ -268,26 +268,48 @@ class CameraMotionRenderer:
     def warp_stretch_stats(self) -> dict:
         """Disocclusion proxy for a backward warp: local stretching of the
         sampling map at the most extreme pose. A stretch factor > 2 means the
-        warp is smearing hidden area into view."""
+        warp is smearing hidden area into view.
+
+        Two signals are measured: the total fraction of overstretched pixels
+        (tolerant — sub-pixel stretch scattered across many small depth edges
+        is invisible), and the size of the single largest *connected*
+        overstretched region (strict — a small total fraction concentrated
+        into one contiguous seam, e.g. along a bed edge or a table corner,
+        reads as an obvious visual smear even though the area is small)."""
         extreme = self.path.max_abs_pose()
         worst_fraction = 0.0
         worst_max = 1.0
+        worst_contig = 0.0
+        px_per_out_x = self.geom.crop_w / (self.map_w - 1)
+        px_per_out_y = self.geom.crop_h / (self.map_h - 1)
         for sgn in (1.0, -1.0):
-            mx, _my = self._maps_for_pose(
+            mx, my = self._maps_for_pose(
                 1.0 + (extreme.scale - 1.0) * sgn,
                 extreme.pan_x * sgn,
                 extreme.pan_y * sgn,
                 extreme.roll_deg * sgn,
             )
-            # d(source_x)/d(out_x) < 0.5 => output stretches source by > 2x.
-            # Maps are at map_w resolution, so the identity step is crop_w/map_w.
-            dx = np.abs(np.diff(mx, axis=1))
-            px_per_out = self.geom.crop_w / (self.map_w - 1)
-            stretch = px_per_out / np.maximum(dx, 1e-6)
-            frac = float((stretch > 2.0).mean())
+            # d(source)/d(out) < 0.5 in either axis => output stretches
+            # source by > 2x there. Maps are at map_w x map_h resolution.
+            stretch_x = px_per_out_x / np.maximum(np.abs(np.diff(mx, axis=1)), 1e-6)
+            stretch_y = px_per_out_y / np.maximum(np.abs(np.diff(my, axis=0)), 1e-6)
+            h2 = min(stretch_x.shape[0], stretch_y.shape[0])
+            w2 = min(stretch_x.shape[1], stretch_y.shape[1])
+            stretch = np.maximum(stretch_x[:h2, :w2], stretch_y[:h2, :w2])
+            mask = (stretch > 2.0).astype(np.uint8)
+            frac = float(mask.mean())
             worst_fraction = max(worst_fraction, frac)
             worst_max = max(worst_max, float(np.percentile(stretch, 99.9)))
-        return {"overstretch_fraction": worst_fraction, "stretch_p999": worst_max}
+            if mask.any():
+                n, _labels, stats, _centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+                if n > 1:
+                    largest = int(stats[1:, cv2.CC_STAT_AREA].max())
+                    worst_contig = max(worst_contig, largest / mask.size)
+        return {
+            "overstretch_fraction": worst_fraction,
+            "stretch_p999": worst_max,
+            "contiguous_stretch_fraction": worst_contig,
+        }
 
     def source_bounds_check(self) -> dict:
         """Verify the warp never samples outside the source image at the most

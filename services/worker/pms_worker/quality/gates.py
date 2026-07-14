@@ -8,7 +8,7 @@ from __future__ import annotations
 import cv2
 import numpy as np
 
-from ..config import quality_gates
+from ..config import motion_templates, quality_gates
 from . import metrics
 
 
@@ -68,19 +68,21 @@ class CameraMotionGate:
         drift = 0.0
         if len(deltas) >= 3:
             drift = abs(float(np.polyfit(times, deltas, 1)[0]))
-        checks["color_mean_delta_e"] = {
-            "value": float(np.mean(deltas)),
-            "threshold": cfg["color_mean_delta_e_max"],
-            "pass": bool(np.mean(deltas) <= cfg["color_mean_delta_e_max"]),
-        }
         # The renderer never grades a pixel, so true color drift can only be
         # resampling error. Camera motion sweeps new content through the
-        # measured region and that content flux reads as a color trend, so the
-        # limit scales with the planned motion rate (a static shot stays at
-        # the strict base limit).
+        # measured region and that content flux reads as a color change, so
+        # both the mean and the rate limit scale with the planned motion (a
+        # static shot stays at the strict base limit).
         pan_total = abs(float(self.plan["total_pan_x"])) + abs(float(self.plan["total_pan_y"]))
         scale_total = abs(float(self.plan["total_scale_delta"]))
-        motion_per_s = (pan_total + scale_total) / max(float(self.plan["duration_seconds"]), 1e-6)
+        motion_total = pan_total + scale_total
+        motion_per_s = motion_total / max(float(self.plan["duration_seconds"]), 1e-6)
+        mean_limit = cfg["color_mean_delta_e_max"] + 6.0 * motion_total
+        checks["color_mean_delta_e"] = {
+            "value": float(np.mean(deltas)),
+            "threshold": mean_limit,
+            "pass": bool(np.mean(deltas) <= mean_limit),
+        }
         drift_limit = cfg["color_drift_max_delta_e_per_s"] + 15.0 * motion_per_s
         checks["color_drift_per_s"] = {
             "value": drift,
@@ -116,15 +118,33 @@ class CameraMotionGate:
             "pass": bool(worst_bend <= cfg["line_max_bend_fraction"]),
         }
 
-        # 4. Disocclusion / stretch (from renderer warp-jacobian analysis)
+        # 4. Disocclusion / stretch (from renderer warp-jacobian analysis).
+        # Bigger, more cinematic camera moves inherently reveal more area
+        # behind near objects; since no pixel is ever generated, a backward
+        # warp responds with bounded local stretching rather than a hole
+        # (camera_motion.py docstring). The tolerance therefore scales with
+        # the shot's risk class instead of one flat ceiling calibrated for
+        # near-static motion.
         if stretch_stats is not None:
+            risk_limits = motion_templates()["risk_class_limits"].get(self.plan.get("risk_class"), {})
+            stretch_limit = risk_limits.get(
+                "max_disocclusion_fraction", cfg["disocclusion_max_fraction_per_frame"]
+            )
             checks["warp_stretch_fraction"] = {
                 "value": stretch_stats.get("overstretch_fraction", 0.0),
-                "threshold": cfg["disocclusion_max_fraction_per_frame"],
-                "pass": bool(
-                    stretch_stats.get("overstretch_fraction", 0.0)
-                    <= cfg["disocclusion_max_fraction_per_frame"]
-                ),
+                "threshold": stretch_limit,
+                "pass": bool(stretch_stats.get("overstretch_fraction", 0.0) <= stretch_limit),
+            }
+            # A small total stretched area is only invisible if it is spread
+            # out; concentrated into one connected seam (a bed edge, a table
+            # corner) it reads as an obvious smear even at low total area, so
+            # it is capped far tighter and does not scale with risk class.
+            contig = stretch_stats.get("contiguous_stretch_fraction", 0.0)
+            contig_limit = cfg["disocclusion_max_contiguous_hole_fraction"]
+            checks["warp_contiguous_stretch_fraction"] = {
+                "value": contig,
+                "threshold": contig_limit,
+                "pass": bool(contig <= contig_limit),
             }
 
         # 5+6. Trajectory measurement. Totals are measured with two

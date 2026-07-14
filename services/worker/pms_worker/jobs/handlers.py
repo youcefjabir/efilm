@@ -18,7 +18,7 @@ from ..director.semantic import apply_hard_rules, get_director
 from ..director.storyboard import build_storyboard
 from ..perception.masks import propose_all
 from ..pipeline import render_camera_motion_shot, render_scene_life_shot
-from ..render.encode import concat_mp4s, probe
+from ..render.encode import concat_with_crossfade, probe
 
 
 def _download_image(url: str) -> np.ndarray:
@@ -154,7 +154,7 @@ def handle_export_final(payload: dict, report_progress) -> dict:
             paths.append(p)
             report_progress(0.6 * (i + 1) / len(clips), f"fetched clip {i + 1}/{len(clips)}")
         out = Path(td) / "final.mp4"
-        concat_mp4s(paths, out)
+        concat_with_crossfade(paths, out)
         meta = probe(out)
         report_progress(0.9, "encoded")
         _upload_file(payload["output_put_url"], out, "video/mp4")
