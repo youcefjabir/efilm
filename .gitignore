@@ -29,3 +29,4 @@ evals/output/
 # misc
 .DS_Store
 *.log
+.vercel
