@@ -1,0 +1,32 @@
+{
+  "name": "@pms/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "node --test --experimental-strip-types test/*.test.ts"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "0.5.4",
+    "@supabase/ssr": "0.12.1",
+    "@supabase/supabase-js": "2.110.3",
+    "drizzle-orm": "0.45.2",
+    "next": "16.2.10",
+    "pg": "^8.22.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7",
+    "sharp": "^0.35.3",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "@types/pg": "^8.20.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.10",
+    "typescript": "^5.9"
+  }
+}
