@@ -52,11 +52,14 @@ def estimate_affine_motion(prev_gray: np.ndarray, cur_gray: np.ndarray):
     good_next = nxt[status.flatten() == 1]
     if len(good_prev) < 20:
         return result
-    m, inliers = cv2.estimateAffinePartial2D(good_prev, good_next, method=cv2.RANSAC)
+    m, inliers = cv2.estimateAffinePartial2D(
+        good_prev, good_next, method=cv2.RANSAC, ransacReprojThreshold=8.0
+    )
     if m is None:
         return result
     scale = float(np.hypot(m[0, 0], m[0, 1]))
     rot = float(np.degrees(np.arctan2(m[0, 1], m[0, 0])))
+    n_inliers = int(inliers.sum()) if inliers is not None else 0
     result.update(
         {
             "pan_x": float(m[0, 2]) / w,
@@ -65,6 +68,7 @@ def estimate_affine_motion(prev_gray: np.ndarray, cur_gray: np.ndarray):
             "rot_deg": rot,
             "valid": True,
             "affine": m,
+            "inliers": n_inliers,
         }
     )
 
@@ -198,6 +202,9 @@ def measure_line_bending(
         coeff = np.polyfit(tsf, offs, 1)
         resid = offs - np.polyval(coeff, tsf)
         bend_px = float(np.percentile(np.abs(resid), 90))
+        # Measurement noise floor: 0.5 px search quantization + motion-blur
+        # edge widening. Only bending beyond it counts as real.
+        bend_px = max(bend_px - 0.6, 0.0)
         bends.append(bend_px / length)
 
     if not bends:

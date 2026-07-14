@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
     serverActions: {
       bodySizeLimit: "40mb",
     },
+    // Uploads pass through the auth middleware; allow batches of large photos.
+    proxyClientMaxBodySize: "500mb",
   },
 };
 

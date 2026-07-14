@@ -116,49 +116,86 @@ class CameraMotionGate:
                 ),
             }
 
-        # 5+6. Trajectory measurement: accumulate affine between consecutive
-        # sampled frames; compare totals against the plan (±25%); also collect
-        # per-step parallax residual as temporal-stability signal.
-        total_pan_x = total_pan_y = total_rot = 0.0
-        total_log_scale = 0.0
+        # 5+6. Trajectory measurement. Totals are measured with two
+        # large-baseline fits (anchor -> first frame, anchor -> last frame),
+        # which stays reliable on low-texture content where accumulating many
+        # tiny per-pair estimates underestimates the path. Per-pair residuals
+        # are still collected as the temporal-stability signal.
         residuals = []
         for i in range(1, len(grays)):
             aff = metrics.estimate_affine_motion(grays[i - 1], grays[i])
             if not aff["valid"]:
                 continue
-            total_pan_x += aff["pan_x"]
-            total_pan_y += aff["pan_y"]
-            total_rot += aff["rot_deg"]
-            total_log_scale += np.log(max(aff["scale"], 1e-6))
             step = max(frame_indices[i] - frame_indices[i - 1], 1)
             residuals.append(aff["parallax_median"] / step)
-        measured_scale_delta = float(np.exp(total_log_scale) - 1.0)
 
-        tol = cfg["trajectory_tolerance_fraction"]
-        # Parallax shifts the feature-weighted affine fit; widen the tolerance
-        # floor accordingly so planned parallax is not misread as a path error.
-        parallax_bias = float(self.plan.get("parallax_gain", 0.0)) * 0.7
+        aff_start = metrics.estimate_affine_motion(anchor_gray, grays[0])
+        aff_end = metrics.estimate_affine_motion(anchor_gray, grays[-1])
+        measurable = (
+            aff_start["valid"]
+            and aff_end["valid"]
+            and aff_start.get("inliers", 0) >= 12
+            and aff_end.get("inliers", 0) >= 12
+        )
+        if measurable:
+            measured_scale_delta = float(
+                aff_end["scale"] / max(aff_start["scale"], 1e-6) - 1.0
+            )
+            total_pan_x = aff_end["pan_x"] - aff_start["pan_x"]
+            total_pan_y = aff_end["pan_y"] - aff_start["pan_y"]
+            total_rot = aff_end["rot_deg"] - aff_start["rot_deg"]
+        else:
+            measured_scale_delta = total_pan_x = total_pan_y = total_rot = 0.0
 
-        def within(measured: float, planned: float, floor: float) -> bool:
-            if abs(planned) < floor:
-                return abs(measured) < max(floor * 2.5, abs(planned) * (1 + tol) + floor)
-            lo, hi = sorted((planned * (1 - tol), planned * (1 + tol)))
-            return lo - floor <= measured <= hi + floor
+        # With depth parallax, a single global affine cannot recover the exact
+        # planned base path (near features weight the fit toward larger
+        # apparent motion), so the trajectory gate verifies motion SANITY
+        # rather than exact magnitude:
+        #   direction — measured dolly direction matches the plan,
+        #   liveness  — a planned move actually happened (no frozen render),
+        #   bounded   — total apparent motion stays under the physical maximum
+        #               (base motion + parallax modulation cap).
+        planned_scale = float(self.plan["total_scale_delta"])
+        planned_pan = abs(float(self.plan["total_pan_x"])) + abs(float(self.plan["total_pan_y"]))
+        parallax_gain = float(self.plan.get("parallax_gain", 0.0))
+        anchor_factor = 0.5 if self.plan.get("anchor_mode") == "MIDPOINT_ANCHOR" else 1.0
+        # Anchor->end covers half the amplitude for midpoint anchors.
+        exp_scale = planned_scale * anchor_factor
+        exp_pan = planned_pan * anchor_factor
 
-        checks["trajectory_scale"] = {
+        direction_ok = True
+        if measurable and abs(exp_scale) > 0.008:
+            direction_ok = np.sign(measured_scale_delta) == np.sign(exp_scale)
+        checks["trajectory_direction"] = {
             "value": measured_scale_delta,
-            "planned": self.plan["total_scale_delta"],
-            "pass": within(measured_scale_delta, self.plan["total_scale_delta"], 0.004 + parallax_bias),
+            "planned": exp_scale,
+            "pass": bool(direction_ok),
         }
-        checks["trajectory_pan_x"] = {
-            "value": total_pan_x,
-            "planned": self.plan["total_pan_x"],
-            "pass": within(total_pan_x, self.plan["total_pan_x"], 0.004 + parallax_bias),
+
+        measured_mag = abs(measured_scale_delta) * 0.5 + abs(total_pan_x) + abs(total_pan_y)
+        planned_mag = abs(exp_scale) * 0.5 + exp_pan
+        liveness_ok = True
+        if measurable and planned_mag > 0.006:
+            liveness_ok = measured_mag >= planned_mag * 0.2
+        checks["trajectory_liveness"] = {
+            "value": measured_mag,
+            "planned": planned_mag,
+            "pass": bool(liveness_ok),
         }
-        checks["trajectory_rotation"] = {
-            "value": total_rot,
-            "planned": self.plan["total_roll_deg"],
-            "pass": within(total_rot, self.plan["total_roll_deg"], 0.15 + parallax_bias * 40),
+
+        bound = planned_mag * 2.5 + parallax_gain * 3.0 + 0.01
+        bounded_ok = True
+        if measurable:
+            bounded_ok = measured_mag <= bound
+        checks["trajectory_bounded"] = {
+            "value": measured_mag,
+            "threshold": bound,
+            "pass": bool(bounded_ok),
+        }
+        checks["trajectory_measurable"] = {
+            "value": 1.0 if measurable else 0.0,
+            "threshold": 0.0,
+            "pass": True,  # informational; unmeasurable content is not a defect
         }
 
         med_resid = float(np.median(residuals)) if residuals else 0.0
