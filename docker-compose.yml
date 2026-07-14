@@ -1,0 +1,56 @@
+# Property Motion Studio — one-command self-hosted deployment.
+#
+#   cp .env.example .env        # fill in the three secrets + OWNER_EMAIL
+#   docker compose up --build
+#
+# Default mode uses embedded PGlite (zero external services). To use Postgres
+# instead: docker compose --profile postgres up --build  and set
+# DATABASE_PROVIDER=postgres in .env.
+services:
+  web:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.web
+    ports:
+      - "3000:3000"
+    environment:
+      OWNER_EMAIL: ${OWNER_EMAIL:?set in .env}
+      AUTH_SECRET: ${AUTH_SECRET:?set in .env}
+      WORKER_SHARED_SECRET: ${WORKER_SHARED_SECRET:?set in .env}
+      STORAGE_SIGNING_SECRET: ${STORAGE_SIGNING_SECRET:?set in .env}
+      DATABASE_PROVIDER: ${DATABASE_PROVIDER:-pglite}
+      DATABASE_URL: ${DATABASE_URL:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      DIRECTOR_PROVIDER: ${DIRECTOR_PROVIDER:-deterministic}
+    volumes:
+      - pms-data:/data
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.worker
+    environment:
+      WEB_INTERNAL_URL: http://web:3000
+      WORKER_SHARED_SECRET: ${WORKER_SHARED_SECRET:?set in .env}
+      WORKER_CONCURRENCY: ${WORKER_CONCURRENCY:-2}
+      DEPTH_PROVIDER: ${DEPTH_PROVIDER:-auto}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    environment:
+      POSTGRES_DB: pms
+      POSTGRES_USER: pms
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pms}
+    volumes:
+      - pms-pg:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  pms-data:
+  pms-pg:

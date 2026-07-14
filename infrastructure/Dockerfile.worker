@@ -1,0 +1,16 @@
+# Property Motion Studio — Python render worker
+FROM python:3.11-slim
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY services/worker/requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY services/worker/pms_worker ./pms_worker
+COPY packages/config ./config
+
+ENV PMS_CONFIG_DIR=/app/config
+CMD ["python3", "-m", "pms_worker.jobs.loop"]

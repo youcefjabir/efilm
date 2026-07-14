@@ -73,7 +73,7 @@ export async function getObject(bucket: Bucket, key: string): Promise<Buffer | n
 export function getObjectStream(bucket: Bucket, key: string) {
   const p = keyPath(bucket, key);
   if (!fs.existsSync(p)) return null;
-  return { stream: fs.createReadStream(p), size: fs.statSync(p).size, path: p };
+  return { size: fs.statSync(p).size, path: p };
 }
 
 export async function deleteObject(bucket: Bucket, key: string) {
