@@ -141,17 +141,24 @@ class CameraMotionRenderer:
         xs = np.linspace(0, self.geom.crop_w, self.out_w, dtype=np.float32) + self.geom.crop_x
         ys = np.linspace(0, self.geom.crop_h, self.out_h, dtype=np.float32) + self.geom.crop_y
         self._grid_x, self._grid_y = np.meshgrid(xs, ys)
-        self._rel_x = self._grid_x - self.geom.center_x
-        self._rel_y = self._grid_y - self.geom.center_y
 
-        # Depth sampled on the base grid (updated per-frame with one fixed-point
-        # refinement of the sampling location).
-        self._depth_base = cv2.remap(
-            self.depth, self._grid_x, self._grid_y, interpolation=cv2.INTER_LINEAR
-        )
+        # Warp maps are evaluated on a downscaled grid and bilinearly upsampled
+        # before the final image remap. The affine pose component is linear in
+        # the grid coordinates, so bilinear upsampling reproduces it exactly;
+        # only the (already smooth) depth-parallax term is low-passed, which
+        # softens depth-edge displacement slightly and never bends lines.
+        self.map_w = max(out_w // 4, 240)
+        self.map_h = max(out_h // 4, 135)
+        lxs = np.linspace(0, self.geom.crop_w, self.map_w, dtype=np.float32) + self.geom.crop_x
+        lys = np.linspace(0, self.geom.crop_h, self.map_h, dtype=np.float32) + self.geom.crop_y
+        lgx, lgy = np.meshgrid(lxs, lys)
+        self._rel_x = lgx - self.geom.center_x
+        self._rel_y = lgy - self.geom.center_y
 
     def _maps_for_pose(self, scale: float, pan_x: float, pan_y: float, roll_deg: float):
-        """Backward map: output pixel -> source pixel for a camera pose."""
+        """Backward map (at map_w x map_h resolution): output pixel -> source
+        pixel for a camera pose. Upsample with _upsample_maps before remapping
+        the full-resolution image."""
         # Plain-float inputs keep the float32 grids from promoting to float64
         # (cv2.remap requires CV_32FC1 maps).
         scale, pan_x = float(scale), float(pan_x)
@@ -193,6 +200,14 @@ class CameraMotionRenderer:
             map_y -= pan_y * crop_h * self.k_lateral * w_rel
         return map_x.astype(np.float32, copy=False), map_y.astype(np.float32, copy=False)
 
+    def _upsample_maps(self, mx: np.ndarray, my: np.ndarray):
+        if mx.shape == (self.out_h, self.out_w):
+            return mx, my
+        return (
+            cv2.resize(mx, (self.out_w, self.out_h), interpolation=cv2.INTER_LINEAR),
+            cv2.resize(my, (self.out_w, self.out_h), interpolation=cv2.INTER_LINEAR),
+        )
+
     def render_frame(self, frame_index: int) -> np.ndarray:
         pose0 = self.path.pose(frame_index)
         is_anchor = frame_index == self.path.anchor_frame_index
@@ -203,13 +218,14 @@ class CameraMotionRenderer:
             crop = self._exact_crop()
             return crop
 
-        samples = []
+        acc = None
         n = self.blur_samples
         # 180-degree shutter: subframe offsets span half the frame interval.
         offsets = np.linspace(-0.25, 0.25, n) if n > 1 else [0.0]
         for off in offsets:
             pose = self.path.pose(frame_index, subframe_offset=float(off))
             mx, my = self._maps_for_pose(pose.scale, pose.pan_x, pose.pan_y, pose.roll_deg)
+            mx, my = self._upsample_maps(mx, my)
             frame = cv2.remap(
                 self.image,
                 mx,
@@ -217,8 +233,11 @@ class CameraMotionRenderer:
                 interpolation=cv2.INTER_CUBIC,
                 borderMode=cv2.BORDER_REPLICATE,
             )
-            samples.append(frame.astype(np.float32))
-        out = np.mean(samples, axis=0)
+            if n == 1:
+                return frame
+            f32 = frame.astype(np.float32)
+            acc = f32 if acc is None else cv2.add(acc, f32)
+        out = acc * (1.0 / n)
         return np.clip(out, 0, 255).astype(np.uint8)
 
     def _pose_is_identity(self, pose) -> bool:
@@ -261,8 +280,9 @@ class CameraMotionRenderer:
                 extreme.roll_deg * sgn,
             )
             # d(source_x)/d(out_x) < 0.5 => output stretches source by > 2x.
+            # Maps are at map_w resolution, so the identity step is crop_w/map_w.
             dx = np.abs(np.diff(mx, axis=1))
-            px_per_out = self.geom.crop_w / self.out_w
+            px_per_out = self.geom.crop_w / (self.map_w - 1)
             stretch = px_per_out / np.maximum(dx, 1e-6)
             frac = float((stretch > 2.0).mean())
             worst_fraction = max(worst_fraction, frac)

@@ -120,22 +120,13 @@ def render_camera_motion_shot(
 
         stretch = renderer.warp_stretch_stats()
         gate = CameraMotionGate(plan.to_dict())
-        sample_at = set(_gate_sample_positions(renderer.num_frames, renderer.path.anchor_frame_index))
+        sampled_idx = _gate_sample_positions(renderer.num_frames, renderer.path.anchor_frame_index)
 
-        encoder = FrameEncoder(out_path, out_w, out_h, fps=plan.fps, preview=preview)
-        sampled_frames, sampled_idx = [], []
-        try:
-            for i, frame in enumerate(renderer.frames()):
-                encoder.write(frame)
-                if i in sample_at:
-                    sampled_frames.append(frame)
-                    sampled_idx.append(i)
-            encoder.close()
-        except Exception as e:  # encoding failure is an attempt failure
-            attempt_record["outcome"] = f"encode_error: {e}"
-            result.attempts.append(attempt_record)
-            continue
-
+        # Render only the gate-sample frames first and evaluate the quality
+        # gate BEFORE committing to the full render+encode. A rejected attempt
+        # then costs ~1/4 of a full render; on pass the sampled frames are
+        # reused so no frame is ever rendered twice.
+        sampled_frames = [renderer.render_frame(i) for i in sampled_idx]
         report = gate.evaluate(
             sampled_frames,
             sampled_idx,
@@ -145,6 +136,22 @@ def render_camera_motion_shot(
         )
         attempt_record["quality"] = report
         attempt_record["outcome"] = "pass" if report["pass"] else "gate_failed"
+
+        if report["pass"]:
+            cache = dict(zip(sampled_idx, sampled_frames))
+            encoder = FrameEncoder(out_path, out_w, out_h, fps=plan.fps, preview=preview)
+            try:
+                for i in range(renderer.num_frames):
+                    frame = cache.get(i)
+                    if frame is None:
+                        frame = renderer.render_frame(i)
+                    encoder.write(frame)
+                encoder.close()
+            except Exception as e:  # encoding failure is an attempt failure
+                attempt_record["outcome"] = f"encode_error: {e}"
+                result.attempts.append(attempt_record)
+                continue
+
         result.attempts.append(attempt_record)
 
         if report["pass"]:
@@ -211,30 +218,35 @@ def render_scene_life_shot(
             out_h=out_h,
         )
         gate = SceneLifeGate()
-        sample_at = set(range(0, renderer.num_frames, 4)) | {renderer.num_frames - 1}
+        sampled_idx = sorted(set(range(0, renderer.num_frames, 4)) | {renderer.num_frames - 1})
 
-        encoder = FrameEncoder(out_path, out_w, out_h, fps=fps, preview=preview)
-        sampled_frames, sampled_idx = [], []
         attempt_record = {
             "spec": {"note": spec["note"], "strength": spec["strength"], "effect": effect_type},
         }
-        try:
-            for i, frame in enumerate(renderer.frames()):
-                encoder.write(frame)
-                if i in sample_at:
-                    sampled_frames.append(frame)
-                    sampled_idx.append(i)
-            encoder.close()
-        except Exception as e:
-            attempt_record["outcome"] = f"encode_error: {e}"
-            result.attempts.append(attempt_record)
-            continue
-
+        # Gate the sampled frames before committing to the full render+encode
+        # (same fast-fail strategy as camera motion).
+        sampled_frames = [renderer.render_frame(i) for i in sampled_idx]
         report = gate.evaluate(
             sampled_frames, sampled_idx, renderer.base, renderer.mask, fps=fps
         )
         attempt_record["quality"] = report
         attempt_record["outcome"] = "pass" if report["pass"] else "gate_failed"
+
+        if report["pass"]:
+            cache = dict(zip(sampled_idx, sampled_frames))
+            encoder = FrameEncoder(out_path, out_w, out_h, fps=fps, preview=preview)
+            try:
+                for i in range(renderer.num_frames):
+                    frame = cache.get(i)
+                    if frame is None:
+                        frame = renderer.render_frame(i)
+                    encoder.write(frame)
+                encoder.close()
+            except Exception as e:
+                attempt_record["outcome"] = f"encode_error: {e}"
+                result.attempts.append(attempt_record)
+                continue
+
         result.attempts.append(attempt_record)
 
         if report["pass"]:

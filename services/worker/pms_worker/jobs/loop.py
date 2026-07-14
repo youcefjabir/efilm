@@ -1,12 +1,14 @@
 """Worker main loop: claims jobs from the web app's internal API, executes
-handlers, reports progress/results. Concurrency defaults to 1 (single owner).
+handlers, reports progress/results.
 
 Run: python3 -m pms_worker.jobs.loop
 Env: WEB_INTERNAL_URL, WORKER_SHARED_SECRET, WORKER_POLL_SECONDS,
+     WORKER_CONCURRENCY (default: min(4, cpu//2); shots render in parallel),
      DEPTH_PROVIDER, DIRECTOR_PROVIDER, GEMINI_API_KEY (optional)
 """
 from __future__ import annotations
 
+import multiprocessing
 import os
 import platform
 import time
@@ -20,6 +22,13 @@ BASE = os.environ.get("WEB_INTERNAL_URL", "http://localhost:3000").rstrip("/")
 SECRET = os.environ.get("WORKER_SHARED_SECRET", "")
 POLL_SECONDS = float(os.environ.get("WORKER_POLL_SECONDS", "2.5"))
 WORKER_ID = f"{platform.node()}-{os.getpid()}"
+
+
+def _default_concurrency() -> int:
+    env_val = os.environ.get("WORKER_CONCURRENCY")
+    if env_val:
+        return max(1, int(env_val))
+    return max(1, min(4, (os.cpu_count() or 2) // 2))
 
 
 def _headers() -> dict:
@@ -65,9 +74,17 @@ def run_job(job: dict) -> None:
         )
 
 
-def main() -> None:
-    if not SECRET:
-        raise SystemExit("WORKER_SHARED_SECRET is required")
+def _loop(concurrency: int) -> None:
+    global WORKER_ID
+    WORKER_ID = f"{platform.node()}-{os.getpid()}"
+    # Divide the OpenCV thread pool between parallel render processes so they
+    # don't oversubscribe the CPU and slow each other down.
+    try:
+        import cv2
+
+        cv2.setNumThreads(max(1, (os.cpu_count() or 2) // concurrency))
+    except Exception:
+        pass
     print(f"[worker] {WORKER_ID} polling {BASE} every {POLL_SECONDS}s")
     consecutive_errors = 0
     while True:
@@ -86,6 +103,24 @@ def main() -> None:
             time.sleep(min(POLL_SECONDS * consecutive_errors, 30))
             continue
         time.sleep(POLL_SECONDS)
+
+
+def main() -> None:
+    if not SECRET:
+        raise SystemExit("WORKER_SHARED_SECRET is required")
+    concurrency = _default_concurrency()
+    print(f"[worker] starting {concurrency} render process(es)")
+    children = [
+        multiprocessing.Process(target=_loop, args=(concurrency,), daemon=True)
+        for _ in range(concurrency - 1)
+    ]
+    for c in children:
+        c.start()
+    try:
+        _loop(concurrency)
+    finally:
+        for c in children:
+            c.terminate()
 
 
 if __name__ == "__main__":
