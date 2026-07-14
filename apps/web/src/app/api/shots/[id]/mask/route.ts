@@ -5,7 +5,7 @@
  */
 import { NextRequest, NextResponse } from "next/server";
 import { and, desc, eq, sql } from "drizzle-orm";
-import sharp from "sharp";
+import { Jimp, JimpMime } from "jimp";
 
 import { schema } from "@/db/client";
 import { audit } from "@/lib/auth";
@@ -81,7 +81,10 @@ export async function POST(req: NextRequest, { params }: Params) {
     // Validate + binarize to a clean single-channel PNG.
     let png: Buffer;
     try {
-      png = await sharp(data).greyscale().threshold(128).png().toBuffer();
+      const img = await Jimp.read(data);
+      img.greyscale();
+      img.threshold({ max: 128 });
+      png = await img.getBuffer(JimpMime.png);
     } catch {
       return NextResponse.json({ error: "Mask must be a decodable image" }, { status: 400 });
     }
