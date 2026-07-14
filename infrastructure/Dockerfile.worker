@@ -15,6 +15,10 @@ COPY scripts/fetch_models.py ./fetch_models.py
 
 ENV PMS_CONFIG_DIR=/app/config
 ENV PMS_MODELS_DIR=/app/models
+# Python fully-buffers stdout when it isn't a TTY (always true under Docker),
+# so without this a hosting platform's log viewer (Railway, etc.) shows
+# nothing until the buffer fills or the process exits.
+ENV PYTHONUNBUFFERED=1
 
 # Neural depth model (~99 MB). Falls back to the deterministic geometric
 # provider at runtime if the network is unavailable at build time.
