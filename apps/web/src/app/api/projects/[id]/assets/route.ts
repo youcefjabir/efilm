@@ -10,6 +10,10 @@ import { requireProject } from "../route";
 
 type Params = { params: Promise<{ id: string }> };
 
+// Batches of up to 60 photos are resized/hashed/uploaded synchronously here;
+// the platform default (10s on Vercel Hobby) is not enough headroom.
+export const maxDuration = 120;
+
 export async function POST(req: NextRequest, { params }: Params) {
   const { id } = await params;
   try {

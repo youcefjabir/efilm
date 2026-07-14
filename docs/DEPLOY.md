@@ -1,9 +1,70 @@
 # Deploy — Property Motion Studio
 
-Två sätt att köra appen. Båda är helt självförsörjande (ingen tredjepartstjänst
-krävs; Gemini/Supabase är valfria tillägg).
+Tre sätt att köra appen.
 
-## 1. Docker (rekommenderat för server/NAS)
+## 0. Vercel + Supabase (publik URL, delbar länk)
+
+Webbappen körs på Vercel (serverless). Databasen och filerna (bilder/videor)
+ligger i Supabase, eftersom Vercels serverless-funktioner inte har ett
+beständigt filsystem. **Render-workern (Python) kan inte köras på Vercel**
+— serverless-funktioner tillåter inte långlivade processer — den behöver en
+egen, alltid-igång värd (steg 4).
+
+### 1. Supabase-projekt
+
+1. Skapa ett projekt på supabase.com (gratisnivån räcker för test/utvärdering)
+2. **Storage** → skapa sex **privata** buckets med exakt dessa namn:
+   `originals`, `proxies`, `thumbs`, `masks`, `renders`, `exports`
+3. Notera från **Project Settings → API**: `Project URL` och `service_role`-nyckeln
+   (hemlig — delas aldrig med webbläsaren)
+4. Notera från **Project Settings → Database**: connection string (`URI`-format,
+   använd "Transaction pooler"-varianten för serverless)
+
+### 2. Vercel-projekt
+
+1. Importera GitHub-repot i Vercel, sätt **Root Directory** till `apps/web`
+   (Vercel upptäcker automatiskt pnpm-workspacet och installerar från repo-roten)
+2. Environment Variables (Production):
+   ```
+   OWNER_EMAIL              = din e-postadress
+   AUTH_SECRET               = openssl rand -hex 32
+   WORKER_SHARED_SECRET      = openssl rand -hex 32
+   STORAGE_SIGNING_SECRET    = openssl rand -hex 32
+   DATABASE_PROVIDER         = postgres
+   DATABASE_URL               = <connection string från Supabase, steg 1.4>
+   STORAGE_PROVIDER          = supabase
+   NEXT_PUBLIC_SUPABASE_URL  = <Project URL från Supabase, steg 1.3>
+   SUPABASE_SERVICE_ROLE_KEY = <service_role-nyckel från Supabase, steg 1.3>
+   ```
+3. Deploy. Notera den publika URL:en Vercel ger dig (`https://<projekt>.vercel.app`).
+
+### 3. Logga in
+
+Inget mejl skickas i det här läget (för att slippa ännu ett tredjepartskonto).
+Begär en inloggningslänk på sidan, öppna sedan **Vercel Dashboard → ditt
+projekt → Logs** och sök efter `[auth] Magic link` — raden innehåller den
+kompletta länken. (Vill du ha riktiga mejl går det att koppla in `AUTH_PROVIDER=supabase`,
+men det kräver ytterligare arbete med Supabase Auth-flödet — hör av dig om du vill ha det.)
+
+### 4. Render-worker (måste köras separat, alltid igång)
+
+Rekommendation: **Railway** (enklast — deployar `infrastructure/Dockerfile.worker`
+direkt från GitHub, generös gratisnivå, stödjer långlivade processer).
+
+1. Nytt Railway-projekt → "Deploy from GitHub repo" → välj detta repo
+2. Settings → Dockerfile Path: `infrastructure/Dockerfile.worker`, Root: `/` (repo-roten)
+3. Environment Variables:
+   ```
+   WEB_INTERNAL_URL      = https://<ditt-projekt>.vercel.app
+   WORKER_SHARED_SECRET  = <samma värde som i Vercel, steg 2.2>
+   WORKER_CONCURRENCY    = 2
+   ```
+4. Deploy. Workern börjar polla webbappen omedelbart.
+
+Alternativ till Railway: Render.com, Fly.io, eller din egen VPS — samma
+Dockerfile fungerar överallt som stödjer långlivade Docker-containrar.
+
+## 1. Docker (självhostat, en maskin — enklast om du inte behöver en publik länk)
 
 Krav: Docker med compose-plugin.
 

@@ -35,6 +35,10 @@ function contentTypeFor(key: string): string {
 
 type Params = { params: Promise<{ bucket: string; key: string[] }> };
 
+// Video downloads/uploads can run long on a slow connection; the platform
+// default (10s on Vercel Hobby) is not enough headroom.
+export const maxDuration = 60;
+
 export async function GET(req: NextRequest, { params }: Params) {
   const { bucket, key } = await params;
   if (!BUCKETS.includes(bucket as Bucket)) {
@@ -48,7 +52,7 @@ export async function GET(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const obj = getObjectStream(bucket as Bucket, keyStr);
+  const obj = await getObjectStream(bucket as Bucket, keyStr);
   if (!obj) return NextResponse.json({ error: "not found" }, { status: 404 });
 
   const headers = new Headers({
@@ -56,9 +60,29 @@ export async function GET(req: NextRequest, { params }: Params) {
     "Content-Length": String(obj.size),
     "Cache-Control": "private, max-age=60",
   });
+  const range = req.headers.get("range"); // Range support so <video> can seek.
 
-  // Range support so <video> can seek.
-  const range = req.headers.get("range");
+  if (obj.remoteUrl) {
+    // Supabase Storage supports Range natively; forward it and stream the
+    // response straight through rather than buffering the whole file.
+    const upstream = await fetch(obj.remoteUrl, {
+      headers: {
+        Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+        apikey: process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+        ...(range ? { Range: range } : {}),
+      },
+    });
+    if (!upstream.ok && upstream.status !== 206) {
+      return NextResponse.json({ error: "not found" }, { status: 404 });
+    }
+    headers.set("Accept-Ranges", "bytes");
+    const contentRange = upstream.headers.get("content-range");
+    if (contentRange) headers.set("Content-Range", contentRange);
+    const contentLength = upstream.headers.get("content-length");
+    if (contentLength) headers.set("Content-Length", contentLength);
+    return new NextResponse(upstream.body, { status: upstream.status, headers });
+  }
+
   if (range) {
     const m = /bytes=(\d+)-(\d*)/.exec(range);
     if (m) {
@@ -67,11 +91,11 @@ export async function GET(req: NextRequest, { params }: Params) {
       headers.set("Content-Range", `bytes ${start}-${end}/${obj.size}`);
       headers.set("Content-Length", String(end - start + 1));
       headers.set("Accept-Ranges", "bytes");
-      return new NextResponse(fileStream(obj.path, { start, end }), { status: 206, headers });
+      return new NextResponse(fileStream(obj.path!, { start, end }), { status: 206, headers });
     }
   }
   headers.set("Accept-Ranges", "bytes");
-  return new NextResponse(fileStream(obj.path), { status: 200, headers });
+  return new NextResponse(fileStream(obj.path!), { status: 200, headers });
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {

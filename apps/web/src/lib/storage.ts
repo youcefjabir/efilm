@@ -1,9 +1,13 @@
 /**
  * Storage provider: local disk (default) or Supabase Storage.
  *
- * Local mode stores files under STORAGE_DIR/<bucket>/<key> and serves them
- * through /api/storage with short-lived HMAC-signed URLs — the same
- * signed-URL discipline as production, so nothing is publicly readable.
+ * Both modes are addressed the same way by the rest of the app: signed HMAC
+ * URLs pointing at /api/storage/<bucket>/<key>, verified by
+ * verifySignedRequest. Only the object bytes move differently underneath —
+ * local disk reads/writes a file; Supabase mode proxies to the Storage REST
+ * API with the service-role key (server-side only, never sent to a client).
+ * Keeping one URL scheme for both means the Python worker and every route
+ * handler are unaffected by which backend is active.
  */
 import { createHmac, timingSafeEqual } from "node:crypto";
 import fs from "node:fs";
@@ -56,13 +60,90 @@ export function verifySignedRequest(
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
+// ---------- Supabase Storage REST client (server-side only) ----------
+
+function supabaseHeaders(extra?: Record<string, string>): Record<string, string> {
+  return {
+    Authorization: `Bearer ${env.supabaseServiceRoleKey}`,
+    apikey: env.supabaseServiceRoleKey,
+    ...extra,
+  };
+}
+
+function supabaseObjectUrl(bucket: Bucket, key: string): string {
+  return `${env.supabaseUrl}/storage/v1/object/${bucket}/${key}`;
+}
+
+async function supabasePutObject(bucket: Bucket, key: string, data: Buffer | Uint8Array) {
+  const res = await fetch(supabaseObjectUrl(bucket, key), {
+    method: "POST",
+    headers: supabaseHeaders({
+      "Content-Type": "application/octet-stream",
+      "x-upsert": "true",
+    }),
+    body: new Uint8Array(data),
+  });
+  if (!res.ok) {
+    throw new Error(`Supabase Storage upload failed (${res.status}): ${await res.text()}`);
+  }
+}
+
+async function supabaseGetObject(bucket: Bucket, key: string): Promise<Buffer | null> {
+  const res = await fetch(supabaseObjectUrl(bucket, key), { headers: supabaseHeaders() });
+  if (!res.ok) return null;
+  return Buffer.from(await res.arrayBuffer());
+}
+
+async function supabaseDeleteObject(bucket: Bucket, key: string) {
+  await fetch(supabaseObjectUrl(bucket, key), {
+    method: "DELETE",
+    headers: supabaseHeaders(),
+  }).catch(() => {});
+}
+
+async function supabaseDeletePrefix(bucket: Bucket, prefix: string) {
+  const listRes = await fetch(`${env.supabaseUrl}/storage/v1/object/list/${bucket}`, {
+    method: "POST",
+    headers: supabaseHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ prefix, limit: 1000 }),
+  });
+  if (!listRes.ok) return;
+  const entries = (await listRes.json()) as { name: string }[];
+  const prefixes = entries.map((e) => `${prefix.replace(/\/+$/, "")}/${e.name}`);
+  if (prefixes.length === 0) return;
+  await fetch(`${env.supabaseUrl}/storage/v1/object/${bucket}`, {
+    method: "DELETE",
+    headers: supabaseHeaders({ "Content-Type": "application/json" }),
+    body: JSON.stringify({ prefixes }),
+  }).catch(() => {});
+}
+
+async function supabaseHeadObject(
+  bucket: Bucket,
+  key: string,
+): Promise<{ size: number } | null> {
+  const res = await fetch(supabaseObjectUrl(bucket, key), {
+    method: "HEAD",
+    headers: supabaseHeaders(),
+  });
+  if (!res.ok) return null;
+  const len = res.headers.get("content-length");
+  return { size: len ? parseInt(len, 10) : 0 };
+}
+
+// ---------- Public API (local disk or Supabase, selected by env.storageProvider) ----------
+
+const useSupabase = () => env.storageProvider === "supabase";
+
 export async function putObject(bucket: Bucket, key: string, data: Buffer | Uint8Array) {
+  if (useSupabase()) return supabasePutObject(bucket, key, data);
   const p = keyPath(bucket, key);
   await fsp.mkdir(path.dirname(p), { recursive: true });
   await fsp.writeFile(p, data);
 }
 
 export async function getObject(bucket: Bucket, key: string): Promise<Buffer | null> {
+  if (useSupabase()) return supabaseGetObject(bucket, key);
   try {
     return await fsp.readFile(keyPath(bucket, key));
   } catch {
@@ -70,26 +151,40 @@ export async function getObject(bucket: Bucket, key: string): Promise<Buffer | n
   }
 }
 
-export function getObjectStream(bucket: Bucket, key: string) {
+/** Local mode: {size, path} for a direct fs.createReadStream with Range
+ * support. Supabase mode: {size, remoteUrl} — the storage route fetches from
+ * Supabase and forwards the (possibly ranged) response instead. */
+export type ObjectRef = { size: number; path?: string; remoteUrl?: string };
+
+export async function getObjectStream(bucket: Bucket, key: string): Promise<ObjectRef | null> {
+  if (useSupabase()) {
+    const head = await supabaseHeadObject(bucket, key);
+    if (!head) return null;
+    return { size: head.size, remoteUrl: supabaseObjectUrl(bucket, key) };
+  }
   const p = keyPath(bucket, key);
   if (!fs.existsSync(p)) return null;
   return { size: fs.statSync(p).size, path: p };
 }
 
 export async function deleteObject(bucket: Bucket, key: string) {
+  if (useSupabase()) return supabaseDeleteObject(bucket, key);
   await fsp.rm(keyPath(bucket, key), { force: true });
 }
 
 export async function deletePrefix(bucket: Bucket, prefix: string) {
+  if (useSupabase()) return supabaseDeletePrefix(bucket, prefix);
   const p = keyPath(bucket, prefix);
   await fsp.rm(p, { recursive: true, force: true });
 }
 
-export function objectExists(bucket: Bucket, key: string): boolean {
+export async function objectExists(bucket: Bucket, key: string): Promise<boolean> {
+  if (useSupabase()) return (await supabaseHeadObject(bucket, key)) !== null;
   return fs.existsSync(keyPath(bucket, key));
 }
 
-export function objectSize(bucket: Bucket, key: string): number {
+export async function objectSize(bucket: Bucket, key: string): Promise<number> {
+  if (useSupabase()) return (await supabaseHeadObject(bucket, key))?.size ?? 0;
   try {
     return fs.statSync(keyPath(bucket, key)).size;
   } catch {
