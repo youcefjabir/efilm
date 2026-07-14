@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-import templatesConfig from "../../../../../../../packages/config/motion-templates.json";
+import templatesConfig from "@pms/config/motion-templates.json";
 
 export type Shot = {
   id: string;

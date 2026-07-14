@@ -4,7 +4,7 @@ import { z } from "zod";
 
 import { getDb, schema } from "@/db/client";
 import { audit, requireOwner } from "@/lib/auth";
-import templatesConfig from "../../../../../../../packages/config/motion-templates.json";
+import templatesConfig from "@pms/config/motion-templates.json";
 
 type Params = { params: Promise<{ id: string }> };
 
