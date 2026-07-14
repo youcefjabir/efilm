@@ -11,7 +11,11 @@ import { createHash } from "node:crypto";
 import exifr from "exifr";
 import { Jimp, JimpMime } from "jimp";
 
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+// WebP decoding would need @jimp/wasm-webp, which loads its codec via
+// browser fetch() and has no Node fallback -- unusable from a server route.
+// Detected and rejected below with a clear message instead of a cryptic
+// decode failure.
+const ALLOWED = new Set(["image/jpeg", "image/png"]);
 const MAX_BYTES = 40 * 1024 * 1024;
 const MIN_LONG_EDGE = 800;
 
@@ -86,8 +90,11 @@ export async function processUpload(
   if (data.length > MAX_BYTES) throw new Error("File larger than 40 MB");
 
   const sniffed = sniffMime(data);
+  if (sniffed === "image/webp") {
+    throw new Error("WebP isn't supported yet — please convert to JPG or PNG and re-upload.");
+  }
   if (!sniffed || !ALLOWED.has(sniffed)) {
-    throw new Error("Unsupported or corrupt file (JPEG, PNG or WebP required)");
+    throw new Error("Unsupported or corrupt file (JPEG or PNG required)");
   }
   if (ALLOWED.has(declaredMime) && declaredMime !== sniffed) {
     // Signature wins; declared type mismatch is suspicious but tolerable.

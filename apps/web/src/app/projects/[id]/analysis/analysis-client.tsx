@@ -66,18 +66,64 @@ export function AnalysisClient({ projectId }: { projectId: string }) {
     return () => clearInterval(t);
   }, [analyzing, refresh]);
 
+  async function readJsonSafely(res: Response) {
+    const text = await res.text();
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(res.ok ? "Unexpected response from server" : `${res.status}: ${text.slice(0, 200)}`);
+    }
+  }
+
   async function uploadFiles(files: FileList | File[]) {
     setUploading(true);
     setError("");
     setUploadErrors([]);
     setWarnings([]);
     try {
-      const form = new FormData();
-      for (const f of Array.from(files)) form.append("files", f);
-      const res = await fetch(`/api/projects/${projectId}/assets`, { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Upload failed");
-      setUploadErrors(data.errors ?? []);
+      const fileList = Array.from(files);
+      // Step 1: ask for a direct upload URL per file (tiny JSON request —
+      // never touches the size limit a server function has for its body).
+      const initRes = await fetch(`/api/projects/${projectId}/assets/init`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          files: fileList.map((f) => ({ filename: f.name, mimeType: f.type || "application/octet-stream" })),
+        }),
+      });
+      const initData = await readJsonSafely(initRes);
+      if (!initRes.ok) throw new Error(initData.error ?? "Could not start upload");
+
+      // Step 2: each file's bytes go straight to storage, not through us.
+      const confirmed: { filename: string; mimeType: string; key: string }[] = [];
+      const uploadErrs: { filename: string; error: string }[] = [];
+      await Promise.all(
+        initData.files.map(async (target: { filename: string; mimeType: string; key: string; uploadUrl: string }, i: number) => {
+          try {
+            const putRes = await fetch(target.uploadUrl, { method: "PUT", body: fileList[i] });
+            if (!putRes.ok) throw new Error(`Upload failed (${putRes.status})`);
+            confirmed.push({ filename: target.filename, mimeType: target.mimeType, key: target.key });
+          } catch (e) {
+            uploadErrs.push({ filename: target.filename, error: (e as Error).message });
+          }
+        }),
+      );
+
+      if (confirmed.length === 0) {
+        setUploadErrors(uploadErrs);
+        return;
+      }
+
+      // Step 3: tell the server to validate/normalize what actually arrived
+      // (also a tiny JSON request — no image bytes in this body either).
+      const confirmRes = await fetch(`/api/projects/${projectId}/assets/confirm`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ files: confirmed }),
+      });
+      const data = await readJsonSafely(confirmRes);
+      if (!confirmRes.ok) throw new Error(data.error ?? "Upload failed");
+      setUploadErrors([...uploadErrs, ...(data.errors ?? [])]);
       const warns = (data.uploaded ?? []).flatMap(
         (u: { filename: string; warnings: string[] }) =>
           u.warnings.map((w: string) => `${u.filename}: ${w}`),

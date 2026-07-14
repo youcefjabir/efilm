@@ -1,18 +1,40 @@
+/**
+ * Step 2 of the direct-upload flow: the browser has already PUT the raw
+ * bytes straight to storage (see assets/init); this endpoint's request body
+ * is tiny (just keys/filenames, no image bytes) so it is never affected by
+ * Vercel's request body size cap. It fetches each staged upload server-side
+ * (server -> storage has no such cap), validates/normalizes it exactly like
+ * the old single-request upload did, and cleans up the staging object.
+ */
 import { NextRequest, NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 
 import { schema } from "@/db/client";
 import { audit } from "@/lib/auth";
-import { processUpload } from "@/lib/images";
 import { logUsage } from "@/lib/costs";
-import { putObject } from "@/lib/storage";
-import { requireProject } from "../route";
+import { processUpload } from "@/lib/images";
+import { deleteObject, getObject, putObject } from "@/lib/storage";
+import { requireProject } from "../../route";
 
 type Params = { params: Promise<{ id: string }> };
 
-// Batches of up to 60 photos are resized/hashed/uploaded synchronously here;
-// the platform default (10s on Vercel Hobby) is not enough headroom.
+// Fetching + normalizing/re-encoding several full-size photos server-side
+// can take a while; the platform default (10s on Vercel Hobby) is not enough.
 export const maxDuration = 120;
+
+const bodySchema = z.object({
+  files: z
+    .array(
+      z.object({
+        filename: z.string().min(1).max(300),
+        mimeType: z.string().min(1).max(100),
+        key: z.string().min(1).max(500),
+      }),
+    )
+    .min(1)
+    .max(60),
+});
 
 export async function POST(req: NextRequest, { params }: Params) {
   const { id } = await params;
@@ -24,30 +46,28 @@ export async function POST(req: NextRequest, { params }: Params) {
         { status: 409 },
       );
     }
-    const form = await req.formData();
-    const files = form.getAll("files") as File[];
-    if (files.length === 0) {
-      return NextResponse.json({ error: "No files received" }, { status: 400 });
-    }
-    if (files.length > 60) {
-      return NextResponse.json({ error: "Max 60 images per upload" }, { status: 400 });
-    }
+    const { files } = bodySchema.parse(await req.json());
 
     const uploaded: unknown[] = [];
     const errors: { filename: string; error: string }[] = [];
     let bytes = 0;
 
-    for (const file of files) {
+    for (const f of files) {
       try {
-        const data = Buffer.from(await file.arrayBuffer());
-        const processed = await processUpload(data, file.type);
+        const data = await getObject("originals", f.key);
+        if (!data) {
+          errors.push({ filename: f.filename, error: "Upload did not arrive at storage" });
+          continue;
+        }
+        const processed = await processUpload(data, f.mimeType);
 
         const existing = await db
           .select()
           .from(schema.assets)
           .where(eq(schema.assets.contentHash, processed.contentHash));
         if (existing.some((a) => a.projectId === id && a.status !== "deleted")) {
-          errors.push({ filename: file.name, error: "Identical file already uploaded" });
+          await deleteObject("originals", f.key);
+          errors.push({ filename: f.filename, error: "Identical file already uploaded" });
           continue;
         }
 
@@ -55,7 +75,7 @@ export async function POST(req: NextRequest, { params }: Params) {
           .insert(schema.assets)
           .values({
             projectId: id,
-            originalFilename: file.name,
+            originalFilename: f.filename,
             contentHash: processed.contentHash,
             mimeType: processed.mimeType,
             width: processed.width,
@@ -74,6 +94,7 @@ export async function POST(req: NextRequest, { params }: Params) {
         }
         await putObject("proxies", proxyKey, processed.proxy);
         await putObject("thumbs", proxyKey, processed.thumb);
+        await deleteObject("originals", f.key);
 
         const renderSourceKey =
           processed.normalized === processed.original ? rawKey : normKey;
@@ -87,9 +108,9 @@ export async function POST(req: NextRequest, { params }: Params) {
           .where(eq(schema.assets.id, asset.id));
 
         bytes += data.length;
-        uploaded.push({ id: asset.id, filename: file.name, warnings: processed.warnings });
+        uploaded.push({ id: asset.id, filename: f.filename, warnings: processed.warnings });
       } catch (e) {
-        errors.push({ filename: file.name, error: (e as Error).message });
+        errors.push({ filename: f.filename, error: (e as Error).message });
       }
     }
 

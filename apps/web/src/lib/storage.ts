@@ -118,6 +118,19 @@ async function supabaseDeletePrefix(bucket: Bucket, prefix: string) {
   }).catch(() => {});
 }
 
+async function supabaseCreateUploadUrl(bucket: Bucket, key: string): Promise<string> {
+  const res = await fetch(`${env.supabaseUrl}/storage/v1/object/upload/sign/${bucket}/${key}`, {
+    method: "POST",
+    headers: supabaseHeaders({ "Content-Type": "application/json" }),
+    body: "{}",
+  });
+  if (!res.ok) {
+    throw new Error(`Supabase Storage signed-upload creation failed (${res.status}): ${await res.text()}`);
+  }
+  const body = (await res.json()) as { url: string };
+  return `${env.supabaseUrl}/storage/v1${body.url}`;
+}
+
 async function supabaseHeadObject(
   bucket: Bucket,
   key: string,
@@ -181,6 +194,21 @@ export async function deletePrefix(bucket: Bucket, prefix: string) {
 export async function objectExists(bucket: Bucket, key: string): Promise<boolean> {
   if (useSupabase()) return (await supabaseHeadObject(bucket, key)) !== null;
   return fs.existsSync(keyPath(bucket, key));
+}
+
+/** A URL the *browser* can PUT raw bytes to directly, bypassing our own
+ * server for the transfer. In Supabase mode this is a native Supabase
+ * signed-upload URL (browser -> Supabase, never touches our serverless
+ * function, so Vercel's ~4.5 MB request body cap never applies no matter how
+ * large the photo is). In local mode there is no such cap on a self-hosted
+ * Node process, so it's just our own signed PUT URL. */
+export async function createDirectUploadUrl(
+  bucket: Bucket,
+  key: string,
+  baseUrl: string,
+): Promise<string> {
+  if (useSupabase()) return supabaseCreateUploadUrl(bucket, key);
+  return signedUrl(bucket, key, { method: "PUT", baseUrl });
 }
 
 export async function objectSize(bucket: Bucket, key: string): Promise<number> {
