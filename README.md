@@ -18,10 +18,9 @@ Two motion categories, never combined within a shot:
 
 ```
 apps/web            Next.js app (auth, projects, upload, storyboard, render UI)
+                    -- db/schema.ts + drizzle/migrations (PGlite locally, Postgres/Supabase in prod)
 services/worker     Python render worker (perception, renderers, quality gate)
-packages/contracts  Shared zod schemas + JSON contracts (jobs, shots, templates)
 packages/config     Product config: motion templates, budgets, feature flags
-packages/database   Drizzle schema + migrations (PGlite locally, Postgres/Supabase in prod)
 reference           Permanent test dataset + curated benchmark outputs
 evals               Quality-gate evaluation scripts
 docs                Architecture and operations documentation

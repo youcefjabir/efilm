@@ -42,8 +42,12 @@ export const env = {
     return req("STORAGE_SIGNING_SECRET");
   },
 
-  dataDir: path.resolve(process.env.DATA_DIR ?? "./var/data"),
-  storageDir: path.resolve(process.env.STORAGE_DIR ?? "./var/storage"),
+  // Local-disk mode only (DATABASE_PROVIDER=pglite / STORAGE_PROVIDER=local);
+  // unused in Vercel deployments. The ignore comment stops Next's file
+  // tracer from treating this as an unresolvable dynamic fs access and
+  // pulling in the whole monorepo as a defensive fallback.
+  dataDir: path.resolve(/* turbopackIgnore: true */ process.env.DATA_DIR ?? "./var/data"),
+  storageDir: path.resolve(/* turbopackIgnore: true */ process.env.STORAGE_DIR ?? "./var/storage"),
 
   databaseUrl: process.env.DATABASE_URL ?? "",
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
