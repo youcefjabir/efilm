@@ -59,8 +59,17 @@ const StabProcess = (() => {
     const wob = st.wobble / 100;
     const sigmaShape = sigma * (1 + wob * 1.6);
 
+    // Walking bob: för att ta bort en svängning på f Hz måste lågpassfiltret
+    // ligga klart under f. Ett extra bandstopp ovanpå utjämningen dubbelräknar
+    // samma rörelse och gör resultatet sämre — bredda filtret i stället.
+    const bobHzDet = (report && report.bob && report.bob.hz) || 0;
+    let sigmaY = sigma;
+    if (st.verticalBob > 0 && bobHzDet > 0.4 && bobHzDet < 4) {
+      const need = (fps / bobHzDet) * 1.1;             // ~1,1 perioder
+      sigmaY = Math.max(sigmaY, need * (st.verticalBob / 100));
+    }
     const sm = {
-      tx: gauss(raw.tx, sigma), ty: gauss(raw.ty, sigma),
+      tx: gauss(raw.tx, sigma), ty: gauss(raw.ty, sigmaY),
       rot: st.lockHorizon ? constArr(n, mean(raw.rot)) : gauss(raw.rot, sigma * (0.6 + 0.8 * st.rotation / 100)),
       scale: gauss(raw.scale, sigma), shear: gauss(raw.shear, sigmaShape), aspect: gauss(raw.aspect, sigmaShape),
     };
@@ -74,13 +83,6 @@ const StabProcess = (() => {
     let cRot = sub(sm.rot, raw.rot), cScale = sub(sm.scale, raw.scale);
     let cShear = sub(sm.shear, raw.shear), cAspect = sub(sm.aspect, raw.aspect);
 
-    // --- walking bob: extra bandstopp på Y i den detekterade rytmen ---
-    const bobHz = (report && report.bob && report.bob.hz) || 0;
-    if (st.verticalBob > 0 && bobHz > 0.4 && bobHz < 4) {
-      const comp = bandpass(raw.ty, fps, bobHz);
-      const k = st.verticalBob / 100 * g;
-      for (let i = 0; i < n; i++) cTy[i] -= comp[i] * k;
-    }
     // --- rolling shutter: shear proportionell mot horisontell hastighet ---
     if (st.rollingShutter > 0) {
       const k = st.rollingShutter / 100 * 0.10;
@@ -99,9 +101,9 @@ const StabProcess = (() => {
       cTx[i] = U.clamp(cTx[i] * g, -maxShift, maxShift);
       cTy[i] = U.clamp(cTy[i] * g, -maxShift * a * 1.6, maxShift * a * 1.6);
       cRot[i] = U.clamp(cRot[i] * gRot, -0.12, 0.12);
-      cScale[i] = U.clamp(cScale[i] * gScale, -0.25, 0.25);
-      cShear[i] = U.clamp(cShear[i] * gPersp * (1 + wob), -0.08, 0.08);
-      cAspect[i] = U.clamp(cAspect[i] * gPersp * (1 + wob), -0.08, 0.08);
+      cScale[i] = U.clamp(cScale[i] * gScale, -0.08, 0.08);
+      cShear[i] = U.clamp(cShear[i] * gPersp * (1 + wob), -0.03, 0.03);
+      cAspect[i] = 0;   // bildförhållandet får aldrig ändras
     }
 
     // --- nödvändig zoom: minsta z så att hela vyn täcks i varje bildruta ---

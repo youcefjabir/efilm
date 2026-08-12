@@ -256,8 +256,10 @@ const Renderer = (() => {
     // 3. stabilisering
     const s = o.stab;
     if (s) {
-      const sc = Math.exp(s.scale || 0), ar = Math.exp(s.aspect || 0);
-      const A = m3.chain(m3.rotate(s.rot || 0), m3.shear(s.shear || 0), m3.scale(sc * ar, sc / ar));
+      // Skalan är ALLTID likformig. En separat aspektkorrigering skulle töja
+      // bilden och ändra bildförhållandet, vilket aldrig är acceptabelt.
+      const sc = Math.exp(s.scale || 0);
+      const A = m3.chain(m3.rotate(s.rot || 0), m3.shear(s.shear || 0), m3.scale(sc, sc));
       F = m3.chain(m3.scale(s.zoom || 1, s.zoom || 1), m3.translate(s.tx || 0, s.ty || 0), A, F);
     }
     // 4. rörelsepreset

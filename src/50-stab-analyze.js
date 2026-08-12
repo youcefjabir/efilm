@@ -281,46 +281,89 @@ const StabAnalyze = (() => {
   }
 
   /* ---------- huvudanalys ---------- */
-  /** Fångar bildrutor genom att spela upp klippet (snabbt, tätt samplat) och
-   *  faller tillbaka på sökning om requestVideoFrameCallback saknas. */
-  async function captureAndTrack(v, duration, opts, onFrame, onProgress) {
-    const useRVFC = typeof v.requestVideoFrameCallback === 'function' && !opts.forceSeek;
-    const maxSamples = opts.maxSamples || 500;
-    if (useRVFC) {
-      // uppspelningen ger täta sampel; snabbare än sökning men aldrig snabbare än realtid
-      const rate = duration > 40 ? 2 : 1;
+  /** Fångar bildrutor UTAN att spåra dem — bara avkodning och gråskala, ~1 ms
+   *  per ruta. Spårningen körs efteråt. Poängen: infångningen får inte vara
+   *  flaskhalsen, för då tappas bildrutor och skakning över halva samplings-
+   *  frekvensen blir omöjlig att korrigera. */
+  async function captureFrames(v, duration, w, h, opts, onProgress) {
+    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    const g = cv.getContext('2d', { willReadFrequently: true, alpha: false });
+    const srcFps = opts.srcFps || 30;
+    const wanted = Math.floor(duration * srcFps);
+    const MAX = opts.maxFrames || 1500;
+    const stride = Math.max(1, Math.ceil(wanted / MAX));   // långa klipp glesas ut
+    const grab = () => {
+      g.drawImage(v, 0, 0, w, h);
+      const d = g.getImageData(0, 0, w, h).data;
+      const gray = new Uint8Array(w * h);
+      for (let i = 0, p = 0; i < gray.length; i++, p += 4)
+        gray[i] = (d[p] * 0.299 + d[p + 1] * 0.587 + d[p + 2] * 0.114) | 0;
+      return gray;
+    };
+
+    async function pass(rate) {
+      const frames = [], times = [];
       v.muted = true; v.playbackRate = rate;
-      try { v.currentTime = 0; } catch (e) { }
-      let count = 0, done = false, lastT = -1;
-      await new Promise((resolve, reject) => {
-        const finish = () => { if (done) return; done = true; try { v.pause(); } catch (e) { } resolve(); };
+      await new Promise(res => {
+        let done = false, last = -1, kept = 0;
+        const finish = () => { if (done) return; done = true; try { v.pause(); } catch (e) { } res(); };
         const step = (now, meta) => {
           if (done) return;
-          if (opts.cancelled && opts.cancelled()) { finish(); return; }
+          if (opts.cancelled && opts.cancelled()) return finish();
           const t = meta.mediaTime;
-          if (t > lastT + 1e-4) { onFrame(t); count++; lastT = t; onProgress(U.clamp(t / duration, 0, 1), `${count} bildrutor`); }
-          if (count >= maxSamples || t >= duration - 0.02) return finish();
+          if (t > last + 1e-4) {
+            last = t;
+            if (kept % stride === 0) { frames.push(grab()); times.push(t); }
+            kept++;
+            onProgress(U.clamp(t / duration, 0, 1), frames.length + ' bildrutor');
+          }
+          if (frames.length >= MAX || t >= duration - 0.02) return finish();
           v.requestVideoFrameCallback(step);
         };
-        v.requestVideoFrameCallback(step);
-        const p = v.play();
-        if (p && p.catch) p.catch(() => finish());
-        v.addEventListener('ended', finish, { once: true });
-        setTimeout(finish, Math.min(120000, (duration / rate) * 1000 + 8000));
+        const go = () => {
+          v.requestVideoFrameCallback(step);
+          const pr = v.play();
+          if (pr && pr.catch) pr.catch(() => finish());
+        };
+        try { v.currentTime = 0; } catch (e) { }
+        setTimeout(go, 60);
+        setTimeout(finish, Math.min(180000, (duration / rate) * 1000 + 12000));
       });
-      if (count >= 12) return count;
+      return { frames, times };
+    }
+
+    if (typeof v.requestVideoFrameCallback === 'function') {
+      let rate = 1, res = await pass(rate);
+      const target = Math.floor(wanted / stride);
+      // Tappade webbläsaren bildrutor? Kör om långsammare — då hinner den med.
+      let tries = 0;
+      while (res.frames.length < target * 0.85 && rate > 0.26 && tries < 2 &&
+             !(opts.cancelled && opts.cancelled())) {
+        rate /= 2; tries++;
+        onProgress(0, 'För få bildrutor — kör om i ' + rate + '× hastighet');
+        const again = await pass(rate);
+        if (again.frames.length > res.frames.length) res = again;
+      }
+      if (res.frames.length >= 8) return { ...res, w, h, stride, srcFps };
     }
     // fallback: sökbaserad sampling
-    const fps = U.clamp(Math.min(v.playbackRate ? 15 : 15, 15), 6, 15);
-    const step = Math.max(1 / fps, duration / maxSamples);
-    let count = 0;
+    const frames = [], times = [];
+    const step = Math.max(1 / 15, duration / (opts.maxFrames || 220));
     for (let t = 0; t < duration - 1e-3; t += step) {
       if (opts.cancelled && opts.cancelled()) break;
       await Media.seekTo(v, t);
-      onFrame(t); count++;
-      if (count % 4 === 0) { onProgress(t / duration, `${count} bildrutor`); await U.raf(); }
+      frames.push(grab()); times.push(t);
+      if (frames.length % 4 === 0) { onProgress(t / duration, frames.length + ' bildrutor'); await U.raf(); }
     }
-    return count;
+    return { frames, times, w, h, stride, srcFps };
+  }
+
+  /** Bygger pyramiden ur en lagrad gråskaleruta. */
+  function pyramidFromGray(gray, w, h) {
+    const L0 = new Float32Array(w * h);
+    for (let i = 0; i < L0.length; i++) L0[i] = gray[i];
+    const d1 = down(L0, w, h), d2 = down(d1.a, d1.w, d1.h);
+    return { L0, w0: w, h0: h, L1: d1.a, w1: d1.w, h1: d1.h, L2: d2.a, w2: d2.w, h2: d2.h };
   }
 
   async function analyze(media, opts = {}) {
@@ -331,23 +374,28 @@ const StabAnalyze = (() => {
     if (!(duration > 0.4)) throw new Error('Klippet är för kort för att analyseras.');
 
     const w = AW, h = Math.max(2, Math.round(AW * (v.videoHeight / Math.max(1, v.videoWidth)) / 2) * 2);
-    const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
-    const g = cv.getContext('2d', { willReadFrequently: true });
     const hw = w / 2, hh = h / 2;
-
-    const T = { t: [], tx: [], ty: [], rot: [], scale: [], shear: [], aspect: [] };
-    const D = { dt: [], dx: [], dy: [], drot: [], dscale: [], dshear: [], residual: [], inlierRatio: [], quad: [] };
-    let prev = null, prevT = 0;
-    const acc = { tx: 0, ty: 0, rot: 0, scale: 0, shear: 0, aspect: 0 };
     const t0 = performance.now();
 
-    let feats = null, frameIdx = 0;
-    const onFrame = (t) => {
-      g.drawImage(v, 0, 0, w, h);
-      const P = grayPyramid(g.getImageData(0, 0, w, h), w, h);
+    // 1) avkoda och lagra
+    const cap = await captureFrames(v, duration, w, h, { ...opts, srcFps: media.fps || 30 },
+      (p, m) => onProgress(p * 0.45, 'Läser in · ' + m));
+    try { v.pause(); v.src = ''; v.load(); } catch (e) { }
+    if (opts.cancelled && opts.cancelled()) throw new Error('cancelled');
+    if (cap.frames.length < 8) throw new Error('För få bildrutor kunde läsas ur klippet (' + cap.frames.length + ').');
+
+    // 2) spåra
+    const T = { t: [], tx: [], ty: [], rot: [], scale: [], shear: [], aspect: [] };
+    const D = { dt: [], dx: [], dy: [], drot: [], dscale: [], dshear: [], residual: [], inlierRatio: [], quad: [] };
+    const acc = { tx: 0, ty: 0, rot: 0, scale: 0, shear: 0, aspect: 0 };
+    let prev = null, prevT = 0, feats = null;
+
+    for (let i = 0; i < cap.frames.length; i++) {
+      if (opts.cancelled && opts.cancelled()) throw new Error('cancelled');
+      const t = cap.times[i];
+      const P = pyramidFromGray(cap.frames[i], w, h);
       if (prev) {
-        // punkterna propageras mellan bildrutor och väljs om var femte ruta
-        if (!feats || feats.length < 14 || frameIdx % 5 === 0) feats = pickFeatures(prev);
+        if (!feats || feats.length < 14 || i % 5 === 0) feats = pickFeatures(prev);
         const pts = [], next = [];
         for (const f of feats) {
           const m = track(prev, P, f.x, f.y, f.hint);
@@ -356,7 +404,6 @@ const StabAnalyze = (() => {
           next.push({ x: Math.round(f.x + m.dx), y: Math.round(f.y + m.dy), hint: { dx: m.dx, dy: m.dy } });
         }
         feats = next;
-        frameIdx++;
         const fit = pts.length >= 10 ? fitAffine(pts, hw, hh) : null;
         if (fit) {
           const d = decompose(fit.px, fit.py);
@@ -368,7 +415,7 @@ const StabAnalyze = (() => {
           D.inlierRatio.push(fit.inliers / Math.max(1, fit.total));
           D.quad.push(fit.divergence || 0);
           D.dt.push(Math.max(1e-3, t - prevT));
-        } else if (pts.length >= 3) {          // för få punkter: bara translation
+        } else if (pts.length >= 3) {
           let sx = 0, sy = 0;
           for (const p of pts) { sx += p.dx; sy += p.dy; }
           acc.tx += (sx / pts.length) / hw; acc.ty += (sy / pts.length) / hw;
@@ -380,16 +427,18 @@ const StabAnalyze = (() => {
       T.t.push(t); T.tx.push(acc.tx); T.ty.push(acc.ty); T.rot.push(acc.rot);
       T.scale.push(acc.scale); T.shear.push(acc.shear); T.aspect.push(acc.aspect);
       prev = P; prevT = t;
-    };
-
-    const count = await captureAndTrack(v, duration, opts, onFrame, onProgress);
-    try { v.pause(); v.src = ''; v.load(); } catch (e) { }
-    if (opts.cancelled && opts.cancelled()) throw new Error('cancelled');
-    if (count < 8 || T.t.length < 8) throw new Error('För få bildrutor kunde läsas ur klippet (' + count + ').');
+      cap.frames[i] = null;                       // frigör minne under körningen
+      if (i % 6 === 0) { onProgress(0.45 + 0.55 * (i / cap.frames.length), `Spårar ${i}/${cap.frames.length}`); await U.raf(); }
+    }
     onProgress(1, 'Sammanställer');
 
     const traj = resample(T, duration, w / h);
+    traj.captureFps = cap.times.length > 1 ? (cap.times.length - 1) / Math.max(0.1, cap.times[cap.times.length - 1] - cap.times[0]) : 15;
+    traj.sourceFps = cap.srcFps;
+    traj.coverage = U.clamp(traj.captureFps * cap.stride / Math.max(1, cap.srcFps), 0, 1);
     const report = buildReport(traj, D, media, performance.now() - t0);
+    report.captureFps = U.round(traj.captureFps, 1);
+    report.coverage = U.round(traj.coverage, 2);
     return { traj, report, deltas: D };
   }
 
@@ -398,8 +447,8 @@ const StabAnalyze = (() => {
   function resample(T, duration, aspect) {
     const n0 = T.t.length;
     const span = Math.max(1e-3, T.t[n0 - 1] - T.t[0]);
-    let fps = U.clamp((n0 - 1) / span, 6, 30);
-    let n = Math.max(8, Math.min(600, Math.round(duration * fps)));
+    let fps = U.clamp((n0 - 1) / span, 6, 60);
+    let n = Math.max(8, Math.min(2400, Math.round(duration * fps)));
     const step = duration / n;
     fps = 1 / step;
     const ch = ['tx', 'ty', 'rot', 'scale', 'shear', 'aspect'];
@@ -479,7 +528,11 @@ const StabAnalyze = (() => {
 
     // rekommendation
     let preset = 'smooth', why = 'Tydlig men jämn kamerarörelse.';
-    if (wobbleRisk > .45) { preset = 'wobble'; why = 'Bilden deformeras icke-rigidt — typiskt för AI-genererade klipp.'; }
+    // Vid mycket kraftig icke-rigid deformation kan ingen global transform
+    // hjälpa — då är en försiktig utjämning ärligare än ett läge som lovar
+    // reparation. Mätningar visar att stark korrigering gör sådana klipp sämre.
+    if (wobbleRisk > .72) { preset = 'subtle'; why = 'Kraftig icke-rigid deformation. En global stabilisator kan inte räta ut den — håll korrigeringen låg.'; }
+    else if (wobbleRisk > .45) { preset = 'wobble'; why = 'Bilden deformeras icke-rigidt — typiskt för AI-genererade klipp.'; }
     else if (bobScore > .45) { preset = 'bob'; why = 'Rytmisk vertikal rörelse i gånghastighet upptäckt.'; }
     else if (rotShakeDeg > .28 && shakeScore < .55) { preset = 'horizon'; why = 'Rotationen vandrar mer än translationen.'; }
     else if (shakeScore < .12 && Math.abs(scaleSum) + Math.abs(dxSum) + Math.abs(dySum) < .02) { preset = 'locked'; why = 'Kameran står nästan still — kan låsas helt.'; }
@@ -502,10 +555,12 @@ const StabAnalyze = (() => {
       trackingQuality: U.round(inl, 2),
       recommended: preset, why,
       estimatedCrop: est.cropPct,
-      unsalvageable: est.cropPct > 18,
-      note: est.cropPct > 18
-        ? 'Klippet kräver mer än 18 % beskärning för att bli stabilt. Sänk styrkan, välj Subtle, eller använd klippet kortare.'
-        : null,
+      unsalvageable: est.cropPct > 18 || wobbleRisk > .72,
+      note: wobbleRisk > .72
+        ? 'Rörelsen i klippet är till stor del icke-rigid: olika delar av bilden rör sig åt olika håll. En global stabilisator kan bara ta bort kamerans gemensamma rörelse — deformationen i väggar och karmar sitter kvar, och en för stark korrigering kan förstärka den. Håll styrkan låg och kontrollera resultatet i före/efter.'
+        : est.cropPct > 18
+          ? 'Klippet kräver mer än 18 % beskärning för att bli stabilt. Sänk styrkan, välj Subtle, eller använd klippet kortare.'
+          : null,
     };
   }
   const lvl = s => s < .18 ? 'Låg' : s < .42 ? 'Måttlig' : s < .7 ? 'Hög' : 'Mycket hög';
@@ -514,5 +569,10 @@ const StabAnalyze = (() => {
   let estimateCrop = () => ({ cropPct: 0 });
   const _bind = fn => { estimateCrop = fn; };
 
-  return { analyze, _bind, highpass, periodicity, rms, range };
+  return {
+    analyze, _bind, highpass, periodicity, rms, range,
+    // exponeras för mätverktyget: gör det möjligt att spåra rörelsen i den
+    // FÄRDIGRENDERADE bilden och därmed mäta hur mycket som faktiskt togs bort
+    internals: { grayPyramid, pickFeatures, track, fitAffine, decompose, AW },
+  };
 })();

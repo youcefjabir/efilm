@@ -41,8 +41,13 @@ const Playback = (() => {
     v.preload = 'auto'; v.playsInline = true; v.muted = false; v.crossOrigin = 'anonymous';
     v.src = media.url;
     v.load();
-    e = { video: v, mediaId: media.id, used: performance.now(), gain: null, src: null, ready: false };
+    e = { video: v, mediaId: media.id, used: performance.now(), gain: null, src: null, ready: false, mediaTime: null };
     v.addEventListener('loadeddata', () => { e.ready = true; });
+    // Stabiliseringen MÅSTE hämtas för exakt den bildruta som visas. Klockan i
+    // timelinen och videons egen tid glider isär med 1–2 rutor, och eftersom
+    // korrigeringen är lika snabb som skakningen den ska ta bort blir en
+    // felfasad korrigering lika illa som ingen alls — den lägger till skakning.
+    // requestVideoFrameCallback ger presentationstiden för den visade rutan.
     try {
       const c = ctx();
       e.src = c.createMediaElementSource(v);
@@ -51,11 +56,22 @@ const Playback = (() => {
       e.gain.gain.value = 0;
     } catch (err) { /* ljudgraf ej tillgänglig */ }
     pool.set(clip.id, e);
+    // startas EFTER pool.set — annars avbryter vaktvillkoret direkt
+    if (typeof v.requestVideoFrameCallback === 'function') {
+      const pump = () => {
+        if (pool.get(clip.id) !== e) return;
+        try {
+          v.requestVideoFrameCallback((now, meta) => { e.mediaTime = meta.mediaTime; e.presentedAt = now; pump(); });
+        } catch (err) { /* elementet är borta */ }
+      };
+      pump();
+    }
     return e;
   }
   function release(clipId) {
     const e = pool.get(clipId);
     if (!e) return;
+    e.mediaTime = null;
     try { e.video.pause(); e.video.removeAttribute('src'); e.video.load(); } catch (x) { }
     try { if (e.gain) e.gain.disconnect(); if (e.src) e.src.disconnect(); } catch (x) { }
     pool.delete(clipId);
@@ -123,7 +139,16 @@ const Playback = (() => {
     let stab = null;
     if (clip.stabEnabled && media.stab && media.stab.traj) {
       const corr = Stab.corrFor(media);
-      stab = corr ? Stab.sample(corr, srcT) : null;
+      // tiden för den bildruta som faktiskt ligger i texturen — inte den tid
+      // timelinen tror att vi är på
+      // Texturen laddas från den bildruta som webbläsaren PRESENTERAR just nu,
+      // och rVFC:s mediaTime kommer från exakt samma källa. currentTime kan
+      // ligga ett par rutor före efter en sökning — då hämtas fel korrigering
+      // och skakningen blir kvar. Följ därför alltid presentationstiden.
+      const v = e.video;
+      const shown = e.mediaTime != null ? e.mediaTime
+        : (v.readyState >= 2 ? v.currentTime : srcT);
+      stab = corr ? Stab.sample(corr, shown) : null;
     }
     const motion = motionAt(clip, t - clip.start, dur);
     // extra marginal när rörelsepresetet panorerar

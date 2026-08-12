@@ -28,45 +28,70 @@ verifierat i automatiska tester mot en riktig webbläsare:
 
 ## Stabiliseringen
 
-Det här är produktens kärna, så den är byggd som en riktig pipeline i fyra
-utbytbara moduler:
+Det här är produktens kärna. Den är byggd i fyra utbytbara steg, och varje steg
+är mätt — inte antaget.
 
-1. **Analys** (`src/50-stab-analyze.js`) — klippet spelas upp och varje
-   levererad bildruta blir en gråskalepyramid i tre nivåer. Harris-respons
-   väljer spårpunkter där både vertikala och horisontella linjer möts, alltså
-   dörrkarmar, fönsterhörn och väggmöten. Punkterna matchas grov-till-fint med
-   SAD-blockmatchning och subpixelförfining, propageras mellan bildrutor och
-   väljs om var femte ruta.
-2. **Modell** — en robust affin transform anpassas per bildruta med IRLS och
-   ridge-regularisering (utan ridge blir den integrerade banan en slumpvandring
-   som ser ut som perspektivdrift). Transformen dekomponeras i sex kanaler:
-   x, y, rotation, skala, shear och aspekt.
-3. **Bearbetning** (`src/55-stab-process.js`) — varje kanal jämnas ut med ett
-   gaussfilter vars bredd styrs av Smoothness. Skillnaden mot den råa banan är
-   korrigeringen. Walking bob tas bort med ett bandstopp runt den uppmätta
-   gångfrekvensen, rolling shutter med en shear proportionell mot horisontell
-   hastighet, och motion preservation låter avsiktlig lågfrekvent rörelse vara.
-   Nödvändig zoom räknas ut genom att testa vyns fyra hörn i varje bildruta.
-4. **Rendering** (`src/70-render.js`) — korrigeringen appliceras som en
-   homografi i GPU:n, samma transform i preview och i export.
+1. **Infångning** (`src/50-stab-analyze.js`) — klippet spelas upp och varje
+   presenterad bildruta lagras som gråskala. Avkodningen är avsiktligt skild
+   från spårningen: om spårningen får ligga i infångningsloopen tappas
+   bildrutor, och skakning över halva samplingsfrekvensen blir då omöjlig att
+   korrigera. Hinner webbläsaren inte med körs klippet om i halv hastighet
+   tills täckningen är minst 85 % av källans bildfrekvens.
+2. **Spårning** — varje ruta blir en gråskalepyramid i tre nivåer.
+   Harris-respons väljer punkter där vertikala och horisontella linjer möts,
+   alltså dörrkarmar, fönsterhörn och väggmöten. Punkterna matchas
+   grov-till-fint med SAD och subpixelförfining och propageras mellan rutor.
+3. **Modell** — en robust affin transform anpassas per ruta med IRLS och
+   ridge-regularisering, och dekomponeras i x, y, rotation, skala och shear.
+   Aspektkanalen mäts men appliceras aldrig: den skulle töja bilden och ändra
+   bildförhållandet.
+4. **Bearbetning** (`src/55-stab-process.js`) — varje kanal jämnas ut med ett
+   gaussfilter vars bredd styrs av Smoothness; skillnaden mot den råa banan är
+   korrigeringen. Walking bob tas bort genom att Y-kanalens filter breddas till
+   minst en gångperiod. Nödvändig zoom räknas ut genom att testa vyns fyra hörn
+   i varje bildruta.
+5. **Rendering** (`src/70-render.js`) — korrigeringen appliceras som en
+   homografi i GPU:n, samma transform i preview och export.
 
-**Det som inte går att beskriva med en global transform** — äkta icke-rigid
-wobble, där väggar böljar i AI-genererade klipp — mäts (residual efter
-anpassning + kvadrantvis divergens) och rapporteras som wobble-risk, och dämpas
-med extra utjämning, shear-/aspektkorrigering och marginal. Den försvinner inte
-helt; det kräver mesh-warp per pixel, vilket inte ryms i den här körmiljön.
-Det står också i panelen, i klartext.
+### Den svåraste detaljen: rätt korrigering till rätt bildruta
 
-### Verifiering mot facit
+Korrigeringen är lika snabb som skakningen den ska ta bort. Hämtas den för fel
+bildruta blir den inte bara verkningslös — den *lägger till* skakning med
+omvänd fas. Timelinens klocka och videoelementets `currentTime` glider isär med
+en till två rutor, och efter en sökning kan `currentTime` ligga före den ruta
+som faktiskt är på skärmen.
 
-`tools/make-clips.js` genererar tre testklipp med **känd** kamerarörelse.
-Analysen ska hitta tillbaka till den:
+Därför följer stabiliseringen `requestVideoFrameCallback`-ens `mediaTime`:
+samma källa som texturen laddas från. Det är skillnaden mellan 0 % och 90 %
+borttagen skakning, och det syns inte i något test som bara kontrollerar att
+bilden "förändras".
 
-| Klipp | Inlagd rörelse | Analysens svar |
-|---|---|---|
-| `walking-bob.webm` | 9 px vertikal bob @ 1,70 Hz | bob 1,6–1,8 Hz, amplitud 1,9 % → **Walking Bob Removal** |
-| `handheld-pushin.webm` | små vibrationer + långsam push-in | skakning låg, wobble 0,03 → **Subtle** |
-| `ai-wobble.webm` | 24 remsor som deformeras sinusformat | residual 0,31 px, divergens 0,39 px → **AI Wobble Repair** |
+### Uppmätt effekt
+
+`tools/test-stab.js` renderar klippet genom hela kedjan, spårar rörelsen i den
+**färdiga utbilden** och jämför med stabiliseringen avstängd:
+
+| Klipp | Inlagd rörelse | Skakning borta | Ryckighet borta |
+|---|---|---|---|
+| `walking-bob.webm` | 9 px bob @ 1,70 Hz + vibrationer | **94,6 %** | **89,1 %** |
+| `handheld-pushin.webm` | små vibrationer + push-in | **78,6 %** | **62,5 %** |
+
+Analysen hittar också tillbaka till den inlagda rörelsen: bobfrekvensen mäts
+till 1,6–1,8 Hz mot facit 1,70 Hz.
+
+### Vad den inte klarar
+
+`ai-wobble.webm` innehåller icke-rigid deformation — 24 remsor som rör sig åt
+olika håll samtidigt. Där mäter testet att *varje* läge gör den globala
+rörelsen större, inte mindre. Det är inte en bugg utan en gräns: en global
+transform kan bara ta bort kamerans gemensamma rörelse. Deformationen i väggar
+och karmar sitter kvar, och en stark korrigering kan förstärka den.
+
+Editorn hanterar det ärligt i stället för att dölja det: wobble-risken mäts
+(residual efter anpassning + kvadrantvis divergens), och överstiger den
+tröskeln rekommenderar Auto **Subtle** med en varning i klartext — inte ett
+läge som låter som en reparation. Att räta ut deformationen kräver mesh-warp
+per pixel, vilket inte ryms i den här körmiljön.
 
 ## Tester
 
@@ -74,6 +99,8 @@ Analysen ska hitta tillbaka till den:
 node tools/make-clips.js      # genererar testklipp + en musikfil med tydliga transienter
 node tools/test-app.js        # hela användarscenariot, 44 kontroller
 node tools/test-ui.js         # musinteraktioner: drag & drop, trim, ordning, kortkommandon
+node tools/test-stab.js       # KRÄVER att skakningen faktiskt minskar i utbilden
+node tools/measure-stab.js <fil> [läge]   # mäter effekten per stabiliseringsläge
 node tools/diag-stab.js <fil> # rå analysrapport för ett klipp
 ```
 
@@ -122,6 +149,7 @@ stabiliseringsbanorna och gradevärdena är rena data och kan skickas som JSON.
 * Exporten renderas i realtid — en två minuter lång film tar ungefär två
   minuter. Codec beror på webbläsaren (MP4/H.264 i Chrome, annars WebM).
 * Analysen går inte snabbare än uppspelning, eftersom bildrutorna hämtas under
-  uppspelning. Sökbaserad sampling finns som fallback men är långsammare.
+  uppspelning — och halveras hastigheten om webbläsaren tappar rutor. Ett 10
+  sekunders klipp tar 10–20 sekunder att analysera.
 * Reverse spelas stegvis (bildruteexakt sökning), inte som mjuk baklängesuppspelning.
-* Icke-rigid wobble dämpas, men tas inte bort helt (se ovan).
+* Icke-rigid wobble kan inte rätas ut av en global transform (se ovan).

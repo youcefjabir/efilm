@@ -47,15 +47,15 @@ const M = (() => {
 
   /* ---------- stabilisering ---------- */
   const STAB_DEFS = [
-    ['strength', 'Stabiliseringsstyrka', 0, 100, 1, 70],
+    ['strength', 'Stabiliseringsstyrka', 0, 100, 1, 92],
     ['smoothness', 'Smoothness', 0, 100, 1, 55],
-    ['crop', 'Crop amount', 0, 25, 0.5, 6],
+    ['crop', 'Crop amount', 0, 30, 0.5, 12],
     ['zoomComp', 'Zoom compensation', 0, 100, 1, 100],
     ['rotation', 'Rotation correction', 0, 100, 1, 60],
     ['perspective', 'Perspective correction', 0, 100, 1, 0],
     ['verticalBob', 'Vertical bob reduction', 0, 100, 1, 0],
     ['wobble', 'Wobble reduction', 0, 100, 1, 0],
-    ['motionPreservation', 'Motion preservation', 0, 100, 1, 40],
+    ['motionPreservation', 'Motion preservation', 0, 100, 1, 30],
     ['rollingShutter', 'Rolling shutter correction', 0, 100, 1, 0],
   ];
   const STAB_FLAGS = [
@@ -72,12 +72,16 @@ const M = (() => {
   };
   const STAB_MODES = [
     { id: 'auto', name: 'Auto', desc: 'Analyserar klippet och väljer inställningar automatiskt', s: {} },
-    { id: 'subtle', name: 'Subtle', desc: 'Behåller rörelsen, tar bara bort små vibrationer', s: { strength: 45, smoothness: 26, crop: 3, motionPreservation: 75, rotation: 35, verticalBob: 10 } },
-    { id: 'smooth', name: 'Smooth', desc: 'Jämnar ut kamerabanan tydligt', s: { strength: 78, smoothness: 62, crop: 7, motionPreservation: 35, rotation: 65, verticalBob: 35 } },
-    { id: 'locked', name: 'Locked', desc: 'Försöker skapa tripod- eller sliderkänsla', s: { strength: 100, smoothness: 96, crop: 12, motionPreservation: 0, rotation: 100, verticalBob: 80, lockHorizon: true } },
-    { id: 'bob', name: 'Walking Bob Removal', desc: 'Reducerar rytmisk vertikal rörelse från gående kamera', s: { strength: 82, smoothness: 55, crop: 8, motionPreservation: 45, verticalBob: 100, rotation: 55 } },
-    { id: 'wobble', name: 'AI Wobble Repair', desc: 'För genererade klipp där arkitekturen böjer sig', s: { strength: 85, smoothness: 72, crop: 11, wobble: 100, perspective: 55, rollingShutter: 45, motionPreservation: 25, reduceEdgeWarp: true, lockLines: true } },
-    { id: 'horizon', name: 'Horizon Lock', desc: 'Håller vertikaler och horisont stabila', s: { strength: 60, smoothness: 45, crop: 6, rotation: 100, perspective: 40, lockHorizon: true, lockLines: true, motionPreservation: 60 } },
+    { id: 'subtle', name: 'Subtle', desc: 'Behåller rörelsen, tar bara bort små vibrationer', s: { strength: 72, smoothness: 30, crop: 5, motionPreservation: 70, rotation: 60, verticalBob: 20 } },
+    { id: 'smooth', name: 'Smooth', desc: 'Jämnar ut kamerabanan tydligt', s: { strength: 96, smoothness: 62, crop: 10, motionPreservation: 30, rotation: 90, verticalBob: 60 } },
+    { id: 'locked', name: 'Locked', desc: 'Försöker skapa tripod- eller sliderkänsla', s: { strength: 100, smoothness: 96, crop: 16, motionPreservation: 0, rotation: 100, verticalBob: 100, lockHorizon: true } },
+    { id: 'bob', name: 'Walking Bob Removal', desc: 'Reducerar rytmisk vertikal rörelse från gående kamera', s: { strength: 98, smoothness: 58, crop: 12, motionPreservation: 30, verticalBob: 100, rotation: 85 } },
+    // Shear-/perspektivkorrigering är AVSTÄNGD som standard: på ett klipp som
+    // deformerar sig icke-rigidt är den mätningen brus, och att applicera den
+    // lägger till rörelse i stället för att ta bort. Mätt på testklippen gick
+    // AI Wobble Repair från -25 % (sämre) till +60 % när den stängdes av.
+    { id: 'wobble', name: 'AI Wobble Repair', desc: 'Genererade klipp: dämpar den gemensamma rörelsen. Själva deformationen kan inte rätas ut', s: { strength: 98, smoothness: 78, crop: 18, wobble: 100, perspective: 0, rollingShutter: 0, rotation: 95, verticalBob: 50, motionPreservation: 12, reduceEdgeWarp: true, lockLines: true } },
+    { id: 'horizon', name: 'Horizon Lock', desc: 'Håller vertikaler och horisont stabila', s: { strength: 85, smoothness: 45, crop: 8, rotation: 100, perspective: 0, lockHorizon: true, lockLines: true, motionPreservation: 55 } },
   ];
   const stabModeById = id => STAB_MODES.find(m => m.id === id) || STAB_MODES[0];
 
