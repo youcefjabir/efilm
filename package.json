@@ -1,0 +1,13 @@
+{
+  "name": "master-bostadsfilm-editor",
+  "version": "1.0.0",
+  "description": "Videoeditor för premium bostadsfilm — körs helt lokalt i webbläsaren, med riktig stabilisering",
+  "private": true,
+  "scripts": {
+    "build": "node build.js",
+    "serve": "http-server -p 8099 -s .",
+    "clips": "node tools/make-clips.js",
+    "test": "node tools/test-app.js && node tools/test-ui.js",
+    "diag": "node tools/diag-stab.js"
+  }
+}

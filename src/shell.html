@@ -1,0 +1,101 @@
+<div id="app">
+  <div id="topbar">
+    <span style="font-weight:700;letter-spacing:.02em;color:var(--fg-0)">Master Bostadsfilm</span>
+    <span class="sep"></span>
+    <input type="text" id="projname" style="width:172px" data-tip="Projektets namn">
+    <button class="btn icon" id="btnUndo" data-tip="Ångra (Ctrl+Z)">↶</button>
+    <button class="btn icon" id="btnRedo" data-tip="Gör om (Ctrl+Shift+Z)">↷</button>
+    <button class="btn" id="btnSave" data-tip="Spara projekt (Ctrl+S)">Spara</button>
+    <button class="btn" id="btnProjects" data-tip="Projekt: nytt, duplicera, importera, exportera">Projekt</button>
+    <span class="sep"></span>
+    <label class="hint">Format</label>
+    <select id="selAspect" data-tip="Bildformat"></select>
+    <select id="selRes" data-tip="Upplösning"></select>
+    <select id="selFps" data-tip="Framerate"></select>
+    <span class="sep"></span>
+    <label class="hint">Preview</label>
+    <select id="selPQ" data-tip="Preview quality — lägre = mjukare uppspelning"></select>
+    <span class="spacer"></span>
+    <span id="autosave" class="tag" data-tip="Autosave-status">Autosave</span>
+    <span id="storagestat" class="tag" data-tip="Lokal lagring (IndexedDB)">Lagring</span>
+    <button class="btn primary" id="btnExport" data-tip="Öppna exportpanelen">Exportera</button>
+  </div>
+
+  <div id="mid">
+    <div id="leftpanel">
+      <div id="tabrail"></div>
+      <div id="panelbody"></div>
+    </div>
+
+    <div id="center">
+      <div id="previewarea">
+        <div id="stage">
+          <div id="stageinner">
+            <canvas id="outcanvas"></canvas>
+            <div id="stageoverlay"></div>
+            <div id="splitbar"><div class="h"></div></div>
+          </div>
+          <div id="emptyprev">
+            <div style="font-size:15px;color:var(--fg-1)">Ingen film ännu</div>
+            <div class="hint" style="max-width:340px">Ladda upp videoklipp i mediabiblioteket till vänster, dra dem sedan till timelinen längst ner.</div>
+            <button class="btn primary" id="btnEmptyUpload">Ladda upp videoklipp</button>
+          </div>
+        </div>
+        <div id="transportbar">
+          <button class="btn icon" id="btnPrevClip" data-tip="Föregående klipp">|◀</button>
+          <button class="btn icon" id="btnFrameBack" data-tip="Föregående frame (←)">◀|</button>
+          <button class="btn icon primary" id="btnPlay" data-tip="Play / Paus (Mellanslag)">▶</button>
+          <button class="btn icon" id="btnFrameFwd" data-tip="Nästa frame (→)">|▶</button>
+          <button class="btn icon" id="btnNextClip" data-tip="Nästa klipp">▶|</button>
+          <span id="timecode">00:00.00 <span class="tot">/ 00:00.00</span></span>
+          <input type="range" id="scrub" min="0" max="1000" value="0">
+          <button class="btn sm" id="btnLoopClip" data-tip="Loopa markerat klipp">Loop</button>
+          <button class="btn sm" id="btnBeforeAfter" data-tip="Före / efter — split screen">Före/Efter</button>
+          <button class="btn sm" id="btnFitFill" data-tip="Fit eller fill inom bildformatet">Fit</button>
+          <button class="btn sm" id="btnGuides" data-tip="Safe area och rutnät">Guider</button>
+          <button class="btn icon sm" id="btnZoomView" data-tip="Zoomad detaljvy (100%)">⌖</button>
+          <span style="width:16px"></span>
+          <button class="btn icon sm" id="btnMute" data-tip="Mute">🔊</button>
+          <input type="range" id="volume" min="0" max="100" value="100" style="width:70px" data-tip="Master volym">
+          <button class="btn icon sm" id="btnFull" data-tip="Fullscreen">⛶</button>
+        </div>
+      </div>
+      <div id="tlresizer"></div>
+      <div id="timelinewrap">
+        <div id="tltoolbar">
+          <button class="btn icon sm" id="tlSplit" data-tip="Dela klipp vid playhead (S)">⑃</button>
+          <button class="btn icon sm" id="tlDup" data-tip="Duplicera (Ctrl+D)">⧉</button>
+          <button class="btn icon sm" id="tlDel" data-tip="Ta bort (Delete)">🗑</button>
+          <button class="btn sm" id="tlRipple" data-tip="Ripple delete — tar bort och stänger luckan (Shift+Delete)">Ripple</button>
+          <span class="sep"></span>
+          <button class="btn sm on" id="tlSnap" data-tip="Magnetisk snapping">Snap</button>
+          <span class="sep"></span>
+          <button class="btn icon sm" id="tlZoomOut" data-tip="Zooma ut (-)">−</button>
+          <span id="tlzoomval" class="hint mono" style="width:52px;text-align:center">–</span>
+          <button class="btn icon sm" id="tlZoomIn" data-tip="Zooma in (+)">+</button>
+          <button class="btn sm" id="tlZoomFit" data-tip="Anpassa till fönstret (Shift+Z)">Fit</button>
+          <span class="sep"></span>
+          <span id="tlinfo" class="hint"></span>
+          <span class="spacer"></span>
+          <span id="tlsel" class="hint"></span>
+        </div>
+        <div id="tlmain">
+          <div id="tlgutter">
+            <div class="gspacer"></div>
+            <div class="glabel video">Video</div>
+            <div class="glabel music">Musik</div>
+            <div class="glabel text">Text</div>
+          </div>
+          <div id="tlscroll"><div id="tlcontent"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="inspector"></div>
+  </div>
+</div>
+<div id="dragveil">Släpp video- eller ljudfiler för att importera</div>
+<div id="modalwrap"><div class="modal" id="modal"></div></div>
+<div id="toasts"></div>
+<input type="file" id="fileinput" multiple accept="video/*,audio/*" style="display:none">
+<input type="file" id="projinput" accept=".json,application/json" style="display:none">
