@@ -40,7 +40,7 @@ button,input,select,textarea{font:inherit;color:inherit;font-variant-numeric:tab
 ::-webkit-scrollbar-thumb:hover{background:#464c50}
 
 /* ---------- app shell ---------- */
-#app{display:flex;flex-direction:column;height:100%}
+#app{display:flex;flex-direction:column;height:100vh;height:100dvh}
 #topbar{
   height:42px;flex:0 0 42px;display:flex;align-items:center;gap:6px;
   padding:0 10px;background:var(--bg-2);border-bottom:1px solid var(--line);
@@ -63,6 +63,9 @@ button,input,select,textarea{font:inherit;color:inherit;font-variant-numeric:tab
 }
 .btn:hover{background:var(--bg-4);color:var(--fg-0);border-color:#3d4348}
 .btn:active{background:#191c1e}
+.btn:focus-visible,.tab:focus-visible,.seg>button:focus-visible,.mitem:focus-visible,.preset-card:focus-visible{
+  outline:2px solid var(--accent-hi);outline-offset:1px;color:var(--fg-0);
+}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:#10120f;font-weight:600}
 .btn.primary:hover{background:var(--accent-hi);border-color:var(--accent-hi)}
 .btn.on{background:var(--accent-dim);border-color:var(--accent);color:#dfe4d8}
@@ -300,6 +303,10 @@ body.cmp #splitbar{display:block}
 }
 [data-tip].tipup:hover::after{top:auto;bottom:calc(100% + 5px)}
 .busy{position:relative;pointer-events:none;opacity:.6}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{transition-duration:.001ms !important;animation-duration:.001ms !important}
+}
 
 </style>
 <div id="app">
