@@ -209,7 +209,10 @@ const Media = (() => {
           v.src = ''; v.load();
         } else if (m.type === 'audio' && !m.wave && m.file) {
           const a = await analyzeAudio(m.file);
-          m.wave = a.peaks; m.beats = a.beats.times; m.bpm = a.beats.bpm;
+          m.wave = a.peaks;
+          // En låt som appen komponerat vet redan sitt exakta tempo och sitt
+          // taktrutnät — mätvärdena får inte skriva över dem.
+          if (!m.composed) { m.beats = a.beats.times; m.bpm = a.beats.bpm; }
         }
       } catch (e) { console.warn('kunde inte bygga om förhandsbilder för', m.name, e); }
     }

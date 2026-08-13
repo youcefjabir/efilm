@@ -9,7 +9,7 @@ const DIST = path.join(__dirname, 'dist');
 
 const ORDER = [
   '00-utils.js', '10-model.js', '12-motion-model.js', '20-store.js', '30-persist.js',
-  '40-media.js', '44-image-analyze.js', '46-music-structure.js', '48-director.js',
+  '40-media.js', '44-image-analyze.js', '45-music-make.js', '46-music-structure.js', '48-director.js',
   '49-generation.js', '50-stab-analyze.js', '55-stab-process.js', '60-color.js',
   '70-render.js', '75-playback.js', '80-timeline.js', '85-panels.js',
   '87-motion-ui.js', '90-export.js', '95-app.js',

@@ -20,6 +20,7 @@ const Motion = (() => {
     phase: '', progress: 0,
     result: null,
     credits: null,
+    overrides: { moves: new Map(), durations: new Map(), rooms: new Map(), names: new Map() },
   };
   let root = null;
 
@@ -133,11 +134,13 @@ const Motion = (() => {
   function viewMusic() {
     const list = U.el('div', { class: 'mo-tracks' });
     const tracks = S.project.media.filter(m => m.type === 'audio');
-    if (!tracks.length) list.append(U.el('div', { class: 'hint', style: { padding: '10px 0' } }, 'Ingen musik importerad ännu.'));
+    if (!tracks.length) list.append(U.el('div', { class: 'hint', style: { padding: '10px 0' } },
+      'Ingen låt ännu. Skapa en nedan, eller ladda upp din egen.'));
 
     for (const m of tracks) {
       const sel = st.music && st.music.id === m.id;
       const wave = U.el('canvas', { class: 'mo-wave', width: 600, height: 40 });
+      const c = m.composed;
       const row = U.el('div', {
         class: 'mo-track' + (sel ? ' on' : ''),
         onclick: () => { st.music = m; render(); },
@@ -146,18 +149,42 @@ const Motion = (() => {
           class: 'mo-play', onclick: e => { e.stopPropagation(); togglePlay(m); },
         }, playingId === m.id ? '❚❚' : '▶'),
         U.el('div', { class: 'mo-tmeta' },
-          U.el('div', { class: 'nm', text: m.name.replace(/\.[^.]+$/, '') }),
-          U.el('div', { class: 'hint mono' }, `${m.bpm ? m.bpm + ' BPM · ' : ''}${U.dur(m.duration)}${m.beats ? ' · ' + m.beats.length + ' transienter' : ''}`)),
+          U.el('div', { class: 'nm' }, m.name.replace(/\.[^.]+$/, ''),
+            c ? U.el('span', { class: 'tag accent', style: { marginLeft: '6px' }, text: 'SKAPAD' }) : null),
+          U.el('div', { class: 'hint mono' }, c
+            ? `${c.bpm} BPM · ${U.dur(c.duration)} · takt ${c.barSeconds}s · ${c.sections.length} sektioner · ${c.cutPoints.length} klipplägen`
+            : `${m.bpm ? m.bpm + ' BPM · ' : ''}${U.dur(m.duration)}${m.beats ? ' · ' + m.beats.length + ' transienter (uppmätta)' : ''}`)),
         sel ? wave : U.el('span', { class: 'hint mono', text: U.dur(m.duration) }));
       list.append(row);
       if (sel) requestAnimationFrame(() => drawWave(wave, m));
     }
 
-    return shell('Välj soundtrack',
-      'Musiken är inte bakgrund — den bestämmer var filmen klipper.',
-      U.el('div', {}, list,
-        U.el('button', { class: 'btn', style: { marginTop: '10px' }, onclick: () => pickFiles('audio') }, 'Ladda upp musik'),
-        U.el('div', { class: 'mo-field', style: { marginTop: '14px' } },
+    /* Låtarna är inte pynt: eftersom appen komponerar dem vet den exakt var
+       takterna ligger, och det är takterna som bestämmer klipplängderna. */
+    const styles = U.el('div', { class: 'mo-styles' },
+      ...MusicMake.STYLES.map(s => {
+        const barSec = 240 / s.bpm;
+        // vilka klipplängder låten faktiskt erbjuder: hel och halv takt inom
+        // det spann ett klipp får ligga i
+        const steps = [];
+        for (let k = 1; k * barSec / 2 <= Director.SHOT_MAX_MANUAL + 0.01; k++) {
+          const d = U.round(k * barSec / 2, 2);
+          if (d >= Director.SHOT_MIN) steps.push(d);
+        }
+        return U.el('div', { class: 'preset-card', onclick: () => composeTrack(s.id) },
+          U.el('div', { style: { flex: '1' } },
+            U.el('div', { class: 'pn' }, s.name,
+              U.el('span', { class: 'tag', style: { marginLeft: '6px' }, text: s.bpm + ' BPM' })),
+            U.el('div', { class: 'pd', text: s.mood }),
+            U.el('div', { class: 'hint mono', style: { marginTop: '2px' } },
+              `Takt ${U.round(barSec, 2)}s · klipplängder ${steps.join(' / ')}s`)),
+          U.el('button', { class: 'btn sm', onclick: e => { e.stopPropagation(); composeTrack(s.id); } }, 'Skapa'));
+      }));
+
+    return shell('Musiken',
+      'Musiken är inte bakgrund — den bestämmer var filmen klipper. Skapar appen låten vet den exakt var varje takt ligger, och klipplängderna blir exakta i stället för ungefärliga.',
+      U.el('div', {},
+        U.el('div', { class: 'mo-field' },
           U.el('label', {}, 'Ungefärlig filmlängd'),
           U.el('div', { class: 'row', style: { padding: 0, gap: '8px' } },
             ...[30, 45, 60, 90].map(v => U.el('button', {
@@ -170,7 +197,14 @@ const Motion = (() => {
             ...['16:9', '9:16', '4:5', '1:1'].map(a => U.el('button', {
               class: 'btn sm' + (st.aspect === a ? ' on' : ''),
               onclick: () => { st.aspect = a; render(); },
-            }, a))))),
+            }, a)))),
+        U.el('h3', { class: 'sectitle', text: 'Skapa en låt' }),
+        U.el('div', { class: 'hint', style: { padding: '0 0 8px' } },
+          `Låten komponeras för ${st.targetDuration} s film med intro, uppbyggnad, peak och avslut.`),
+        styles,
+        U.el('h3', { class: 'sectitle', text: 'Låtar i projektet' }),
+        list,
+        U.el('button', { class: 'btn', style: { marginTop: '10px' }, onclick: () => pickFiles('audio') }, 'Ladda upp egen musik')),
       U.el('div', { class: 'mo-foot' },
         U.el('button', { class: 'btn', onclick: () => { st.step = 'images'; render(); } }, '← Tillbaka'),
         U.el('span', { class: 'spacer' }),
@@ -178,6 +212,19 @@ const Motion = (() => {
           class: 'btn primary', disabled: !st.music,
           onclick: () => startPlanning(),
         }, 'Fortsätt →')));
+  }
+
+  async function composeTrack(styleId) {
+    const t = U.toast('Komponerar…', MusicMake.styleById(styleId).name);
+    await U.raf(); await U.raf();
+    try {
+      const m = await MusicMake.makeTrack(styleId, st.targetDuration);
+      S.update(p => { p.media.push(m); }, 'motion-compose');
+      st.music = m;
+      t.remove();
+      render();
+      U.toast('Låten är klar', `${m.composed.bpm} BPM · ${U.dur(m.duration)} · ${m.composed.cutPoints.length} klipplägen`);
+    } catch (e) { t.remove(); U.errToast('Kunde inte skapa låten', e); }
   }
 
   let playingId = null, audioEl = null;
@@ -218,6 +265,7 @@ const Motion = (() => {
       st.plan = Director.buildPlan({
         assets: st.images, imageAnalysis: st.imageAnalysis, musicAnalysis: st.musicAnalysis,
         targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
+        overrides: st.overrides,
       });
       const errs = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
       if (errs.length) console.warn('planvalidering', errs);
@@ -235,16 +283,26 @@ const Motion = (() => {
     const prov = MM.providerById(st.provider);
 
     const shots = U.el('div', { class: 'mo-shots' });
-    plan.shots.forEach(s => {
+    plan.shots.forEach((s, i) => {
       const a = st.images.find(x => x.id === s.assetId);
-      shots.append(U.el('div', { class: 'mo-shot' },
+      const edited = s.movementLocked || s.durationLocked;
+      shots.append(U.el('div', { class: 'mo-shot' + (edited ? ' edited' : '') },
         U.el('img', { src: a ? a.thumb : '', alt: '' }),
         U.el('div', { class: 'mo-shotmeta' },
           U.el('div', { class: 'top' },
             U.el('span', { class: 'tag accent', text: 'SHOT ' + String(s.index + 1).padStart(2, '0') }),
             roomSelect(s),
             s.role === 'hero' || s.role === 'closer' ? U.el('span', { class: 'tag ok', text: s.role.toUpperCase() }) : null,
-            U.el('span', { class: 'tag', text: MM.moveById(s.movementId).name })),
+            edited ? U.el('span', { class: 'tag warn', text: 'ÄNDRAD' }) : null),
+          U.el('div', { class: 'mo-shotctl' }, moveSelect(s, plan, i), durationStepper(s),
+            edited ? U.el('button', {
+              class: 'btn sm', 'data-tip': 'Återgå till regissörens val',
+              onclick: () => {
+                st.overrides.moves.delete(s.assetId);
+                st.overrides.durations.delete(s.assetId);
+                rebuildPlan();
+              },
+            }, '↺') : null),
           U.el('div', { class: 'hint', text: s.motivation }),
           U.el('div', { class: 'hint mono' },
             `${U.tc(s.timelineIn, false)}–${U.tc(s.timelineOut, false)} · ${s.timelineDuration}s i filmen · genererar ${s.generatedDuration}s, använder ${s.sourceIn}–${s.sourceOut}`))));
@@ -263,7 +321,15 @@ const Motion = (() => {
             U.el('div', { class: 'pd', text: p.note }))))));
 
     const warn = [];
-    if (plan.droppedImages) warn.push(`${plan.droppedImages} bilder rymdes inte i ${st.targetDuration} s — höj längden eller ta bort bilder.`);
+    if (plan.droppedImages) {
+      // Klippen ligger på takten, så antalet bilder som får plats bestäms av
+      // låtens taktlängd. Säg vad som faktiskt krävs i stället för "höj längden".
+      const bar = st.musicAnalysis.barSeconds || (240 / (st.musicAnalysis.bpm || 100));
+      const need = Math.ceil((plan.duration + plan.droppedImages * bar) / 5) * 5;
+      warn.push(`${plan.droppedImages} bilder rymdes inte i ${st.targetDuration} s. `
+        + `Med den här låten tar varje klipp ${U.round(bar, 1)} s — välj ${need} s film, `
+        + `eller ta bort ${plan.droppedImages} bilder.`);
+    }
     if (st.provider === 'higgsfield_kling3') {
       warn.push(`Genereringen kostar ${cost} credits av dina ${st.credits != null ? st.credits : '–'}.`);
       if (!Generation.bridgeAlive) warn.push('Ingen brygga ansluten: jobben läggs i kön och exporteras som manifest som Claude kör via Higgsfield MCP.');
@@ -283,7 +349,7 @@ const Motion = (() => {
         warn.length ? U.el('div', { class: 'mo-warn' }, ...warn.map(w => U.el('div', { text: w }))) : null,
         U.el('h3', { class: 'sectitle', text: 'Director Plan' }),
         U.el('div', { class: 'hint', style: { padding: '0 0 8px' } },
-          'Rumstypen är ett förslag från bildanalysen. Ändra den om den är fel — planen regisseras om direkt.'),
+          'Allt går att ändra: rum, kamerarörelse och längd. Längden stegar mellan låtens klipplägen, så filmen håller sig på musiken oavsett vad du väljer. Efterföljande klipp flyttas med.'),
         shots),
       U.el('div', { class: 'mo-foot' },
         U.el('button', { class: 'btn', onclick: () => { st.step = 'music'; render(); } }, '← Tillbaka'),
@@ -296,31 +362,119 @@ const Motion = (() => {
   }
   const stat = (v, l) => U.el('div', { class: 'mo-stat' }, U.el('b', { text: String(v) }), U.el('span', { text: l }));
 
-  /** Rumstypen är ett förslag — användaren rättar den här och planen byggs om. */
-  function roomSelect(s) {
+  /** Kamerarörelsen går alltid att byta. Biblioteket visas i sin helhet, men
+   *  de rörelser regissören anser olämpliga för just den bilden ligger i en
+   *  egen grupp — en drönarbild ska inte råka få en sidled-slide av misstag. */
+  function moveSelect(s, plan, i) {
     const f = st.imageAnalysis.get(s.assetId);
-    const uncertain = f && f.roomUncertain;
+    const x = { a: { id: s.assetId }, f };
+    const energy = MusicStructure.energyAt(st.musicAnalysis, (s.timelineIn + s.timelineOut) / 2);
+    const opts = f ? Director.moveOptions(x, plan.shots[i - 1], plan.shots[i - 2], energy)
+      : MM.MOVES.map(m => ({ move: m, suitable: true }));
     const sel = U.el('select', {
-      class: 'mo-room' + (uncertain ? ' uncertain' : ''),
-      'data-tip': uncertain ? 'Osäker gissning — välj rätt rum så byggs planen om' : 'Rumstyp',
+      class: 'mo-move' + (s.movementLocked ? ' locked' : ''),
+      'data-tip': 'Kamerarörelse för det här klippet',
       onchange: () => {
-        if (f) { f.roomType = sel.value; f.roomUncertain = false; f.isDetail = sel.value === 'detail'; }
-        rebuildPlan();
+        if (sel.value === '__auto') st.overrides.moves.delete(s.assetId);
+        else st.overrides.moves.set(s.assetId, sel.value);
+        rebuildPlan(false);
       },
     });
-    MM.ROOMS.forEach(([id, name]) => sel.append(U.el('option', { value: id, selected: id === s.roomType }, name)));
-    sel.value = s.roomType;
+    sel.append(U.el('option', { value: '__auto' }, s.movementLocked
+      ? 'Regissörens val' : 'Regissörens val: ' + MM.moveById(s.movementId).name));
+    const good = U.el('optgroup', { label: 'Passar bilden' });
+    const bad = U.el('optgroup', { label: 'Mindre lämpliga för den här bilden' });
+    for (const o of opts) (o.suitable ? good : bad).append(U.el('option', { value: o.move.id }, o.move.name));
+    if (good.children.length) sel.append(good);
+    if (bad.children.length) sel.append(bad);
+    sel.value = s.movementLocked ? s.movementId : '__auto';
     return sel;
   }
-  function rebuildPlan() {
+
+  /** Längden stegas mellan låtens egna klipplägen. Det går alltså inte att
+   *  välja en längd som ligger utanför takten — men allt som ligger på takten
+   *  går att välja. */
+  function durationStepper(s) {
+    const opts = Director.durationOptions(st.musicAnalysis, s.timelineIn);
+    let cur = 0, bd = 1e9;
+    opts.forEach((o, i) => { const d = Math.abs(o.duration - s.timelineDuration); if (d < bd) { bd = d; cur = i; } });
+    const set = k => {
+      const o = opts[U.clamp(cur + k, 0, opts.length - 1)];
+      if (!o || o.duration === s.timelineDuration) return;
+      st.overrides.durations.set(s.assetId, o.duration);
+      rebuildPlan(false);
+    };
+    const kind = opts[cur] ? opts[cur].kind : '';
+    return U.el('div', { class: 'mo-dur', 'data-tip': 'Längd i filmen — stegar mellan musikens klipplägen' },
+      U.el('button', { class: 'btn sm', disabled: cur <= 0, onclick: () => set(-1) }, '−'),
+      U.el('span', { class: 'mono' }, s.timelineDuration.toFixed(2) + ' s',
+        U.el('i', { class: 'k', text: kind ? ' ' + kindLabel(kind) : '' })),
+      U.el('button', { class: 'btn sm', disabled: cur >= opts.length - 1, onclick: () => set(1) }, '+'));
+  }
+  const kindLabel = k => ({ section: 'sektion', phrase: 'fras', downbeat: 'takt', halfbar: '½ takt', accent: 'accent' }[k] || k);
+
+  /** Klustringen grupperar bilder som är samma rum, men den kan ha fel.
+   *  Här flyttas en bild till rätt rum, och rummen får riktiga namn. */
+  function roomSelect(s) {
+    const rooms = Director.roomsOf(st.images, st.imageAnalysis, st.overrides);
+    const sel = U.el('select', {
+      class: 'mo-room',
+      'data-tip': 'Vilket rum bilden hör till. Ändra om grupperingen är fel.',
+      onchange: () => {
+        if (sel.value === '__new') {
+          const n = rooms.reduce((m, r) => Math.max(m, parseInt(String(r.id).replace(/^room/, ''), 10) || 0), 0);
+          st.overrides.rooms.set(s.assetId, 'room' + (n + 1));
+          rebuildPlan(false);
+        } else if (sel.value === '__rename') {
+          renameRoom(s.clusterId || s.roomType, s.roomLabel);
+        } else {
+          st.overrides.rooms.set(s.assetId, sel.value);
+          rebuildPlan(false);
+        }
+      },
+    });
+    for (const r of rooms) sel.append(U.el('option', { value: r.id }, r.label + (r.size > 1 ? ` (${r.size})` : '')));
+    // Scentypen styr vilka kamerarörelser bilden får. Har analysen gissat fel
+    // — en fasadbild tagen för en drönarbild — rättas det här, och rörelse-
+    // reglerna följer med.
+    const scenes = U.el('optgroup', { label: 'Scentyp' });
+    for (const [id, label] of [['exterior', 'Exteriör'], ['drone', 'Drönare'], ['detail', 'Detalj']])
+      if (!rooms.some(r => r.id === id)) scenes.append(U.el('option', { value: id }, label));
+    if (scenes.children.length) sel.append(scenes);
+    sel.append(U.el('option', { value: '__new' }, 'Nytt rum…'));
+    sel.append(U.el('option', { value: '__rename' }, 'Byt namn på rummet…'));
+    sel.value = s.clusterId || rooms[0] && rooms[0].id || '';
+    return sel;
+  }
+
+  function renameRoom(clusterId, current) {
+    const inp = U.el('input', { type: 'text', value: current || '', style: { width: '100%' }, placeholder: 'Vardagsrum' });
+    U.modal({
+      title: 'Byt namn på rummet',
+      body: U.el('div', {}, inp,
+        U.el('div', { class: 'hint', style: { marginTop: '6px' } },
+          'Namnet gäller alla bilder som hör till samma rum.')),
+      actions: [{ label: 'Avbryt', onclick: () => render() }, {
+        label: 'Spara', primary: true, onclick: () => {
+          const v = inp.value.trim();
+          if (v) st.overrides.names.set(clusterId, v); else st.overrides.names.delete(clusterId);
+          rebuildPlan(false);
+        },
+      }],
+    });
+    setTimeout(() => { inp.focus(); inp.select(); }, 30);
+  }
+
+  function rebuildPlan(notify = true) {
     try {
       st.plan = Director.buildPlan({
         assets: st.images, imageAnalysis: st.imageAnalysis, musicAnalysis: st.musicAnalysis,
         targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
+        overrides: st.overrides,
       });
       st.planErrors = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
       render();
-      U.toast('Planen omregisserad', 'Ordning, längder och rörelser räknades om.');
+      if (notify) U.toast('Planen omregisserad', 'Ordning, längder och rörelser räknades om.');
     } catch (e) { U.errToast('Kunde inte bygga om planen', e); }
   }
 

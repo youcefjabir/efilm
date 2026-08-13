@@ -8,6 +8,11 @@
     "serve": "http-server -p 8099 -s .",
     "clips": "node tools/make-clips.js",
     "test": "node tools/test-app.js && node tools/test-ui.js",
-    "diag": "node tools/diag-stab.js"
+    "diag": "node tools/diag-stab.js",
+    "motion": "node tools/test-motion.js && node tools/test-director.js",
+    "photos": "node tools/make-photos.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
   }
 }

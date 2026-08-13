@@ -45,46 +45,40 @@ const head = t => console.log(`\n[${++step}] ${t}`);
   check(imgs.every(i => i.w > 0 && i.thumb), 'Alla bilder har mått och thumbnail');
   await page.screenshot({ path: path.join(SHOTS, 'm2-images.png') });
 
-  head('Bildanalys mot facit');
+  head('Bildanalys och rumsgruppering');
   const cls = await page.evaluate(async () => {
-    const out = [];
-    for (const m of Motion.st.images) {
-      const a = await ImageAnalyze.analyze(m);
-      out.push({ name: m.name, room: a.roomType, conf: a.roomConfidence, hero: a.heroScore, ext: a.isExterior, detail: a.isDetail });
-    }
-    return out;
+    const ia = await ImageAnalyze.analyzeAll(Motion.st.images);
+    const list = Motion.st.images.map(m => ia.get(m.id));
+    ImageAnalyze.clusterRooms(list);
+    Motion.st.imageAnalysis = ia;
+    return Motion.st.images.map((m, i) => ({
+      name: m.name, scene: list[i].scene, cid: list[i].clusterId,
+      hero: list[i].heroScore, ext: list[i].isExterior, detail: list[i].isDetail,
+    }));
   });
   const map = new Map(truth.map(t => [t.file, t.room]));
-  let hit = 0;
-  for (const c of cls) {
-    const want = map.get(c.name);
-    const grouped = (a, b) => a === b
-      || (['exterior', 'drone', 'garden'].includes(a) && ['exterior', 'drone', 'garden'].includes(b));
-    if (grouped(c.room, want)) hit++;
-  }
-  console.log('    ' + cls.map(c => `${c.name.replace('.jpg', '')}→${c.room}`).join('  '));
-  // Ute/inne, detalj och hero-poäng är det regissören faktiskt bygger på och
-  // det som ska hålla. Exakt rumstyp inomhus är ett förslag användaren rättar.
+  console.log('    ' + cls.map(c => `${c.name.replace('.jpg', '')}→${c.cid}`).join('  '));
   const outdoorTruth = f => ['exterior', 'drone', 'garden'].includes(map.get(f));
-  const outdoorGuess = c => ['exterior', 'drone', 'garden', 'balcony'].includes(c.room);
-  const splitOk = cls.filter(c => outdoorTruth(c.name) === outdoorGuess(c)).length;
-  check(splitOk >= cls.length - 1, `Ute/inne stämmer för ${splitOk}/${cls.length}`);
+  const splitOk = cls.filter(c => outdoorTruth(c.name) === c.ext).length;
+  check(splitOk === cls.length, `Ute/inne stämmer för ${splitOk}/${cls.length}`);
   check(cls.filter(c => c.ext).length >= 3, 'Exteriörer identifierade', cls.filter(c => c.ext).length + ' st');
   check(cls.every(c => c.hero >= 0 && c.hero <= 1), 'Hero-poäng inom [0,1]');
-  const uncertain = await page.evaluate(async () => {
-    let u = 0;
-    for (const m of Motion.st.images) { const a = await ImageAnalyze.analyze(m); if (a.roomUncertain) u++; }
-    return u;
-  });
-  console.log(`    exakt rumstyp inomhus: ${hit}/${cls.length} — ${uncertain} markeras som osäkra och kan rättas i planen`);
-  check(true, 'Osäkra rumsgissningar flaggas i gränssnittet', uncertain + ' av ' + cls.length);
+  // samma rum från två vinklar ska hamna i samma grupp
+  let pairsOk = 0, pairs = 0;
+  for (let i = 0; i < cls.length; i++) for (let j = i + 1; j < cls.length; j++) {
+    if (outdoorTruth(cls[i].name) || map.get(cls[i].name) !== map.get(cls[j].name)) continue;
+    pairs++; if (cls[i].cid === cls[j].cid) pairsOk++;
+  }
+  check(pairsOk === pairs, 'Samma rum från olika vinklar grupperas ihop', `${pairsOk}/${pairs} par`);
 
   head('Välj musik');
   await page.click('.mo-foot .btn.primary');
   await page.waitForTimeout(300);
-  await page.setInputFiles('#motionfiles', [path.join(MEDIA, 'music-structured.wav')]);
-  await page.waitForFunction(() => !!Motion.st.music, null, { timeout: 60000 });
-  check(await page.evaluate(() => !!Motion.st.music), 'Musik vald');
+  await page.evaluate(() => { Motion.st.targetDuration = 30; });
+  await page.locator('.mo-styles .preset-card', { hasText: 'Nordic Calm' }).locator('.btn').click();
+  await page.waitForFunction(() => !!Motion.st.music, null, { timeout: 120000 });
+  check(await page.evaluate(() => !!Motion.st.music), 'Låten skapad och vald');
+  check(await page.evaluate(() => !!Motion.st.music.composed), 'Låten bär med sig sin exakta struktur');
   await page.screenshot({ path: path.join(SHOTS, 'm3-music.png') });
 
   head('Musikanalys');
@@ -97,12 +91,12 @@ const head = t => console.log(`\n[${++step}] ${t}`);
     };
   });
   console.log('    ', JSON.stringify(ma));
-  check(ma.bpm > 60 && ma.bpm < 200, 'BPM uppskattat', ma.bpm + '');
+  check(ma.bpm === 80, 'Tempot är exakt känt', ma.bpm + ' BPM');
   check(ma.downbeats > 4 && ma.bars > 4, 'Takter och downbeats hittade');
   check(ma.phrases >= 2, 'Fraser identifierade', ma.phrases + ' st');
   check(ma.sections.length >= 2, 'Sektioner identifierade', ma.sections.join(','));
   check(ma.sections.includes('intro'), 'Intro hittat');
-  check(ma.cuts > 10 && ma.kinds.includes('phrase'), 'Klipppunkter med typ', ma.kinds.join(','));
+  check(ma.cuts > 10 && ma.kinds.includes('section'), 'Klipppunkter med typ', ma.kinds.join(','));
 
   head('Regissören bygger planen');
   await page.evaluate(() => { Motion.st.targetDuration = 30; Motion.st.provider = 'local'; });
@@ -138,9 +132,14 @@ const head = t => console.log(`\n[${++step}] ${t}`);
     return Motion.st.plan.shots.slice(0, -1).filter(s =>
       ma.cutPoints.some(c => Math.abs(c.t - s.timelineOut) < 0.08)).length;
   });
-  check(onMusic >= plan.shots - 2, 'Klippen ligger på musikaliska punkter', `${onMusic}/${plan.shots - 1}`);
+  check(onMusic === plan.shots - 1, 'Alla klipp ligger på musikaliska punkter', `${onMusic}/${plan.shots - 1}`);
   const firstIsExt = plan.list[0].room === 'exterior' || plan.list[0].room === 'drone' || plan.list[0].role === 'hero';
   check(firstIsExt, 'Filmen öppnar med en etableringsbild', plan.list[0].room);
+  const genDefault = plan.list.every(s => s.gen >= 3 && s.gen <= 5);
+  check(genDefault, 'Genereringen håller sig kring 3 s', [...new Set(plan.list.map(s => s.gen))].join('/') + ' s');
+  const noAudio = await page.evaluate(() => MM.newJob(Motion.st.plan.shots[0], 'higgsfield_kling3', '16:9').params);
+  check(noAudio.sound === 'off', 'Kling genererar utan ljud — musiken läggs på i editorn');
+  check(noAudio.duration === plan.list[0].gen && Number.isInteger(noAudio.duration), 'Jobbet får planens längd i heltalssekunder');
   await page.screenshot({ path: path.join(SHOTS, 'm4-plan.png'), fullPage: true });
 
   head('Kostnadsberäkning');

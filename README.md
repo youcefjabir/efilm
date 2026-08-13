@@ -99,39 +99,58 @@ per pixel, vilket inte ryms i den här körmiljön.
 Arkitekturen ligger i [MOTION.md](MOTION.md). Kortversionen:
 
 ```
-bilder ─┐
-        ├─► bildanalys ──┐
-musik ──┴─► musikanalys ─┴─► DIRECTOR ─► Director Plan ─► jobbkö ─► generering
-                                                                       │
+bilder ────► bildanalys ──┐
+                          ├─► DIRECTOR ─► Director Plan ─► jobbkö ─► generering
+låt (skapas i appen) ─────┘                                             │
                                          Master Editor ◄── projekt ◄── QC
 ```
 
-Inget genereras innan planen finns. Musiken bestämmer klipppunkterna, och
-videomodellen får rätta sig efter klippningen — behöver ett shot 3,08 s medan
-Kling bara gör heltalssekunder genereras 4 s och segmentet 0,9–3,98 används.
+Inget genereras innan planen finns. **Appen komponerar låten**, och därför är
+taktrutnätet känt exakt i stället för uppmätt: varje klipp slutar på en
+sektionsgräns, frasgräns, downbeat eller halvtakt — aldrig bredvid. Ryms inte
+alla bilder inom filmens längd får bilder utgå hellre än att ett klipp hamnar
+utanför takten.
+
+Videomodellen får rätta sig efter klippningen. Vid 80 BPM är en takt 3,00 s,
+vilket är både den rätta rytmen för bostadsfilm och den billigaste
+genereringen: Kling tar heltalssekunder, så 3 s är standard. Klingklippen
+genereras **utan ljud** — musiken ligger på editorns musikspår.
 
 | Del | Status |
 |---|---|
-| Bildanalys | ljus, kontrast, kanter, symmetri, djup, horisont, himmel, hero-poäng, dubblettsignatur |
+| Bildanalys | ljus, kontrast, kanter, symmetri, djup, horisont, himmel, ljusbalans, hero-poäng, färghistogram, dubblettsignatur |
+| Musikmakaren | fem stilar, additiv syntes, arrangemang med intro/uppbyggnad/peak/avslut, exakt taktrutnät |
 | Musikstruktur | taktrutnät, downbeats, takter, fraser, sektioner, energikurva, klipppunkter med typ och styrka |
-| Regissör | ordning som rundtur, längder på musikens punkter, rörelseval med grannhänsyn, motivering per shot |
+| Regissör | rumsgruppering, rundtur, längder ur musikens klipplägen, scenbundna rörelseval, motivering per shot |
+| Handredigering | rum, kamerarörelse och längd per shot — efterföljande klipp flyttas med och snäpps om mot musiken |
 | Generering | provider-interface: lokal rendering (gratis) och Kling v3.0 via brygga/manifest |
 | QC | stabilisatorns mätningar återanvänds för att hitta wobble och skakning |
 | Överlämning | planen blir ett vanligt editorprojekt — samma format, ingen konvertering |
 
 ### Vad analysen klarar och inte klarar
 
-Mätt mot 13 syntetiska bostadsbilder med känt facit:
+Mätt mot 14 syntetiska bostadsbilder med känt facit, där varje rum är
+fotograferat från två håll (`tools/test-director.js`):
 
-* **ute mot inne: 13/13.** Ett fönster inomhus skiljs från riktig himmel genom
-  att äkta himmel fyller bildens översta remsa.
-* **exakt rumstyp inomhus: 5/13.** Ett kök och ett sovrum skiljer sig inte
-  tillräckligt i ljus-, kant- och färgstatistik för att en handskriven
-  heuristik ska klara det. Därför är rumstypen ett *förslag*: osäkra gissningar
-  markeras, går att ändra i planen, och planen regisseras om direkt. Regissören
-  bygger i övrigt på det som faktiskt håller — ute/inne, detalj, hero-poäng,
-  symmetri och djup. Rätt lösning är en vision-modell, och den kopplas in där
-  `ImageAnalyze.classify()` sitter.
+* **ute mot inne: 14/14**, och drönare skiljs från fasad och trädgård. Ett
+  fönster inomhus skiljs från riktig himmel genom att äkta himmel fyller
+  bildens översta remsa.
+* **samma rum från olika vinklar: 5/5 par grupperade rätt, 0 felaktiga
+  sammanslagningar.** Grupperingen bygger på rummets färgvärld — färghistogram
+  plus ett ljusstyrkeoberoende kromatikhistogram — vilket är stabilt när kameran
+  flyttas men skiljer tydligt mellan rum. Lägsta poäng inom ett rum 0,84, högsta
+  mellan olika rum 0,78.
+* **vad rummet heter: gissas inte.** Ett kök och ett sovrum skiljer sig inte
+  tillräckligt i pixelstatistik för att en handskriven heuristik ska sätta rätt
+  namn — tidigare versioner kunde kalla samma rum "entré" i en bild och "kök" i
+  nästa. Rummen heter "Rum 1", "Rum 2" tills du döper dem, och namnet gäller
+  hela rummet. Vill man ha automatiska namn krävs en vision-modell; den kopplas
+  in där `ImageAnalyze.classify()` sitter.
+
+Kamerarörelserna är regelstyrda, inte poängstyrda: varje rörelse deklarerar
+vilka scentyper den hör hemma i, så en drönarbild kan inte få en sidledsslide
+och ett badrum kan inte lyftas som en fasad. Riktningen på en slide bestäms av
+bildens ljusbalans — kameran går mot fönstret.
 
 ### Kostnad
 
@@ -156,8 +175,9 @@ node tools/make-clips.js      # genererar testklipp + en musikfil med tydliga tr
 node tools/test-app.js        # hela användarscenariot, 44 kontroller
 node tools/test-ui.js         # musinteraktioner: drag & drop, trim, ordning, kortkommandon
 node tools/test-stab.js       # KRÄVER att skakningen faktiskt minskar i utbilden
-node tools/make-photos.js     # syntetiska bostadsbilder med känd rumstyp
-node tools/test-motion.js     # hela Motion-flödet: bilder → musik → regi → generering → editor
+node tools/make-photos.js     # syntetiska bostadsbilder, varje rum från två vinklar
+node tools/test-motion.js     # hela Motion-flödet: bilder → låt → regi → generering → editor
+node tools/test-director.js   # rumsgruppering mot facit, rörelseregler, handredigering, låtstruktur
 node tools/measure-stab.js <fil> [läge]   # mäter effekten per stabiliseringsläge
 node tools/diag-stab.js <fil> # rå analysrapport för ett klipp
 ```

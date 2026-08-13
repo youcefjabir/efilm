@@ -7,15 +7,19 @@
    måtten poängsätts rumstyp, hero-värde och risk för dubbletter.
 
    VAD SOM ÄR TILLFÖRLITLIGT: ute mot inne, detalj mot rum, hero-poäng,
-   symmetri, djup och dubblettdetektering. Det är också det regissören
-   främst bygger på.
+   symmetri, djup, dubblettdetektering — och vilka bilder som visar SAMMA rum.
 
-   VAD SOM INTE ÄR DET: exakt rumstyp inomhus. Ett kök och ett sovrum skiljer
-   sig inte tillräckligt i ljus, kant- och färgstatistik för att en handskriven
-   heuristik ska klara det — mätt på testmaterialet träffar den ungefär hälften.
-   Därför redovisas rumstypen som ett förslag med konfidens, den går att ändra
-   i planen, och regissören klarar sig utan den. Rätt lösning är en
-   vision-modell; den kopplas in där classify() nu sitter.
+   VAD SOM INTE ÄR DET: vad rummet HETER. Ett kök och ett sovrum skiljer sig
+   inte tillräckligt i ljus-, kant- och färgstatistik för att en handskriven
+   heuristik ska sätta rätt namn; den gissade tidigare ändå, och kunde kalla
+   samma rum "entré" i en bild och "kök" i nästa.
+
+   Därför gissas inget namn längre. Bilderna grupperas i stället efter
+   färgvärld — se sameRoomScore och clusterRooms — vilket är en fråga som
+   pixlarna FAKTISKT kan svara på, och som är den regissören behöver:
+   rundturen ska ta ett rum i taget. Namnet sätter användaren, en gång per
+   rum. Vill man ha automatiska namn krävs en vision-modell; den kopplas in
+   där classify() nu sitter, utan att något annat behöver ändras.
    ============================================================ */
 const ImageAnalyze = (() => {
   const W = 256;
@@ -92,6 +96,16 @@ const ImageAnalyze = (() => {
     for (let y = Math.floor(h * 0.15); y < h * 0.85; y++) if (rowH[y] > hyv) { hyv = rowH[y]; hy = y; }
     const horizonY = hy / h;
 
+    /* --- ljusbalans vänster/höger ---
+       Ger kamerarörelsen en riktning som motiveras av bilden i stället för
+       av slumpen: en slide åt det ljusare hållet avslöjar fönstret, vilket
+       är den rörelse en riktig fotograf väljer. */
+    let lumL = 0, lumR = 0, lumN = 0;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < (W >> 2); x++) { lumL += lum[y * W + x]; lumR += lum[y * W + (W - 1 - x)]; lumN++; }
+    }
+    const lumBalance = lumN ? (lumR - lumL) / lumN : 0;
+
     /* --- symmetri: vänster halva mot speglad höger halva --- */
     let symErr = 0, symN = 0;
     const half = W >> 1;
@@ -135,6 +149,39 @@ const ImageAnalyze = (() => {
     const sharp = lap / px;
     const centerBias = (cN && pN) ? (lapCenter / cN) / Math.max(1e-6, lapPeriph / pN) : 1;
 
+    /* --- färg- och layoutsignatur: 4x4 rutor med medelfärg ---
+       Det här är nyckeln till att känna igen SAMMA RUM från en annan vinkel.
+       Väggfärg, golvton och ljusfördelning ändras knappt när man flyttar
+       kameran några meter — men de skiljer sig tydligt mellan olika rum. */
+    const colorSig = [];
+    for (let by = 0; by < 4; by++) for (let bx = 0; bx < 4; bx++) {
+      let r = 0, gg = 0, b = 0, cnt = 0;
+      const y0 = Math.floor(by * h / 4), y1 = Math.floor((by + 1) * h / 4);
+      const x0 = Math.floor(bx * W / 4), x1 = Math.floor((bx + 1) * W / 4);
+      for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+        const q = (y * W + x) * 4;
+        r += d[q]; gg += d[q + 1]; b += d[q + 2]; cnt++;
+      }
+      colorSig.push(U.round(r / cnt / 255, 3), U.round(gg / cnt / 255, 3), U.round(b / cnt / 255, 3));
+    }
+
+    /* --- färghistogram: rummets färgvärld oberoende av var sakerna står ---
+       Det spatiala rutnätet ovan ändras när kameran flyttas. Ett histogram
+       gör det inte: väggfärg, golvton och materialpalett är desamma oavsett
+       vinkel, men skiljer sig mellan ett kaklat badrum och ett kök i trä.
+       chroma-histogrammet räknar bort ljusstyrkan, så samma rum känns igen
+       även när man fotograferar mot respektive från fönstret. */
+    const hist = new Float32Array(64), chroma = new Float32Array(36);
+    for (let i = 0, p = 0; i < n; i++, p += 4) {
+      const r = d[p], gg = d[p + 1], b = d[p + 2];
+      hist[((r >> 6) << 4) + ((gg >> 6) << 2) + (b >> 6)]++;
+      const s = r + gg + b || 1;
+      const cr = Math.min(5, (r / s * 9) | 0), cg = Math.min(5, (gg / s * 9) | 0);
+      chroma[cr * 6 + cg]++;
+    }
+    for (let i = 0; i < hist.length; i++) hist[i] /= n;
+    for (let i = 0; i < chroma.length; i++) chroma[i] /= n;
+
     /* --- perceptuell signatur (8x8 average hash) för dubblettdetektering --- */
     const sig = [];
     let sigMean = 0;
@@ -159,8 +206,10 @@ const ImageAnalyze = (() => {
       vertLines: U.round(vert / px, 4), horizLines: U.round(horiz / px, 4),
       longVertical: longV, longHorizontal: longH,
       horizonY: U.round(horizonY, 3), symmetry: U.round(symmetry, 3),
+      lumBalance: U.round(lumBalance, 4),
       depthScore: U.round(depthScore, 3), centerBias: U.round(centerBias, 3),
-      signature,
+      signature, colorSig,
+      hist: Array.from(hist, v => U.round(v, 5)), chroma: Array.from(chroma, v => U.round(v, 5)),
     };
     const cls = classify(f);
     return {
@@ -170,56 +219,37 @@ const ImageAnalyze = (() => {
     };
   }
 
-  /** Heuristisk rumsklassificering. Varje regel är ett mätbart drag — inte en
-   *  gissning ur tomma luften — men den är just en heuristik. */
+  /** Vad som faktiskt går att avgöra ur pixlarna med rimlig säkerhet:
+   *  ute eller inne, och om det är en närbild eller ett helt rum.
+   *
+   *  Vad som INTE går: att sätta rätt namn på ett rum. Ett kök och ett
+   *  vardagsrum skiljer sig inte tillräckligt i ljus-, kant- och färgstatistik.
+   *  Tidigare gissades namnet ändå, vilket gjorde att samma rum fotograferat
+   *  från två håll kunde bli "entré" i ena bilden och "kök" i den andra.
+   *  Nu gissas inget namn — bilderna grupperas i stället efter hur lika de är,
+   *  så att samma rum hamnar ihop oavsett vad rummet heter. */
   function classify(f) {
-    const s = {};
-    const add = (k, v) => s[k] = (s[k] || 0) + v;
-
-    // normaliserade drag så trösklarna betyder samma sak i alla bilder
-    const dense = U.clamp(f.edgeDensity / 0.08, 0, 2);          // kanttäthet
-    const hBands = U.clamp(f.longHorizontal / 14, 0, 2);        // horisontella band (skåp, bänkar)
-    const vBands = U.clamp(f.longVertical / 14, 0, 2);          // vertikala linjer (karmar, kakelfogar)
-    const flat = U.clamp(1 - dense, 0, 1);                      // stora lugna ytor
-    const cool = U.clamp((0.2 - f.saturation) / 0.2, 0, 1);     // avfärgat
-
     // himmel räknas bara om den fyller den översta remsan — annars är det ett fönster
     const realSky = f.topSkyFrac > 0.35 ? f.skyFrac : f.skyFrac * 0.15;
     const outdoor = realSky * 3.2 + f.greenFrac * 2.2;
-    add('exterior', outdoor * 1.2);
-    add('garden', f.greenFrac * 3.4 - realSky * 0.9);
-    add('balcony', (f.topSkyFrac > 0.3 && realSky < 0.2 ? 0.7 : 0) + vBands * 0.25);
-    add('drone', (realSky + f.greenFrac) * 1.5 + (f.horizonY < 0.35 ? 0.6 : 0) - vBands * 0.5);
-
-    const indoor = 1 - U.clamp(outdoor, 0, 1);
-    // detalj: motivet sitter i mitten, ingen rumsgeometri, få långa linjer
-    const detail = (f.centerBias > 1.5 ? 1.0 : 0) + (1 - f.depthScore) * 0.35
-      - vBands * 0.6 - hBands * 0.6;
-    add('detail', detail);
-    // kök: horisontella band över OCH under mitten, ofta varma luckor
-    add('kitchen', indoor * (hBands * 1.3 + f.warmFrac * 1.2 - flat * 0.5));
-    // badrum: avfärgat, ljust och tätt rutmönster i både led
-    add('bathroom', indoor * (cool * 1.1 + (f.meanL > 0.55 ? 0.6 : 0) + Math.min(hBands, vBands) * 0.9 - f.warmFrac * 1.2));
-    // sovrum: stora lugna ytor, låg kanttäthet, låg mättnad, få band
-    add('bedroom', indoor * (flat * 1.3 + cool * 0.4 - hBands * 0.8 - vBands * 0.4));
-    // vardagsrum: djup, blandad struktur, varken extremt platt eller extremt tätt
-    add('livingroom', indoor * (0.45 + f.depthScore * 1.0 + (dense > 0.4 && dense < 1.3 ? 0.4 : 0)));
-    // matplats: ett horisontellt möbelblock mitt i bilden med djup runt
-    add('diningroom', indoor * (hBands * 0.5 + f.depthScore * 0.5 + (f.centerBias > 1.2 && f.centerBias < 1.5 ? 0.4 : 0)));
-    add('entry', indoor * (vBands * 0.7 + (f.meanL < 0.4 ? 0.5 : 0) - f.depthScore * 0.4));
-    add('other', 0.3);
-
-    const ranked = Object.entries(s).sort((a, b) => b[1] - a[1]);
-    const total = ranked.reduce((a, r) => a + Math.max(0, r[1]), 0) || 1;
-    const roomGuess = ranked.slice(0, 3).map(([id, v]) => ({ id, p: U.round(Math.max(0, v) / total, 3) }));
-    const top = roomGuess[0];
-    // marginalen till tvåan säger mer om säkerheten än den normaliserade andelen
-    const margin = roomGuess.length > 1 ? top.p - roomGuess[1].p : top.p;
+    const isExterior = outdoor > 0.35;
+    /* Drönare: marken fyller bilden, horisonten ligger högt och det finns
+       nästan inga stående linjer — uppifrån ser man tak, inte fasader. Bara
+       hög horisont räcker inte: en fasadbild med taknock högt upp får också
+       det. Marktäckningen är det som skiljer. Gissningen är ändå just en
+       gissning, och användaren kan flytta bilden till Exteriör i planen. */
+    const vBands = U.clamp(f.longVertical / 14, 0, 2);
+    const isDrone = isExterior && f.greenFrac > 0.5 && vBands < 0.5 && f.horizonY < 0.35;
+    /* Närbild: motivet sitter i mitten och periferin är tom. Tröskeln ligger
+       högt med flit — ett rum med ett starkt centralmotiv ska inte bli
+       "detalj" och därmed berövas alla rörelser utom push. */
+    const isDetail = !isExterior && f.centerBias > 2.2 && f.depthScore < 0.3
+      && vBands < 0.6 && U.clamp(f.longHorizontal / 14, 0, 2) < 0.6;
+    const scene = isDrone ? 'drone' : isExterior ? 'exterior' : isDetail ? 'detail' : 'interior';
     return {
-      roomType: top.id, roomConfidence: U.round(U.clamp(margin * 3.5, 0, 1), 2), roomGuess,
-      roomUncertain: margin < 0.12,
-      isExterior: outdoor > 0.35, isDrone: top.id === 'drone',
-      isDetail: top.id === 'detail',
+      scene, isExterior, isDrone, isDetail,
+      roomType: scene,            // fylls med klusternamn av regissören
+      roomLabel: null, clusterId: null,
     };
   }
 
@@ -238,13 +268,108 @@ const ImageAnalyze = (() => {
     return U.round(U.clamp(v, 0, 1), 3);
   }
 
-  /** Hammingavstånd mellan signaturer: 0 = identiska, 64 = motsatta. */
+  /** Strukturlikhet (average hash): fångar samma bildutsnitt. */
   function similarity(a, b) {
     if (!a || !b || !a.signature || !b.signature) return 0;
     let same = 0;
     for (let i = 0; i < 64; i++) if (a.signature[i] === b.signature[i]) same++;
     return U.round(same / 64, 3);
   }
+
+  /** Histogramsnitt: hur stor andel av färgerna är gemensam? */
+  function intersect(a, b) {
+    if (!a || !b) return 0;
+    let s = 0;
+    for (let i = 0; i < a.length; i++) s += Math.min(a[i], b[i]);
+    return s;
+  }
+
+  /** Rumslikhet: hur troligt är det att två bilder visar SAMMA rum?
+   *
+   *  Färgvärlden bär informationen. Ett rum behåller sin palett när kameran
+   *  flyttas — möblerna hamnar någon annanstans i bilden, men väggfärgen,
+   *  golvtonen och materialen är kvar. Därför väger histogrammen tyngst och
+   *  det spatiala rutnätet nästan ingenting: det senare säger mer om
+   *  bildutsnittet än om rummet. */
+  function sameRoomScore(a, b) {
+    if (!a || !b) return 0;
+    const histMatch = intersect(a.hist, b.hist);          // hela paletten
+    const chromaMatch = intersect(a.chroma, b.chroma);    // paletten utan ljusstyrka
+    const toneMatch = U.clamp(1 - Math.abs(a.meanL - b.meanL) * 3.0, 0, 1);
+    const warmMatch = U.clamp(1 - Math.abs(a.warmth - b.warmth) * 6, 0, 1);
+    const textureMatch = U.clamp(1 - Math.abs(a.edgeDensity - b.edgeDensity) * 10, 0, 1);
+    let dc = 0;
+    if (a.colorSig && b.colorSig) {
+      for (let i = 0; i < a.colorSig.length; i++) dc += Math.abs(a.colorSig[i] - b.colorSig[i]);
+      dc /= a.colorSig.length;
+    }
+    const layoutMatch = U.clamp(1 - dc * 4.5, 0, 1);
+    return U.round(histMatch * 0.34 + chromaMatch * 0.30 + toneMatch * 0.14
+      + warmMatch * 0.09 + textureMatch * 0.08 + layoutMatch * 0.05, 3);
+  }
+
+  /** Grupperar bilder i rum utan att gissa vad rummen heter.
+   *
+   *  Agglomerativ klustring med average linkage. Var gränsen går kan inte
+   *  vara en enda fast siffra: hur lika två bilder av samma rum är beror på
+   *  bostaden, kameran och ljuset. Därför slås grupperna ihop hela vägen ner
+   *  till en, och sammanslagningarna accepteras så länge de håller sig i
+   *  samma kvalitetsband som de föregående — när poängen faller av en klippa
+   *  har vi lämnat rummet. FLOOR är skyddsräcket: under det är det aldrig
+   *  samma rum, hur likt materialet i övrigt än är. */
+  const FLOOR = 0.75, BAND = 0.08;
+  function clusterRooms(analyses) {
+    const items = analyses.filter(a => !a.isExterior);
+    let groups = items.map(a => [a]);
+    const score = (g1, g2) => {
+      let s = 0, n = 0;
+      for (const a of g1) for (const b of g2) { s += sameRoomScore(a, b); n++; }
+      return n ? s / n : 0;
+    };
+    const merges = [];
+    while (groups.length > 1) {
+      let best = -1, bi = 0, bj = 0;
+      for (let i = 0; i < groups.length; i++)
+        for (let j = i + 1; j < groups.length; j++) {
+          const v = score(groups[i], groups[j]);
+          if (v > best) { best = v; bi = i; bj = j; }
+        }
+      merges.push({ score: best, i: bi, j: bj });
+      groups[bi] = groups[bi].concat(groups[bj]);
+      groups.splice(bj, 1);
+    }
+
+    // hur många av sammanslagningarna behåller vi?
+    let keep = 0, weakest = 1;
+    for (const m of merges) {
+      if (m.score < FLOOR || m.score < weakest - BAND) break;
+      weakest = Math.min(weakest, m.score);
+      keep++;
+    }
+
+    // bygg om klustringen med bara de sammanslagningar vi behöll
+    groups = items.map(a => [a]);
+    for (let k = 0; k < keep; k++) {
+      const m = merges[k];
+      groups[m.i] = groups[m.i].concat(groups[m.j]);
+      groups.splice(m.j, 1);
+    }
+    // störst och ljusast först — troligen sällskapsytorna
+    groups.sort((a, b) => (b.length - a.length) || (avg(b, 'meanL') - avg(a, 'meanL')));
+    groups.forEach((g, i) => g.forEach(a => {
+      a.clusterId = 'room' + (i + 1);
+      a.roomLabel = g.length > 1 ? `Rum ${i + 1}` : (a.isDetail ? 'Detalj' : `Rum ${i + 1}`);
+      a.roomType = a.isDetail ? 'detail' : a.clusterId;
+      a.clusterSize = g.length;
+    }));
+    for (const a of analyses) if (a.isExterior) {
+      a.clusterId = a.isDrone ? 'drone' : 'exterior';
+      a.roomLabel = a.isDrone ? 'Drönare' : 'Exteriör';
+      a.roomType = a.clusterId;
+    }
+    return groups;
+  }
+  const avg = (g, k) => g.reduce((s, a) => s + a[k], 0) / Math.max(1, g.length);
 
   /** Analyserar en lista bilder med progress och andningspauser. */
   async function analyzeAll(assets, onProgress) {
@@ -259,5 +384,5 @@ const ImageAnalyze = (() => {
     return out;
   }
 
-  return { analyze, analyzeAll, similarity, classify, heroScore };
+  return { analyze, analyzeAll, similarity, sameRoomScore, clusterRooms, classify, heroScore };
 })();

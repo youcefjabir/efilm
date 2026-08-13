@@ -1,54 +1,72 @@
 [
   {
     "file": "exterior-front.jpg",
-    "room": "exterior"
+    "room": "exterior",
+    "angle": 0
   },
   {
     "file": "drone-overview.jpg",
-    "room": "drone"
+    "room": "drone",
+    "angle": 0
   },
   {
     "file": "exterior-side.jpg",
-    "room": "exterior"
+    "room": "exterior",
+    "angle": 1
   },
   {
     "file": "livingroom-1.jpg",
-    "room": "livingroom"
+    "room": "livingroom",
+    "angle": 0
   },
   {
     "file": "livingroom-2.jpg",
-    "room": "livingroom"
+    "room": "livingroom",
+    "angle": 1
   },
   {
     "file": "kitchen-1.jpg",
-    "room": "kitchen"
+    "room": "kitchen",
+    "angle": 0
   },
   {
     "file": "kitchen-2.jpg",
-    "room": "kitchen"
+    "room": "kitchen",
+    "angle": 1
   },
   {
     "file": "bedroom-1.jpg",
-    "room": "bedroom"
+    "room": "bedroom",
+    "angle": 0
   },
   {
     "file": "bedroom-2.jpg",
-    "room": "bedroom"
+    "room": "bedroom",
+    "angle": 1
   },
   {
     "file": "bathroom-1.jpg",
-    "room": "bathroom"
+    "room": "bathroom",
+    "angle": 0
+  },
+  {
+    "file": "bathroom-2.jpg",
+    "room": "bathroom",
+    "angle": 1
   },
   {
     "file": "detail-1.jpg",
-    "room": "detail"
+    "room": "detail",
+    "angle": 0
   },
   {
     "file": "detail-2.jpg",
-    "room": "detail"
+    "room": "detail",
+    "angle": 1
   },
   {
     "file": "garden-1.jpg",
-    "room": "garden"
+    "room": "garden",
+    "angle": 0
   }
 ]

@@ -252,9 +252,12 @@ const Generation = (() => {
 
     if (ctx.music) {
       p.media.push(ctx.music);
+      // Musiken slutar när bilden slutar. Att låta den ringa ut efter sista
+      // rutan gör bara filmen längre än den ser ut att vara.
+      const videoEnd = p.tracks.video.reduce((a, c) => Math.max(a, c.start + (c.out - c.in)), 0);
       const a = M.newAudioClip(ctx.music, 0);
-      a.out = Math.min(ctx.music.duration, M.totalDuration(p) + 1.5);
-      a.fade = { in: 0.6, out: 2.2 };
+      a.out = Math.min(ctx.music.duration, videoEnd);
+      a.fade = { in: 0.6, out: Math.min(2.2, videoEnd * 0.25) };
       p.tracks.music.push(a);
     }
     for (const img of (ctx.assets || [])) if (!p.media.find(m => m.id === img.id)) p.media.push(img);

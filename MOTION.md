@@ -117,6 +117,32 @@ musik ──┴─► musikanalys ─┴─► DIRECTOR ─► Director Plan ─
 Ingenting genereras innan planen finns. Musiken bestämmer klipppunkterna, och
 videogeneratorn anpassas efter klippningen — inte tvärtom.
 
+### 5.1 Musiken skapas av appen
+
+`MusicMake` komponerar låten i stället för att analysera fram en. Det är inte
+en finess utan grunden för allt annat: en uppmätt beatgrid är alltid ungefärlig,
+medan en komponerad låt har ett *känt* taktrutnät. `MusicStructure.analyze()`
+känner igen en komponerad låt på `media.composed` och returnerar strukturen
+oförändrad i stället för att mäta upp den igen.
+
+Fem stilar, med tempon valda så att en takt hamnar där bostadsfilm faktiskt
+klipper:
+
+| Stil | BPM | Takt | Karaktär |
+|---|---|---|---|
+| Nordic Calm | 80 | 3,00 s | stilla piano, standardvalet |
+| Warm Daylight | 76 | 3,16 s | dur, ljust, villa och trädgård |
+| Modern Deep | 100 | 2,40 s | stadig puls, nyproduktion |
+| Uplift | 112 | 2,14 s | plock och rörelse |
+| Cinematic Wide | 88 | 2,73 s | breda svep, exteriör och drönare |
+
+Låten byggs ur ett arrangemang med nivåer per fras (intro → uppbyggnad → peak →
+avslut), och antalet fraser sätts av önskad filmlängd. Sektionsgränser,
+frasgränser, downbeats och halvtakter blir därmed exakta klipplägen, och det
+är den listan användaren stegar mellan när ett klipps längd ändras för hand.
+Syntesen är additiv och skrivs rakt in i en `Float32Array` — inget
+WebAudio-beroende, så låtarna går att bygga och verifiera headless.
+
 ---
 
 ## 6. Regissören — två nivåer, samma schema
@@ -130,18 +156,32 @@ hårdkodad sortering:
   vertikalaxeln, djupmått ur perspektivlinjernas konvergens, horisontlinje,
   andel himmel/grönska (exteriör), närhet/oskärpa (detalj), samt en
   perceptuell signatur för att hitta nästan identiska bilder.
-- *Rumsgissning*: viktad poäng från färg, ljusfördelning, kantstruktur och
-  proportioner — exteriör, entré, vardagsrum, kök, sovrum, badrum, detalj,
-  trädgård/balkong, drönare.
+- *Rumsgruppering*: bilderna grupperas efter färgvärld — färghistogram, ett
+  ljusstyrkeoberoende kromatikhistogram, ton, värme och textur — med
+  agglomerativ klustring vars snitt sätts där sammanslagningspoängen faller av
+  en klippa. Samma rum fotograferat från två håll hamnar därmed i samma grupp.
+  Regissören gissar däremot **inte** vad rummet heter: kök och sovrum går inte
+  att skilja åt på pixelstatistik, och ett felaktigt namn var precis det som
+  gjorde tidigare versioner opålitliga. Rummen heter "Rum 1", "Rum 2" tills
+  användaren döper dem, en gång per rum.
+- *Scentyp*: exteriör, drönare, detalj eller interiör. Drönare kräver att
+  marken fyller bilden, hög horisont och nästan inga stående linjer. Gissningen
+  går att rätta i planen, och kamerareglerna följer med rättelsen.
 - *Ordning*: en rundtur byggd som en sekvens med öppning (starkaste exteriör),
-  logiska rumsövergångar, hero-bilder på musikaliska sektionsbyten, detaljer som
-  andhämtning, avslut på reveal. Straffar nästan identiska grannar och
-  mekaniska mönster.
-- *Längder*: klipppunkter från musikanalysen; hero får längre, detalj kortare,
-  sektionsbyten motiverar längre shot.
-- *Rörelser*: väljs från bildens geometri **och** grannarnas rörelser — samma
-  rörelse tre gånger i rad blockeras, liksom konstlad växling för variationens
-  skull.
+  ett rum i taget, närbilder som övergång **mellan** rum (aldrig mitt i ett),
+  avslut på reveal. Straffar nästan identiska grannar och mekaniska mönster.
+- *Längder*: alltid en klipppunkt ur musiken — aldrig en längd som ligger
+  bredvid takten. Ryms inte alla bilder inom filmens längd får bilder utgå, och
+  planen säger vilken filmlängd som hade räckt.
+- *Rörelser*: varje rörelse deklarerar vilka scentyper den hör hemma i
+  (`scenes`), och det är en hård regel — en drönarbild kan inte få en
+  sidledsslide, ett badrum kan inte lyftas som en fasad, en närbild får bara
+  lugn push. Inom ramen väljs rörelsen utifrån bildens geometri, ljusbalansen
+  (slide går mot det ljusare hållet, alltså mot fönstret) och grannarnas
+  rörelser.
+- *Handredigering*: rum, kamerarörelse och längd går att ändra per shot.
+  Ändringarna ligger som overrides på assetId och överlever att planen
+  regisseras om; efterföljande klipp flyttas med och snäpps om mot musiken.
 
 **Nivå 2 — Claude som regissör (när bryggan finns).** Analysen serialiseras och
 skickas till Claude, som får returnera en plan i exakt samma schema. Planen

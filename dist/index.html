@@ -410,6 +410,24 @@ body.cmp #splitbar{display:block}
 }
 .mo-room.uncertain{border-color:var(--warn);color:#d8b273}
 .mo-room:hover{border-color:var(--line);color:var(--fg-0)}
+.mo-shot.edited{border-color:var(--accent-dim)}
+.mo-shotctl{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:1px 0 2px}
+.mo-move{
+  height:21px;max-width:200px;padding:0 5px;font-size:11px;background:var(--bg-3);
+  border:1px solid var(--line-soft);border-radius:2px;color:var(--fg-1);
+}
+.mo-move:hover{border-color:var(--line);color:var(--fg-0)}
+.mo-move.locked{border-color:var(--accent-dim);color:var(--fg-0)}
+.mo-dur{display:flex;align-items:center;gap:3px}
+.mo-dur .btn.sm{width:20px;height:20px;padding:0;justify-content:center;font-size:12px}
+.mo-dur>span{
+  min-width:86px;text-align:center;font-size:11px;color:var(--fg-1);
+  background:var(--bg-3);border:1px solid var(--line-soft);border-radius:2px;padding:2px 5px;
+}
+.mo-dur .k{font-style:normal;color:var(--fg-3);font-size:9.5px}
+.mo-styles{display:flex;flex-direction:column;gap:5px;margin-bottom:6px}
+.mo-styles .preset-card{align-items:center}
+.mo-tracks .nm{display:flex;align-items:center}
 
 </style>
 <div id="app">
@@ -914,105 +932,105 @@ const MM = (() => {
       id: 'slow_push_in', name: 'Slow push in',
       prompt: 'Make a slow cinematic push in to the image. Keep the camera movement smooth and stable.',
       editorPreset: 'pushin', energy: 0.35, axis: 'z', dir: 1,
-      fits: ['livingroom', 'kitchen', 'bedroom', 'exterior', 'entry', 'detail', 'bathroom', 'diningroom'],
+      scenes: ['interior', 'exterior', 'detail'],
       wants: { symmetry: 0.45, depth: 0.35 },
     },
     {
       id: 'slow_push_out', name: 'Slow push out',
       prompt: 'Make a slow cinematic pull back from the image. Keep the camera movement smooth and stable.',
       editorPreset: 'pullout', energy: 0.35, axis: 'z', dir: -1,
-      fits: ['livingroom', 'exterior', 'diningroom', 'garden'],
-      wants: { openness: 0.5 },
+      scenes: ['interior', 'exterior', 'detail'],
+      wants: { depth: 0.25 },
     },
     {
       id: 'slow_slide_left', name: 'Slide left',
       prompt: 'Make a slow smooth cinematic camera slide to the left. Keep the camera stable.',
       editorPreset: 'panl', energy: 0.5, axis: 'x', dir: -1,
-      fits: ['livingroom', 'kitchen', 'exterior', 'diningroom', 'garden'],
+      scenes: ['interior', 'exterior'],
       wants: { width: 0.5, depth: 0.3 },
     },
     {
       id: 'slow_slide_right', name: 'Slide right',
       prompt: 'Make a slow smooth cinematic camera slide to the right. Keep the camera stable.',
       editorPreset: 'panr', energy: 0.5, axis: 'x', dir: 1,
-      fits: ['livingroom', 'kitchen', 'exterior', 'diningroom', 'garden'],
+      scenes: ['interior', 'exterior'],
       wants: { width: 0.5, depth: 0.3 },
     },
     {
       id: 'slow_pan_left', name: 'Pan left',
       prompt: 'Make a slow smooth cinematic pan to the left. Keep the camera stable.',
       editorPreset: 'panl', energy: 0.45, axis: 'x', dir: -1, sparse: true,
-      fits: ['livingroom', 'exterior', 'garden'],
+      scenes: ['interior', 'exterior'],
     },
     {
       id: 'slow_pan_right', name: 'Pan right',
       prompt: 'Make a slow smooth cinematic pan to the right. Keep the camera stable.',
       editorPreset: 'panr', energy: 0.45, axis: 'x', dir: 1, sparse: true,
-      fits: ['livingroom', 'exterior', 'garden'],
+      scenes: ['interior', 'exterior'],
     },
     {
       id: 'slow_rise', name: 'Rise',
       prompt: 'Make the camera slowly rise upward. Keep the movement smooth and stable.',
       editorPreset: 'rise', energy: 0.45, axis: 'y', dir: -1,
-      fits: ['exterior', 'garden', 'balcony', 'livingroom'],
+      scenes: ['exterior'],
       wants: { height: 0.4 },
     },
     {
       id: 'slow_lower', name: 'Lower',
       prompt: 'Make the camera slowly move downward. Keep the movement smooth and stable.',
       editorPreset: 'descend', energy: 0.45, axis: 'y', dir: 1, sparse: true,
-      fits: ['exterior', 'detail'],
+      scenes: ['exterior'],
     },
     {
       id: 'rise_tilt_down', name: 'Rise + tilt down',
       prompt: 'Make the camera slowly rise while gently tilting down. Keep the movement smooth and stable.',
       editorPreset: 'risetilt', energy: 0.6, axis: 'y', dir: -1,
-      fits: ['exterior', 'garden', 'balcony', 'drone'],
+      scenes: ['exterior', 'drone'],
       wants: { height: 0.5 },
     },
     {
       id: 'descend_tilt_up', name: 'Descend + tilt up',
       prompt: 'Make the camera slowly descend while gently tilting upward. Keep the movement smooth and stable.',
       editorPreset: 'desctilt', energy: 0.6, axis: 'y', dir: 1, sparse: true,
-      fits: ['exterior', 'entry'],
+      scenes: ['exterior'],
     },
     {
       id: 'push_in_slide_left', name: 'Push in + slide left',
       prompt: 'Make a slow cinematic push in while gently moving left. Keep the camera smooth and stable.',
       editorPreset: 'pushin', energy: 0.65, axis: 'xz', dir: -1,
-      fits: ['livingroom', 'kitchen', 'diningroom'],
+      scenes: ['interior', 'exterior'],
       wants: { depth: 0.55, width: 0.4 },
     },
     {
       id: 'push_in_slide_right', name: 'Push in + slide right',
       prompt: 'Make a slow cinematic push in while gently moving right. Keep the camera smooth and stable.',
       editorPreset: 'pushin', energy: 0.65, axis: 'xz', dir: 1,
-      fits: ['livingroom', 'kitchen', 'diningroom'],
+      scenes: ['interior', 'exterior'],
       wants: { depth: 0.55, width: 0.4 },
     },
     {
       id: 'pull_back_rise', name: 'Pull back + rise',
       prompt: 'Make the camera slowly pull back while gently rising. Keep the movement smooth and stable.',
       editorPreset: 'pullout', energy: 0.6, axis: 'yz', dir: -1,
-      fits: ['exterior', 'garden', 'drone'],
+      scenes: ['exterior', 'drone'],
     },
     {
       id: 'drone_push_forward', name: 'Drone push forward',
       prompt: 'Make a slow smooth cinematic forward camera movement. Keep the camera stable.',
       editorPreset: 'pushin', energy: 0.55, axis: 'z', dir: 1, droneOnly: true,
-      fits: ['drone', 'exterior'],
+      scenes: ['drone'],
     },
     {
       id: 'drone_rise', name: 'Drone rise',
       prompt: 'Make the camera slowly rise upward. Keep the movement smooth and stable.',
       editorPreset: 'rise', energy: 0.5, axis: 'y', dir: -1, droneOnly: true,
-      fits: ['drone', 'exterior'],
+      scenes: ['drone'],
     },
     {
       id: 'drone_pullback_rise', name: 'Drone pull back + rise',
       prompt: 'Make the camera slowly pull back while rising. Keep the movement smooth and stable.',
       editorPreset: 'pullout', energy: 0.6, axis: 'yz', dir: -1, droneOnly: true,
-      fits: ['drone', 'exterior'],
+      scenes: ['drone'],
     },
   ];
   const moveById = id => MOVES.find(m => m.id === id) || MOVES[0];
@@ -1084,6 +1102,8 @@ const MM = (() => {
       generatedDuration: o.generatedDuration,
       sourceIn: o.sourceIn, sourceOut: o.sourceOut,
       role: o.role || 'support', roomType: o.roomType || 'other',
+      roomLabel: o.roomLabel || null, clusterId: o.clusterId || null,
+      movementLocked: !!o.movementLocked, durationLocked: !!o.durationLocked,
       motivation: o.motivation || '',
       status: 'planned', jobId: null, outputAssetId: null, qc: null, attempts: 0,
     };
@@ -1094,7 +1114,7 @@ const MM = (() => {
       id: U.uid('job'), shotId: shot.id, provider: p.id, model: p.model,
       params: {
         prompt: shot.prompt, duration: shot.generatedDuration,
-        mode: 'std', sound: 'off', aspect_ratio: aspect,
+        mode: 'std', sound: 'off', aspect_ratio: aspect,   // ljud av: musiken läggs på i editorn
       },
       status: 'pending', attempts: 0, cost: shotCost(provider, shot.generatedDuration),
       requestId: null, outputUrl: null, error: null, log: [],
@@ -1107,12 +1127,13 @@ const MM = (() => {
    *  och trimmar sedan i timelinen. Klippningen styr — aldrig tvärtom. */
   function planDurations(timelineDuration, provider) {
     const p = providerById(provider);
-    const margin = 1.4;
-    let gen = Math.ceil(timelineDuration + margin);
+    // Kling tar heltalssekunder och 3 s är standard: bostadsfilm klipper i
+    // 2,5–4 s, så längre generering är bortkastade credits. Marginalen räcker
+    // för att kunna flytta in-/utpunkten något i editorn.
+    let gen = Math.max(p.minDuration, Math.ceil(timelineDuration + 0.4));
     gen = U.clamp(gen, p.minDuration, p.maxDuration);
-    // lägg segmentet centrerat, men lämna alltid en halv sekunds ingång
     const slack = Math.max(0, gen - timelineDuration);
-    const sourceIn = U.round(Math.min(slack * 0.45, 0.9), 2);
+    const sourceIn = U.round(Math.min(slack * 0.5, 0.6), 2);
     return { generatedDuration: gen, sourceIn, sourceOut: U.round(sourceIn + timelineDuration, 3) };
   }
 
@@ -1583,7 +1604,10 @@ const Media = (() => {
           v.src = ''; v.load();
         } else if (m.type === 'audio' && !m.wave && m.file) {
           const a = await analyzeAudio(m.file);
-          m.wave = a.peaks; m.beats = a.beats.times; m.bpm = a.beats.bpm;
+          m.wave = a.peaks;
+          // En låt som appen komponerat vet redan sitt exakta tempo och sitt
+          // taktrutnät — mätvärdena får inte skriva över dem.
+          if (!m.composed) { m.beats = a.beats.times; m.bpm = a.beats.bpm; }
         }
       } catch (e) { console.warn('kunde inte bygga om förhandsbilder för', m.name, e); }
     }
@@ -1614,15 +1638,19 @@ const Media = (() => {
    måtten poängsätts rumstyp, hero-värde och risk för dubbletter.
 
    VAD SOM ÄR TILLFÖRLITLIGT: ute mot inne, detalj mot rum, hero-poäng,
-   symmetri, djup och dubblettdetektering. Det är också det regissören
-   främst bygger på.
+   symmetri, djup, dubblettdetektering — och vilka bilder som visar SAMMA rum.
 
-   VAD SOM INTE ÄR DET: exakt rumstyp inomhus. Ett kök och ett sovrum skiljer
-   sig inte tillräckligt i ljus, kant- och färgstatistik för att en handskriven
-   heuristik ska klara det — mätt på testmaterialet träffar den ungefär hälften.
-   Därför redovisas rumstypen som ett förslag med konfidens, den går att ändra
-   i planen, och regissören klarar sig utan den. Rätt lösning är en
-   vision-modell; den kopplas in där classify() nu sitter.
+   VAD SOM INTE ÄR DET: vad rummet HETER. Ett kök och ett sovrum skiljer sig
+   inte tillräckligt i ljus-, kant- och färgstatistik för att en handskriven
+   heuristik ska sätta rätt namn; den gissade tidigare ändå, och kunde kalla
+   samma rum "entré" i en bild och "kök" i nästa.
+
+   Därför gissas inget namn längre. Bilderna grupperas i stället efter
+   färgvärld — se sameRoomScore och clusterRooms — vilket är en fråga som
+   pixlarna FAKTISKT kan svara på, och som är den regissören behöver:
+   rundturen ska ta ett rum i taget. Namnet sätter användaren, en gång per
+   rum. Vill man ha automatiska namn krävs en vision-modell; den kopplas in
+   där classify() nu sitter, utan att något annat behöver ändras.
    ============================================================ */
 const ImageAnalyze = (() => {
   const W = 256;
@@ -1699,6 +1727,16 @@ const ImageAnalyze = (() => {
     for (let y = Math.floor(h * 0.15); y < h * 0.85; y++) if (rowH[y] > hyv) { hyv = rowH[y]; hy = y; }
     const horizonY = hy / h;
 
+    /* --- ljusbalans vänster/höger ---
+       Ger kamerarörelsen en riktning som motiveras av bilden i stället för
+       av slumpen: en slide åt det ljusare hållet avslöjar fönstret, vilket
+       är den rörelse en riktig fotograf väljer. */
+    let lumL = 0, lumR = 0, lumN = 0;
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < (W >> 2); x++) { lumL += lum[y * W + x]; lumR += lum[y * W + (W - 1 - x)]; lumN++; }
+    }
+    const lumBalance = lumN ? (lumR - lumL) / lumN : 0;
+
     /* --- symmetri: vänster halva mot speglad höger halva --- */
     let symErr = 0, symN = 0;
     const half = W >> 1;
@@ -1742,6 +1780,39 @@ const ImageAnalyze = (() => {
     const sharp = lap / px;
     const centerBias = (cN && pN) ? (lapCenter / cN) / Math.max(1e-6, lapPeriph / pN) : 1;
 
+    /* --- färg- och layoutsignatur: 4x4 rutor med medelfärg ---
+       Det här är nyckeln till att känna igen SAMMA RUM från en annan vinkel.
+       Väggfärg, golvton och ljusfördelning ändras knappt när man flyttar
+       kameran några meter — men de skiljer sig tydligt mellan olika rum. */
+    const colorSig = [];
+    for (let by = 0; by < 4; by++) for (let bx = 0; bx < 4; bx++) {
+      let r = 0, gg = 0, b = 0, cnt = 0;
+      const y0 = Math.floor(by * h / 4), y1 = Math.floor((by + 1) * h / 4);
+      const x0 = Math.floor(bx * W / 4), x1 = Math.floor((bx + 1) * W / 4);
+      for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) {
+        const q = (y * W + x) * 4;
+        r += d[q]; gg += d[q + 1]; b += d[q + 2]; cnt++;
+      }
+      colorSig.push(U.round(r / cnt / 255, 3), U.round(gg / cnt / 255, 3), U.round(b / cnt / 255, 3));
+    }
+
+    /* --- färghistogram: rummets färgvärld oberoende av var sakerna står ---
+       Det spatiala rutnätet ovan ändras när kameran flyttas. Ett histogram
+       gör det inte: väggfärg, golvton och materialpalett är desamma oavsett
+       vinkel, men skiljer sig mellan ett kaklat badrum och ett kök i trä.
+       chroma-histogrammet räknar bort ljusstyrkan, så samma rum känns igen
+       även när man fotograferar mot respektive från fönstret. */
+    const hist = new Float32Array(64), chroma = new Float32Array(36);
+    for (let i = 0, p = 0; i < n; i++, p += 4) {
+      const r = d[p], gg = d[p + 1], b = d[p + 2];
+      hist[((r >> 6) << 4) + ((gg >> 6) << 2) + (b >> 6)]++;
+      const s = r + gg + b || 1;
+      const cr = Math.min(5, (r / s * 9) | 0), cg = Math.min(5, (gg / s * 9) | 0);
+      chroma[cr * 6 + cg]++;
+    }
+    for (let i = 0; i < hist.length; i++) hist[i] /= n;
+    for (let i = 0; i < chroma.length; i++) chroma[i] /= n;
+
     /* --- perceptuell signatur (8x8 average hash) för dubblettdetektering --- */
     const sig = [];
     let sigMean = 0;
@@ -1766,8 +1837,10 @@ const ImageAnalyze = (() => {
       vertLines: U.round(vert / px, 4), horizLines: U.round(horiz / px, 4),
       longVertical: longV, longHorizontal: longH,
       horizonY: U.round(horizonY, 3), symmetry: U.round(symmetry, 3),
+      lumBalance: U.round(lumBalance, 4),
       depthScore: U.round(depthScore, 3), centerBias: U.round(centerBias, 3),
-      signature,
+      signature, colorSig,
+      hist: Array.from(hist, v => U.round(v, 5)), chroma: Array.from(chroma, v => U.round(v, 5)),
     };
     const cls = classify(f);
     return {
@@ -1777,56 +1850,37 @@ const ImageAnalyze = (() => {
     };
   }
 
-  /** Heuristisk rumsklassificering. Varje regel är ett mätbart drag — inte en
-   *  gissning ur tomma luften — men den är just en heuristik. */
+  /** Vad som faktiskt går att avgöra ur pixlarna med rimlig säkerhet:
+   *  ute eller inne, och om det är en närbild eller ett helt rum.
+   *
+   *  Vad som INTE går: att sätta rätt namn på ett rum. Ett kök och ett
+   *  vardagsrum skiljer sig inte tillräckligt i ljus-, kant- och färgstatistik.
+   *  Tidigare gissades namnet ändå, vilket gjorde att samma rum fotograferat
+   *  från två håll kunde bli "entré" i ena bilden och "kök" i den andra.
+   *  Nu gissas inget namn — bilderna grupperas i stället efter hur lika de är,
+   *  så att samma rum hamnar ihop oavsett vad rummet heter. */
   function classify(f) {
-    const s = {};
-    const add = (k, v) => s[k] = (s[k] || 0) + v;
-
-    // normaliserade drag så trösklarna betyder samma sak i alla bilder
-    const dense = U.clamp(f.edgeDensity / 0.08, 0, 2);          // kanttäthet
-    const hBands = U.clamp(f.longHorizontal / 14, 0, 2);        // horisontella band (skåp, bänkar)
-    const vBands = U.clamp(f.longVertical / 14, 0, 2);          // vertikala linjer (karmar, kakelfogar)
-    const flat = U.clamp(1 - dense, 0, 1);                      // stora lugna ytor
-    const cool = U.clamp((0.2 - f.saturation) / 0.2, 0, 1);     // avfärgat
-
     // himmel räknas bara om den fyller den översta remsan — annars är det ett fönster
     const realSky = f.topSkyFrac > 0.35 ? f.skyFrac : f.skyFrac * 0.15;
     const outdoor = realSky * 3.2 + f.greenFrac * 2.2;
-    add('exterior', outdoor * 1.2);
-    add('garden', f.greenFrac * 3.4 - realSky * 0.9);
-    add('balcony', (f.topSkyFrac > 0.3 && realSky < 0.2 ? 0.7 : 0) + vBands * 0.25);
-    add('drone', (realSky + f.greenFrac) * 1.5 + (f.horizonY < 0.35 ? 0.6 : 0) - vBands * 0.5);
-
-    const indoor = 1 - U.clamp(outdoor, 0, 1);
-    // detalj: motivet sitter i mitten, ingen rumsgeometri, få långa linjer
-    const detail = (f.centerBias > 1.5 ? 1.0 : 0) + (1 - f.depthScore) * 0.35
-      - vBands * 0.6 - hBands * 0.6;
-    add('detail', detail);
-    // kök: horisontella band över OCH under mitten, ofta varma luckor
-    add('kitchen', indoor * (hBands * 1.3 + f.warmFrac * 1.2 - flat * 0.5));
-    // badrum: avfärgat, ljust och tätt rutmönster i både led
-    add('bathroom', indoor * (cool * 1.1 + (f.meanL > 0.55 ? 0.6 : 0) + Math.min(hBands, vBands) * 0.9 - f.warmFrac * 1.2));
-    // sovrum: stora lugna ytor, låg kanttäthet, låg mättnad, få band
-    add('bedroom', indoor * (flat * 1.3 + cool * 0.4 - hBands * 0.8 - vBands * 0.4));
-    // vardagsrum: djup, blandad struktur, varken extremt platt eller extremt tätt
-    add('livingroom', indoor * (0.45 + f.depthScore * 1.0 + (dense > 0.4 && dense < 1.3 ? 0.4 : 0)));
-    // matplats: ett horisontellt möbelblock mitt i bilden med djup runt
-    add('diningroom', indoor * (hBands * 0.5 + f.depthScore * 0.5 + (f.centerBias > 1.2 && f.centerBias < 1.5 ? 0.4 : 0)));
-    add('entry', indoor * (vBands * 0.7 + (f.meanL < 0.4 ? 0.5 : 0) - f.depthScore * 0.4));
-    add('other', 0.3);
-
-    const ranked = Object.entries(s).sort((a, b) => b[1] - a[1]);
-    const total = ranked.reduce((a, r) => a + Math.max(0, r[1]), 0) || 1;
-    const roomGuess = ranked.slice(0, 3).map(([id, v]) => ({ id, p: U.round(Math.max(0, v) / total, 3) }));
-    const top = roomGuess[0];
-    // marginalen till tvåan säger mer om säkerheten än den normaliserade andelen
-    const margin = roomGuess.length > 1 ? top.p - roomGuess[1].p : top.p;
+    const isExterior = outdoor > 0.35;
+    /* Drönare: marken fyller bilden, horisonten ligger högt och det finns
+       nästan inga stående linjer — uppifrån ser man tak, inte fasader. Bara
+       hög horisont räcker inte: en fasadbild med taknock högt upp får också
+       det. Marktäckningen är det som skiljer. Gissningen är ändå just en
+       gissning, och användaren kan flytta bilden till Exteriör i planen. */
+    const vBands = U.clamp(f.longVertical / 14, 0, 2);
+    const isDrone = isExterior && f.greenFrac > 0.5 && vBands < 0.5 && f.horizonY < 0.35;
+    /* Närbild: motivet sitter i mitten och periferin är tom. Tröskeln ligger
+       högt med flit — ett rum med ett starkt centralmotiv ska inte bli
+       "detalj" och därmed berövas alla rörelser utom push. */
+    const isDetail = !isExterior && f.centerBias > 2.2 && f.depthScore < 0.3
+      && vBands < 0.6 && U.clamp(f.longHorizontal / 14, 0, 2) < 0.6;
+    const scene = isDrone ? 'drone' : isExterior ? 'exterior' : isDetail ? 'detail' : 'interior';
     return {
-      roomType: top.id, roomConfidence: U.round(U.clamp(margin * 3.5, 0, 1), 2), roomGuess,
-      roomUncertain: margin < 0.12,
-      isExterior: outdoor > 0.35, isDrone: top.id === 'drone',
-      isDetail: top.id === 'detail',
+      scene, isExterior, isDrone, isDetail,
+      roomType: scene,            // fylls med klusternamn av regissören
+      roomLabel: null, clusterId: null,
     };
   }
 
@@ -1845,13 +1899,108 @@ const ImageAnalyze = (() => {
     return U.round(U.clamp(v, 0, 1), 3);
   }
 
-  /** Hammingavstånd mellan signaturer: 0 = identiska, 64 = motsatta. */
+  /** Strukturlikhet (average hash): fångar samma bildutsnitt. */
   function similarity(a, b) {
     if (!a || !b || !a.signature || !b.signature) return 0;
     let same = 0;
     for (let i = 0; i < 64; i++) if (a.signature[i] === b.signature[i]) same++;
     return U.round(same / 64, 3);
   }
+
+  /** Histogramsnitt: hur stor andel av färgerna är gemensam? */
+  function intersect(a, b) {
+    if (!a || !b) return 0;
+    let s = 0;
+    for (let i = 0; i < a.length; i++) s += Math.min(a[i], b[i]);
+    return s;
+  }
+
+  /** Rumslikhet: hur troligt är det att två bilder visar SAMMA rum?
+   *
+   *  Färgvärlden bär informationen. Ett rum behåller sin palett när kameran
+   *  flyttas — möblerna hamnar någon annanstans i bilden, men väggfärgen,
+   *  golvtonen och materialen är kvar. Därför väger histogrammen tyngst och
+   *  det spatiala rutnätet nästan ingenting: det senare säger mer om
+   *  bildutsnittet än om rummet. */
+  function sameRoomScore(a, b) {
+    if (!a || !b) return 0;
+    const histMatch = intersect(a.hist, b.hist);          // hela paletten
+    const chromaMatch = intersect(a.chroma, b.chroma);    // paletten utan ljusstyrka
+    const toneMatch = U.clamp(1 - Math.abs(a.meanL - b.meanL) * 3.0, 0, 1);
+    const warmMatch = U.clamp(1 - Math.abs(a.warmth - b.warmth) * 6, 0, 1);
+    const textureMatch = U.clamp(1 - Math.abs(a.edgeDensity - b.edgeDensity) * 10, 0, 1);
+    let dc = 0;
+    if (a.colorSig && b.colorSig) {
+      for (let i = 0; i < a.colorSig.length; i++) dc += Math.abs(a.colorSig[i] - b.colorSig[i]);
+      dc /= a.colorSig.length;
+    }
+    const layoutMatch = U.clamp(1 - dc * 4.5, 0, 1);
+    return U.round(histMatch * 0.34 + chromaMatch * 0.30 + toneMatch * 0.14
+      + warmMatch * 0.09 + textureMatch * 0.08 + layoutMatch * 0.05, 3);
+  }
+
+  /** Grupperar bilder i rum utan att gissa vad rummen heter.
+   *
+   *  Agglomerativ klustring med average linkage. Var gränsen går kan inte
+   *  vara en enda fast siffra: hur lika två bilder av samma rum är beror på
+   *  bostaden, kameran och ljuset. Därför slås grupperna ihop hela vägen ner
+   *  till en, och sammanslagningarna accepteras så länge de håller sig i
+   *  samma kvalitetsband som de föregående — när poängen faller av en klippa
+   *  har vi lämnat rummet. FLOOR är skyddsräcket: under det är det aldrig
+   *  samma rum, hur likt materialet i övrigt än är. */
+  const FLOOR = 0.75, BAND = 0.08;
+  function clusterRooms(analyses) {
+    const items = analyses.filter(a => !a.isExterior);
+    let groups = items.map(a => [a]);
+    const score = (g1, g2) => {
+      let s = 0, n = 0;
+      for (const a of g1) for (const b of g2) { s += sameRoomScore(a, b); n++; }
+      return n ? s / n : 0;
+    };
+    const merges = [];
+    while (groups.length > 1) {
+      let best = -1, bi = 0, bj = 0;
+      for (let i = 0; i < groups.length; i++)
+        for (let j = i + 1; j < groups.length; j++) {
+          const v = score(groups[i], groups[j]);
+          if (v > best) { best = v; bi = i; bj = j; }
+        }
+      merges.push({ score: best, i: bi, j: bj });
+      groups[bi] = groups[bi].concat(groups[bj]);
+      groups.splice(bj, 1);
+    }
+
+    // hur många av sammanslagningarna behåller vi?
+    let keep = 0, weakest = 1;
+    for (const m of merges) {
+      if (m.score < FLOOR || m.score < weakest - BAND) break;
+      weakest = Math.min(weakest, m.score);
+      keep++;
+    }
+
+    // bygg om klustringen med bara de sammanslagningar vi behöll
+    groups = items.map(a => [a]);
+    for (let k = 0; k < keep; k++) {
+      const m = merges[k];
+      groups[m.i] = groups[m.i].concat(groups[m.j]);
+      groups.splice(m.j, 1);
+    }
+    // störst och ljusast först — troligen sällskapsytorna
+    groups.sort((a, b) => (b.length - a.length) || (avg(b, 'meanL') - avg(a, 'meanL')));
+    groups.forEach((g, i) => g.forEach(a => {
+      a.clusterId = 'room' + (i + 1);
+      a.roomLabel = g.length > 1 ? `Rum ${i + 1}` : (a.isDetail ? 'Detalj' : `Rum ${i + 1}`);
+      a.roomType = a.isDetail ? 'detail' : a.clusterId;
+      a.clusterSize = g.length;
+    }));
+    for (const a of analyses) if (a.isExterior) {
+      a.clusterId = a.isDrone ? 'drone' : 'exterior';
+      a.roomLabel = a.isDrone ? 'Drönare' : 'Exteriör';
+      a.roomType = a.clusterId;
+    }
+    return groups;
+  }
+  const avg = (g, k) => g.reduce((s, a) => s + a[k], 0) / Math.max(1, g.length);
 
   /** Analyserar en lista bilder med progress och andningspauser. */
   async function analyzeAll(assets, onProgress) {
@@ -1866,7 +2015,395 @@ const ImageAnalyze = (() => {
     return out;
   }
 
-  return { analyze, analyzeAll, similarity, classify, heroScore };
+  return { analyze, analyzeAll, similarity, sameRoomScore, clusterRooms, classify, heroScore };
+})();
+
+
+/* ===== 45-music-make.js ===== */
+/* ============================================================
+   45 — Musikmakaren
+
+   Motion skapar sina egna låtar. Det är inte en kosmetisk finess: när
+   appen komponerar musiken vet den EXAKT var varje takt, fras och
+   sektionsbyte ligger — den behöver inte gissa fram dem ur en waveform.
+   Klippunkterna blir därmed exakta i stället för ungefärliga, och det är
+   låten som bestämmer hur långt varje klipp blir.
+
+   Tempona är valda så att en takt hamnar nära den längd bostadsfilm
+   faktiskt klipper i (2,4–3,2 s). Med halvtakter som mellansteg får
+   regissören en stege av musikaliskt riktiga klipplängder att välja på.
+
+   Syntesen är additiv och skrivs rakt in i en Float32Array — inget
+   WebAudio-beroende, så låtarna går att bygga och verifiera headless.
+   ============================================================ */
+const MusicMake = (() => {
+  const SR = 44100;
+  const TAU = Math.PI * 2;
+  const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+
+  const SCALES = {
+    minor: [0, 2, 3, 5, 7, 8, 10],
+    major: [0, 2, 4, 5, 7, 9, 11],
+  };
+
+  /* ---------- stilar ----------
+     bpm väljs efter hur lång en takt blir:
+       76 → 3,16 s   80 → 3,00 s   88 → 2,73 s   100 → 2,40 s   112 → 2,14 s */
+  const STYLES = [
+    {
+      id: 'nordic', name: 'Nordic Calm', bpm: 80, root: 57, mode: 'minor',
+      prog: [0, 5, 3, 4],
+      mood: 'Stilla piano och varm pad. Standardvalet för svensk bostadsfilm.',
+      palette: { piano: 1, pad: 0.9, sub: 0.5, kick: 0.5, hat: 0.35, clap: 0, pluck: 0.4, impact: 0.5, riser: 0.4 },
+      kickPattern: [[], [0], [0, 2], [0, 2, 3.5], [0, 1.5, 2, 3.5]],
+    },
+    {
+      id: 'warm', name: 'Warm Daylight', bpm: 76, root: 60, mode: 'major',
+      prog: [0, 3, 5, 4],
+      mood: 'Dur, ljust och vänligt. Passar villa, trädgård och morgonljus.',
+      palette: { piano: 1, pad: 0.75, sub: 0.45, kick: 0.42, hat: 0.3, clap: 0, pluck: 0.55, impact: 0.4, riser: 0.35 },
+      kickPattern: [[], [0], [0, 2], [0, 2, 3.5], [0, 1.5, 2, 3.5]],
+    },
+    {
+      id: 'deep', name: 'Modern Deep', bpm: 100, root: 53, mode: 'minor',
+      prog: [0, 5, 6, 4],
+      mood: 'Stadig puls och djup bas. Nyproduktion, city, kväll.',
+      palette: { piano: 0.35, pad: 0.7, sub: 0.9, kick: 0.95, hat: 0.7, clap: 0.5, pluck: 0.6, impact: 0.7, riser: 0.6 },
+      kickPattern: [[], [0], [0, 2], [0, 1, 2, 3], [0, 1, 2, 3]],
+    },
+    {
+      id: 'uplift', name: 'Uplift', bpm: 112, root: 62, mode: 'major',
+      prog: [5, 3, 0, 4],
+      mood: 'Snabbare puls och plockade toner. Familjebostad, rörelse, ljus.',
+      palette: { piano: 0.4, pad: 0.6, sub: 0.7, kick: 0.85, hat: 0.75, clap: 0.65, pluck: 1, impact: 0.6, riser: 0.55 },
+      kickPattern: [[], [0], [0, 2], [0, 1, 2, 3], [0, 1, 2, 3]],
+    },
+    {
+      id: 'wide', name: 'Cinematic Wide', bpm: 88, root: 50, mode: 'minor',
+      prog: [0, 5, 3, 0],
+      mood: 'Breda stråkliknande svep och tunga anslag. Exteriör och drönare.',
+      palette: { piano: 0.5, pad: 1, sub: 0.8, kick: 0.6, hat: 0.2, clap: 0, pluck: 0.3, impact: 1, riser: 0.8 },
+      kickPattern: [[], [0], [0, 2], [0, 2], [0, 2, 3.5]],
+    },
+  ];
+  const styleById = id => STYLES.find(s => s.id === id) || STYLES[0];
+
+  /* ---------- ackord ur skalan ---------- */
+  function chordNotes(style, degree) {
+    const sc = SCALES[style.mode];
+    const at = d => style.root + Math.floor(d / 7) * 12 + sc[((d % 7) + 7) % 7];
+    return [at(degree), at(degree + 2), at(degree + 4)];
+  }
+
+  /* ---------- arrangemang ----------
+     Nivå 0 intro, 4 peak. Sektionerna faller ut ur nivåerna, så filmen
+     kan klippa på ett sektionsbyte som verkligen finns i låten. */
+  function arrange(nPhrases) {
+    const lv = new Array(nPhrases).fill(2);
+    lv[0] = 0;
+    if (nPhrases > 1) lv[1] = 1;
+    const pk = Math.max(2, Math.round((nPhrases - 1) * 0.62));
+    for (let i = 2; i < nPhrases; i++) lv[i] = i < pk ? 2 : i === pk ? 4 : 3;
+    lv[nPhrases - 1] = 1;
+    if (nPhrases >= 6) lv[nPhrases - 2] = 2;
+    return lv;
+  }
+
+  /* ---------- instrument ----------
+     Alla skriver direkt i mixbufferten. Ingen filterkedja — bara
+     summerade partialer med egna envelopes, vilket räcker långt och är
+     snabbt nog att köra i en enda synkron passning. */
+  function kick(buf, s, g) {
+    const n = (SR * 0.4) | 0;
+    let ph = 0;
+    for (let i = 0; i < n && s + i < buf.length; i++) {
+      const t = i / SR;
+      const f = 46 + 105 * Math.exp(-t * 34);
+      ph += TAU * f / SR;
+      const a = Math.exp(-t * 9) * (1 - Math.exp(-t * 900));
+      buf[s + i] += Math.sin(ph) * a * g;
+    }
+  }
+  function sub(buf, s, note, dur, g) {
+    const n = (SR * dur) | 0, f = mtof(note - 12);
+    for (let i = 0; i < n && s + i < buf.length; i++) {
+      const t = i / SR, e = Math.min(1, t * 22) * Math.min(1, (dur - t) * 6);
+      buf[s + i] += (Math.sin(TAU * f * t) * 0.85 + Math.sin(TAU * f * 2 * t) * 0.15) * e * g;
+    }
+  }
+  function hat(buf, s, g, open) {
+    const n = (SR * (open ? 0.2 : 0.055)) | 0;
+    let prev = 0;
+    for (let i = 0; i < n && s + i < buf.length; i++) {
+      const t = i / SR, r = Math.random() * 2 - 1;
+      const hp = r - prev; prev = r;                       // enkel diskant
+      buf[s + i] += hp * Math.exp(-t * (open ? 16 : 65)) * g * 0.35;
+    }
+  }
+  function clap(buf, s, g) {
+    for (let k = 0; k < 3; k++) {
+      const off = s + ((SR * 0.009 * k) | 0), n = (SR * 0.09) | 0;
+      let prev = 0;
+      for (let i = 0; i < n && off + i < buf.length; i++) {
+        const t = i / SR, r = Math.random() * 2 - 1, hp = r - prev; prev = r;
+        buf[off + i] += hp * Math.exp(-t * 34) * g * 0.3;
+      }
+    }
+    const n2 = (SR * 0.22) | 0;
+    let prev = 0;
+    for (let i = 0; i < n2 && s + i < buf.length; i++) {
+      const t = i / SR, r = Math.random() * 2 - 1, hp = r - prev; prev = r;
+      buf[s + i] += hp * Math.exp(-t * 13) * g * 0.11;
+    }
+  }
+  /** Piano: harmoniskt avtagande partialer, ljusare partialer dör först. */
+  function piano(buf, s, note, dur, g) {
+    const f0 = mtof(note), n = (SR * Math.min(dur, 3.2)) | 0;
+    const H = [1, 2, 3, 4, 5, 6], A = [1, 0.42, 0.22, 0.11, 0.06, 0.03];
+    for (let h = 0; h < H.length; h++) {
+      const f = f0 * H[h] * (1 + h * 0.0006), a = A[h] * g * 0.32, dec = 2.6 + h * 1.5;
+      if (f > 16000) continue;
+      for (let i = 0; i < n && s + i < buf.length; i++) {
+        const t = i / SR;
+        buf[s + i] += Math.sin(TAU * f * t) * a * Math.exp(-t * dec) * (1 - Math.exp(-t * 500));
+      }
+    }
+  }
+  function pluck(buf, s, note, g) {
+    const f0 = mtof(note), n = (SR * 0.55) | 0;
+    for (let h = 1; h <= 3; h++) {
+      const f = f0 * h, a = g * 0.26 / h;
+      if (f > 16000) continue;
+      for (let i = 0; i < n && s + i < buf.length; i++) {
+        const t = i / SR;
+        buf[s + i] += Math.sin(TAU * f * t) * a * Math.exp(-t * (7 + h * 4)) * (1 - Math.exp(-t * 800));
+      }
+    }
+  }
+  /** Pad: lätt detunade partialer med långsam attack — filmens grundton. */
+  function pad(buf, s, notes, dur, g) {
+    const n = (SR * dur) | 0;
+    for (const note of notes) {
+      const f0 = mtof(note);
+      for (const [mul, det, amp] of [[1, 0, 1], [1, 0.004, 0.8], [2, 0.002, 0.32], [3, -0.003, 0.13]]) {
+        const f = f0 * mul * (1 + det), a = g * 0.075 * amp;
+        if (f > 15000) continue;
+        for (let i = 0; i < n && s + i < buf.length; i++) {
+          const t = i / SR;
+          const e = Math.min(1, t / (dur * 0.35)) * Math.min(1, (dur - t) / (dur * 0.45));
+          buf[s + i] += Math.sin(TAU * f * t) * a * e;
+        }
+      }
+    }
+  }
+  function impact(buf, s, g) {
+    const n = (SR * 1.4) | 0;
+    let prev = 0;
+    for (let i = 0; i < n && s + i < buf.length; i++) {
+      const t = i / SR, r = Math.random() * 2 - 1, hp = r - prev; prev = r;
+      buf[s + i] += Math.sin(TAU * 41 * t) * Math.exp(-t * 3.2) * g * 0.5
+        + hp * Math.exp(-t * 12) * g * 0.09;
+    }
+  }
+  /** Riser inför ett sektionsbyte — hörbar signal om att ett klipp kommer. */
+  function riser(buf, s, dur, g) {
+    const n = (SR * dur) | 0;
+    let lp = 0;
+    for (let i = 0; i < n && s + i < buf.length; i++) {
+      const t = i / SR, p = t / dur;
+      const r = Math.random() * 2 - 1;
+      const k = 0.06 + p * 0.5;                            // öppnas uppåt
+      lp += (r - lp) * k;
+      buf[s + i] += (r - lp) * p * p * g * 0.16;
+    }
+  }
+
+  /* ---------- komposition ---------- */
+  /** Bygger en färdig låt och dess EXAKTA struktur.
+   *  targetSeconds styr antalet fraser; låten görs alltid något längre än
+   *  filmen så att sista klippet får sluta på en musikalisk punkt. */
+  function compose(styleId, targetSeconds) {
+    const style = styleById(styleId);
+    const beat = 60 / style.bpm, bar = beat * 4, phrase = bar * 4;
+    const nPhrases = Math.max(4, Math.ceil((targetSeconds + 1.5) / phrase));
+    const levels = arrange(nPhrases);
+    const nBars = nPhrases * 4;
+    const musicEnd = nBars * bar;
+    const tail = 2.2;
+    const total = musicEnd + tail;
+    const buf = new Float32Array(Math.ceil(total * SR) + 8);
+    const P = style.palette;
+    const S = t => Math.max(0, Math.round(t * SR));
+
+    for (let b = 0; b < nBars; b++) {
+      const t0 = b * bar;
+      const ph = (b / 4) | 0, lvl = levels[ph], inPhrase = b % 4;
+      const deg = style.prog[b % style.prog.length];
+      const notes = chordNotes(style, deg);
+      const dens = lvl / 4;
+      const isSectionStart = inPhrase === 0 && (ph === 0 || levels[ph - 1] !== lvl);
+
+      // pad: bärlagret, alltid närvarande men svagare i intro/outro
+      if (P.pad) pad(buf, S(t0), notes.map(n => n + 12), bar * 1.02, P.pad * (0.45 + dens * 0.55));
+      // bas
+      if (P.sub && lvl >= 1) sub(buf, S(t0), notes[0], bar * 0.94, P.sub * (0.5 + dens * 0.5));
+      if (P.sub && lvl >= 3) sub(buf, S(t0 + beat * 2.5), notes[2] - 12, beat * 1.2, P.sub * 0.4);
+
+      // trummor
+      for (const k of style.kickPattern[lvl]) kick(buf, S(t0 + k * beat), P.kick);
+      if (P.hat && lvl >= 2) {
+        const step = lvl >= 3 ? 0.5 : 1;
+        for (let x = (lvl >= 3 ? 0.5 : 1); x < 4; x += step)
+          hat(buf, S(t0 + x * beat), P.hat * (0.6 + dens * 0.4), lvl >= 4 && Math.abs(x - 3.5) < 0.01);
+      }
+      if (P.clap && lvl >= 3) { clap(buf, S(t0 + beat), P.clap); clap(buf, S(t0 + beat * 3), P.clap); }
+
+      // melodi
+      if (P.piano) {
+        piano(buf, S(t0), notes[0] + 12, bar, P.piano * (0.5 + dens * 0.5));
+        if (lvl >= 2) piano(buf, S(t0 + beat * 1.5), notes[1] + 12, beat * 2, P.piano * 0.55);
+        if (lvl >= 3) piano(buf, S(t0 + beat * 3), notes[2] + 12, beat, P.piano * 0.5);
+      }
+      if (P.pluck && lvl >= 2) {
+        const seq = lvl >= 4 ? [0, 0.75, 1.5, 2, 2.75, 3.5] : [0.75, 2, 3.25];
+        seq.forEach((x, i) => pluck(buf, S(t0 + x * beat), notes[i % 3] + 24, P.pluck * (0.45 + dens * 0.45)));
+      }
+
+      // sektionsmarkörer
+      if (isSectionStart && lvl >= 2 && P.impact) impact(buf, S(t0), P.impact);
+      if (P.riser && inPhrase === 3 && ph + 1 < nPhrases && levels[ph + 1] > lvl)
+        riser(buf, S(t0), bar, P.riser);
+    }
+
+    space(buf);
+    normalize(buf, musicEnd);
+
+    const structure = describe(style, nPhrases, levels, beat, bar, total);
+    return { style, samples: buf, sampleRate: SR, duration: total, structure };
+  }
+
+  /** Lite rum, utan att transienterna blir grumliga. */
+  function space(buf) {
+    for (const [ms, g] of [[37, 0.2], [53, 0.15], [71, 0.11]]) {
+      const d = (SR * ms / 1000) | 0;
+      for (let i = d; i < buf.length; i++) buf[i] += buf[i - d] * g;
+    }
+  }
+  function normalize(buf, musicEnd) {
+    let mx = 0;
+    for (let i = 0; i < buf.length; i++) { const a = Math.abs(buf[i]); if (a > mx) mx = a; }
+    const g = mx > 0 ? 0.89 / mx : 1;
+    const fadeIn = (SR * 0.05) | 0, fadeOutStart = (musicEnd * SR) | 0;
+    const fadeLen = buf.length - fadeOutStart;
+    for (let i = 0; i < buf.length; i++) {
+      let v = buf[i] * g;
+      if (i < fadeIn) v *= i / fadeIn;
+      if (i > fadeOutStart && fadeLen > 0) v *= Math.max(0, 1 - (i - fadeOutStart) / fadeLen);
+      buf[i] = Math.tanh(v * 1.08) * 0.94;                 // mjuk begränsning
+    }
+  }
+
+  /* ---------- den exakta strukturen ----------
+     Samma form som MusicStructure.analyze returnerar, men uträknad ur
+     arrangemanget i stället för uppmätt ur ljudet. Inga gissningar. */
+  function describe(style, nPhrases, levels, beat, bar, duration) {
+    const grid = [], downbeats = [], bars = [], phrases = [];
+    const nBars = nPhrases * 4;
+    for (let b = 0; b < nBars; b++) {
+      const t0 = b * bar, lvl = levels[(b / 4) | 0];
+      downbeats.push(U.round(t0, 3));
+      bars.push({ t: U.round(t0, 3), index: b, energy: U.round(lvl / 4, 3) });
+      for (let k = 0; k < 4; k++) grid.push(U.round(t0 + k * beat, 3));
+    }
+    for (let p = 0; p < nPhrases; p++) {
+      phrases.push({
+        t: U.round(p * bar * 4, 3), end: U.round((p + 1) * bar * 4, 3),
+        index: p, energy: U.round(levels[p] / 4, 3),
+      });
+    }
+
+    const sections = [];
+    for (let p = 0; p < nPhrases; p++) {
+      const lvl = levels[p];
+      const last = sections[sections.length - 1];
+      if (last && last.level === lvl) { last.end = U.round((p + 1) * bar * 4, 3); continue; }
+      sections.push({
+        t: U.round(p * bar * 4, 3), end: U.round((p + 1) * bar * 4, 3),
+        level: lvl, kind: lvl <= 1 ? 'low' : lvl >= 4 ? 'high' : 'mid',
+        energy: U.round(lvl / 4, 3), index: sections.length,
+      });
+    }
+    const peak = sections.reduce((a, b) => b.level > a.level ? b : a, sections[0]);
+    sections.forEach((s, i) => {
+      s.type = i === 0 ? 'intro' : s === peak ? 'peak'
+        : i === sections.length - 1 ? 'outro'
+          : s.level > sections[i - 1].level ? 'buildup' : 'body';
+    });
+
+    // energikurva var 0,25 s, direkt ur nivåerna
+    const step = 0.25, nE = Math.ceil(duration / step);
+    const energyCurve = new Array(nE).fill(0);
+    for (let i = 0; i < nE; i++) {
+      const t = i * step, p = Math.floor(t / (bar * 4));
+      energyCurve[i] = U.round(0.12 + 0.22 * (levels[U.clamp(p, 0, nPhrases - 1)] || 0), 3);
+    }
+
+    // klipppunkter: exakta, med styrka efter hur stor gränsen är
+    const cutPoints = [];
+    const push = (t, strength, kind) => {
+      if (t < 0.2 || t > nBars * bar - 0.05) return;
+      const ex = cutPoints.find(c => Math.abs(c.t - t) < 0.03);
+      if (ex) { if (strength > ex.strength) { ex.strength = strength; ex.kind = kind; } return; }
+      cutPoints.push({ t: U.round(t, 3), strength, kind });
+    };
+    for (const s of sections) push(s.t, 1.55, 'section');
+    for (const p of phrases) push(p.t, 1.25, 'phrase');
+    for (const d of downbeats) push(d, 1.0, 'downbeat');
+    for (const d of downbeats) push(d + bar / 2, 0.6, 'halfbar');
+    cutPoints.sort((a, b) => a.t - b.t);
+
+    return {
+      composed: true, styleId: style.id, styleName: style.name,
+      duration: U.round(duration, 3), bpm: style.bpm, beatPeriod: U.round(beat, 4),
+      beats: downbeats.flatMap(t => [0, 1, 2, 3].map(k => U.round(t + k * beat, 3))).filter(t => t < duration),
+      grid, downbeats, bars, phrases, sections, accents: [], cutPoints,
+      energyStep: step, energyCurve, barsPerPhrase: 4,
+      barSeconds: U.round(bar, 3),
+    };
+  }
+
+  /* ---------- WAV ---------- */
+  function toWav(samples, sr) {
+    const n = samples.length;
+    const b = new ArrayBuffer(44 + n * 2), v = new DataView(b);
+    const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    str(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); str(8, 'WAVE');
+    str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    str(36, 'data'); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) {
+      const s = Math.max(-1, Math.min(1, samples[i]));
+      v.setInt16(44 + i * 2, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+    }
+    return new Blob([b], { type: 'audio/wav' });
+  }
+
+  /** Komponerar och lägger in låten i mediabiblioteket som vilken låt som
+   *  helst — men med den exakta strukturen fastnitad på mediaobjektet. */
+  async function makeTrack(styleId, targetSeconds) {
+    const out = compose(styleId, targetSeconds);
+    const blob = toWav(out.samples, out.sampleRate);
+    const name = `${out.style.name} · ${out.style.bpm} BPM · ${Math.round(out.duration)}s.wav`;
+    const file = new File([blob], name, { type: 'audio/wav' });
+    const media = await Media.ingestOne(file);
+    media.composed = out.structure;
+    media.bpm = out.style.bpm;                             // känd, inte uppskattad
+    media.beats = out.structure.beats;
+    media.generated = { styleId: out.style.id, targetSeconds };
+    return media;
+  }
+
+  return { STYLES, styleById, compose, toWav, makeTrack, chordNotes, arrange };
 })();
 
 
@@ -1886,6 +2423,9 @@ const MusicStructure = (() => {
 
   function analyze(media) {
     if (!media || media.type !== 'audio') throw new Error('Ingen musikfil vald');
+    // Låtar som appen själv komponerat bär med sig sin exakta struktur.
+    // Att mäta upp den ur waveformen igen kan bara göra den sämre.
+    if (media.composed) return { ...media.composed, id: U.uid('ma'), assetId: media.id, at: Date.now() };
     const dur = media.duration || 0;
     const beats = (media.beats || []).slice();
     const peaks = media.wave || [];
@@ -2066,53 +2606,61 @@ const MusicStructure = (() => {
    ============================================================ */
 const Director = (() => {
 
+  /** Användarens rättningar. Regissören är ett förslag, inte ett facit —
+   *  allt som ändras för hand måste överleva att planen byggs om. */
+  const noOverrides = () => ({ moves: new Map(), durations: new Map(), rooms: new Map(), names: new Map() });
+
   /* ---------- 1. ORDNING ---------- */
-  /** Bygger en rundtur i stället för en mekanisk rum-för-rum-sortering. */
-  function orderImages(assets, ia) {
+  /** Bygger en rundtur. Bilderna grupperas först i rum efter hur lika de är,
+   *  så att samma rum fotograferat från flera håll alltid hamnar ihop. Ingen
+   *  gissning om vad rummet heter behövs för det. */
+  function orderImages(assets, ia, ov = noOverrides()) {
     const items = assets.map(a => ({ a, f: ia.get(a.id) })).filter(x => x.f);
     if (!items.length) return [];
+    ImageAnalyze.clusterRooms(items.map(x => x.f));
+    applyRoomOverrides(items, ov);
 
-    const by = t => items.filter(x => x.f.roomType === t && !x.used);
-    const bestOf = list => list.slice().sort((p, q) => q.f.heroScore - p.f.heroScore)[0];
     const seq = [];
     const take = (x, role, why) => { if (!x || x.used) return false; x.used = true; x.role = role; x.why = why; seq.push(x); return true; };
+    const free = pred => items.filter(x => !x.used && pred(x));
+    const best = list => list.slice().sort((p, q) => q.f.heroScore - p.f.heroScore)[0];
 
-    // Öppning: starkaste exteriör eller drönarbild — annars starkaste bilden alls
-    const opener = bestOf(items.filter(x => x.f.isExterior || x.f.isDrone)) || bestOf(items);
+    // Öppning: starkaste utomhusbilden — annars starkaste bilden alls
+    const opener = best(free(x => x.f.isExterior)) || best(free(() => true));
     take(opener, 'hero', 'Starkaste etableringsbilden — den öppnar filmen och placerar bostaden.');
 
-    // Entré efter etableringen om den finns
-    take(bestOf(by('entry')), 'support', 'Entrén tar betraktaren in i bostaden.');
-
-    // Interiören i rundturens ordning, hero först i varje rum
-    const interior = MM.TOUR_ORDER.filter(t => !['exterior', 'drone', 'entry', 'detail', 'garden', 'balcony', 'other'].includes(t));
+    // Interiören rum för rum. Störst rum först — det är normalt sällskapsytan,
+    // och en rundtur som börjar där känns igen från riktig bostadsfilm.
+    const interior = items.filter(x => !x.f.isExterior && !x.f.isDetail);
+    const clusters = [...new Set(interior.map(x => x.f.clusterId))]
+      .sort((p, q) => interior.filter(x => x.f.clusterId === q).length
+        - interior.filter(x => x.f.clusterId === p).length);
     let sinceDetail = 0;
-    for (const room of interior) {
-      const group = by(room).sort((p, q) => q.f.heroScore - p.f.heroScore);
-      for (let i = 0; i < group.length; i++) {
-        const role = i === 0 && group[i].f.heroScore > 0.5 ? 'hero' : 'support';
-        take(group[i], role, `${MM.roomName(room)}${i === 0 ? ' — rummets starkaste vinkel' : ', kompletterande vinkel'}.`);
+    for (const cid of clusters) {
+      const group = free(x => x.f.clusterId === cid).sort((p, q) => q.f.heroScore - p.f.heroScore);
+      group.forEach((x, i) => {
+        const role = i === 0 && x.f.heroScore > 0.5 ? 'hero' : 'support';
+        take(x, role, i === 0
+          ? `${x.f.roomLabel} — rummets starkaste vinkel.`
+          : `${x.f.roomLabel}, ny vinkel i samma rum.`);
         sinceDetail++;
-        // detalj som andhämtning efter några rumsbilder
-        if (sinceDetail >= 3) {
-          const det = bestOf(by('detail'));
-          if (det) { take(det, 'detail', 'Detalj som andningspaus mellan rummen.'); sinceDetail = 0; }
-        }
+      });
+      // Detaljen läggs MELLAN rum, aldrig mitt i ett. Ett rum som avbryts av
+      // en närbild och sedan fortsätter ser ut som ett klippfel.
+      if (sinceDetail >= 2) {
+        const det = best(free(x => x.f.isDetail));
+        if (det) { take(det, 'detail', 'Detalj som övergång till nästa rum.'); sinceDetail = 0; }
       }
     }
-    // Uteplatser mot slutet
-    for (const t of ['balcony', 'garden']) {
-      for (const x of by(t).sort((p, q) => q.f.heroScore - p.f.heroScore))
-        take(x, x.f.heroScore > 0.55 ? 'hero' : 'support', `${MM.roomName(t)} — övergången ut.`);
-    }
-    // Resten
-    for (const x of items.filter(x => !x.used).sort((p, q) => q.f.heroScore - p.f.heroScore))
-      take(x, x.f.isDetail ? 'detail' : 'support', 'Kompletterar rundturen.');
+    for (const x of free(x => x.f.isDetail).sort((p, q) => q.f.heroScore - p.f.heroScore))
+      take(x, 'detail', 'Detalj som ger filmen andrum.');
+    for (const x of free(() => true).sort((p, q) => q.f.heroScore - p.f.heroScore))
+      take(x, 'support', 'Kompletterar rundturen.');
 
-    // Avslutning: spara en stark exteriör till sist om vi har fler än en
-    const exteriors = seq.filter(x => x.f.isExterior || x.f.isDrone);
-    if (exteriors.length > 1 && seq.length > 3) {
-      const closer = exteriors.slice(1).sort((p, q) => q.f.heroScore - p.f.heroScore)[0];
+    // Avslutning: spara en stark utomhusbild till sist
+    const ext = seq.filter(x => x.f.isExterior);
+    if (ext.length > 1 && seq.length > 3) {
+      const closer = ext.slice(1).sort((p, q) => q.f.heroScore - p.f.heroScore)[0];
       if (closer && seq[seq.length - 1] !== closer) {
         seq.splice(seq.indexOf(closer), 1);
         closer.role = 'closer';
@@ -2123,16 +2671,55 @@ const Director = (() => {
     return separateDuplicates(seq);
   }
 
-  /** Två nästan identiska bilder efter varandra ser ut som ett fel. Skjut isär dem. */
+  /** Klustringen är bra men inte ofelbar. Flyttar användaren en bild till ett
+   *  annat rum, eller döper om ett rum, gäller det före maskinens gruppering —
+   *  och det gäller för alla bilder i samma rum, inte bara den man klickade på. */
+  function applyRoomOverrides(items, ov) {
+    for (const x of items) {
+      const forced = ov.rooms.get(x.a.id);
+      if (!forced) continue;
+      x.f.clusterId = forced;
+      x.f.roomType = forced;
+      // Flyttar användaren en bild till Exteriör eller Drönare är det ett
+      // besked om vad bilden FÖRESTÄLLER, inte bara var den ska ligga i
+      // rundturen — kamerareglerna måste följa med.
+      x.f.isExterior = forced === 'exterior' || forced === 'drone';
+      x.f.isDrone = forced === 'drone';
+      x.f.isDetail = forced === 'detail';
+      x.f.scene = x.f.isDrone ? 'drone' : x.f.isExterior ? 'exterior' : x.f.isDetail ? 'detail' : 'interior';
+    }
+    const sizes = new Map();
+    for (const x of items) sizes.set(x.f.clusterId, (sizes.get(x.f.clusterId) || 0) + 1);
+    for (const x of items) {
+      const cid = x.f.clusterId;
+      const named = ov.names.get(cid);
+      if (named) x.f.roomLabel = named;
+      else if (cid === 'exterior') x.f.roomLabel = 'Exteriör';
+      else if (cid === 'drone') x.f.roomLabel = 'Drönare';
+      else if (x.f.isDetail && sizes.get(cid) === 1) x.f.roomLabel = 'Detalj';
+      else x.f.roomLabel = 'Rum ' + String(cid).replace(/^room/, '');
+      x.f.clusterSize = sizes.get(cid);
+    }
+  }
+
+  /** Alla rum som finns i materialet — underlag till rullgardinen i planen. */
+  function roomsOf(assets, ia, ov = noOverrides()) {
+    const items = assets.map(a => ({ a, f: ia.get(a.id) })).filter(x => x.f);
+    ImageAnalyze.clusterRooms(items.map(x => x.f));
+    applyRoomOverrides(items, ov);
+    const out = [];
+    for (const x of items) if (!out.some(r => r.id === x.f.clusterId))
+      out.push({ id: x.f.clusterId, label: x.f.roomLabel, size: x.f.clusterSize });
+    return out;
+  }
+
+  /** Två nästan identiska bilder efter varandra ser ut som ett fel. Skjut isär
+   *  dem — men bara om de är nästan identiska, inte bara samma rum. */
   function separateDuplicates(seq) {
     for (let i = 1; i < seq.length; i++) {
-      const sim = ImageAnalyze.similarity(seq[i - 1].f, seq[i].f);
-      if (sim < 0.88) continue;
-      // hitta något att byta med längre fram som inte liknar grannarna
+      if (ImageAnalyze.similarity(seq[i - 1].f, seq[i].f) < 0.92) continue;
       for (let j = i + 2; j < seq.length; j++) {
-        const okPrev = ImageAnalyze.similarity(seq[i - 1].f, seq[j].f) < 0.85;
-        const okNext = i + 1 >= seq.length || ImageAnalyze.similarity(seq[j].f, seq[i + 1].f) < 0.85;
-        if (okPrev && okNext) {
+        if (ImageAnalyze.similarity(seq[i - 1].f, seq[j].f) < 0.85) {
           const tmp = seq[i]; seq[i] = seq[j]; seq[j] = tmp;
           seq[i].why += ' Flyttad för att inte hamna intill en nästan identisk bild.';
           break;
@@ -2143,90 +2730,123 @@ const Director = (() => {
   }
 
   /* ---------- 2. LÄNGDER PÅ MUSIKENS PUNKTER ---------- */
-  const ROLE_WEIGHT = { hero: 1.38, closer: 1.25, support: 1.0, detail: 0.72 };
+  /* Premium bostadsfilm klipper i 2,5–4 sekunder. Kortare blir stressigt,
+     längre blir dött — och Kling genererar bara heltalssekunder, så 3 s är
+     både den rätta rytmen och det billigaste valet. */
+  const SHOT_TARGET = { hero: 3.6, closer: 3.4, support: 3.0, detail: 2.4 };
+  const SHOT_MIN = 1.8, SHOT_MAX = 4.5, SHOT_MAX_MANUAL = 7.0;
 
-  function planCuts(seq, ma, targetDuration) {
-    const n = seq.length;
-    const musicLimit = Math.min(targetDuration, ma.duration - 0.6);
-    const totalWeight = seq.reduce((a, x) => a + (ROLE_WEIGHT[x.role] || 1), 0);
+  /** Hur lång kan filmen bli med det bildmaterial som finns? */
+  function feasibleDuration(seq, ma, targetDuration, ov) {
+    const byImages = seq.reduce((a, x) => a + (ov.durations.get(x.a.id) || SHOT_TARGET[x.role] || 3.0), 0);
+    return Math.min(targetDuration, ma.duration - 0.4, byImages);
+  }
+
+  /** Vilka längder kan det här klippet få utan att lämna musiken?
+   *  Stegen är låtens egna klipppunkter — därför ligger varje längd
+   *  användaren kan välja garanterat på en takt, fras eller sektion. */
+  function durationOptions(ma, tStart, manual = true) {
+    const max = manual ? SHOT_MAX_MANUAL : SHOT_MAX;
+    const out = [];
+    for (const c of ma.cutPoints) {
+      const d = c.t - tStart;
+      if (d < SHOT_MIN - 0.02 || d > max + 0.02) continue;
+      if (c.t > ma.duration - 0.3) continue;
+      out.push({ t: U.round(c.t, 3), duration: U.round(d, 2), kind: c.kind, strength: c.strength });
+    }
+    return out;
+  }
+
+  /** Klippunkterna hämtas ALLTID ur musiken. Går bilderna inte ihop med
+   *  filmens längd får bilder utgå — de får aldrig klippas bredvid takten.
+   *  Ett klipp som ligger en tredjedels sekund fel hörs direkt, och det är
+   *  hela poängen med att låta musiken styra. */
+  function planCuts(seq, ma, targetDuration, ov = noOverrides()) {
+    const limit = feasibleDuration(seq, ma, targetDuration, ov);
     const cuts = [];
     let t = 0;
 
-    for (let i = 0; i < n; i++) {
-      const w = ROLE_WEIGHT[seq[i].role] || 1;
-      let want = musicLimit * (w / totalWeight);
-      want = U.clamp(want, 1.8, 6.5);
-      const rest = n - i - 1;
-      // se till att det finns tid kvar åt de shots som återstår
-      const maxHere = Math.max(1.8, musicLimit - t - rest * 1.9);
-      want = Math.min(want, maxHere);
+    for (let i = 0; i < seq.length; i++) {
+      const forced = ov.durations.get(seq[i].a.id);
+      const want = forced || SHOT_TARGET[seq[i].role] || 3.0;
+      const rest = seq.length - i - 1;
+      const opts = durationOptions(ma, t, !!forced);
+      if (!opts.length) { for (let j = i; j < seq.length; j++) seq[j].dropped = true; break; }
 
-      // hero och sektionsstart vill ligga på starka punkter
-      const minStrength = seq[i].role === 'hero' || seq[i].role === 'closer' ? 1.0 : 0.6;
-      const desired = t + want;
-      let cut = MusicStructure.nearestCut(ma, desired, minStrength);
-      if (!cut || Math.abs(cut.t - desired) > want * 0.45) cut = MusicStructure.nearestCut(ma, desired, 0.6);
-      let end = cut ? cut.t : desired;
-      if (i === n - 1) end = Math.min(musicLimit, Math.max(t + 1.8, end));
-      if (end - t < 1.6) end = t + 1.8;
-      end = Math.min(end, musicLimit);                 // filmen får aldrig bli längre än musiken
-      if (end - t < 1.5) { // resten ryms inte
-        for (let j = i; j < n; j++) seq[j].dropped = true;
-        break;
+      // ett automatiskt klipp måste lämna plats åt resten av bilderna
+      const ceiling = forced ? ma.duration - 0.3 : limit;
+      let cands = opts.filter(o => o.t + rest * SHOT_MIN <= ceiling + 0.01);
+      if (!cands.length) cands = opts.filter(o => o.t <= ceiling + 0.01);
+      if (!cands.length) { for (let j = i; j < seq.length; j++) seq[j].dropped = true; break; }
+
+      // närmast önskad längd vinner; hero och avslut får dra mot en starkare
+      // punkt i musiken när det finns en i närheten
+      const pull = forced ? 0 : (seq[i].role === 'hero' || seq[i].role === 'closer') ? 0.5 : 0.18;
+      let best = cands[0], bestS = -1e9;
+      for (const o of cands) {
+        const s = -Math.abs(o.duration - want) + o.strength * pull;
+        if (s > bestS) { bestS = s; best = o; }
       }
-      cuts.push({ in: U.round(t, 3), out: U.round(end, 3), cut: cut || { kind: 'free', strength: 0 } });
-      t = end;
-      if (t >= musicLimit - 1.5) {
-        for (let j = i + 1; j < n; j++) seq[j].dropped = true;
-        break;
-      }
+
+      cuts.push({ in: U.round(t, 3), out: U.round(best.t, 3), cut: best, forced: !!forced });
+      t = best.t;
     }
     return cuts;
   }
 
   /* ---------- 3. KAMERARÖRELSER ---------- */
-  /** Poängsätter en rörelse mot bilden, grannarna och musiken. */
+  /** Poängsätter en rörelse mot bilden, grannarna och musiken.
+   *  Scentypen sätter hårda ramar: en drönarbild ska aldrig få en sidled-slide,
+   *  och en närbild ska aldrig få något annat än en mycket lugn push in. */
   function scoreMove(mv, x, prev, prev2, energy) {
     const f = x.f;
-    if (mv.droneOnly && !f.isDrone) return -Infinity;
-    if (prev && prev.movementId === mv.id) return -Infinity;   // aldrig samma två i rad
+    if (prev && prev.movementId === mv.id) return -Infinity;    // aldrig samma två i rad
+
+    // --- hårda ramar per scentyp ---
+    // Varje rörelse säger själv vilka scener den hör hemma i. En drönarbild
+    // kan inte slidas i sidled, ett badrum kan inte lyftas som en fasad, och
+    // en närbild tål inget annat än en lugn push. Det är regler, inte poäng:
+    // en dålig rörelse ska inte kunna vinna för att bilden i övrigt passar.
+    const scene = f.scene || (f.isDrone ? 'drone' : f.isExterior ? 'exterior' : f.isDetail ? 'detail' : 'interior');
+    if (!mv.scenes || !mv.scenes.includes(scene)) return -Infinity;
+
     let s = 0;
-
-    // passar rummet
-    s += mv.fits.includes(f.roomType) ? 0.9 : (mv.fits.includes('exterior') && f.isExterior ? 0.5 : 0);
-
-    // passar bildens geometri
-    if (mv.wants) {
-      if (mv.wants.symmetry) s += f.symmetry * mv.wants.symmetry * 1.5;
-      if (mv.wants.depth) s += f.depthScore * mv.wants.depth * 1.6;
-      if (mv.wants.width) s += U.clamp(f.aspect / 1.8, 0, 1) * mv.wants.width;
-      if (mv.wants.height) s += (1 - f.horizonY) * mv.wants.height;
-      if (mv.wants.openness) s += U.clamp(1 - f.edgeDensity * 5, 0, 1) * mv.wants.openness;
+    // --- bildens geometri avgör ---
+    if (f.symmetry > 0.58 && mv.axis === 'z') s += 1.0;         // symmetriskt rum vill ha push
+    if (f.depthScore > 0.42 && mv.axis === 'x') s += 0.85;      // djup åt sidan vill ha slide
+    if (f.depthScore > 0.5 && mv.axis === 'z') s += 0.5;        // djup rakt in vill ha push
+    if (f.isExterior && !f.isDrone) {
+      if (mv.id === 'slow_push_in') s += 0.9;
+      if (mv.id === 'slow_rise' || mv.id === 'rise_tilt_down') s += 0.8;
     }
-    // symmetrisk interiör vill ha push in/out
-    if (f.symmetry > 0.62 && mv.axis === 'z') s += 0.55;
-    // brett rum med djup vill ha slide
-    if (f.depthScore > 0.45 && f.symmetry < 0.55 && mv.axis === 'x') s += 0.45;
-    // detalj: bara mycket subtil push in
-    if (f.isDetail) s += mv.id === 'slow_push_in' ? 0.8 : -0.7;
-    // drönare
-    if (f.isDrone && mv.droneOnly) s += 0.7;
+    if (f.isDrone && mv.droneOnly) s += 1.2;
+    if (f.isDetail && mv.id === 'slow_push_in') s += 1.2;
+    if (mv.wants) {
+      if (mv.wants.symmetry) s += f.symmetry * mv.wants.symmetry;
+      if (mv.wants.depth) s += f.depthScore * mv.wants.depth;
+      if (mv.wants.width) s += U.clamp(f.aspect / 1.8, 0, 1) * mv.wants.width * 0.6;
+      if (mv.wants.height) s += (1 - f.horizonY) * mv.wants.height * 0.6;
+    }
+    // Riktningen är inte godtycklig: rör kameran mot det ljusare hållet så
+    // avslöjas fönstret, vilket är vad en fotograf gör. Utan det här blir
+    // vänster och höger likvärdiga och vänster vinner alltid av en slump.
+    if (mv.axis === 'x' || mv.axis === 'xz') s += (mv.dir || 0) * (f.lumBalance || 0) * 2.6;
+    // sammansatta rörelser bara när bilden har både djup och bredd
+    if (mv.axis === 'xz' || mv.axis === 'yz') s += (f.depthScore > 0.45 ? 0.3 : -0.9);
+    if (mv.sparse) s -= 0.7;
 
-    // musikens energi: lugna rörelser i intro/outro, mer rörelse i höga partier
-    s -= Math.abs(mv.energy - U.clamp(energy * 1.1, 0.25, 0.75)) * 0.7;
+    // --- musiken ---
+    s -= Math.abs(mv.energy - U.clamp(0.3 + energy * 0.5, 0.3, 0.7)) * 0.8;
 
-    // sparsamma rörelser kräver starkare motiv
-    if (mv.sparse) s -= 0.45;
-
-    // ---- grannregler ----
+    // --- variation utan konstlat mönster ---
     if (prev) {
       const pm = MM.moveById(prev.movementId);
-      if (pm.axis === mv.axis) s -= 0.35;                            // variera axel
-      if (pm.axis === mv.axis && pm.dir === -mv.dir) s -= 0.5;       // fram-och-tillbaka ser konstlat ut
+      if (pm.axis === mv.axis) s -= 0.45;
+      if (pm.axis === mv.axis && pm.dir === -mv.dir) s -= 0.6;   // fram-och-tillbaka
       if (prev2) {
         const pm2 = MM.moveById(prev2.movementId);
-        if (pm2.axis === mv.axis && pm.axis !== mv.axis) s -= 0.4;   // A-B-A-mönster
-        if (pm2.movementId === mv.id) s -= 0.6;
+        if (pm2.movementId === mv.id) s -= 0.7;
+        if (pm2.axis === mv.axis && pm.axis !== mv.axis) s -= 0.5;
       }
     }
     return s;
@@ -2242,10 +2862,11 @@ const Director = (() => {
   }
 
   /* ---------- 4. HELA PLANEN ---------- */
-  function buildPlan({ assets, imageAnalysis, musicAnalysis, targetDuration, provider, aspect }) {
-    const seq = orderImages(assets, imageAnalysis);
+  function buildPlan({ assets, imageAnalysis, musicAnalysis, targetDuration, provider, aspect, overrides }) {
+    const ov = overrides || noOverrides();
+    const seq = orderImages(assets, imageAnalysis, ov);
     if (!seq.length) throw new Error('Inga analyserade bilder att regissera.');
-    const cuts = planCuts(seq, musicAnalysis, targetDuration);
+    const cuts = planCuts(seq, musicAnalysis, targetDuration, ov);
     const shots = [];
     const planId = U.uid('plan');
 
@@ -2255,7 +2876,8 @@ const Director = (() => {
       const c = cuts[i];
       const energy = MusicStructure.energyAt(musicAnalysis, (c.in + c.out) / 2);
       const prev = shots[shots.length - 1], prev2 = shots[shots.length - 2];
-      const { move } = chooseMove(x, prev, prev2, energy);
+      const forcedMove = ov.moves.get(x.a.id);
+      const move = forcedMove ? MM.moveById(forcedMove) : chooseMove(x, prev, prev2, energy).move;
       const d = MM.planDurations(c.out - c.in, provider);
       const sec = MusicStructure.sectionAt(musicAnalysis, c.in);
 
@@ -2263,8 +2885,12 @@ const Director = (() => {
         planId, index: i, assetId: x.a.id, movementId: move.id,
         timelineIn: c.in, timelineOut: c.out,
         generatedDuration: d.generatedDuration, sourceIn: d.sourceIn, sourceOut: d.sourceOut,
-        role: x.role, roomType: x.f.roomType,
-        motivation: motivate(x, move, c, sec, prev),
+        role: x.role, roomType: x.f.roomType, roomLabel: x.f.roomLabel || null,
+        clusterId: x.f.clusterId || null,
+        movementLocked: !!forcedMove, durationLocked: !!c.forced,
+        motivation: forcedMove || c.forced
+          ? handEdited(x, move, c, !!forcedMove, !!c.forced)
+          : motivate(x, move, c, sec, prev),
       }));
     }
 
@@ -2277,6 +2903,17 @@ const Director = (() => {
       rationale: summarize(shots, musicAnalysis, dropped),
     };
   }
+
+  /** Har användaren bestämt något själv säger vi det rakt ut i stället för att
+   *  hitta på en motivering åt ett val regissören inte gjorde. */
+  function handEdited(x, move, cut, movedByHand, timedByHand) {
+    const bits = [x.why];
+    if (movedByHand) bits.push(`${move.name} — vald för hand.`);
+    else bits.push(`${move.name}.`);
+    if (timedByHand) bits.push(`Längden satt för hand, snäppt till närmaste ${cutWord(cut.cut.kind)}.`);
+    return bits.join(' ');
+  }
+  const cutWord = k => ({ section: 'sektionsbyte', phrase: 'frasgräns', downbeat: 'downbeat', halfbar: 'halvtakt', accent: 'accent' }[k] || 'taktpunkt');
 
   /** Motiveringen speglar de mått som faktiskt styrde valet. */
   function motivate(x, move, cut, section, prev) {
@@ -2296,7 +2933,7 @@ const Director = (() => {
   }
 
   function summarize(shots, ma, dropped) {
-    const rooms = [...new Set(shots.map(s => MM.roomName(s.roomType)))];
+    const rooms = [...new Set(shots.map(s => s.roomLabel || MM.roomName(s.roomType)))];
     const moves = [...new Set(shots.map(s => MM.moveById(s.movementId).name))];
     const onMusic = shots.filter((s, i) => i > 0).length;
     return `${shots.length} shots över ${U.round(shots.length ? shots[shots.length - 1].timelineOut : 0, 1)} s. ` +
@@ -2334,7 +2971,7 @@ const Director = (() => {
     return {
       task: 'Regissera en bostadsfilm. Returnera shots i samma schema.',
       targetDuration,
-      movements: MM.MOVES.map(m => ({ id: m.id, name: m.name, fits: m.fits, energy: m.energy, sparse: !!m.sparse, droneOnly: !!m.droneOnly })),
+      movements: MM.MOVES.map(m => ({ id: m.id, name: m.name, scenes: m.scenes, energy: m.energy, sparse: !!m.sparse })),
       music: {
         bpm: musicAnalysis.bpm, duration: musicAnalysis.duration,
         sections: musicAnalysis.sections, phrases: musicAnalysis.phrases.map(p => p.t),
@@ -2360,7 +2997,20 @@ const Director = (() => {
     };
   }
 
-  return { buildPlan, orderImages, planCuts, chooseMove, scoreMove, validate, brief, motivate };
+  /** Vilka rörelser passar den här bilden? Regissören rangordnar dem, men
+   *  användaren får se hela biblioteket — de olämpliga tydligt märkta. */
+  function moveOptions(x, prev, prev2, energy) {
+    return MM.MOVES.map(mv => {
+      const s = scoreMove(mv, x, prev, prev2, energy);
+      return { move: mv, score: s, suitable: s > -Infinity };
+    }).sort((a, b) => b.score - a.score);
+  }
+
+  return {
+    buildPlan, orderImages, planCuts, chooseMove, scoreMove, validate, brief, motivate,
+    durationOptions, moveOptions, roomsOf, noOverrides, applyRoomOverrides,
+    SHOT_MIN, SHOT_MAX, SHOT_MAX_MANUAL,
+  };
 })();
 
 
@@ -2619,9 +3269,12 @@ const Generation = (() => {
 
     if (ctx.music) {
       p.media.push(ctx.music);
+      // Musiken slutar när bilden slutar. Att låta den ringa ut efter sista
+      // rutan gör bara filmen längre än den ser ut att vara.
+      const videoEnd = p.tracks.video.reduce((a, c) => Math.max(a, c.start + (c.out - c.in)), 0);
       const a = M.newAudioClip(ctx.music, 0);
-      a.out = Math.min(ctx.music.duration, M.totalDuration(p) + 1.5);
-      a.fade = { in: 0.6, out: 2.2 };
+      a.out = Math.min(ctx.music.duration, videoEnd);
+      a.fade = { in: 0.6, out: Math.min(2.2, videoEnd * 0.25) };
       p.tracks.music.push(a);
     }
     for (const img of (ctx.assets || [])) if (!p.media.find(m => m.id === img.id)) p.media.push(img);
@@ -5481,6 +6134,7 @@ const Motion = (() => {
     phase: '', progress: 0,
     result: null,
     credits: null,
+    overrides: { moves: new Map(), durations: new Map(), rooms: new Map(), names: new Map() },
   };
   let root = null;
 
@@ -5594,11 +6248,13 @@ const Motion = (() => {
   function viewMusic() {
     const list = U.el('div', { class: 'mo-tracks' });
     const tracks = S.project.media.filter(m => m.type === 'audio');
-    if (!tracks.length) list.append(U.el('div', { class: 'hint', style: { padding: '10px 0' } }, 'Ingen musik importerad ännu.'));
+    if (!tracks.length) list.append(U.el('div', { class: 'hint', style: { padding: '10px 0' } },
+      'Ingen låt ännu. Skapa en nedan, eller ladda upp din egen.'));
 
     for (const m of tracks) {
       const sel = st.music && st.music.id === m.id;
       const wave = U.el('canvas', { class: 'mo-wave', width: 600, height: 40 });
+      const c = m.composed;
       const row = U.el('div', {
         class: 'mo-track' + (sel ? ' on' : ''),
         onclick: () => { st.music = m; render(); },
@@ -5607,18 +6263,42 @@ const Motion = (() => {
           class: 'mo-play', onclick: e => { e.stopPropagation(); togglePlay(m); },
         }, playingId === m.id ? '❚❚' : '▶'),
         U.el('div', { class: 'mo-tmeta' },
-          U.el('div', { class: 'nm', text: m.name.replace(/\.[^.]+$/, '') }),
-          U.el('div', { class: 'hint mono' }, `${m.bpm ? m.bpm + ' BPM · ' : ''}${U.dur(m.duration)}${m.beats ? ' · ' + m.beats.length + ' transienter' : ''}`)),
+          U.el('div', { class: 'nm' }, m.name.replace(/\.[^.]+$/, ''),
+            c ? U.el('span', { class: 'tag accent', style: { marginLeft: '6px' }, text: 'SKAPAD' }) : null),
+          U.el('div', { class: 'hint mono' }, c
+            ? `${c.bpm} BPM · ${U.dur(c.duration)} · takt ${c.barSeconds}s · ${c.sections.length} sektioner · ${c.cutPoints.length} klipplägen`
+            : `${m.bpm ? m.bpm + ' BPM · ' : ''}${U.dur(m.duration)}${m.beats ? ' · ' + m.beats.length + ' transienter (uppmätta)' : ''}`)),
         sel ? wave : U.el('span', { class: 'hint mono', text: U.dur(m.duration) }));
       list.append(row);
       if (sel) requestAnimationFrame(() => drawWave(wave, m));
     }
 
-    return shell('Välj soundtrack',
-      'Musiken är inte bakgrund — den bestämmer var filmen klipper.',
-      U.el('div', {}, list,
-        U.el('button', { class: 'btn', style: { marginTop: '10px' }, onclick: () => pickFiles('audio') }, 'Ladda upp musik'),
-        U.el('div', { class: 'mo-field', style: { marginTop: '14px' } },
+    /* Låtarna är inte pynt: eftersom appen komponerar dem vet den exakt var
+       takterna ligger, och det är takterna som bestämmer klipplängderna. */
+    const styles = U.el('div', { class: 'mo-styles' },
+      ...MusicMake.STYLES.map(s => {
+        const barSec = 240 / s.bpm;
+        // vilka klipplängder låten faktiskt erbjuder: hel och halv takt inom
+        // det spann ett klipp får ligga i
+        const steps = [];
+        for (let k = 1; k * barSec / 2 <= Director.SHOT_MAX_MANUAL + 0.01; k++) {
+          const d = U.round(k * barSec / 2, 2);
+          if (d >= Director.SHOT_MIN) steps.push(d);
+        }
+        return U.el('div', { class: 'preset-card', onclick: () => composeTrack(s.id) },
+          U.el('div', { style: { flex: '1' } },
+            U.el('div', { class: 'pn' }, s.name,
+              U.el('span', { class: 'tag', style: { marginLeft: '6px' }, text: s.bpm + ' BPM' })),
+            U.el('div', { class: 'pd', text: s.mood }),
+            U.el('div', { class: 'hint mono', style: { marginTop: '2px' } },
+              `Takt ${U.round(barSec, 2)}s · klipplängder ${steps.join(' / ')}s`)),
+          U.el('button', { class: 'btn sm', onclick: e => { e.stopPropagation(); composeTrack(s.id); } }, 'Skapa'));
+      }));
+
+    return shell('Musiken',
+      'Musiken är inte bakgrund — den bestämmer var filmen klipper. Skapar appen låten vet den exakt var varje takt ligger, och klipplängderna blir exakta i stället för ungefärliga.',
+      U.el('div', {},
+        U.el('div', { class: 'mo-field' },
           U.el('label', {}, 'Ungefärlig filmlängd'),
           U.el('div', { class: 'row', style: { padding: 0, gap: '8px' } },
             ...[30, 45, 60, 90].map(v => U.el('button', {
@@ -5631,7 +6311,14 @@ const Motion = (() => {
             ...['16:9', '9:16', '4:5', '1:1'].map(a => U.el('button', {
               class: 'btn sm' + (st.aspect === a ? ' on' : ''),
               onclick: () => { st.aspect = a; render(); },
-            }, a))))),
+            }, a)))),
+        U.el('h3', { class: 'sectitle', text: 'Skapa en låt' }),
+        U.el('div', { class: 'hint', style: { padding: '0 0 8px' } },
+          `Låten komponeras för ${st.targetDuration} s film med intro, uppbyggnad, peak och avslut.`),
+        styles,
+        U.el('h3', { class: 'sectitle', text: 'Låtar i projektet' }),
+        list,
+        U.el('button', { class: 'btn', style: { marginTop: '10px' }, onclick: () => pickFiles('audio') }, 'Ladda upp egen musik')),
       U.el('div', { class: 'mo-foot' },
         U.el('button', { class: 'btn', onclick: () => { st.step = 'images'; render(); } }, '← Tillbaka'),
         U.el('span', { class: 'spacer' }),
@@ -5639,6 +6326,19 @@ const Motion = (() => {
           class: 'btn primary', disabled: !st.music,
           onclick: () => startPlanning(),
         }, 'Fortsätt →')));
+  }
+
+  async function composeTrack(styleId) {
+    const t = U.toast('Komponerar…', MusicMake.styleById(styleId).name);
+    await U.raf(); await U.raf();
+    try {
+      const m = await MusicMake.makeTrack(styleId, st.targetDuration);
+      S.update(p => { p.media.push(m); }, 'motion-compose');
+      st.music = m;
+      t.remove();
+      render();
+      U.toast('Låten är klar', `${m.composed.bpm} BPM · ${U.dur(m.duration)} · ${m.composed.cutPoints.length} klipplägen`);
+    } catch (e) { t.remove(); U.errToast('Kunde inte skapa låten', e); }
   }
 
   let playingId = null, audioEl = null;
@@ -5679,6 +6379,7 @@ const Motion = (() => {
       st.plan = Director.buildPlan({
         assets: st.images, imageAnalysis: st.imageAnalysis, musicAnalysis: st.musicAnalysis,
         targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
+        overrides: st.overrides,
       });
       const errs = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
       if (errs.length) console.warn('planvalidering', errs);
@@ -5696,16 +6397,26 @@ const Motion = (() => {
     const prov = MM.providerById(st.provider);
 
     const shots = U.el('div', { class: 'mo-shots' });
-    plan.shots.forEach(s => {
+    plan.shots.forEach((s, i) => {
       const a = st.images.find(x => x.id === s.assetId);
-      shots.append(U.el('div', { class: 'mo-shot' },
+      const edited = s.movementLocked || s.durationLocked;
+      shots.append(U.el('div', { class: 'mo-shot' + (edited ? ' edited' : '') },
         U.el('img', { src: a ? a.thumb : '', alt: '' }),
         U.el('div', { class: 'mo-shotmeta' },
           U.el('div', { class: 'top' },
             U.el('span', { class: 'tag accent', text: 'SHOT ' + String(s.index + 1).padStart(2, '0') }),
             roomSelect(s),
             s.role === 'hero' || s.role === 'closer' ? U.el('span', { class: 'tag ok', text: s.role.toUpperCase() }) : null,
-            U.el('span', { class: 'tag', text: MM.moveById(s.movementId).name })),
+            edited ? U.el('span', { class: 'tag warn', text: 'ÄNDRAD' }) : null),
+          U.el('div', { class: 'mo-shotctl' }, moveSelect(s, plan, i), durationStepper(s),
+            edited ? U.el('button', {
+              class: 'btn sm', 'data-tip': 'Återgå till regissörens val',
+              onclick: () => {
+                st.overrides.moves.delete(s.assetId);
+                st.overrides.durations.delete(s.assetId);
+                rebuildPlan();
+              },
+            }, '↺') : null),
           U.el('div', { class: 'hint', text: s.motivation }),
           U.el('div', { class: 'hint mono' },
             `${U.tc(s.timelineIn, false)}–${U.tc(s.timelineOut, false)} · ${s.timelineDuration}s i filmen · genererar ${s.generatedDuration}s, använder ${s.sourceIn}–${s.sourceOut}`))));
@@ -5724,7 +6435,15 @@ const Motion = (() => {
             U.el('div', { class: 'pd', text: p.note }))))));
 
     const warn = [];
-    if (plan.droppedImages) warn.push(`${plan.droppedImages} bilder rymdes inte i ${st.targetDuration} s — höj längden eller ta bort bilder.`);
+    if (plan.droppedImages) {
+      // Klippen ligger på takten, så antalet bilder som får plats bestäms av
+      // låtens taktlängd. Säg vad som faktiskt krävs i stället för "höj längden".
+      const bar = st.musicAnalysis.barSeconds || (240 / (st.musicAnalysis.bpm || 100));
+      const need = Math.ceil((plan.duration + plan.droppedImages * bar) / 5) * 5;
+      warn.push(`${plan.droppedImages} bilder rymdes inte i ${st.targetDuration} s. `
+        + `Med den här låten tar varje klipp ${U.round(bar, 1)} s — välj ${need} s film, `
+        + `eller ta bort ${plan.droppedImages} bilder.`);
+    }
     if (st.provider === 'higgsfield_kling3') {
       warn.push(`Genereringen kostar ${cost} credits av dina ${st.credits != null ? st.credits : '–'}.`);
       if (!Generation.bridgeAlive) warn.push('Ingen brygga ansluten: jobben läggs i kön och exporteras som manifest som Claude kör via Higgsfield MCP.');
@@ -5744,7 +6463,7 @@ const Motion = (() => {
         warn.length ? U.el('div', { class: 'mo-warn' }, ...warn.map(w => U.el('div', { text: w }))) : null,
         U.el('h3', { class: 'sectitle', text: 'Director Plan' }),
         U.el('div', { class: 'hint', style: { padding: '0 0 8px' } },
-          'Rumstypen är ett förslag från bildanalysen. Ändra den om den är fel — planen regisseras om direkt.'),
+          'Allt går att ändra: rum, kamerarörelse och längd. Längden stegar mellan låtens klipplägen, så filmen håller sig på musiken oavsett vad du väljer. Efterföljande klipp flyttas med.'),
         shots),
       U.el('div', { class: 'mo-foot' },
         U.el('button', { class: 'btn', onclick: () => { st.step = 'music'; render(); } }, '← Tillbaka'),
@@ -5757,31 +6476,119 @@ const Motion = (() => {
   }
   const stat = (v, l) => U.el('div', { class: 'mo-stat' }, U.el('b', { text: String(v) }), U.el('span', { text: l }));
 
-  /** Rumstypen är ett förslag — användaren rättar den här och planen byggs om. */
-  function roomSelect(s) {
+  /** Kamerarörelsen går alltid att byta. Biblioteket visas i sin helhet, men
+   *  de rörelser regissören anser olämpliga för just den bilden ligger i en
+   *  egen grupp — en drönarbild ska inte råka få en sidled-slide av misstag. */
+  function moveSelect(s, plan, i) {
     const f = st.imageAnalysis.get(s.assetId);
-    const uncertain = f && f.roomUncertain;
+    const x = { a: { id: s.assetId }, f };
+    const energy = MusicStructure.energyAt(st.musicAnalysis, (s.timelineIn + s.timelineOut) / 2);
+    const opts = f ? Director.moveOptions(x, plan.shots[i - 1], plan.shots[i - 2], energy)
+      : MM.MOVES.map(m => ({ move: m, suitable: true }));
     const sel = U.el('select', {
-      class: 'mo-room' + (uncertain ? ' uncertain' : ''),
-      'data-tip': uncertain ? 'Osäker gissning — välj rätt rum så byggs planen om' : 'Rumstyp',
+      class: 'mo-move' + (s.movementLocked ? ' locked' : ''),
+      'data-tip': 'Kamerarörelse för det här klippet',
       onchange: () => {
-        if (f) { f.roomType = sel.value; f.roomUncertain = false; f.isDetail = sel.value === 'detail'; }
-        rebuildPlan();
+        if (sel.value === '__auto') st.overrides.moves.delete(s.assetId);
+        else st.overrides.moves.set(s.assetId, sel.value);
+        rebuildPlan(false);
       },
     });
-    MM.ROOMS.forEach(([id, name]) => sel.append(U.el('option', { value: id, selected: id === s.roomType }, name)));
-    sel.value = s.roomType;
+    sel.append(U.el('option', { value: '__auto' }, s.movementLocked
+      ? 'Regissörens val' : 'Regissörens val: ' + MM.moveById(s.movementId).name));
+    const good = U.el('optgroup', { label: 'Passar bilden' });
+    const bad = U.el('optgroup', { label: 'Mindre lämpliga för den här bilden' });
+    for (const o of opts) (o.suitable ? good : bad).append(U.el('option', { value: o.move.id }, o.move.name));
+    if (good.children.length) sel.append(good);
+    if (bad.children.length) sel.append(bad);
+    sel.value = s.movementLocked ? s.movementId : '__auto';
     return sel;
   }
-  function rebuildPlan() {
+
+  /** Längden stegas mellan låtens egna klipplägen. Det går alltså inte att
+   *  välja en längd som ligger utanför takten — men allt som ligger på takten
+   *  går att välja. */
+  function durationStepper(s) {
+    const opts = Director.durationOptions(st.musicAnalysis, s.timelineIn);
+    let cur = 0, bd = 1e9;
+    opts.forEach((o, i) => { const d = Math.abs(o.duration - s.timelineDuration); if (d < bd) { bd = d; cur = i; } });
+    const set = k => {
+      const o = opts[U.clamp(cur + k, 0, opts.length - 1)];
+      if (!o || o.duration === s.timelineDuration) return;
+      st.overrides.durations.set(s.assetId, o.duration);
+      rebuildPlan(false);
+    };
+    const kind = opts[cur] ? opts[cur].kind : '';
+    return U.el('div', { class: 'mo-dur', 'data-tip': 'Längd i filmen — stegar mellan musikens klipplägen' },
+      U.el('button', { class: 'btn sm', disabled: cur <= 0, onclick: () => set(-1) }, '−'),
+      U.el('span', { class: 'mono' }, s.timelineDuration.toFixed(2) + ' s',
+        U.el('i', { class: 'k', text: kind ? ' ' + kindLabel(kind) : '' })),
+      U.el('button', { class: 'btn sm', disabled: cur >= opts.length - 1, onclick: () => set(1) }, '+'));
+  }
+  const kindLabel = k => ({ section: 'sektion', phrase: 'fras', downbeat: 'takt', halfbar: '½ takt', accent: 'accent' }[k] || k);
+
+  /** Klustringen grupperar bilder som är samma rum, men den kan ha fel.
+   *  Här flyttas en bild till rätt rum, och rummen får riktiga namn. */
+  function roomSelect(s) {
+    const rooms = Director.roomsOf(st.images, st.imageAnalysis, st.overrides);
+    const sel = U.el('select', {
+      class: 'mo-room',
+      'data-tip': 'Vilket rum bilden hör till. Ändra om grupperingen är fel.',
+      onchange: () => {
+        if (sel.value === '__new') {
+          const n = rooms.reduce((m, r) => Math.max(m, parseInt(String(r.id).replace(/^room/, ''), 10) || 0), 0);
+          st.overrides.rooms.set(s.assetId, 'room' + (n + 1));
+          rebuildPlan(false);
+        } else if (sel.value === '__rename') {
+          renameRoom(s.clusterId || s.roomType, s.roomLabel);
+        } else {
+          st.overrides.rooms.set(s.assetId, sel.value);
+          rebuildPlan(false);
+        }
+      },
+    });
+    for (const r of rooms) sel.append(U.el('option', { value: r.id }, r.label + (r.size > 1 ? ` (${r.size})` : '')));
+    // Scentypen styr vilka kamerarörelser bilden får. Har analysen gissat fel
+    // — en fasadbild tagen för en drönarbild — rättas det här, och rörelse-
+    // reglerna följer med.
+    const scenes = U.el('optgroup', { label: 'Scentyp' });
+    for (const [id, label] of [['exterior', 'Exteriör'], ['drone', 'Drönare'], ['detail', 'Detalj']])
+      if (!rooms.some(r => r.id === id)) scenes.append(U.el('option', { value: id }, label));
+    if (scenes.children.length) sel.append(scenes);
+    sel.append(U.el('option', { value: '__new' }, 'Nytt rum…'));
+    sel.append(U.el('option', { value: '__rename' }, 'Byt namn på rummet…'));
+    sel.value = s.clusterId || rooms[0] && rooms[0].id || '';
+    return sel;
+  }
+
+  function renameRoom(clusterId, current) {
+    const inp = U.el('input', { type: 'text', value: current || '', style: { width: '100%' }, placeholder: 'Vardagsrum' });
+    U.modal({
+      title: 'Byt namn på rummet',
+      body: U.el('div', {}, inp,
+        U.el('div', { class: 'hint', style: { marginTop: '6px' } },
+          'Namnet gäller alla bilder som hör till samma rum.')),
+      actions: [{ label: 'Avbryt', onclick: () => render() }, {
+        label: 'Spara', primary: true, onclick: () => {
+          const v = inp.value.trim();
+          if (v) st.overrides.names.set(clusterId, v); else st.overrides.names.delete(clusterId);
+          rebuildPlan(false);
+        },
+      }],
+    });
+    setTimeout(() => { inp.focus(); inp.select(); }, 30);
+  }
+
+  function rebuildPlan(notify = true) {
     try {
       st.plan = Director.buildPlan({
         assets: st.images, imageAnalysis: st.imageAnalysis, musicAnalysis: st.musicAnalysis,
         targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
+        overrides: st.overrides,
       });
       st.planErrors = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
       render();
-      U.toast('Planen omregisserad', 'Ordning, längder och rörelser räknades om.');
+      if (notify) U.toast('Planen omregisserad', 'Ordning, längder och rörelser räknades om.');
     } catch (e) { U.errToast('Kunde inte bygga om planen', e); }
   }
 

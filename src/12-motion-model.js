@@ -16,105 +16,105 @@ const MM = (() => {
       id: 'slow_push_in', name: 'Slow push in',
       prompt: 'Make a slow cinematic push in to the image. Keep the camera movement smooth and stable.',
       editorPreset: 'pushin', energy: 0.35, axis: 'z', dir: 1,
-      fits: ['livingroom', 'kitchen', 'bedroom', 'exterior', 'entry', 'detail', 'bathroom', 'diningroom'],
+      scenes: ['interior', 'exterior', 'detail'],
       wants: { symmetry: 0.45, depth: 0.35 },
     },
     {
       id: 'slow_push_out', name: 'Slow push out',
       prompt: 'Make a slow cinematic pull back from the image. Keep the camera movement smooth and stable.',
       editorPreset: 'pullout', energy: 0.35, axis: 'z', dir: -1,
-      fits: ['livingroom', 'exterior', 'diningroom', 'garden'],
-      wants: { openness: 0.5 },
+      scenes: ['interior', 'exterior', 'detail'],
+      wants: { depth: 0.25 },
     },
     {
       id: 'slow_slide_left', name: 'Slide left',
       prompt: 'Make a slow smooth cinematic camera slide to the left. Keep the camera stable.',
       editorPreset: 'panl', energy: 0.5, axis: 'x', dir: -1,
-      fits: ['livingroom', 'kitchen', 'exterior', 'diningroom', 'garden'],
+      scenes: ['interior', 'exterior'],
       wants: { width: 0.5, depth: 0.3 },
     },
     {
       id: 'slow_slide_right', name: 'Slide right',
       prompt: 'Make a slow smooth cinematic camera slide to the right. Keep the camera stable.',
       editorPreset: 'panr', energy: 0.5, axis: 'x', dir: 1,
-      fits: ['livingroom', 'kitchen', 'exterior', 'diningroom', 'garden'],
+      scenes: ['interior', 'exterior'],
       wants: { width: 0.5, depth: 0.3 },
     },
     {
       id: 'slow_pan_left', name: 'Pan left',
       prompt: 'Make a slow smooth cinematic pan to the left. Keep the camera stable.',
       editorPreset: 'panl', energy: 0.45, axis: 'x', dir: -1, sparse: true,
-      fits: ['livingroom', 'exterior', 'garden'],
+      scenes: ['interior', 'exterior'],
     },
     {
       id: 'slow_pan_right', name: 'Pan right',
       prompt: 'Make a slow smooth cinematic pan to the right. Keep the camera stable.',
       editorPreset: 'panr', energy: 0.45, axis: 'x', dir: 1, sparse: true,
-      fits: ['livingroom', 'exterior', 'garden'],
+      scenes: ['interior', 'exterior'],
     },
     {
       id: 'slow_rise', name: 'Rise',
       prompt: 'Make the camera slowly rise upward. Keep the movement smooth and stable.',
       editorPreset: 'rise', energy: 0.45, axis: 'y', dir: -1,
-      fits: ['exterior', 'garden', 'balcony', 'livingroom'],
+      scenes: ['exterior'],
       wants: { height: 0.4 },
     },
     {
       id: 'slow_lower', name: 'Lower',
       prompt: 'Make the camera slowly move downward. Keep the movement smooth and stable.',
       editorPreset: 'descend', energy: 0.45, axis: 'y', dir: 1, sparse: true,
-      fits: ['exterior', 'detail'],
+      scenes: ['exterior'],
     },
     {
       id: 'rise_tilt_down', name: 'Rise + tilt down',
       prompt: 'Make the camera slowly rise while gently tilting down. Keep the movement smooth and stable.',
       editorPreset: 'risetilt', energy: 0.6, axis: 'y', dir: -1,
-      fits: ['exterior', 'garden', 'balcony', 'drone'],
+      scenes: ['exterior', 'drone'],
       wants: { height: 0.5 },
     },
     {
       id: 'descend_tilt_up', name: 'Descend + tilt up',
       prompt: 'Make the camera slowly descend while gently tilting upward. Keep the movement smooth and stable.',
       editorPreset: 'desctilt', energy: 0.6, axis: 'y', dir: 1, sparse: true,
-      fits: ['exterior', 'entry'],
+      scenes: ['exterior'],
     },
     {
       id: 'push_in_slide_left', name: 'Push in + slide left',
       prompt: 'Make a slow cinematic push in while gently moving left. Keep the camera smooth and stable.',
       editorPreset: 'pushin', energy: 0.65, axis: 'xz', dir: -1,
-      fits: ['livingroom', 'kitchen', 'diningroom'],
+      scenes: ['interior', 'exterior'],
       wants: { depth: 0.55, width: 0.4 },
     },
     {
       id: 'push_in_slide_right', name: 'Push in + slide right',
       prompt: 'Make a slow cinematic push in while gently moving right. Keep the camera smooth and stable.',
       editorPreset: 'pushin', energy: 0.65, axis: 'xz', dir: 1,
-      fits: ['livingroom', 'kitchen', 'diningroom'],
+      scenes: ['interior', 'exterior'],
       wants: { depth: 0.55, width: 0.4 },
     },
     {
       id: 'pull_back_rise', name: 'Pull back + rise',
       prompt: 'Make the camera slowly pull back while gently rising. Keep the movement smooth and stable.',
       editorPreset: 'pullout', energy: 0.6, axis: 'yz', dir: -1,
-      fits: ['exterior', 'garden', 'drone'],
+      scenes: ['exterior', 'drone'],
     },
     {
       id: 'drone_push_forward', name: 'Drone push forward',
       prompt: 'Make a slow smooth cinematic forward camera movement. Keep the camera stable.',
       editorPreset: 'pushin', energy: 0.55, axis: 'z', dir: 1, droneOnly: true,
-      fits: ['drone', 'exterior'],
+      scenes: ['drone'],
     },
     {
       id: 'drone_rise', name: 'Drone rise',
       prompt: 'Make the camera slowly rise upward. Keep the movement smooth and stable.',
       editorPreset: 'rise', energy: 0.5, axis: 'y', dir: -1, droneOnly: true,
-      fits: ['drone', 'exterior'],
+      scenes: ['drone'],
     },
     {
       id: 'drone_pullback_rise', name: 'Drone pull back + rise',
       prompt: 'Make the camera slowly pull back while rising. Keep the movement smooth and stable.',
       editorPreset: 'pullout', energy: 0.6, axis: 'yz', dir: -1, droneOnly: true,
-      fits: ['drone', 'exterior'],
+      scenes: ['drone'],
     },
   ];
   const moveById = id => MOVES.find(m => m.id === id) || MOVES[0];
@@ -186,6 +186,8 @@ const MM = (() => {
       generatedDuration: o.generatedDuration,
       sourceIn: o.sourceIn, sourceOut: o.sourceOut,
       role: o.role || 'support', roomType: o.roomType || 'other',
+      roomLabel: o.roomLabel || null, clusterId: o.clusterId || null,
+      movementLocked: !!o.movementLocked, durationLocked: !!o.durationLocked,
       motivation: o.motivation || '',
       status: 'planned', jobId: null, outputAssetId: null, qc: null, attempts: 0,
     };
@@ -196,7 +198,7 @@ const MM = (() => {
       id: U.uid('job'), shotId: shot.id, provider: p.id, model: p.model,
       params: {
         prompt: shot.prompt, duration: shot.generatedDuration,
-        mode: 'std', sound: 'off', aspect_ratio: aspect,
+        mode: 'std', sound: 'off', aspect_ratio: aspect,   // ljud av: musiken läggs på i editorn
       },
       status: 'pending', attempts: 0, cost: shotCost(provider, shot.generatedDuration),
       requestId: null, outputUrl: null, error: null, log: [],
@@ -209,12 +211,13 @@ const MM = (() => {
    *  och trimmar sedan i timelinen. Klippningen styr — aldrig tvärtom. */
   function planDurations(timelineDuration, provider) {
     const p = providerById(provider);
-    const margin = 1.4;
-    let gen = Math.ceil(timelineDuration + margin);
+    // Kling tar heltalssekunder och 3 s är standard: bostadsfilm klipper i
+    // 2,5–4 s, så längre generering är bortkastade credits. Marginalen räcker
+    // för att kunna flytta in-/utpunkten något i editorn.
+    let gen = Math.max(p.minDuration, Math.ceil(timelineDuration + 0.4));
     gen = U.clamp(gen, p.minDuration, p.maxDuration);
-    // lägg segmentet centrerat, men lämna alltid en halv sekunds ingång
     const slack = Math.max(0, gen - timelineDuration);
-    const sourceIn = U.round(Math.min(slack * 0.45, 0.9), 2);
+    const sourceIn = U.round(Math.min(slack * 0.5, 0.6), 2);
     return { generatedDuration: gen, sourceIn, sourceOut: U.round(sourceIn + timelineDuration, 3) };
   }
 

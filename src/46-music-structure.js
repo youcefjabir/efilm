@@ -13,6 +13,9 @@ const MusicStructure = (() => {
 
   function analyze(media) {
     if (!media || media.type !== 'audio') throw new Error('Ingen musikfil vald');
+    // Låtar som appen själv komponerat bär med sig sin exakta struktur.
+    // Att mäta upp den ur waveformen igen kan bara göra den sämre.
+    if (media.composed) return { ...media.composed, id: U.uid('ma'), assetId: media.id, at: Date.now() };
     const dur = media.duration || 0;
     const beats = (media.beats || []).slice();
     const peaks = media.wave || [];
