@@ -121,8 +121,9 @@ const Media = (() => {
   /* ---------- ingestion ---------- */
   async function ingestFiles(files, onProgress) {
     const out = [];
-    const list = [...files].filter(f => f.type.startsWith('video/') || f.type.startsWith('audio/') || /\.(mp4|mov|webm|m4v|mkv|mp3|wav|m4a|aac|ogg)$/i.test(f.name));
-    if (!list.length) { U.toast('Inga giltiga filer', 'Ladda upp video (mp4, mov, webm) eller ljud (mp3, wav, m4a).', 'warn'); return out; }
+    const list = [...files].filter(f => f.type.startsWith('video/') || f.type.startsWith('audio/') || f.type.startsWith('image/')
+      || /\.(mp4|mov|webm|m4v|mkv|mp3|wav|m4a|aac|ogg|jpe?g|png|webp|avif|heic)$/i.test(f.name));
+    if (!list.length) { U.toast('Inga giltiga filer', 'Ladda upp video, bilder eller ljud.', 'warn'); return out; }
     for (let i = 0; i < list.length; i++) {
       const f = list[i];
       onProgress && onProgress(i / list.length, f.name);
@@ -135,6 +136,8 @@ const Media = (() => {
 
   async function ingestOne(file) {
     const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|m4a|aac|ogg)$/i.test(file.name);
+    const isImage = !isAudio && (file.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|heic)$/i.test(file.name));
+    if (isImage) return ingestImage(file);
     const id = U.uid(isAudio ? 'aud' : 'vid');
     const url = URL.createObjectURL(file);
     const m = {
@@ -159,6 +162,30 @@ const Media = (() => {
       // har klippet ljudspår?
       m.hasAudio = !!(v.mozHasAudio || (v.webkitAudioDecodedByteCount > 0) || (v.audioTracks && v.audioTracks.length));
     }
+    try { await DB.putFile(id, file, file.name, file.type); } catch (e) { console.warn('IDB put misslyckades', e); }
+    return m;
+  }
+
+  /** Stillbilder: Motion-flödets råmaterial. Lagras som media av typen 'image'
+   *  med samma livscykel som video — thumbnail, IndexedDB, object URL. */
+  async function ingestImage(file) {
+    const id = U.uid('img');
+    const url = URL.createObjectURL(file);
+    const im = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error('Bildformatet stöds inte av webbläsaren'));
+      i.src = url;
+    });
+    const w = 320, h = Math.max(1, Math.round(w * (im.naturalHeight / Math.max(1, im.naturalWidth))));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    c.getContext('2d').drawImage(im, 0, 0, w, h);
+    const m = {
+      id, name: file.name, size: file.size, mime: file.type || 'image/*',
+      type: 'image', addedAt: Date.now(), folder: 'Alla',
+      duration: 0, width: im.naturalWidth, height: im.naturalHeight, fps: null,
+      url, file, thumb: c.toDataURL('image/jpeg', 0.75),
+    };
     try { await DB.putFile(id, file, file.name, file.type); } catch (e) { console.warn('IDB put misslyckades', e); }
     return m;
   }
@@ -199,5 +226,5 @@ const Media = (() => {
   }
   const usedCount = (project, id) => project.tracks.video.filter(c => c.mediaId === id).length + project.tracks.music.filter(c => c.mediaId === id).length;
 
-  return { ingestFiles, ingestOne, rehydrate, removeMedia, usedCount, loadVideoEl, seekTo, makeThumb, analyzeAudio, getAudioCtx };
+  return { ingestFiles, ingestOne, ingestImage, rehydrate, removeMedia, usedCount, loadVideoEl, seekTo, makeThumb, analyzeAudio, getAudioCtx };
 })();

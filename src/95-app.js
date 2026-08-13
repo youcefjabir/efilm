@@ -480,6 +480,7 @@ const App = (() => {
     U.$('#btnSave').onclick = () => Autosave.saveNow(false);
     U.$('#btnProjects').onclick = projectsModal;
     U.$('#btnExport').onclick = () => Panels.open('export');
+    U.$('#btnMotion').onclick = () => Motion.open();
     U.$('#btnEmptyUpload').onclick = () => U.$('#fileinput').click();
 
     const selA = U.$('#selAspect'); Object.keys(U.ASPECTS).forEach(a => selA.append(U.el('option', { value: a }, a)));
@@ -639,6 +640,7 @@ const App = (() => {
     wire();
     Timeline.init();
     Panels.init();
+    Motion.init();
     Autosave.init();
     applyPreviewSize();
     syncTopbar();

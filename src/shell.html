@@ -1,6 +1,7 @@
 <div id="app">
   <div id="topbar">
     <span style="font-weight:700;letter-spacing:.02em;color:var(--fg-0)">Master Bostadsfilm</span>
+    <button class="btn primary" id="btnMotion" data-tip="Motion — AI-regisserad bostadsfilm från bilder">Motion</button>
     <span class="sep"></span>
     <input type="text" id="projname" style="width:172px" data-tip="Projektets namn">
     <button class="btn icon" id="btnUndo" data-tip="Ångra (Ctrl+Z)">↶</button>
@@ -97,5 +98,5 @@
 <div id="dragveil">Släpp video- eller ljudfiler för att importera</div>
 <div id="modalwrap"><div class="modal" id="modal"></div></div>
 <div id="toasts"></div>
-<input type="file" id="fileinput" multiple accept="video/*,audio/*" style="display:none">
+<input type="file" id="fileinput" multiple accept="video/*,audio/*,image/*" style="display:none">
 <input type="file" id="projinput" accept=".json,application/json" style="display:none">

@@ -144,5 +144,25 @@ const PROFILES = {
     buf.writeInt16LE(Math.round(s * 32000), 44 + i * 2);
   }
   fs.writeFileSync(path.join(OUT, 'music-100bpm.wav'), buf);
+
+  // strukturerad låt: tydliga sektioner så sektionsdetekteringen kan testas
+  const dur2 = 32, n2 = sr * dur2;
+  const b2 = Buffer.alloc(44 + n2 * 2);
+  buf.copy(b2, 0, 0, 44);
+  b2.writeUInt32LE(36 + n2 * 2, 4); b2.writeUInt32LE(n2 * 2, 40);
+  const beat2 = 60 / 96;
+  for (let i = 0; i < n2; i++) {
+    const t = i / sr;
+    const level = t < 6 ? 0.22 : t < 14 ? 0.55 : t < 26 ? 1.0 : 0.30;   // intro/build/peak/outro
+    const phase = (t % beat2) / beat2;
+    const env = Math.exp(-phase * 12);
+    const kick = Math.sin(2 * Math.PI * 52 * t) * env * 0.6 * level;
+    const hat = (Math.random() - .5) * Math.exp(-((t % (beat2 / 2)) / (beat2 / 2)) * 36) * 0.14 * level;
+    const pad = (Math.sin(2 * Math.PI * 196 * t) + Math.sin(2 * Math.PI * 262 * t)) * 0.05 * level;
+    const s2 = Math.max(-1, Math.min(1, kick + hat + pad));
+    b2.writeInt16LE(Math.round(s2 * 32000), 44 + i * 2);
+  }
+  fs.writeFileSync(path.join(OUT, 'music-structured.wav'), b2);
+  console.log('  music-structured.wav ' + (b2.length / 1024).toFixed(0) + ' KB');
   console.log('  music-100bpm.wav ' + (buf.length / 1024).toFixed(0) + ' KB');
 })();

@@ -4,6 +4,7 @@
 <div id="app">
   <div id="topbar">
     <span style="font-weight:700;letter-spacing:.02em;color:var(--fg-0)">Master Bostadsfilm</span>
+    <button class="btn primary" id="btnMotion" data-tip="Motion — AI-regisserad bostadsfilm från bilder">Motion</button>
     <span class="sep"></span>
     <input type="text" id="projname" style="width:172px" data-tip="Projektets namn">
     <button class="btn icon" id="btnUndo" data-tip="Ångra (Ctrl+Z)">↶</button>
@@ -100,14 +101,19 @@
 <div id="dragveil">Släpp video- eller ljudfiler för att importera</div>
 <div id="modalwrap"><div class="modal" id="modal"></div></div>
 <div id="toasts"></div>
-<input type="file" id="fileinput" multiple accept="video/*,audio/*" style="display:none">
+<input type="file" id="fileinput" multiple accept="video/*,audio/*,image/*" style="display:none">
 <input type="file" id="projinput" accept=".json,application/json" style="display:none">
 
 <script src="src/00-utils.js"></script>
 <script src="src/10-model.js"></script>
+<script src="src/12-motion-model.js"></script>
 <script src="src/20-store.js"></script>
 <script src="src/30-persist.js"></script>
 <script src="src/40-media.js"></script>
+<script src="src/44-image-analyze.js"></script>
+<script src="src/46-music-structure.js"></script>
+<script src="src/48-director.js"></script>
+<script src="src/49-generation.js"></script>
 <script src="src/50-stab-analyze.js"></script>
 <script src="src/55-stab-process.js"></script>
 <script src="src/60-color.js"></script>
@@ -115,5 +121,6 @@
 <script src="src/75-playback.js"></script>
 <script src="src/80-timeline.js"></script>
 <script src="src/85-panels.js"></script>
+<script src="src/87-motion-ui.js"></script>
 <script src="src/90-export.js"></script>
 <script src="src/95-app.js"></script>

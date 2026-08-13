@@ -308,10 +308,114 @@ body.cmp #splitbar{display:block}
   *,*::before,*::after{transition-duration:.001ms !important;animation-duration:.001ms !important}
 }
 
+/* ---------- Motion ---------- */
+#motionview{
+  position:fixed;inset:0;z-index:150;display:none;flex-direction:column;align-items:center;
+  background:var(--bg-0);overflow-y:auto;padding:34px 20px 60px;
+}
+.mo-close{
+  position:absolute;top:14px;right:16px;width:30px;height:30px;border-radius:50%;
+  background:var(--bg-3);border:1px solid var(--line);color:var(--fg-1);cursor:pointer;font-size:13px;
+}
+.mo-close:hover{background:var(--bg-4);color:var(--fg-0)}
+.mo-shell{width:100%;max-width:760px;display:flex;flex-direction:column;gap:16px}
+.mo-steps{display:flex;gap:6px;justify-content:center;margin-bottom:2px}
+.mo-step{
+  display:flex;align-items:center;gap:7px;padding:5px 13px;border-radius:14px;
+  background:var(--bg-2);border:1px solid var(--line-soft);color:var(--fg-3);font-size:11.5px;
+}
+.mo-step .n{
+  width:17px;height:17px;border-radius:50%;background:var(--bg-4);color:var(--fg-2);
+  display:flex;align-items:center;justify-content:center;font-size:10px;
+}
+.mo-step.on{border-color:var(--accent);color:var(--fg-0)}
+.mo-step.on .n{background:var(--accent);color:#10120f;font-weight:700}
+.mo-step.past{color:var(--fg-2)}
+.mo-step.past .n{background:var(--accent-dim);color:#cfd6c6}
+.mo-card{background:var(--bg-1);border:1px solid var(--line);border-radius:6px;padding:22px 24px}
+.mo-card h2{font-size:20px;font-weight:500;letter-spacing:-.01em;margin-bottom:4px}
+.mo-sub{color:var(--fg-2);font-size:12.5px;line-height:1.5;margin-bottom:16px;max-width:56ch}
+.mo-foot{display:flex;align-items:center;gap:8px;padding:0 2px}
+
+.mo-drop{
+  border:1px dashed var(--line);border-radius:4px;padding:22px;text-align:center;cursor:pointer;
+  background:var(--bg-2);transition:border-color .12s,background .12s;
+}
+.mo-drop:hover,.mo-drop.over{border-color:var(--accent);background:var(--bg-3)}
+.mo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(126px,1fr));gap:8px;margin-top:14px}
+.mo-img{position:relative;border-radius:3px;overflow:hidden;background:var(--bg-3);cursor:grab;border:1px solid transparent}
+.mo-img.over{border-color:var(--accent)}
+.mo-img img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+.mo-img .idx{
+  position:absolute;top:4px;left:4px;background:rgba(0,0,0,.7);color:#fff;font-size:10px;
+  width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+}
+.mo-img .rm{
+  position:absolute;top:4px;right:4px;width:18px;height:18px;border-radius:50%;border:0;
+  background:rgba(0,0,0,.7);color:#fff;cursor:pointer;font-size:10px;opacity:0;
+}
+.mo-img:hover .rm{opacity:1}
+.mo-img .nm{
+  display:block;padding:3px 5px;font-size:9.5px;color:var(--fg-3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.mo-field{margin-top:16px}
+.mo-field>label{display:block;font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--fg-3);margin-bottom:6px}
+.mo-toggle{display:flex;align-items:center;gap:14px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line-soft)}
+.mo-toggle>div:first-child{flex:1}
+.mo-switch{width:38px;height:21px;border-radius:11px;background:var(--bg-4);border:1px solid var(--line);cursor:pointer;padding:0;position:relative}
+.mo-switch i{position:absolute;top:2px;left:2px;width:15px;height:15px;border-radius:50%;background:var(--fg-2);transition:left .14s,background .14s}
+.mo-switch.on{background:var(--accent-dim);border-color:var(--accent)}
+.mo-switch.on i{left:19px;background:var(--accent-hi)}
+
+.mo-tracks{display:flex;flex-direction:column;gap:5px}
+.mo-track{
+  display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:4px;
+  background:var(--bg-2);border:1px solid var(--line-soft);cursor:pointer;
+}
+.mo-track:hover{border-color:#41474b}
+.mo-track.on{border-color:var(--accent);background:var(--bg-3)}
+.mo-play{
+  width:26px;height:26px;border-radius:50%;flex:0 0 26px;border:1px solid var(--line);
+  background:var(--bg-3);color:var(--fg-1);cursor:pointer;font-size:9px;
+}
+.mo-track.on .mo-play{background:var(--accent);border-color:var(--accent);color:#10120f}
+.mo-tmeta{flex:0 0 auto;min-width:150px}
+.mo-tmeta .nm{font-size:12.5px;color:var(--fg-0)}
+.mo-wave{flex:1;height:40px;min-width:0}
+
+.mo-stats{display:flex;gap:22px;flex-wrap:wrap;padding:14px 0;border-bottom:1px solid var(--line-soft)}
+.mo-stat b{display:block;font-size:17px;font-weight:500;color:var(--fg-0)}
+.mo-stat span{font-size:10.5px;color:var(--fg-3);letter-spacing:.03em}
+.mo-warn{
+  margin-top:14px;padding:9px 11px;border-radius:3px;background:#2a2418;
+  border-left:2px solid var(--warn);font-size:11.5px;color:#d9bd8b;line-height:1.55;
+}
+.mo-warn>div+div{margin-top:4px}
+.mo-shots{display:flex;flex-direction:column;gap:6px;max-height:380px;overflow-y:auto;padding-right:4px}
+.mo-shot{display:flex;gap:10px;padding:8px;border-radius:3px;background:var(--bg-2);border:1px solid var(--line-soft)}
+.mo-shot img{width:84px;height:52px;object-fit:cover;border-radius:2px;flex:0 0 84px;background:#000}
+.mo-shotmeta{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.mo-shotmeta .top{display:flex;gap:4px;flex-wrap:wrap}
+.mo-phases{display:flex;flex-direction:column;gap:9px;margin-top:8px}
+.mo-phase{display:flex;align-items:center;gap:9px;font-size:12.5px;color:var(--fg-3)}
+.mo-phase .dot{width:6px;height:6px;border-radius:50%;background:var(--bg-4)}
+.mo-phase.done{color:var(--fg-2)}
+.mo-phase.done .dot{background:var(--accent-dim)}
+.mo-phase.on{color:var(--fg-0)}
+.mo-phase.on .dot{background:var(--accent);box-shadow:0 0 0 3px var(--accent-dim)}
+.mo-room{
+  height:18px;padding:0 4px;font-size:10px;background:var(--bg-4);border:1px solid transparent;
+  border-radius:2px;color:var(--fg-2);
+}
+.mo-room.uncertain{border-color:var(--warn);color:#d8b273}
+.mo-room:hover{border-color:var(--line);color:var(--fg-0)}
+
 </style>
 <div id="app">
   <div id="topbar">
     <span style="font-weight:700;letter-spacing:.02em;color:var(--fg-0)">Master Bostadsfilm</span>
+    <button class="btn primary" id="btnMotion" data-tip="Motion — AI-regisserad bostadsfilm från bilder">Motion</button>
     <span class="sep"></span>
     <input type="text" id="projname" style="width:172px" data-tip="Projektets namn">
     <button class="btn icon" id="btnUndo" data-tip="Ångra (Ctrl+Z)">↶</button>
@@ -408,7 +512,7 @@ body.cmp #splitbar{display:block}
 <div id="dragveil">Släpp video- eller ljudfiler för att importera</div>
 <div id="modalwrap"><div class="modal" id="modal"></div></div>
 <div id="toasts"></div>
-<input type="file" id="fileinput" multiple accept="video/*,audio/*" style="display:none">
+<input type="file" id="fileinput" multiple accept="video/*,audio/*,image/*" style="display:none">
 <input type="file" id="projinput" accept=".json,application/json" style="display:none">
 
 <script>
@@ -791,6 +895,236 @@ const M = (() => {
 })();
 
 
+/* ===== 12-motion-model.js ===== */
+/* ============================================================
+   12 — Motion: datamodell, rörelsebibliotek, statusmaskin
+
+   Motion producerar ett vanligt editorprojekt (M.newProject) plus ett
+   motion-dokument. Ingen konvertering behövs för att öppna resultatet i
+   Master Editor — det ÄR samma projekt.
+   ============================================================ */
+const MM = (() => {
+
+  /* ---------- kamerarörelser ----------
+     Prompterna är avsiktligt korta och restriktiva. Långa, beskrivande
+     prompter får videomodellen att hitta på rörelse: walking bob, wobble,
+     deformerad arkitektur. Kort och konkret ger stabil bild. */
+  const MOVES = [
+    {
+      id: 'slow_push_in', name: 'Slow push in',
+      prompt: 'Make a slow cinematic push in to the image. Keep the camera movement smooth and stable.',
+      editorPreset: 'pushin', energy: 0.35, axis: 'z', dir: 1,
+      fits: ['livingroom', 'kitchen', 'bedroom', 'exterior', 'entry', 'detail', 'bathroom', 'diningroom'],
+      wants: { symmetry: 0.45, depth: 0.35 },
+    },
+    {
+      id: 'slow_push_out', name: 'Slow push out',
+      prompt: 'Make a slow cinematic pull back from the image. Keep the camera movement smooth and stable.',
+      editorPreset: 'pullout', energy: 0.35, axis: 'z', dir: -1,
+      fits: ['livingroom', 'exterior', 'diningroom', 'garden'],
+      wants: { openness: 0.5 },
+    },
+    {
+      id: 'slow_slide_left', name: 'Slide left',
+      prompt: 'Make a slow smooth cinematic camera slide to the left. Keep the camera stable.',
+      editorPreset: 'panl', energy: 0.5, axis: 'x', dir: -1,
+      fits: ['livingroom', 'kitchen', 'exterior', 'diningroom', 'garden'],
+      wants: { width: 0.5, depth: 0.3 },
+    },
+    {
+      id: 'slow_slide_right', name: 'Slide right',
+      prompt: 'Make a slow smooth cinematic camera slide to the right. Keep the camera stable.',
+      editorPreset: 'panr', energy: 0.5, axis: 'x', dir: 1,
+      fits: ['livingroom', 'kitchen', 'exterior', 'diningroom', 'garden'],
+      wants: { width: 0.5, depth: 0.3 },
+    },
+    {
+      id: 'slow_pan_left', name: 'Pan left',
+      prompt: 'Make a slow smooth cinematic pan to the left. Keep the camera stable.',
+      editorPreset: 'panl', energy: 0.45, axis: 'x', dir: -1, sparse: true,
+      fits: ['livingroom', 'exterior', 'garden'],
+    },
+    {
+      id: 'slow_pan_right', name: 'Pan right',
+      prompt: 'Make a slow smooth cinematic pan to the right. Keep the camera stable.',
+      editorPreset: 'panr', energy: 0.45, axis: 'x', dir: 1, sparse: true,
+      fits: ['livingroom', 'exterior', 'garden'],
+    },
+    {
+      id: 'slow_rise', name: 'Rise',
+      prompt: 'Make the camera slowly rise upward. Keep the movement smooth and stable.',
+      editorPreset: 'rise', energy: 0.45, axis: 'y', dir: -1,
+      fits: ['exterior', 'garden', 'balcony', 'livingroom'],
+      wants: { height: 0.4 },
+    },
+    {
+      id: 'slow_lower', name: 'Lower',
+      prompt: 'Make the camera slowly move downward. Keep the movement smooth and stable.',
+      editorPreset: 'descend', energy: 0.45, axis: 'y', dir: 1, sparse: true,
+      fits: ['exterior', 'detail'],
+    },
+    {
+      id: 'rise_tilt_down', name: 'Rise + tilt down',
+      prompt: 'Make the camera slowly rise while gently tilting down. Keep the movement smooth and stable.',
+      editorPreset: 'risetilt', energy: 0.6, axis: 'y', dir: -1,
+      fits: ['exterior', 'garden', 'balcony', 'drone'],
+      wants: { height: 0.5 },
+    },
+    {
+      id: 'descend_tilt_up', name: 'Descend + tilt up',
+      prompt: 'Make the camera slowly descend while gently tilting upward. Keep the movement smooth and stable.',
+      editorPreset: 'desctilt', energy: 0.6, axis: 'y', dir: 1, sparse: true,
+      fits: ['exterior', 'entry'],
+    },
+    {
+      id: 'push_in_slide_left', name: 'Push in + slide left',
+      prompt: 'Make a slow cinematic push in while gently moving left. Keep the camera smooth and stable.',
+      editorPreset: 'pushin', energy: 0.65, axis: 'xz', dir: -1,
+      fits: ['livingroom', 'kitchen', 'diningroom'],
+      wants: { depth: 0.55, width: 0.4 },
+    },
+    {
+      id: 'push_in_slide_right', name: 'Push in + slide right',
+      prompt: 'Make a slow cinematic push in while gently moving right. Keep the camera smooth and stable.',
+      editorPreset: 'pushin', energy: 0.65, axis: 'xz', dir: 1,
+      fits: ['livingroom', 'kitchen', 'diningroom'],
+      wants: { depth: 0.55, width: 0.4 },
+    },
+    {
+      id: 'pull_back_rise', name: 'Pull back + rise',
+      prompt: 'Make the camera slowly pull back while gently rising. Keep the movement smooth and stable.',
+      editorPreset: 'pullout', energy: 0.6, axis: 'yz', dir: -1,
+      fits: ['exterior', 'garden', 'drone'],
+    },
+    {
+      id: 'drone_push_forward', name: 'Drone push forward',
+      prompt: 'Make a slow smooth cinematic forward camera movement. Keep the camera stable.',
+      editorPreset: 'pushin', energy: 0.55, axis: 'z', dir: 1, droneOnly: true,
+      fits: ['drone', 'exterior'],
+    },
+    {
+      id: 'drone_rise', name: 'Drone rise',
+      prompt: 'Make the camera slowly rise upward. Keep the movement smooth and stable.',
+      editorPreset: 'rise', energy: 0.5, axis: 'y', dir: -1, droneOnly: true,
+      fits: ['drone', 'exterior'],
+    },
+    {
+      id: 'drone_pullback_rise', name: 'Drone pull back + rise',
+      prompt: 'Make the camera slowly pull back while rising. Keep the movement smooth and stable.',
+      editorPreset: 'pullout', energy: 0.6, axis: 'yz', dir: -1, droneOnly: true,
+      fits: ['drone', 'exterior'],
+    },
+  ];
+  const moveById = id => MOVES.find(m => m.id === id) || MOVES[0];
+
+  /* ---------- rumstyper ---------- */
+  const ROOMS = [
+    ['exterior', 'Exteriör'], ['drone', 'Drönare'], ['entry', 'Entré'],
+    ['livingroom', 'Vardagsrum'], ['kitchen', 'Kök'], ['diningroom', 'Matplats'],
+    ['bedroom', 'Sovrum'], ['bathroom', 'Badrum'], ['balcony', 'Balkong'],
+    ['garden', 'Trädgård'], ['detail', 'Detalj'], ['other', 'Övrigt'],
+  ];
+  const roomName = id => (ROOMS.find(r => r[0] === id) || ['other', 'Övrigt'])[1];
+
+  /** Ordningen en bostadsvisning normalt följer. Regissören använder den som
+   *  ramverk men får avvika utifrån vad bildmaterialet faktiskt innehåller. */
+  const TOUR_ORDER = ['exterior', 'drone', 'entry', 'livingroom', 'diningroom', 'kitchen',
+    'bedroom', 'bathroom', 'balcony', 'garden', 'detail', 'other'];
+
+  /* ---------- generering ---------- */
+  const PROVIDERS = {
+    higgsfield_kling3: {
+      id: 'higgsfield_kling3', name: 'Higgsfield · Kling v3.0', model: 'kling3_0',
+      minDuration: 3, maxDuration: 15, integerDuration: true,
+      creditsPer5s: 7.5, aspects: ['16:9', '9:16', '1:1'],
+      note: 'Standardläge, ljud av. 7,5 credits per 5-sekundersklipp.',
+    },
+    stub: {
+      id: 'stub', name: 'Simulerad (ingen kostnad)', model: 'stub',
+      minDuration: 3, maxDuration: 15, integerDuration: true,
+      creditsPer5s: 0, aspects: ['16:9', '9:16', '1:1'],
+      note: 'Renderar rörelsen lokalt i stället för att generera. Kostar inget och används för att prova flödet.',
+    },
+  };
+  const providerById = id => PROVIDERS[id] || PROVIDERS.stub;
+
+  /** Kostnaden skalar linjärt med längden — 7,5 cr per 5 s. */
+  function shotCost(provider, seconds) {
+    const p = providerById(provider);
+    return U.round(p.creditsPer5s * (seconds / 5), 2);
+  }
+  function planCost(plan, provider) {
+    return U.round((plan.shots || []).reduce((a, s) => a + shotCost(provider, s.generatedDuration), 0), 1);
+  }
+
+  /* ---------- statusar ---------- */
+  const PROJECT_STATUS = ['draft', 'analyzing', 'planned', 'generating', 'qc', 'ready', 'failed'];
+  const SHOT_STATUS = ['planned', 'queued', 'generating', 'generated', 'qc_fail', 'approved', 'failed'];
+  const JOB_STATUS = ['pending', 'submitted', 'running', 'done', 'failed', 'cancelled'];
+
+  /* ---------- fabriker ---------- */
+  function newMotionProject(name = 'Ny bostadsfilm') {
+    return {
+      id: U.uid('mp'), projectId: null, propertyName: name,
+      status: 'draft', createdAt: Date.now(), updatedAt: Date.now(),
+      imageIds: [], musicAssetId: null,
+      targetDuration: 45, aspect: '16:9',
+      provider: 'higgsfield_kling3',
+      aiOrder: true,
+      credits: { estimated: 0, spent: 0 },
+      planId: null,
+    };
+  }
+  function newShot(o) {
+    return {
+      id: U.uid('shot'), planId: o.planId, index: o.index,
+      assetId: o.assetId, movementId: o.movementId, prompt: moveById(o.movementId).prompt,
+      timelineIn: o.timelineIn, timelineOut: o.timelineOut,
+      timelineDuration: U.round(o.timelineOut - o.timelineIn, 3),
+      generatedDuration: o.generatedDuration,
+      sourceIn: o.sourceIn, sourceOut: o.sourceOut,
+      role: o.role || 'support', roomType: o.roomType || 'other',
+      motivation: o.motivation || '',
+      status: 'planned', jobId: null, outputAssetId: null, qc: null, attempts: 0,
+    };
+  }
+  function newJob(shot, provider, aspect) {
+    const p = providerById(provider);
+    return {
+      id: U.uid('job'), shotId: shot.id, provider: p.id, model: p.model,
+      params: {
+        prompt: shot.prompt, duration: shot.generatedDuration,
+        mode: 'std', sound: 'off', aspect_ratio: aspect,
+      },
+      status: 'pending', attempts: 0, cost: shotCost(provider, shot.generatedDuration),
+      requestId: null, outputUrl: null, error: null, log: [],
+      createdAt: Date.now(),
+    };
+  }
+
+  /** Genereringslängd: modellen tar heltalssekunder. Vi lägger på marginal så
+   *  att klippets in-/utpunkt kan flyttas utan att hamna utanför materialet,
+   *  och trimmar sedan i timelinen. Klippningen styr — aldrig tvärtom. */
+  function planDurations(timelineDuration, provider) {
+    const p = providerById(provider);
+    const margin = 1.4;
+    let gen = Math.ceil(timelineDuration + margin);
+    gen = U.clamp(gen, p.minDuration, p.maxDuration);
+    // lägg segmentet centrerat, men lämna alltid en halv sekunds ingång
+    const slack = Math.max(0, gen - timelineDuration);
+    const sourceIn = U.round(Math.min(slack * 0.45, 0.9), 2);
+    return { generatedDuration: gen, sourceIn, sourceOut: U.round(sourceIn + timelineDuration, 3) };
+  }
+
+  return {
+    MOVES, moveById, ROOMS, roomName, TOUR_ORDER,
+    PROVIDERS, providerById, shotCost, planCost, planDurations,
+    PROJECT_STATUS, SHOT_STATUS, JOB_STATUS,
+    newMotionProject, newShot, newJob,
+  };
+})();
+
+
 /* ===== 20-store.js ===== */
 /* ============================================================
    20 — Project state, selection, undo/redo
@@ -1161,8 +1495,9 @@ const Media = (() => {
   /* ---------- ingestion ---------- */
   async function ingestFiles(files, onProgress) {
     const out = [];
-    const list = [...files].filter(f => f.type.startsWith('video/') || f.type.startsWith('audio/') || /\.(mp4|mov|webm|m4v|mkv|mp3|wav|m4a|aac|ogg)$/i.test(f.name));
-    if (!list.length) { U.toast('Inga giltiga filer', 'Ladda upp video (mp4, mov, webm) eller ljud (mp3, wav, m4a).', 'warn'); return out; }
+    const list = [...files].filter(f => f.type.startsWith('video/') || f.type.startsWith('audio/') || f.type.startsWith('image/')
+      || /\.(mp4|mov|webm|m4v|mkv|mp3|wav|m4a|aac|ogg|jpe?g|png|webp|avif|heic)$/i.test(f.name));
+    if (!list.length) { U.toast('Inga giltiga filer', 'Ladda upp video, bilder eller ljud.', 'warn'); return out; }
     for (let i = 0; i < list.length; i++) {
       const f = list[i];
       onProgress && onProgress(i / list.length, f.name);
@@ -1175,6 +1510,8 @@ const Media = (() => {
 
   async function ingestOne(file) {
     const isAudio = file.type.startsWith('audio/') || /\.(mp3|wav|m4a|aac|ogg)$/i.test(file.name);
+    const isImage = !isAudio && (file.type.startsWith('image/') || /\.(jpe?g|png|webp|avif|heic)$/i.test(file.name));
+    if (isImage) return ingestImage(file);
     const id = U.uid(isAudio ? 'aud' : 'vid');
     const url = URL.createObjectURL(file);
     const m = {
@@ -1199,6 +1536,30 @@ const Media = (() => {
       // har klippet ljudspår?
       m.hasAudio = !!(v.mozHasAudio || (v.webkitAudioDecodedByteCount > 0) || (v.audioTracks && v.audioTracks.length));
     }
+    try { await DB.putFile(id, file, file.name, file.type); } catch (e) { console.warn('IDB put misslyckades', e); }
+    return m;
+  }
+
+  /** Stillbilder: Motion-flödets råmaterial. Lagras som media av typen 'image'
+   *  med samma livscykel som video — thumbnail, IndexedDB, object URL. */
+  async function ingestImage(file) {
+    const id = U.uid('img');
+    const url = URL.createObjectURL(file);
+    const im = await new Promise((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error('Bildformatet stöds inte av webbläsaren'));
+      i.src = url;
+    });
+    const w = 320, h = Math.max(1, Math.round(w * (im.naturalHeight / Math.max(1, im.naturalWidth))));
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    c.getContext('2d').drawImage(im, 0, 0, w, h);
+    const m = {
+      id, name: file.name, size: file.size, mime: file.type || 'image/*',
+      type: 'image', addedAt: Date.now(), folder: 'Alla',
+      duration: 0, width: im.naturalWidth, height: im.naturalHeight, fps: null,
+      url, file, thumb: c.toDataURL('image/jpeg', 0.75),
+    };
     try { await DB.putFile(id, file, file.name, file.type); } catch (e) { console.warn('IDB put misslyckades', e); }
     return m;
   }
@@ -1239,7 +1600,1040 @@ const Media = (() => {
   }
   const usedCount = (project, id) => project.tracks.video.filter(c => c.mediaId === id).length + project.tracks.music.filter(c => c.mediaId === id).length;
 
-  return { ingestFiles, ingestOne, rehydrate, removeMedia, usedCount, loadVideoEl, seekTo, makeThumb, analyzeAudio, getAudioCtx };
+  return { ingestFiles, ingestOne, ingestImage, rehydrate, removeMedia, usedCount, loadVideoEl, seekTo, makeThumb, analyzeAudio, getAudioCtx };
+})();
+
+
+/* ===== 44-image-analyze.js ===== */
+/* ============================================================
+   44 — Bildanalys
+
+   Regissören måste veta vad varje bild faktiskt visar innan den kan
+   bestämma ordning, längd och kamerarörelse. Här mäts bilden: ljus,
+   färg, kanter, symmetri, djup, horisont, himmel och grönska. Utifrån
+   måtten poängsätts rumstyp, hero-värde och risk för dubbletter.
+
+   VAD SOM ÄR TILLFÖRLITLIGT: ute mot inne, detalj mot rum, hero-poäng,
+   symmetri, djup och dubblettdetektering. Det är också det regissören
+   främst bygger på.
+
+   VAD SOM INTE ÄR DET: exakt rumstyp inomhus. Ett kök och ett sovrum skiljer
+   sig inte tillräckligt i ljus, kant- och färgstatistik för att en handskriven
+   heuristik ska klara det — mätt på testmaterialet träffar den ungefär hälften.
+   Därför redovisas rumstypen som ett förslag med konfidens, den går att ändra
+   i planen, och regissören klarar sig utan den. Rätt lösning är en
+   vision-modell; den kopplas in där classify() nu sitter.
+   ============================================================ */
+const ImageAnalyze = (() => {
+  const W = 256;
+
+  function loadImage(url) {
+    return new Promise((res, rej) => {
+      const im = new Image();
+      im.onload = () => res(im);
+      im.onerror = () => rej(new Error('Bilden kunde inte läsas'));
+      im.src = url;
+    });
+  }
+
+  async function analyze(asset) {
+    if (!asset.url) throw new Error('Bilden är inte tillgänglig');
+    const im = await loadImage(asset.url);
+    const h = Math.max(8, Math.round(W * (im.naturalHeight / Math.max(1, im.naturalWidth)) / 2) * 2);
+    const c = document.createElement('canvas'); c.width = W; c.height = h;
+    const g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(im, 0, 0, W, h);
+    const d = g.getImageData(0, 0, W, h).data;
+    const n = W * h;
+
+    const lum = new Float32Array(n);
+    let sr = 0, sg = 0, sb = 0, sl = 0, sky = 0, topSky = 0, green = 0, warm = 0, sat = 0, bright = 0, dark = 0;
+    for (let i = 0, p = 0; i < n; i++, p += 4) {
+      const r = d[p] / 255, gg = d[p + 1] / 255, b = d[p + 2] / 255;
+      const l = 0.2126 * r + 0.7152 * gg + 0.0722 * b;
+      lum[i] = l;
+      sr += r; sg += gg; sb += b; sl += l;
+      const mx = Math.max(r, gg, b), mn = Math.min(r, gg, b);
+      const s = mx > 0.01 ? (mx - mn) / mx : 0;
+      sat += s;
+      if (l > 0.86) bright++;
+      if (l < 0.10) dark++;
+      const y = (i / W) | 0;
+      // himmel: ljus, blådominant, i övre tredjedelen
+      if (y < h / 3 && b > r + 0.045 && l > 0.55) sky++;
+      // ...men ett fönster inomhus ser också ut så. Äkta himmel fyller den
+      // allra översta remsan; ett fönster gör det nästan aldrig.
+      if (y < h * 0.12 && b > r + 0.03 && l > 0.5) topSky++;
+      // grönska: grön kanal dominerar tydligt
+      if (gg > r + 0.035 && gg > b + 0.045) green++;
+      // varma ytor (trä, kök)
+      if (r > b + 0.06 && l > 0.25 && l < 0.85) warm++;
+    }
+    const meanL = sl / n;
+    let varSum = 0;
+    for (let i = 0; i < n; i++) { const dd = lum[i] - meanL; varSum += dd * dd; }
+
+    /* --- kanter och linjeorientering --- */
+    let edge = 0, vert = 0, horiz = 0, longV = 0, longH = 0;
+    const rowH = new Float32Array(h), colV = new Float32Array(W);
+    for (let y = 1; y < h - 1; y++) {
+      for (let x = 1; x < W - 1; x++) {
+        const i = y * W + x;
+        const gx = lum[i + 1] - lum[i - 1], gy = lum[i + W] - lum[i - W];
+        const m = Math.hypot(gx, gy);
+        edge += m;
+        if (m > 0.08) {
+          if (Math.abs(gx) > Math.abs(gy) * 2) { vert++; colV[x] += m; }
+          else if (Math.abs(gy) > Math.abs(gx) * 2) { horiz++; rowH[y] += m; }
+        }
+      }
+    }
+    const px = (W - 2) * (h - 2);
+    // långa sammanhängande linjer = arkitektur
+    const colMax = Math.max(...colV), rowMax = Math.max(...rowH);
+    for (let x = 0; x < W; x++) if (colV[x] > colMax * 0.45) longV++;
+    for (let y = 0; y < h; y++) if (rowH[y] > rowMax * 0.45) longH++;
+
+    /* --- horisont: raden med starkast horisontell kantenergi --- */
+    let hy = 0, hyv = 0;
+    for (let y = Math.floor(h * 0.15); y < h * 0.85; y++) if (rowH[y] > hyv) { hyv = rowH[y]; hy = y; }
+    const horizonY = hy / h;
+
+    /* --- symmetri: vänster halva mot speglad höger halva --- */
+    let symErr = 0, symN = 0;
+    const half = W >> 1;
+    for (let y = 0; y < h; y += 2) {
+      for (let x = 0; x < half; x += 2) {
+        symErr += Math.abs(lum[y * W + x] - lum[y * W + (W - 1 - x)]);
+        symN++;
+      }
+    }
+    const symmetry = U.clamp(1 - (symErr / Math.max(1, symN)) * 4.5, 0, 1);
+
+    /* --- djup: konvergerar de nära-horisontella linjerna mot mitten? ---
+       I ett rum med djup lutar tak- och golvlinjer mot en flyktpunkt. Vi mäter
+       lutningen på nära-horisontella kanter i vänster respektive höger halva;
+       motsatt tecken betyder konvergens, alltså djup. */
+    let lSlope = 0, lN = 0, rSlope = 0, rN = 0;
+    for (let y = 2; y < h - 2; y += 2) {
+      for (let x = 2; x < W - 2; x += 2) {
+        const i = y * W + x;
+        const gx = lum[i + 1] - lum[i - 1], gy = lum[i + W] - lum[i - W];
+        if (Math.abs(gy) > 0.05 && Math.abs(gy) > Math.abs(gx) * 1.8) {
+          const slope = gx / gy;
+          if (x < half) { lSlope += slope; lN++; } else { rSlope += slope; rN++; }
+        }
+      }
+    }
+    const conv = (lN > 10 && rN > 10) ? (lSlope / lN - rSlope / rN) : 0;
+    const depthScore = U.clamp(Math.abs(conv) * 1.8, 0, 1);
+
+    /* --- skärpa: laplace-energi (används för hero och detaljbedömning) --- */
+    let lap = 0, lapPeriph = 0, lapCenter = 0, cN = 0, pN = 0;
+    for (let y = 2; y < h - 2; y++) {
+      for (let x = 2; x < W - 2; x++) {
+        const i = y * W + x;
+        const v = Math.abs(4 * lum[i] - lum[i - 1] - lum[i + 1] - lum[i - W] - lum[i + W]);
+        lap += v;
+        const cx = (x / W - 0.5), cy = (y / h - 0.5);
+        if (Math.hypot(cx, cy) < 0.25) { lapCenter += v; cN++; } else { lapPeriph += v; pN++; }
+      }
+    }
+    const sharp = lap / px;
+    const centerBias = (cN && pN) ? (lapCenter / cN) / Math.max(1e-6, lapPeriph / pN) : 1;
+
+    /* --- perceptuell signatur (8x8 average hash) för dubblettdetektering --- */
+    const sig = [];
+    let sigMean = 0;
+    for (let by = 0; by < 8; by++) for (let bx = 0; bx < 8; bx++) {
+      let s = 0, cnt = 0;
+      for (let y = Math.floor(by * h / 8); y < (by + 1) * h / 8; y++)
+        for (let x = Math.floor(bx * W / 8); x < (bx + 1) * W / 8; x++) { s += lum[y * W + x]; cnt++; }
+      const v = s / Math.max(1, cnt); sig.push(v); sigMean += v;
+    }
+    sigMean /= 64;
+    const signature = sig.map(v => v > sigMean ? 1 : 0);
+
+    const f = {
+      w: im.naturalWidth, h: im.naturalHeight, aspect: im.naturalWidth / im.naturalHeight,
+      meanL: U.round(meanL, 4), contrast: U.round(Math.sqrt(varSum / n), 4),
+      saturation: U.round(sat / n, 4),
+      warmth: U.round((sr - sb) / n, 4),
+      skyFrac: U.round(sky / n, 4), topSkyFrac: U.round(topSky / Math.max(1, W * Math.floor(h * 0.12)), 4),
+      greenFrac: U.round(green / n, 4), warmFrac: U.round(warm / n, 4),
+      brightFrac: U.round(bright / n, 4), darkFrac: U.round(dark / n, 4),
+      edgeDensity: U.round(edge / px, 4), sharpness: U.round(sharp, 4),
+      vertLines: U.round(vert / px, 4), horizLines: U.round(horiz / px, 4),
+      longVertical: longV, longHorizontal: longH,
+      horizonY: U.round(horizonY, 3), symmetry: U.round(symmetry, 3),
+      depthScore: U.round(depthScore, 3), centerBias: U.round(centerBias, 3),
+      signature,
+    };
+    const cls = classify(f);
+    return {
+      id: U.uid('ia'), assetId: asset.id, at: Date.now(),
+      ...f, ...cls,
+      heroScore: heroScore(f, cls),
+    };
+  }
+
+  /** Heuristisk rumsklassificering. Varje regel är ett mätbart drag — inte en
+   *  gissning ur tomma luften — men den är just en heuristik. */
+  function classify(f) {
+    const s = {};
+    const add = (k, v) => s[k] = (s[k] || 0) + v;
+
+    // normaliserade drag så trösklarna betyder samma sak i alla bilder
+    const dense = U.clamp(f.edgeDensity / 0.08, 0, 2);          // kanttäthet
+    const hBands = U.clamp(f.longHorizontal / 14, 0, 2);        // horisontella band (skåp, bänkar)
+    const vBands = U.clamp(f.longVertical / 14, 0, 2);          // vertikala linjer (karmar, kakelfogar)
+    const flat = U.clamp(1 - dense, 0, 1);                      // stora lugna ytor
+    const cool = U.clamp((0.2 - f.saturation) / 0.2, 0, 1);     // avfärgat
+
+    // himmel räknas bara om den fyller den översta remsan — annars är det ett fönster
+    const realSky = f.topSkyFrac > 0.35 ? f.skyFrac : f.skyFrac * 0.15;
+    const outdoor = realSky * 3.2 + f.greenFrac * 2.2;
+    add('exterior', outdoor * 1.2);
+    add('garden', f.greenFrac * 3.4 - realSky * 0.9);
+    add('balcony', (f.topSkyFrac > 0.3 && realSky < 0.2 ? 0.7 : 0) + vBands * 0.25);
+    add('drone', (realSky + f.greenFrac) * 1.5 + (f.horizonY < 0.35 ? 0.6 : 0) - vBands * 0.5);
+
+    const indoor = 1 - U.clamp(outdoor, 0, 1);
+    // detalj: motivet sitter i mitten, ingen rumsgeometri, få långa linjer
+    const detail = (f.centerBias > 1.5 ? 1.0 : 0) + (1 - f.depthScore) * 0.35
+      - vBands * 0.6 - hBands * 0.6;
+    add('detail', detail);
+    // kök: horisontella band över OCH under mitten, ofta varma luckor
+    add('kitchen', indoor * (hBands * 1.3 + f.warmFrac * 1.2 - flat * 0.5));
+    // badrum: avfärgat, ljust och tätt rutmönster i både led
+    add('bathroom', indoor * (cool * 1.1 + (f.meanL > 0.55 ? 0.6 : 0) + Math.min(hBands, vBands) * 0.9 - f.warmFrac * 1.2));
+    // sovrum: stora lugna ytor, låg kanttäthet, låg mättnad, få band
+    add('bedroom', indoor * (flat * 1.3 + cool * 0.4 - hBands * 0.8 - vBands * 0.4));
+    // vardagsrum: djup, blandad struktur, varken extremt platt eller extremt tätt
+    add('livingroom', indoor * (0.45 + f.depthScore * 1.0 + (dense > 0.4 && dense < 1.3 ? 0.4 : 0)));
+    // matplats: ett horisontellt möbelblock mitt i bilden med djup runt
+    add('diningroom', indoor * (hBands * 0.5 + f.depthScore * 0.5 + (f.centerBias > 1.2 && f.centerBias < 1.5 ? 0.4 : 0)));
+    add('entry', indoor * (vBands * 0.7 + (f.meanL < 0.4 ? 0.5 : 0) - f.depthScore * 0.4));
+    add('other', 0.3);
+
+    const ranked = Object.entries(s).sort((a, b) => b[1] - a[1]);
+    const total = ranked.reduce((a, r) => a + Math.max(0, r[1]), 0) || 1;
+    const roomGuess = ranked.slice(0, 3).map(([id, v]) => ({ id, p: U.round(Math.max(0, v) / total, 3) }));
+    const top = roomGuess[0];
+    // marginalen till tvåan säger mer om säkerheten än den normaliserade andelen
+    const margin = roomGuess.length > 1 ? top.p - roomGuess[1].p : top.p;
+    return {
+      roomType: top.id, roomConfidence: U.round(U.clamp(margin * 3.5, 0, 1), 2), roomGuess,
+      roomUncertain: margin < 0.12,
+      isExterior: outdoor > 0.35, isDrone: top.id === 'drone',
+      isDetail: top.id === 'detail',
+    };
+  }
+
+  /** Hur stark är bilden som blickfång? Skärpa, kontrast, komposition, djup. */
+  function heroScore(f, cls) {
+    let v = 0;
+    v += U.clamp(f.sharpness * 9, 0, 1) * 0.28;
+    v += U.clamp(f.contrast * 3.4, 0, 1) * 0.20;
+    v += f.symmetry * 0.16;
+    v += f.depthScore * 0.18;
+    v += U.clamp(1 - Math.abs(f.meanL - 0.5) * 2.6, 0, 1) * 0.12;
+    if (cls.isExterior) v += 0.10;
+    if (cls.isDetail) v -= 0.16;
+    if (f.darkFrac > 0.25) v -= 0.12;
+    if (f.brightFrac > 0.18) v -= 0.08;
+    return U.round(U.clamp(v, 0, 1), 3);
+  }
+
+  /** Hammingavstånd mellan signaturer: 0 = identiska, 64 = motsatta. */
+  function similarity(a, b) {
+    if (!a || !b || !a.signature || !b.signature) return 0;
+    let same = 0;
+    for (let i = 0; i < 64; i++) if (a.signature[i] === b.signature[i]) same++;
+    return U.round(same / 64, 3);
+  }
+
+  /** Analyserar en lista bilder med progress och andningspauser. */
+  async function analyzeAll(assets, onProgress) {
+    const out = new Map();
+    for (let i = 0; i < assets.length; i++) {
+      onProgress && onProgress(i / assets.length, assets[i].name);
+      try { out.set(assets[i].id, await analyze(assets[i])); }
+      catch (e) { console.warn('bildanalys misslyckades', assets[i].name, e); }
+      await U.raf();
+    }
+    onProgress && onProgress(1, '');
+    return out;
+  }
+
+  return { analyze, analyzeAll, similarity, classify, heroScore };
+})();
+
+
+/* ===== 46-music-structure.js ===== */
+/* ============================================================
+   46 — Musikstruktur
+
+   Media.analyzeAudio ger transienter och BPM. Här byggs strukturen ovanpå:
+   taktrutnät, downbeats, takter, fraser, sektioner, energikurva och — det
+   som faktiskt används — en lista kandidater till klipppunkter med styrka
+   och typ.
+
+   Att filmen INTE ska klippa på varje beat är själva poängen. Analysen
+   levererar möjligheterna; regissören väljer vilka som blir klipp.
+   ============================================================ */
+const MusicStructure = (() => {
+
+  function analyze(media) {
+    if (!media || media.type !== 'audio') throw new Error('Ingen musikfil vald');
+    const dur = media.duration || 0;
+    const beats = (media.beats || []).slice();
+    const peaks = media.wave || [];
+    let bpm = media.bpm || null;
+
+    /* --- energikurva ur waveformen, ett värde per 0,25 s --- */
+    const step = 0.25;
+    const nE = Math.max(4, Math.ceil(dur / step));
+    const energy = new Float32Array(nE);
+    if (peaks.length) {
+      for (let i = 0; i < nE; i++) {
+        const t0 = i * step, t1 = t0 + step;
+        const a = Math.floor(t0 / dur * peaks.length), b = Math.max(a + 1, Math.floor(t1 / dur * peaks.length));
+        let s = 0, c = 0;
+        for (let j = a; j < Math.min(peaks.length, b); j++) { s += peaks[j]; c++; }
+        energy[i] = c ? s / c / 255 : 0;
+      }
+    }
+    const smoothE = smooth(energy, 6);
+
+    /* --- taktrutnät: regelbundet, förankrat i de starkaste transienterna --- */
+    let period = null;
+    if (beats.length > 4) {
+      const d = [];
+      for (let i = 1; i < beats.length; i++) d.push(beats[i] - beats[i - 1]);
+      d.sort((a, b) => a - b);
+      period = d[d.length >> 1];
+      // vik in i ett rimligt tempospann (60–180 BPM)
+      while (period > 1.0) period /= 2;
+      while (period < 0.333) period *= 2;
+      bpm = Math.round(60 / period);
+    }
+    if (!period && bpm) period = 60 / bpm;
+    if (!period) { period = 0.5; bpm = 120; }
+
+    // fasa in rutnätet så att så många detekterade transienter som möjligt hamnar på nätet
+    let phase = 0, bestHit = -1;
+    for (let k = 0; k < 24; k++) {
+      const ph = (k / 24) * period;
+      let hit = 0;
+      for (const b of beats) {
+        const r = ((b - ph) % period + period) % period;
+        if (Math.min(r, period - r) < period * 0.12) hit++;
+      }
+      if (hit > bestHit) { bestHit = hit; phase = ph; }
+    }
+    const grid = [];
+    for (let t = phase; t < dur; t += period) grid.push(U.round(t, 3));
+
+    /* --- downbeats: välj den fas i 4/4 som samlar mest anslagsenergi --- */
+    const at = t => smoothE[U.clamp(Math.round(t / step), 0, nE - 1)] || 0;
+    let barPhase = 0, bestBar = -1;
+    for (let ph = 0; ph < 4; ph++) {
+      let s = 0;
+      for (let i = ph; i < grid.length; i += 4) s += at(grid[i]);
+      if (s > bestBar) { bestBar = s; barPhase = ph; }
+    }
+    const downbeats = [], bars = [];
+    for (let i = barPhase; i < grid.length; i += 4) {
+      downbeats.push(grid[i]);
+      bars.push({ t: grid[i], index: bars.length, energy: U.round(at(grid[i]), 3) });
+    }
+
+    /* --- fraser: 4 takter i normalfallet, 8 vid högt tempo --- */
+    const barsPerPhrase = bpm > 128 ? 8 : 4;
+    const phrases = [];
+    for (let i = 0; i < bars.length; i += barsPerPhrase) {
+      const t0 = bars[i].t;
+      const t1 = bars[Math.min(bars.length - 1, i + barsPerPhrase)] ? bars[Math.min(bars.length - 1, i + barsPerPhrase)].t : dur;
+      let e = 0, c = 0;
+      for (let t = t0; t < t1; t += step) { e += at(t); c++; }
+      phrases.push({ t: t0, end: U.round(t1, 3), index: phrases.length, energy: U.round(c ? e / c : 0, 3) });
+    }
+
+    /* --- sektioner: ihållande energiskiften mellan fraser --- */
+    // trösklarna sätts av låtens egen energifördelning, inte absoluta nivåer
+    const es = phrases.map(p => p.energy).sort((a, b) => a - b);
+    const q = f => es.length ? es[U.clamp(Math.floor(f * (es.length - 1)), 0, es.length - 1)] : 0;
+    const lo = q(0.33), hi = q(0.67), spread = Math.max(0.02, q(1) - q(0));
+    const sections = [];
+    let cur = null;
+    for (const p of phrases) {
+      const kind = spread < 0.05 ? 'mid'
+        : p.energy <= lo ? 'low' : p.energy >= hi ? 'high' : 'mid';
+      if (!cur || cur.kind !== kind) {
+        if (cur) cur.end = p.t;
+        cur = { t: p.t, kind, energy: p.energy, index: sections.length };
+        sections.push(cur);
+      } else {
+        cur.energy = U.round((cur.energy + p.energy) / 2, 3);
+      }
+    }
+    if (cur) cur.end = U.round(dur, 3);
+    if (sections.length) {
+      sections[0].type = 'intro';
+      const peak = sections.reduce((a, b) => b.energy > a.energy ? b : a, sections[0]);
+      peak.type = peak.type || 'peak';
+      sections[sections.length - 1].type = sections[sections.length - 1].type || 'outro';
+      sections.forEach(s => s.type = s.type || (s.kind === 'high' ? 'buildup' : 'body'));
+    }
+
+    /* --- accenter: transienter som sticker ut mot lokal bakgrund --- */
+    const accents = [];
+    for (const b of beats) {
+      const e = at(b), before = at(b - 0.6), after = at(b + 0.3);
+      if (e > before * 1.55 && e > 0.22) accents.push({ t: U.round(b, 3), strength: U.round(U.clamp(e / Math.max(0.05, before) / 3, 0, 1), 3) });
+    }
+
+    /* --- klipppunkter: alla musikaliskt rimliga ställen att klippa på --- */
+    const cutPoints = [];
+    const push = (t, strength, kind) => {
+      if (t < 0.2 || t > dur - 0.4) return;
+      const ex = cutPoints.find(c => Math.abs(c.t - t) < 0.06);
+      if (ex) { if (strength > ex.strength) { ex.strength = strength; ex.kind = kind; } return; }
+      cutPoints.push({ t: U.round(t, 3), strength, kind });
+    };
+    for (const s of sections) push(s.t, 1.55, 'section');
+    for (const p of phrases) push(p.t, 1.25, 'phrase');
+    for (const b of downbeats) push(b, 1.0, 'downbeat');
+    // halvtakt ger regissören kortare alternativ utan att bli hackigt
+    for (let i = 0; i < downbeats.length - 1; i++) push((downbeats[i] + downbeats[i + 1]) / 2, 0.6, 'halfbar');
+    for (const a of accents) push(a.t, 0.85 + a.strength * 0.4, 'accent');
+    cutPoints.sort((a, b) => a.t - b.t);
+
+    return {
+      id: U.uid('ma'), assetId: media.id, at: Date.now(),
+      duration: U.round(dur, 3), bpm, beatPeriod: U.round(period, 4),
+      beats: beats.map(b => U.round(b, 3)),
+      grid, downbeats, bars, phrases, sections, accents, cutPoints,
+      energyStep: step, energyCurve: Array.from(smoothE, v => U.round(v, 3)),
+      barsPerPhrase,
+    };
+  }
+
+  function smooth(a, w) {
+    const n = a.length, out = new Float32Array(n), r = Math.max(1, w >> 1);
+    for (let i = 0; i < n; i++) {
+      let s = 0, c = 0;
+      for (let j = Math.max(0, i - r); j <= Math.min(n - 1, i + r); j++) { s += a[j]; c++; }
+      out[i] = s / c;
+    }
+    return out;
+  }
+
+  /** Energi vid en godtycklig tid — används av regissören. */
+  const energyAt = (ma, t) => ma.energyCurve[U.clamp(Math.round(t / ma.energyStep), 0, ma.energyCurve.length - 1)] || 0;
+
+  /** Vilken sektion är vi i? */
+  const sectionAt = (ma, t) => ma.sections.find(s => t >= s.t && t < s.end) || ma.sections[ma.sections.length - 1] || null;
+
+  /** Närmaste klipppunkt till en önskad tid, med minsta styrka. */
+  function nearestCut(ma, t, minStrength = 0) {
+    let best = null, bd = 1e9;
+    for (const c of ma.cutPoints) {
+      if (c.strength < minStrength) continue;
+      const d = Math.abs(c.t - t);
+      if (d < bd) { bd = d; best = c; }
+    }
+    return best;
+  }
+
+  return { analyze, energyAt, sectionAt, nearestCut };
+})();
+
+
+/* ===== 48-director.js ===== */
+/* ============================================================
+   48 — AI-regissören
+
+   Får bildanalysen, musikanalysen, rörelsebiblioteket och önskad längd.
+   Levererar en Director Plan: ordning, klipppunkter, längder, rörelser och
+   en motivering per shot. Planen skapas FÖRE generering — musiken bestämmer
+   klippningen, och videogeneratorn får rätta sig efter den.
+
+   Motorn är deterministisk och förklarar varje beslut med de mått som
+   faktiskt drev det. När LLM-regissören är inkopplad får den samma underlag
+   och kan skriva om planen; validate() ser till att den håller samma regler.
+   ============================================================ */
+const Director = (() => {
+
+  /* ---------- 1. ORDNING ---------- */
+  /** Bygger en rundtur i stället för en mekanisk rum-för-rum-sortering. */
+  function orderImages(assets, ia) {
+    const items = assets.map(a => ({ a, f: ia.get(a.id) })).filter(x => x.f);
+    if (!items.length) return [];
+
+    const by = t => items.filter(x => x.f.roomType === t && !x.used);
+    const bestOf = list => list.slice().sort((p, q) => q.f.heroScore - p.f.heroScore)[0];
+    const seq = [];
+    const take = (x, role, why) => { if (!x || x.used) return false; x.used = true; x.role = role; x.why = why; seq.push(x); return true; };
+
+    // Öppning: starkaste exteriör eller drönarbild — annars starkaste bilden alls
+    const opener = bestOf(items.filter(x => x.f.isExterior || x.f.isDrone)) || bestOf(items);
+    take(opener, 'hero', 'Starkaste etableringsbilden — den öppnar filmen och placerar bostaden.');
+
+    // Entré efter etableringen om den finns
+    take(bestOf(by('entry')), 'support', 'Entrén tar betraktaren in i bostaden.');
+
+    // Interiören i rundturens ordning, hero först i varje rum
+    const interior = MM.TOUR_ORDER.filter(t => !['exterior', 'drone', 'entry', 'detail', 'garden', 'balcony', 'other'].includes(t));
+    let sinceDetail = 0;
+    for (const room of interior) {
+      const group = by(room).sort((p, q) => q.f.heroScore - p.f.heroScore);
+      for (let i = 0; i < group.length; i++) {
+        const role = i === 0 && group[i].f.heroScore > 0.5 ? 'hero' : 'support';
+        take(group[i], role, `${MM.roomName(room)}${i === 0 ? ' — rummets starkaste vinkel' : ', kompletterande vinkel'}.`);
+        sinceDetail++;
+        // detalj som andhämtning efter några rumsbilder
+        if (sinceDetail >= 3) {
+          const det = bestOf(by('detail'));
+          if (det) { take(det, 'detail', 'Detalj som andningspaus mellan rummen.'); sinceDetail = 0; }
+        }
+      }
+    }
+    // Uteplatser mot slutet
+    for (const t of ['balcony', 'garden']) {
+      for (const x of by(t).sort((p, q) => q.f.heroScore - p.f.heroScore))
+        take(x, x.f.heroScore > 0.55 ? 'hero' : 'support', `${MM.roomName(t)} — övergången ut.`);
+    }
+    // Resten
+    for (const x of items.filter(x => !x.used).sort((p, q) => q.f.heroScore - p.f.heroScore))
+      take(x, x.f.isDetail ? 'detail' : 'support', 'Kompletterar rundturen.');
+
+    // Avslutning: spara en stark exteriör till sist om vi har fler än en
+    const exteriors = seq.filter(x => x.f.isExterior || x.f.isDrone);
+    if (exteriors.length > 1 && seq.length > 3) {
+      const closer = exteriors.slice(1).sort((p, q) => q.f.heroScore - p.f.heroScore)[0];
+      if (closer && seq[seq.length - 1] !== closer) {
+        seq.splice(seq.indexOf(closer), 1);
+        closer.role = 'closer';
+        closer.why = 'Avslutande reveal — filmen lämnar bostaden utifrån.';
+        seq.push(closer);
+      }
+    }
+    return separateDuplicates(seq);
+  }
+
+  /** Två nästan identiska bilder efter varandra ser ut som ett fel. Skjut isär dem. */
+  function separateDuplicates(seq) {
+    for (let i = 1; i < seq.length; i++) {
+      const sim = ImageAnalyze.similarity(seq[i - 1].f, seq[i].f);
+      if (sim < 0.88) continue;
+      // hitta något att byta med längre fram som inte liknar grannarna
+      for (let j = i + 2; j < seq.length; j++) {
+        const okPrev = ImageAnalyze.similarity(seq[i - 1].f, seq[j].f) < 0.85;
+        const okNext = i + 1 >= seq.length || ImageAnalyze.similarity(seq[j].f, seq[i + 1].f) < 0.85;
+        if (okPrev && okNext) {
+          const tmp = seq[i]; seq[i] = seq[j]; seq[j] = tmp;
+          seq[i].why += ' Flyttad för att inte hamna intill en nästan identisk bild.';
+          break;
+        }
+      }
+    }
+    return seq;
+  }
+
+  /* ---------- 2. LÄNGDER PÅ MUSIKENS PUNKTER ---------- */
+  const ROLE_WEIGHT = { hero: 1.38, closer: 1.25, support: 1.0, detail: 0.72 };
+
+  function planCuts(seq, ma, targetDuration) {
+    const n = seq.length;
+    const musicLimit = Math.min(targetDuration, ma.duration - 0.6);
+    const totalWeight = seq.reduce((a, x) => a + (ROLE_WEIGHT[x.role] || 1), 0);
+    const cuts = [];
+    let t = 0;
+
+    for (let i = 0; i < n; i++) {
+      const w = ROLE_WEIGHT[seq[i].role] || 1;
+      let want = musicLimit * (w / totalWeight);
+      want = U.clamp(want, 1.8, 6.5);
+      const rest = n - i - 1;
+      // se till att det finns tid kvar åt de shots som återstår
+      const maxHere = Math.max(1.8, musicLimit - t - rest * 1.9);
+      want = Math.min(want, maxHere);
+
+      // hero och sektionsstart vill ligga på starka punkter
+      const minStrength = seq[i].role === 'hero' || seq[i].role === 'closer' ? 1.0 : 0.6;
+      const desired = t + want;
+      let cut = MusicStructure.nearestCut(ma, desired, minStrength);
+      if (!cut || Math.abs(cut.t - desired) > want * 0.45) cut = MusicStructure.nearestCut(ma, desired, 0.6);
+      let end = cut ? cut.t : desired;
+      if (i === n - 1) end = Math.min(musicLimit, Math.max(t + 1.8, end));
+      if (end - t < 1.6) end = t + 1.8;
+      end = Math.min(end, musicLimit);                 // filmen får aldrig bli längre än musiken
+      if (end - t < 1.5) { // resten ryms inte
+        for (let j = i; j < n; j++) seq[j].dropped = true;
+        break;
+      }
+      cuts.push({ in: U.round(t, 3), out: U.round(end, 3), cut: cut || { kind: 'free', strength: 0 } });
+      t = end;
+      if (t >= musicLimit - 1.5) {
+        for (let j = i + 1; j < n; j++) seq[j].dropped = true;
+        break;
+      }
+    }
+    return cuts;
+  }
+
+  /* ---------- 3. KAMERARÖRELSER ---------- */
+  /** Poängsätter en rörelse mot bilden, grannarna och musiken. */
+  function scoreMove(mv, x, prev, prev2, energy) {
+    const f = x.f;
+    if (mv.droneOnly && !f.isDrone) return -Infinity;
+    if (prev && prev.movementId === mv.id) return -Infinity;   // aldrig samma två i rad
+    let s = 0;
+
+    // passar rummet
+    s += mv.fits.includes(f.roomType) ? 0.9 : (mv.fits.includes('exterior') && f.isExterior ? 0.5 : 0);
+
+    // passar bildens geometri
+    if (mv.wants) {
+      if (mv.wants.symmetry) s += f.symmetry * mv.wants.symmetry * 1.5;
+      if (mv.wants.depth) s += f.depthScore * mv.wants.depth * 1.6;
+      if (mv.wants.width) s += U.clamp(f.aspect / 1.8, 0, 1) * mv.wants.width;
+      if (mv.wants.height) s += (1 - f.horizonY) * mv.wants.height;
+      if (mv.wants.openness) s += U.clamp(1 - f.edgeDensity * 5, 0, 1) * mv.wants.openness;
+    }
+    // symmetrisk interiör vill ha push in/out
+    if (f.symmetry > 0.62 && mv.axis === 'z') s += 0.55;
+    // brett rum med djup vill ha slide
+    if (f.depthScore > 0.45 && f.symmetry < 0.55 && mv.axis === 'x') s += 0.45;
+    // detalj: bara mycket subtil push in
+    if (f.isDetail) s += mv.id === 'slow_push_in' ? 0.8 : -0.7;
+    // drönare
+    if (f.isDrone && mv.droneOnly) s += 0.7;
+
+    // musikens energi: lugna rörelser i intro/outro, mer rörelse i höga partier
+    s -= Math.abs(mv.energy - U.clamp(energy * 1.1, 0.25, 0.75)) * 0.7;
+
+    // sparsamma rörelser kräver starkare motiv
+    if (mv.sparse) s -= 0.45;
+
+    // ---- grannregler ----
+    if (prev) {
+      const pm = MM.moveById(prev.movementId);
+      if (pm.axis === mv.axis) s -= 0.35;                            // variera axel
+      if (pm.axis === mv.axis && pm.dir === -mv.dir) s -= 0.5;       // fram-och-tillbaka ser konstlat ut
+      if (prev2) {
+        const pm2 = MM.moveById(prev2.movementId);
+        if (pm2.axis === mv.axis && pm.axis !== mv.axis) s -= 0.4;   // A-B-A-mönster
+        if (pm2.movementId === mv.id) s -= 0.6;
+      }
+    }
+    return s;
+  }
+
+  function chooseMove(x, prev, prev2, energy) {
+    let best = null, bestS = -Infinity, runnerUp = null;
+    for (const mv of MM.MOVES) {
+      const s = scoreMove(mv, x, prev, prev2, energy);
+      if (s > bestS) { runnerUp = best; bestS = s; best = mv; }
+    }
+    return { move: best || MM.MOVES[0], score: bestS, runnerUp };
+  }
+
+  /* ---------- 4. HELA PLANEN ---------- */
+  function buildPlan({ assets, imageAnalysis, musicAnalysis, targetDuration, provider, aspect }) {
+    const seq = orderImages(assets, imageAnalysis);
+    if (!seq.length) throw new Error('Inga analyserade bilder att regissera.');
+    const cuts = planCuts(seq, musicAnalysis, targetDuration);
+    const shots = [];
+    const planId = U.uid('plan');
+
+    for (let i = 0; i < cuts.length; i++) {
+      const x = seq[i];
+      if (!x || x.dropped) break;
+      const c = cuts[i];
+      const energy = MusicStructure.energyAt(musicAnalysis, (c.in + c.out) / 2);
+      const prev = shots[shots.length - 1], prev2 = shots[shots.length - 2];
+      const { move } = chooseMove(x, prev, prev2, energy);
+      const d = MM.planDurations(c.out - c.in, provider);
+      const sec = MusicStructure.sectionAt(musicAnalysis, c.in);
+
+      shots.push(MM.newShot({
+        planId, index: i, assetId: x.a.id, movementId: move.id,
+        timelineIn: c.in, timelineOut: c.out,
+        generatedDuration: d.generatedDuration, sourceIn: d.sourceIn, sourceOut: d.sourceOut,
+        role: x.role, roomType: x.f.roomType,
+        motivation: motivate(x, move, c, sec, prev),
+      }));
+    }
+
+    const dropped = seq.filter(x => x.dropped).length;
+    return {
+      id: planId, version: 1, createdBy: 'engine', createdAt: Date.now(),
+      shots, provider, aspect,
+      duration: shots.length ? shots[shots.length - 1].timelineOut : 0,
+      droppedImages: dropped,
+      rationale: summarize(shots, musicAnalysis, dropped),
+    };
+  }
+
+  /** Motiveringen speglar de mått som faktiskt styrde valet. */
+  function motivate(x, move, cut, section, prev) {
+    const f = x.f, bits = [x.why];
+    const geo = [];
+    if (f.symmetry > 0.6) geo.push('symmetrisk komposition');
+    if (f.depthScore > 0.45) geo.push('tydligt djup');
+    if (f.horizonY < 0.4) geo.push('hög horisont');
+    if (f.isDetail) geo.push('närbild');
+    bits.push(`${move.name} — ${geo.length ? geo.join(', ') + ' passar rörelsen' : 'lugn rörelse som inte konkurrerar med motivet'}.`);
+    if (cut.cut.kind === 'section') bits.push('Klippet ligger på ett sektionsbyte i musiken.');
+    else if (cut.cut.kind === 'phrase') bits.push('Klippet ligger på en frasgräns.');
+    else if (cut.cut.kind === 'accent') bits.push('Klippet ligger på en accent.');
+    else if (cut.cut.kind === 'downbeat') bits.push('Klippet ligger på en downbeat.');
+    if (prev && MM.moveById(prev.movementId).axis === move.axis) bits.push('Följer föregående shots axel medvetet.');
+    return bits.join(' ');
+  }
+
+  function summarize(shots, ma, dropped) {
+    const rooms = [...new Set(shots.map(s => MM.roomName(s.roomType)))];
+    const moves = [...new Set(shots.map(s => MM.moveById(s.movementId).name))];
+    const onMusic = shots.filter((s, i) => i > 0).length;
+    return `${shots.length} shots över ${U.round(shots.length ? shots[shots.length - 1].timelineOut : 0, 1)} s. ` +
+      `Rundturen går genom ${rooms.join(', ')}. ${moves.length} olika kamerarörelser. ` +
+      `Alla ${onMusic} klippunkter ligger på musikaliska punkter (${ma.bpm} BPM). ` +
+      (dropped ? `${dropped} bilder rymdes inte inom filmens längd.` : 'Alla valda bilder fick plats.');
+  }
+
+  /* ---------- 5. VALIDERING (även för LLM-planer) ---------- */
+  function validate(plan, { assets, musicAnalysis, provider }) {
+    const errs = [];
+    const ids = new Set(assets.map(a => a.id));
+    const p = MM.providerById(provider);
+    if (!plan || !Array.isArray(plan.shots) || !plan.shots.length) return ['Planen saknar shots.'];
+    let t = 0;
+    plan.shots.forEach((s, i) => {
+      if (!ids.has(s.assetId)) errs.push(`Shot ${i + 1}: okänd bild.`);
+      if (!MM.MOVES.some(m => m.id === s.movementId)) errs.push(`Shot ${i + 1}: okänd kamerarörelse "${s.movementId}".`);
+      if (Math.abs(s.timelineIn - t) > 0.05) errs.push(`Shot ${i + 1}: glapp eller överlapp i timelinen.`);
+      if (s.timelineDuration < 1.5) errs.push(`Shot ${i + 1}: för kort (${s.timelineDuration}s).`);
+      if (s.timelineDuration > 8) errs.push(`Shot ${i + 1}: för långt (${s.timelineDuration}s).`);
+      if (s.generatedDuration < p.minDuration || s.generatedDuration > p.maxDuration)
+        errs.push(`Shot ${i + 1}: genereringslängd utanför modellens gränser.`);
+      if (s.sourceOut - s.sourceIn > s.generatedDuration + 0.01)
+        errs.push(`Shot ${i + 1}: segmentet ryms inte i det genererade klippet.`);
+      t = s.timelineOut;
+    });
+    if (musicAnalysis && t > musicAnalysis.duration + 0.5) errs.push('Filmen är längre än musiken.');
+    return errs;
+  }
+
+  /* ---------- 6. UNDERLAG TILL LLM-REGISSÖREN ---------- */
+  /** Kompakt brief som kan skickas till Claude när bryggan finns. */
+  function brief({ assets, imageAnalysis, musicAnalysis, targetDuration }) {
+    return {
+      task: 'Regissera en bostadsfilm. Returnera shots i samma schema.',
+      targetDuration,
+      movements: MM.MOVES.map(m => ({ id: m.id, name: m.name, fits: m.fits, energy: m.energy, sparse: !!m.sparse, droneOnly: !!m.droneOnly })),
+      music: {
+        bpm: musicAnalysis.bpm, duration: musicAnalysis.duration,
+        sections: musicAnalysis.sections, phrases: musicAnalysis.phrases.map(p => p.t),
+        cutPoints: musicAnalysis.cutPoints,
+      },
+      images: assets.map(a => {
+        const f = imageAnalysis.get(a.id);
+        if (!f) return null;
+        return {
+          assetId: a.id, name: a.name, roomGuess: f.roomGuess, heroScore: f.heroScore,
+          symmetry: f.symmetry, depth: f.depthScore, horizonY: f.horizonY,
+          isExterior: f.isExterior, isDrone: f.isDrone, isDetail: f.isDetail,
+          brightness: f.meanL, contrast: f.contrast, sharpness: f.sharpness,
+        };
+      }).filter(Boolean),
+      rules: [
+        'Klippunkter måste ligga på angivna cutPoints.',
+        'Ingen rörelse får upprepas två shots i rad.',
+        'Undvik mekaniska mönster; rörelsen ska motiveras av bild, grannar och musik.',
+        'Nästan identiska bilder får inte ligga intill varandra.',
+        'Hero-bilder får längre tid, detaljer kortare.',
+      ],
+    };
+  }
+
+  return { buildPlan, orderImages, planCuts, chooseMove, scoreMove, validate, brief, motivate };
+})();
+
+
+/* ===== 49-generation.js ===== */
+/* ============================================================
+   49 — Generering: providers, jobbkö, QC, projektbygge
+
+   Ett provider-interface, tre sätt att fylla det:
+
+   • local      — renderar kamerarörelsen över stillbilden här i webbläsaren.
+                  Kostar ingenting, ger en riktig videofil, och låter hela
+                  flödet provköras innan credits spenderas.
+   • higgsfield — Kling v3.0. En webbsida kan inte prata MCP, så jobben läggs
+                  i kön och lämnas över: antingen till en lokal brygga
+                  (tools/motion-bridge.js) eller som ett manifest som Claude
+                  kör via MCP och importerar tillbaka.
+   • bridge     — samma som higgsfield men helautomatiskt när bryggan svarar.
+
+   Resten av Motion vet ingenting om vilken som används.
+   ============================================================ */
+const Generation = (() => {
+  const bus = new U.Emitter();
+  const state = { running: false, cancelled: false, jobs: [], done: 0, total: 0, message: '' };
+  let bridgeUrl = null, bridgeAlive = false;
+
+  /* ---------- lokal rendering av kamerarörelsen ---------- */
+  const ease = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+
+  /** Rörelsen uttryckt som zoom/pan över tid, samma semantik som prompten
+   *  beskriver för videomodellen. */
+  function moveTransform(moveId, k) {
+    const e = ease(U.clamp(k, 0, 1));
+    const m = MM.moveById(moveId);
+    const amt = 0.16, pan = 0.10;
+    let zoom = 1.06, dx = 0, dy = 0;
+    switch (m.axis) {
+      case 'z': zoom = m.dir > 0 ? 1.02 + amt * e : (1.02 + amt) - amt * e; break;
+      case 'x': zoom = 1.10; dx = (m.dir > 0 ? -1 : 1) * pan * (e - 0.5) * 2; break;
+      case 'y': zoom = 1.10; dy = (m.dir > 0 ? -1 : 1) * pan * (e - 0.5) * 2; break;
+      case 'xz': zoom = 1.02 + amt * e; dx = (m.dir > 0 ? -1 : 1) * pan * 0.6 * (e - 0.5) * 2; break;
+      case 'yz': zoom = (1.02 + amt) - amt * e; dy = -pan * 0.6 * (e - 0.5) * 2; break;
+    }
+    if (moveId === 'rise_tilt_down') dy = -pan * (e - 0.5) * 2;
+    if (moveId === 'descend_tilt_up') dy = pan * (e - 0.5) * 2;
+    return { zoom, dx, dy };
+  }
+
+  const LocalProvider = {
+    id: 'local', needsBridge: false,
+    async run(job, shot, asset, opts) {
+      const im = await new Promise((res, rej) => {
+        const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('Bilden kunde inte läsas')); i.src = asset.url;
+      });
+      const { w, h } = U.frameSize(opts.aspect || '16:9', 720);
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d');
+      const fps = 30, total = Math.round(job.params.duration * fps);
+      const stream = c.captureStream(fps);
+      const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm']
+        .find(t => { try { return MediaRecorder.isTypeSupported(t); } catch (e) { return false; } });
+      if (!mime) throw new Error('Webbläsaren saknar encoder för lokal rendering.');
+      const rec = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8e6 });
+      const chunks = [];
+      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      const done = new Promise(r => rec.onstop = r);
+      rec.start();
+
+      const srcAR = im.naturalWidth / im.naturalHeight, outAR = w / h;
+      for (let i = 0; i < total; i++) {
+        if (state.cancelled) break;
+        const { zoom, dx, dy } = moveTransform(shot.movementId, i / Math.max(1, total - 1));
+        // fyll bildytan (cover) och lägg rörelsen ovanpå
+        let dw = w * zoom, dh = h * zoom;
+        if (srcAR > outAR) dw = dh * srcAR; else dh = dw / srcAR;
+        g.fillStyle = '#000'; g.fillRect(0, 0, w, h);
+        g.drawImage(im, (w - dw) / 2 + dx * w, (h - dh) / 2 + dy * h, dw, dh);
+        await new Promise(r => setTimeout(r, 1000 / fps));
+      }
+      rec.stop(); await done;
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      if (!blob.size) throw new Error('Renderingen gav en tom fil.');
+      return { blob, name: `shot-${String(shot.index + 1).padStart(2, '0')}-${shot.movementId}.webm`, cost: 0 };
+    },
+  };
+
+  /* ---------- Higgsfield / Kling v3.0 ---------- */
+  const HiggsfieldProvider = {
+    id: 'higgsfield_kling3', needsBridge: true,
+    /** Det som en brygga eller Claude behöver för att köra jobbet. */
+    request(job, shot, asset, opts) {
+      return {
+        jobId: job.id, shotId: shot.id,
+        model: 'kling3_0',
+        prompt: shot.prompt,
+        duration: job.params.duration,
+        mode: job.params.mode, sound: job.params.sound,
+        aspect_ratio: opts.aspect || '16:9',
+        image: { assetId: asset.id, name: asset.name },
+        estimatedCredits: job.cost,
+      };
+    },
+    async run(job, shot, asset, opts) {
+      if (!bridgeAlive) {
+        const e = new Error('Ingen brygga ansluten — jobbet ligger kvar i kön.');
+        e.code = 'no_bridge';
+        throw e;
+      }
+      const form = new FormData();
+      form.append('request', JSON.stringify(this.request(job, shot, asset, opts)));
+      form.append('image', asset.file, asset.name);
+      const res = await fetch(bridgeUrl.replace(/\/$/, '') + '/generate', { method: 'POST', body: form });
+      if (!res.ok) throw new Error('Bryggan svarade ' + res.status + ': ' + (await res.text()).slice(0, 200));
+      const blob = await res.blob();
+      if (!blob.size) throw new Error('Bryggan returnerade en tom fil.');
+      return { blob, name: `shot-${String(shot.index + 1).padStart(2, '0')}-kling.mp4`, cost: job.cost };
+    },
+  };
+
+  const providers = { local: LocalProvider, higgsfield_kling3: HiggsfieldProvider };
+  const providerFor = id => providers[id] || LocalProvider;
+
+  /* ---------- brygga ---------- */
+  async function connectBridge(url) {
+    bridgeUrl = url || bridgeUrl;
+    if (!bridgeUrl) { bridgeAlive = false; return false; }
+    try {
+      const r = await fetch(bridgeUrl.replace(/\/$/, '') + '/health', { method: 'GET' });
+      bridgeAlive = r.ok;
+    } catch (e) { bridgeAlive = false; }
+    bus.emit('bridge', bridgeAlive);
+    return bridgeAlive;
+  }
+  /** Manifest som Claude kan köra via MCP när ingen brygga finns. */
+  function manifest(plan, project, assets) {
+    return {
+      version: 1, createdAt: Date.now(),
+      project: { id: project.id, name: project.propertyName, aspect: plan.aspect },
+      provider: 'higgsfield / kling3_0',
+      totalCredits: MM.planCost(plan, plan.provider),
+      jobs: plan.shots.map(s => {
+        const a = assets.find(x => x.id === s.assetId);
+        return {
+          shotId: s.id, index: s.index + 1, image: a ? a.name : '?',
+          model: 'kling3_0', prompt: s.prompt,
+          duration: s.generatedDuration, mode: 'std', sound: 'off',
+          aspect_ratio: plan.aspect,
+          useSegment: { in: s.sourceIn, out: s.sourceOut },
+          timeline: { in: s.timelineIn, out: s.timelineOut },
+          estimatedCredits: MM.shotCost(plan.provider, s.generatedDuration),
+        };
+      }),
+    };
+  }
+
+  /* ---------- QC: återanvänder stabilisatorns mätningar ---------- */
+  async function qc(media) {
+    try {
+      const { report } = await StabAnalyze.analyze(media, { maxFrames: 240 });
+      const bad = report.wobble.score > 0.55 || report.trackingQuality < 0.5;
+      const shaky = report.shake.score > 0.35 || report.bob.score > 0.4;
+      return {
+        pass: !bad,
+        wobble: report.wobble.score, shake: report.shake.score, bob: report.bob.score,
+        tracking: report.trackingQuality,
+        needsStabilization: shaky,
+        note: bad
+          ? 'Klippet deformeras eller går inte att spåra — bör genereras om.'
+          : shaky ? 'Klippet skakar något; stabilisering slås på automatiskt.' : 'Stabilt.',
+      };
+    } catch (e) {
+      return { pass: true, note: 'QC kunde inte köras: ' + e.message, error: true };
+    }
+  }
+
+  /* ---------- kön ---------- */
+  async function runPlan(plan, ctx) {
+    if (state.running) throw new Error('En generering pågår redan.');
+    state.running = true; state.cancelled = false;
+    state.jobs = plan.shots.map(s => MM.newJob(s, plan.provider, plan.aspect));
+    state.done = 0; state.total = state.jobs.length;
+    const results = [];
+    const prov = providerFor(plan.provider);
+    bus.emit('start', state);
+
+    try {
+      for (let i = 0; i < plan.shots.length; i++) {
+        if (state.cancelled) break;
+        const shot = plan.shots[i], job = state.jobs[i];
+        const asset = ctx.assets.find(a => a.id === shot.assetId);
+        if (!asset) { job.status = 'failed'; job.error = 'Bilden saknas'; shot.status = 'failed'; continue; }
+
+        let attempt = 0, ok = false;
+        while (attempt < 3 && !ok && !state.cancelled) {
+          attempt++; job.attempts = attempt;
+          job.status = 'running'; shot.status = 'generating';
+          state.message = `Shot ${i + 1}/${plan.shots.length} · ${MM.moveById(shot.movementId).name}${attempt > 1 ? ` (försök ${attempt})` : ''}`;
+          bus.emit('progress', { ...state, index: i });
+          try {
+            const out = await prov.run(job, shot, asset, { aspect: plan.aspect });
+            const media = await Media.ingestOne(new File([out.blob], out.name, { type: out.blob.type }));
+            shot.outputAssetId = media.id;
+            job.status = 'done'; job.cost = out.cost;
+            shot.status = 'generated';
+
+            state.message = `QC shot ${i + 1}/${plan.shots.length}`;
+            bus.emit('progress', { ...state, index: i });
+            const q = await qc(media);
+            shot.qc = q;
+            if (!q.pass && attempt < 3) { shot.status = 'qc_fail'; continue; }
+            shot.status = q.pass ? 'approved' : 'qc_fail';
+            shot.needsStabilization = !!q.needsStabilization;
+            results.push({ shot, media });
+            ok = true;
+          } catch (e) {
+            job.error = e.message; job.log.push(e.message);
+            if (e.code === 'no_bridge') { job.status = 'pending'; shot.status = 'queued'; ok = true; break; }
+            if (attempt >= 3) { job.status = 'failed'; shot.status = 'failed'; }
+          }
+        }
+        state.done++;
+        bus.emit('progress', { ...state, index: i });
+      }
+    } finally {
+      state.running = false;
+      bus.emit('done', { results, cancelled: state.cancelled });
+    }
+    return results;
+  }
+  const cancel = () => { state.cancelled = true; state.message = 'Avbryter…'; };
+
+  /* ---------- projektbygge: planen blir ett vanligt editorprojekt ---------- */
+  function buildProject(plan, ctx, results) {
+    const p = M.newProject(ctx.propertyName || 'Motion');
+    p.settings.aspect = plan.aspect;
+    p.motion = {
+      planId: plan.id, createdBy: plan.createdBy, rationale: plan.rationale,
+      provider: plan.provider, musicAssetId: ctx.musicAssetId,
+      shots: plan.shots.map(s => ({ ...s })),
+      musicAnalysisId: ctx.musicAnalysis ? ctx.musicAnalysis.id : null,
+    };
+
+    const byShot = new Map(results.map(r => [r.shot.id, r.media]));
+    for (const s of plan.shots) {
+      const media = byShot.get(s.id);
+      if (!media) continue;
+      p.media.push(media);
+      const clip = M.newClip(media, 0);
+      clip.in = s.sourceIn;
+      clip.out = Math.min(s.sourceOut, media.duration || s.sourceOut);
+      clip.shotId = s.id;
+      clip.transitionIn = { type: 'cut', dur: 0 };   // rena klipp mot musiken
+      clip.stabEnabled = false;
+      p.tracks.video.push(clip);
+    }
+    M.relayout(p.tracks.video);
+
+    if (ctx.music) {
+      p.media.push(ctx.music);
+      const a = M.newAudioClip(ctx.music, 0);
+      a.out = Math.min(ctx.music.duration, M.totalDuration(p) + 1.5);
+      a.fade = { in: 0.6, out: 2.2 };
+      p.tracks.music.push(a);
+    }
+    for (const img of (ctx.assets || [])) if (!p.media.find(m => m.id === img.id)) p.media.push(img);
+    return p;
+  }
+
+  return {
+    bus, state, providers, providerFor, moveTransform,
+    connectBridge, manifest, qc, runPlan, cancel, buildProject,
+    get bridgeAlive() { return bridgeAlive; },
+    get bridgeUrl() { return bridgeUrl; },
+  };
 })();
 
 
@@ -4064,6 +5458,473 @@ const Inspector = (() => {
 })();
 
 
+/* ===== 87-motion-ui.js ===== */
+/* ============================================================
+   87 — Motion: gränssnittet
+
+   Tre steg för användaren: bilder → musik → skapa. All komplexitet
+   (analys, regi, jobbkö, QC) ligger bakom en enkel progressvy.
+   ============================================================ */
+const Motion = (() => {
+  const st = {
+    step: 'images',
+    images: [],            // media-objekt i vald ordning
+    music: null,
+    imageAnalysis: new Map(),
+    musicAnalysis: null,
+    plan: null,
+    provider: 'local',
+    targetDuration: 45,
+    aspect: '16:9',
+    propertyName: '',
+    aiOrder: true,
+    phase: '', progress: 0,
+    result: null,
+    credits: null,
+  };
+  let root = null;
+
+  /* ---------- vy ---------- */
+  function open() {
+    if (!root) {
+      root = U.el('div', { id: 'motionview' });
+      document.body.append(root);
+    }
+    root.style.display = 'flex';
+    document.body.classList.add('motion-open');
+    render();
+  }
+  function close() {
+    if (root) root.style.display = 'none';
+    document.body.classList.remove('motion-open');
+  }
+
+  const shell = (title, sub, body, footer) => U.el('div', { class: 'mo-shell' },
+    U.el('div', { class: 'mo-steps' }, ...['images', 'music', 'plan'].map((s, i) => {
+      const order = ['images', 'music', 'plan'];
+      const cur = order.indexOf(st.step === 'run' || st.step === 'done' ? 'plan' : st.step);
+      return U.el('div', { class: 'mo-step' + (i === cur ? ' on' : '') + (i < cur ? ' past' : '') },
+        U.el('span', { class: 'n', text: String(i + 1) }),
+        ['Bilder', 'Musik', 'Motion'][i]);
+    })),
+    U.el('div', { class: 'mo-card' },
+      U.el('h2', { text: title }),
+      sub ? U.el('p', { class: 'mo-sub', text: sub }) : null,
+      body),
+    footer || null);
+
+  function render() {
+    if (!root) return;
+    U.clear(root);
+    root.append(U.el('button', { class: 'mo-close', onclick: close, 'data-tip': 'Stäng Motion' }, '✕'));
+    const view = { images: viewImages, music: viewMusic, plan: viewPlan, run: viewRun, done: viewDone }[st.step];
+    root.append(view());
+  }
+
+  /* ---------- steg 1: bilder ---------- */
+  function viewImages() {
+    const grid = U.el('div', { class: 'mo-grid' });
+    st.images.forEach((m, i) => {
+      const cell = U.el('div', {
+        class: 'mo-img', draggable: 'true',
+        ondragstart: e => { e.dataTransfer.setData('text/idx', String(i)); e.dataTransfer.effectAllowed = 'move'; },
+        ondragover: e => { e.preventDefault(); cell.classList.add('over'); },
+        ondragleave: () => cell.classList.remove('over'),
+        ondrop: e => {
+          e.preventDefault(); cell.classList.remove('over');
+          const from = parseInt(e.dataTransfer.getData('text/idx'), 10);
+          if (isNaN(from) || from === i) return;
+          const [x] = st.images.splice(from, 1);
+          st.images.splice(i, 0, x);
+          st.aiOrder = false;
+          render();
+        },
+      },
+        U.el('img', { src: m.thumb, alt: m.name }),
+        U.el('span', { class: 'idx', text: String(i + 1) }),
+        U.el('button', {
+          class: 'rm', 'data-tip': 'Ta bort',
+          onclick: () => { st.images.splice(i, 1); render(); },
+        }, '✕'),
+        U.el('span', { class: 'nm', text: m.name }));
+      grid.append(cell);
+    });
+
+    const drop = U.el('div', {
+      class: 'mo-drop',
+      onclick: () => pickFiles('image'),
+      ondragover: e => { e.preventDefault(); drop.classList.add('over'); },
+      ondragleave: () => drop.classList.remove('over'),
+      ondrop: async e => {
+        e.preventDefault(); drop.classList.remove('over');
+        if (e.dataTransfer.files.length) await addFiles(e.dataTransfer.files);
+      },
+    },
+      U.el('div', { style: { fontSize: '14px', color: 'var(--fg-1)' } }, st.images.length ? 'Lägg till fler bilder' : 'Släpp bostadsbilderna här'),
+      U.el('div', { class: 'hint', style: { marginTop: '4px' } }, 'JPG, PNG eller WebP · eller klicka för att välja'));
+
+    const aiRow = U.el('div', { class: 'mo-toggle' },
+      U.el('div', {},
+        U.el('div', { style: { fontSize: '12.5px', color: 'var(--fg-0)' } }, 'AI-bildordning'),
+        U.el('div', { class: 'hint' }, 'Claude analyserar bilderna och bygger en logisk rundtur i stället för filordning.')),
+      U.el('button', {
+        class: 'mo-switch' + (st.aiOrder ? ' on' : ''),
+        onclick: () => { st.aiOrder = !st.aiOrder; render(); },
+      }, U.el('i')));
+
+    const name = U.el('input', {
+      type: 'text', placeholder: 'Adress eller projektnamn', value: st.propertyName,
+      oninput: e => st.propertyName = e.target.value, style: { width: '100%' },
+    });
+
+    return shell('Välj bilder',
+      st.images.length ? `${st.images.length} bilder valda. Du kan dra för att ändra ordning, och redigera allt efteråt.` : 'Börja med bilderna som ska bli film.',
+      U.el('div', {}, drop, grid.children.length ? grid : null,
+        U.el('div', { class: 'mo-field' }, U.el('label', {}, 'Bostad'), name), aiRow),
+      U.el('div', { class: 'mo-foot' },
+        U.el('span', { class: 'hint', text: st.images.length < 3 ? 'Minst 3 bilder behövs' : `${st.images.length} bilder` }),
+        U.el('span', { class: 'spacer' }),
+        U.el('button', {
+          class: 'btn primary', disabled: st.images.length < 3,
+          onclick: () => { st.step = 'music'; render(); },
+        }, 'Fortsätt →')));
+  }
+
+  /* ---------- steg 2: musik ---------- */
+  function viewMusic() {
+    const list = U.el('div', { class: 'mo-tracks' });
+    const tracks = S.project.media.filter(m => m.type === 'audio');
+    if (!tracks.length) list.append(U.el('div', { class: 'hint', style: { padding: '10px 0' } }, 'Ingen musik importerad ännu.'));
+
+    for (const m of tracks) {
+      const sel = st.music && st.music.id === m.id;
+      const wave = U.el('canvas', { class: 'mo-wave', width: 600, height: 40 });
+      const row = U.el('div', {
+        class: 'mo-track' + (sel ? ' on' : ''),
+        onclick: () => { st.music = m; render(); },
+      },
+        U.el('button', {
+          class: 'mo-play', onclick: e => { e.stopPropagation(); togglePlay(m); },
+        }, playingId === m.id ? '❚❚' : '▶'),
+        U.el('div', { class: 'mo-tmeta' },
+          U.el('div', { class: 'nm', text: m.name.replace(/\.[^.]+$/, '') }),
+          U.el('div', { class: 'hint mono' }, `${m.bpm ? m.bpm + ' BPM · ' : ''}${U.dur(m.duration)}${m.beats ? ' · ' + m.beats.length + ' transienter' : ''}`)),
+        sel ? wave : U.el('span', { class: 'hint mono', text: U.dur(m.duration) }));
+      list.append(row);
+      if (sel) requestAnimationFrame(() => drawWave(wave, m));
+    }
+
+    return shell('Välj soundtrack',
+      'Musiken är inte bakgrund — den bestämmer var filmen klipper.',
+      U.el('div', {}, list,
+        U.el('button', { class: 'btn', style: { marginTop: '10px' }, onclick: () => pickFiles('audio') }, 'Ladda upp musik'),
+        U.el('div', { class: 'mo-field', style: { marginTop: '14px' } },
+          U.el('label', {}, 'Ungefärlig filmlängd'),
+          U.el('div', { class: 'row', style: { padding: 0, gap: '8px' } },
+            ...[30, 45, 60, 90].map(v => U.el('button', {
+              class: 'btn sm' + (st.targetDuration === v ? ' on' : ''),
+              onclick: () => { st.targetDuration = v; render(); },
+            }, v + ' s')))),
+        U.el('div', { class: 'mo-field' },
+          U.el('label', {}, 'Format'),
+          U.el('div', { class: 'row', style: { padding: 0, gap: '8px' } },
+            ...['16:9', '9:16', '4:5', '1:1'].map(a => U.el('button', {
+              class: 'btn sm' + (st.aspect === a ? ' on' : ''),
+              onclick: () => { st.aspect = a; render(); },
+            }, a))))),
+      U.el('div', { class: 'mo-foot' },
+        U.el('button', { class: 'btn', onclick: () => { st.step = 'images'; render(); } }, '← Tillbaka'),
+        U.el('span', { class: 'spacer' }),
+        U.el('button', {
+          class: 'btn primary', disabled: !st.music,
+          onclick: () => startPlanning(),
+        }, 'Fortsätt →')));
+  }
+
+  let playingId = null, audioEl = null;
+  function togglePlay(m) {
+    if (!audioEl) audioEl = new Audio();
+    if (playingId === m.id) { audioEl.pause(); playingId = null; render(); return; }
+    audioEl.src = m.url; audioEl.currentTime = 0;
+    audioEl.play().catch(() => { });
+    playingId = m.id;
+    audioEl.onended = () => { playingId = null; render(); };
+    render();
+  }
+  function drawWave(cv, m) {
+    if (!m.wave) return;
+    const g = cv.getContext('2d'), w = cv.width, h = cv.height;
+    g.clearRect(0, 0, w, h);
+    g.fillStyle = 'rgba(139,144,128,.75)';
+    for (let x = 0; x < w; x++) {
+      const v = (m.wave[Math.floor(x / w * m.wave.length)] / 255) * (h * .46);
+      g.fillRect(x, h / 2 - v, 1, v * 2);
+    }
+  }
+
+  /* ---------- steg 3: planen ---------- */
+  async function startPlanning() {
+    st.step = 'run'; st.phase = 'Analyserar bostaden'; st.progress = 0; render();
+    try {
+      st.imageAnalysis = await ImageAnalyze.analyzeAll(st.images, (p, name) => {
+        st.phase = 'Analyserar bostaden'; st.progress = p * 0.5;
+        st.detail = name || ''; renderProgress();
+      });
+      st.phase = 'Lyssnar igenom musiken'; st.progress = 0.55; renderProgress();
+      await U.raf();
+      st.musicAnalysis = MusicStructure.analyze(st.music);
+
+      st.phase = 'Regisserar filmen'; st.progress = 0.8; renderProgress();
+      await U.raf();
+      st.plan = Director.buildPlan({
+        assets: st.images, imageAnalysis: st.imageAnalysis, musicAnalysis: st.musicAnalysis,
+        targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
+      });
+      const errs = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
+      if (errs.length) console.warn('planvalidering', errs);
+      st.planErrors = errs;
+      st.step = 'plan'; render();
+    } catch (e) {
+      U.errToast('Kunde inte skapa planen', e);
+      st.step = 'music'; render();
+    }
+  }
+
+  function viewPlan() {
+    const plan = st.plan;
+    const cost = MM.planCost(plan, st.provider);
+    const prov = MM.providerById(st.provider);
+
+    const shots = U.el('div', { class: 'mo-shots' });
+    plan.shots.forEach(s => {
+      const a = st.images.find(x => x.id === s.assetId);
+      shots.append(U.el('div', { class: 'mo-shot' },
+        U.el('img', { src: a ? a.thumb : '', alt: '' }),
+        U.el('div', { class: 'mo-shotmeta' },
+          U.el('div', { class: 'top' },
+            U.el('span', { class: 'tag accent', text: 'SHOT ' + String(s.index + 1).padStart(2, '0') }),
+            roomSelect(s),
+            s.role === 'hero' || s.role === 'closer' ? U.el('span', { class: 'tag ok', text: s.role.toUpperCase() }) : null,
+            U.el('span', { class: 'tag', text: MM.moveById(s.movementId).name })),
+          U.el('div', { class: 'hint', text: s.motivation }),
+          U.el('div', { class: 'hint mono' },
+            `${U.tc(s.timelineIn, false)}–${U.tc(s.timelineOut, false)} · ${s.timelineDuration}s i filmen · genererar ${s.generatedDuration}s, använder ${s.sourceIn}–${s.sourceOut}`))));
+    });
+
+    const provRow = U.el('div', { class: 'mo-field' },
+      U.el('label', {}, 'Generering'),
+      U.el('div', {},
+        ...Object.values(MM.PROVIDERS).map(p => U.el('div', {
+          class: 'preset-card' + (st.provider === p.id ? ' on' : ''), style: { margin: '4px 0' },
+          onclick: () => { st.provider = p.id; st.plan.provider = p.id; render(); },
+        },
+          U.el('div', { style: { flex: '1' } },
+            U.el('div', { class: 'pn' }, p.name,
+              p.id !== 'stub' && p.creditsPer5s ? U.el('span', { class: 'tag warn', style: { marginLeft: '6px' }, text: MM.planCost(plan, p.id) + ' credits' }) : null),
+            U.el('div', { class: 'pd', text: p.note }))))));
+
+    const warn = [];
+    if (plan.droppedImages) warn.push(`${plan.droppedImages} bilder rymdes inte i ${st.targetDuration} s — höj längden eller ta bort bilder.`);
+    if (st.provider === 'higgsfield_kling3') {
+      warn.push(`Genereringen kostar ${cost} credits av dina ${st.credits != null ? st.credits : '–'}.`);
+      if (!Generation.bridgeAlive) warn.push('Ingen brygga ansluten: jobben läggs i kön och exporteras som manifest som Claude kör via Higgsfield MCP.');
+    }
+    if (st.planErrors && st.planErrors.length) warn.push('Planvarning: ' + st.planErrors[0]);
+
+    return shell('Motion',
+      plan.rationale,
+      U.el('div', {},
+        U.el('div', { class: 'mo-stats' },
+          stat(st.images.length, 'bilder'),
+          stat(plan.shots.length, 'shots'),
+          stat(U.round(plan.duration, 1) + ' s', 'film'),
+          stat(st.musicAnalysis.bpm + ' BPM', st.music.name.replace(/\.[^.]+$/, '')),
+          stat(st.aiOrder ? 'AI' : 'Manuell', 'bildordning')),
+        provRow,
+        warn.length ? U.el('div', { class: 'mo-warn' }, ...warn.map(w => U.el('div', { text: w }))) : null,
+        U.el('h3', { class: 'sectitle', text: 'Director Plan' }),
+        U.el('div', { class: 'hint', style: { padding: '0 0 8px' } },
+          'Rumstypen är ett förslag från bildanalysen. Ändra den om den är fel — planen regisseras om direkt.'),
+        shots),
+      U.el('div', { class: 'mo-foot' },
+        U.el('button', { class: 'btn', onclick: () => { st.step = 'music'; render(); } }, '← Tillbaka'),
+        U.el('span', { class: 'spacer' }),
+        st.provider === 'higgsfield_kling3'
+          ? U.el('button', { class: 'btn', onclick: exportManifest }, 'Exportera jobbmanifest')
+          : null,
+        U.el('button', { class: 'btn primary', onclick: confirmAndRun },
+          st.provider === 'higgsfield_kling3' ? `Skapa Motion · ${cost} credits` : 'Skapa Motion')));
+  }
+  const stat = (v, l) => U.el('div', { class: 'mo-stat' }, U.el('b', { text: String(v) }), U.el('span', { text: l }));
+
+  /** Rumstypen är ett förslag — användaren rättar den här och planen byggs om. */
+  function roomSelect(s) {
+    const f = st.imageAnalysis.get(s.assetId);
+    const uncertain = f && f.roomUncertain;
+    const sel = U.el('select', {
+      class: 'mo-room' + (uncertain ? ' uncertain' : ''),
+      'data-tip': uncertain ? 'Osäker gissning — välj rätt rum så byggs planen om' : 'Rumstyp',
+      onchange: () => {
+        if (f) { f.roomType = sel.value; f.roomUncertain = false; f.isDetail = sel.value === 'detail'; }
+        rebuildPlan();
+      },
+    });
+    MM.ROOMS.forEach(([id, name]) => sel.append(U.el('option', { value: id, selected: id === s.roomType }, name)));
+    sel.value = s.roomType;
+    return sel;
+  }
+  function rebuildPlan() {
+    try {
+      st.plan = Director.buildPlan({
+        assets: st.images, imageAnalysis: st.imageAnalysis, musicAnalysis: st.musicAnalysis,
+        targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
+      });
+      st.planErrors = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
+      render();
+      U.toast('Planen omregisserad', 'Ordning, längder och rörelser räknades om.');
+    } catch (e) { U.errToast('Kunde inte bygga om planen', e); }
+  }
+
+  function exportManifest() {
+    const man = Generation.manifest(st.plan, { id: st.plan.id, propertyName: st.propertyName || 'Motion' }, st.images);
+    const blob = new Blob([JSON.stringify(man, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'motion-jobs.json';
+    document.body.append(a); a.click(); a.remove();
+    U.toast('Jobbmanifest exporterat', `${man.jobs.length} jobb · ${man.totalCredits} credits`);
+  }
+
+  function confirmAndRun() {
+    if (st.provider !== 'higgsfield_kling3') return runGeneration();
+    const cost = MM.planCost(st.plan, st.provider);
+    U.modal({
+      title: 'Bekräfta generering',
+      body: U.el('div', {},
+        U.el('div', { text: `${st.plan.shots.length} shots genereras med Kling v3.0.` }),
+        U.el('div', { class: 'hint', style: { marginTop: '6px' } },
+          `Detta drar ${cost} credits från ditt Higgsfield-konto${st.credits != null ? ` (saldo ${st.credits})` : ''}. Kostnaden är inte återbetalbar.`),
+        !Generation.bridgeAlive ? U.el('div', { class: 'hint', style: { marginTop: '6px' } },
+          'Ingen brygga är ansluten, så jobben läggs i kön utan att köras. Exportera manifestet och låt Claude köra dem via Higgsfield MCP.') : null),
+      actions: [{ label: 'Avbryt' }, { label: `Generera för ${cost} credits`, primary: true, onclick: runGeneration }],
+    });
+  }
+
+  /* ---------- körning ---------- */
+  async function runGeneration() {
+    st.step = 'run'; st.phase = 'Skapar kamerarörelser'; st.progress = 0; render();
+    const off = Generation.bus.on('progress', s => {
+      st.progress = s.total ? s.done / s.total : 0;
+      st.detail = s.message; renderProgress();
+    });
+    try {
+      const results = await Generation.runPlan(st.plan, { assets: st.images });
+      st.phase = 'Bygger projektet'; st.progress = 0.97; renderProgress();
+      const project = Generation.buildProject(st.plan, {
+        assets: st.images, music: st.music, musicAssetId: st.music.id,
+        musicAnalysis: st.musicAnalysis, propertyName: st.propertyName || 'Motion',
+      }, results);
+      for (const r of results) if (r.shot.needsStabilization) {
+        const c = project.tracks.video.find(c => c.shotId === r.shot.id);
+        if (c) c.stabEnabled = true;
+      }
+      st.result = { project, results };
+      st.step = 'done'; render();
+      await Autosave.saveNow(true);
+    } catch (e) {
+      U.errToast('Genereringen misslyckades', e);
+      st.step = 'plan'; render();
+    } finally { off(); }
+  }
+
+  function viewRun() {
+    const phases = ['Analyserar bostaden', 'Lyssnar igenom musiken', 'Regisserar filmen', 'Skapar kamerarörelser', 'Bygger projektet'];
+    return shell('Skapar din film', null,
+      U.el('div', {},
+        U.el('div', { class: 'progress', style: { margin: '18px 0 10px' } }, U.el('i', { id: 'mo-bar', style: { width: (st.progress * 100) + '%' } })),
+        U.el('div', { class: 'mo-phases' }, ...phases.map(p => {
+          const done = phases.indexOf(p) < phases.indexOf(st.phase);
+          return U.el('div', { class: 'mo-phase' + (p === st.phase ? ' on' : '') + (done ? ' done' : '') },
+            U.el('span', { class: 'dot' }), p);
+        })),
+        U.el('div', { class: 'hint', id: 'mo-detail', style: { marginTop: '10px' }, text: st.detail || '' })),
+      U.el('div', { class: 'mo-foot' },
+        U.el('span', { class: 'spacer' }),
+        U.el('button', { class: 'btn danger', onclick: () => { Generation.cancel(); } }, 'Avbryt')));
+  }
+  function renderProgress() {
+    const bar = document.getElementById('mo-bar');
+    if (bar) bar.style.width = (st.progress * 100) + '%';
+    const d = document.getElementById('mo-detail');
+    if (d) d.textContent = st.detail || '';
+    const phases = root && root.querySelectorAll('.mo-phase');
+    if (phases) phases.forEach(el => el.classList.toggle('on', el.textContent.trim() === st.phase));
+  }
+
+  /* ---------- klar ---------- */
+  function viewDone() {
+    const r = st.result;
+    const failed = r.results.filter(x => x.shot.status === 'qc_fail' || x.shot.status === 'failed').length;
+    const stabbed = r.results.filter(x => x.shot.needsStabilization).length;
+    return shell('Filmen är klar',
+      `${r.results.length} shots · ${U.round(M.totalDuration(r.project), 1)} s · ${st.music.name.replace(/\.[^.]+$/, '')}`,
+      U.el('div', {},
+        U.el('div', { class: 'mo-stats' },
+          stat(r.results.length, 'shots'),
+          stat(U.round(M.totalDuration(r.project), 1) + ' s', 'längd'),
+          stat(failed, 'QC-anmärkningar'),
+          stat(stabbed, 'stabiliserade')),
+        failed ? U.el('div', { class: 'mo-warn' }, U.el('div', { text: `${failed} shots klarade inte QC efter tre försök. Öppna i Master Editor och generera om dem.` })) : null,
+        U.el('div', { class: 'hint', style: { marginTop: '10px' } },
+          'Projektet ligger nu under Mina projekt med hela Director Plan, musikanalysen och alla shots.')),
+      U.el('div', { class: 'mo-foot' },
+        U.el('span', { class: 'spacer' }),
+        U.el('button', { class: 'btn', onclick: () => { st.step = 'plan'; render(); } }, 'Se planen'),
+        U.el('button', {
+          class: 'btn primary', onclick: () => {
+            Playback.releaseAll();
+            S.setProject(st.result.project);
+            App.applyPreviewSize(); Timeline.zoomFit();
+            close();
+            U.toast('Öppnad i Master Editor', 'Alla shots ligger på timelinen med musiken.');
+          },
+        }, 'Öppna i Master Editor →')));
+  }
+
+  /* ---------- filhantering ---------- */
+  let pickKind = 'image';
+  function pickFiles(kind) {
+    pickKind = kind;
+    const inp = U.$('#motionfiles');
+    inp.accept = kind === 'audio' ? 'audio/*' : 'image/*';
+    inp.click();
+  }
+  async function addFiles(files) {
+    const t = U.toast('Importerar…');
+    try {
+      const items = await Media.ingestFiles(files);
+      t.remove();
+      if (!items.length) return;
+      S.update(p => { p.media.push(...items); }, 'motion-import');
+      for (const m of items) {
+        if (m.type === 'image') st.images.push(m);
+        else if (m.type === 'audio' && !st.music) st.music = m;
+      }
+      render();
+    } catch (e) { t.remove(); U.errToast('Import misslyckades', e); }
+  }
+
+  function init() {
+    const inp = U.el('input', { type: 'file', id: 'motionfiles', multiple: true, accept: 'image/*', style: { display: 'none' } });
+    inp.addEventListener('change', async e => { await addFiles(e.target.files); e.target.value = ''; });
+    document.body.append(inp);
+    Generation.bus.on('bridge', () => { if (st.step === 'plan') render(); });
+  }
+
+  return { init, open, close, render, st, startPlanning, runGeneration };
+})();
+
+
 /* ===== 90-export.js ===== */
 /* ============================================================
    90 — Export: riktig rendering via canvas.captureStream + MediaRecorder
@@ -4739,6 +6600,7 @@ const App = (() => {
     U.$('#btnSave').onclick = () => Autosave.saveNow(false);
     U.$('#btnProjects').onclick = projectsModal;
     U.$('#btnExport').onclick = () => Panels.open('export');
+    U.$('#btnMotion').onclick = () => Motion.open();
     U.$('#btnEmptyUpload').onclick = () => U.$('#fileinput').click();
 
     const selA = U.$('#selAspect'); Object.keys(U.ASPECTS).forEach(a => selA.append(U.el('option', { value: a }, a)));
@@ -4898,6 +6760,7 @@ const App = (() => {
     wire();
     Timeline.init();
     Panels.init();
+    Motion.init();
     Autosave.init();
     applyPreviewSize();
     syncTopbar();
