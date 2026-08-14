@@ -138,25 +138,40 @@ const MM = (() => {
     higgsfield_kling3: {
       id: 'higgsfield_kling3', name: 'Higgsfield · Kling v3.0', model: 'kling3_0',
       minDuration: 3, maxDuration: 15, integerDuration: true,
-      creditsPer5s: 7.5, aspects: ['16:9', '9:16', '1:1'],
-      note: 'Standardläge, ljud av. 7,5 credits per 5-sekundersklipp.',
+      aspects: ['16:9', '9:16', '1:1'],
+      resolutions: [
+        { id: 'hd', name: '1080p (HD)', creditsPer5s: 7.5, default: true },
+        { id: '2k', name: '1440p (2K)', creditsPer5s: 10 },
+        { id: '4k', name: '2160p (4K)', creditsPer5s: 15 },
+      ],
+      audioOptions: [
+        { id: 'off', name: 'Utan ljud', costMultiplier: 1, default: true },
+        { id: 'on', name: 'Med ljud', costMultiplier: 1.3 },
+      ],
     },
     stub: {
       id: 'stub', name: 'Simulerad (ingen kostnad)', model: 'stub',
       minDuration: 3, maxDuration: 15, integerDuration: true,
-      creditsPer5s: 0, aspects: ['16:9', '9:16', '1:1'],
-      note: 'Renderar rörelsen lokalt i stället för att generera. Kostar inget och används för att prova flödet.',
+      aspects: ['16:9', '9:16', '1:1'],
+      resolutions: [
+        { id: 'hd', name: '1080p (HD)', creditsPer5s: 0, default: true },
+      ],
+      audioOptions: [
+        { id: 'off', name: 'Utan ljud', costMultiplier: 1, default: true },
+      ],
     },
   };
   const providerById = id => PROVIDERS[id] || PROVIDERS.stub;
 
-  /** Kostnaden skalar linjärt med längden — 7,5 cr per 5 s. */
-  function shotCost(provider, seconds) {
+  /** Kostnaden skalar med längden, resolution och audio-inställning. */
+  function shotCost(provider, seconds, resolution = 'hd', audio = 'off') {
     const p = providerById(provider);
-    return U.round(p.creditsPer5s * (seconds / 5), 2);
+    const res = p.resolutions.find(r => r.id === resolution) || p.resolutions[0];
+    const aud = p.audioOptions.find(a => a.id === audio) || p.audioOptions[0];
+    return U.round(res.creditsPer5s * aud.costMultiplier * (seconds / 5), 2);
   }
-  function planCost(plan, provider) {
-    return U.round((plan.shots || []).reduce((a, s) => a + shotCost(provider, s.generatedDuration), 0), 1);
+  function planCost(plan, provider, resolution = 'hd', audio = 'off') {
+    return U.round((plan.shots || []).reduce((a, s) => a + shotCost(provider, s.generatedDuration, resolution, audio), 0), 1);
   }
 
   /* ---------- statusar ---------- */
@@ -192,15 +207,16 @@ const MM = (() => {
       status: 'planned', jobId: null, outputAssetId: null, qc: null, attempts: 0,
     };
   }
-  function newJob(shot, provider, aspect) {
+  function newJob(shot, provider, aspect, resolution = 'hd', audio = 'off') {
     const p = providerById(provider);
+    const audioParam = audio === 'on' ? 'on' : 'off';
     return {
       id: U.uid('job'), shotId: shot.id, provider: p.id, model: p.model,
       params: {
         prompt: shot.prompt, duration: shot.generatedDuration,
-        mode: 'std', sound: 'off', aspect_ratio: aspect,   // ljud av: musiken läggs på i editorn
+        mode: 'std', sound: audioParam, aspect_ratio: aspect, resolution: resolution,
       },
-      status: 'pending', attempts: 0, cost: shotCost(provider, shot.generatedDuration),
+      status: 'pending', attempts: 0, cost: shotCost(provider, shot.generatedDuration, resolution, audio),
       requestId: null, outputUrl: null, error: null, log: [],
       createdAt: Date.now(),
     };

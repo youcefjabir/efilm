@@ -172,7 +172,7 @@ const Generation = (() => {
   async function runPlan(plan, ctx) {
     if (state.running) throw new Error('En generering pågår redan.');
     state.running = true; state.cancelled = false;
-    state.jobs = plan.shots.map(s => MM.newJob(s, plan.provider, plan.aspect));
+    state.jobs = plan.shots.map(s => MM.newJob(s, plan.provider, plan.aspect, plan.resolution || 'hd', plan.audio || 'off'));
     state.done = 0; state.total = state.jobs.length;
     const results = [];
     const prov = providerFor(plan.provider);

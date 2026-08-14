@@ -15,6 +15,8 @@ const Motion = (() => {
     provider: 'local',
     targetDuration: 45,
     aspect: '16:9',
+    resolution: 'hd',
+    audio: 'off',
     propertyName: '',
     aiOrder: true,
     phase: '', progress: 0,
@@ -317,8 +319,33 @@ const Motion = (() => {
         },
           U.el('div', { style: { flex: '1' } },
             U.el('div', { class: 'pn' }, p.name,
-              p.id !== 'stub' && p.creditsPer5s ? U.el('span', { class: 'tag warn', style: { marginLeft: '6px' }, text: MM.planCost(plan, p.id) + ' credits' }) : null),
+              p.id !== 'stub' ? U.el('span', { class: 'tag warn', style: { marginLeft: '6px' }, text: MM.planCost(plan, p.id, st.resolution, st.audio) + ' credits' }) : null),
             U.el('div', { class: 'pd', text: p.note }))))));
+
+    const prov = MM.providerById(st.provider);
+    const resolutionRow = prov.resolutions ? U.el('div', { class: 'mo-field', style: { marginTop: '14px' } },
+      U.el('label', {}, 'Upplösning'),
+      U.el('div', {},
+        ...prov.resolutions.map(r => U.el('div', {
+          class: 'preset-card' + (st.resolution === r.id ? ' on' : ''), style: { margin: '4px 0' },
+          onclick: () => { st.resolution = r.id; render(); },
+        },
+          U.el('div', { style: { flex: '1' } },
+            U.el('div', { class: 'pn' }, r.name,
+              U.el('span', { class: 'tag', style: { marginLeft: '6px' }, text: r.creditsPer5s + ' cr/5s' })),
+            U.el('div', { class: 'pd', text: `Förbättrad kostnad för detta val` })))))) : null;
+
+    const audioRow = prov.audioOptions ? U.el('div', { class: 'mo-field', style: { marginTop: '14px' } },
+      U.el('label', {}, 'Ljud'),
+      U.el('div', {},
+        ...prov.audioOptions.map(a => U.el('div', {
+          class: 'preset-card' + (st.audio === a.id ? ' on' : ''), style: { margin: '4px 0' },
+          onclick: () => { st.audio = a.id; render(); },
+        },
+          U.el('div', { style: { flex: '1' } },
+            U.el('div', { class: 'pn' }, a.name,
+              U.el('span', { class: 'tag', style: { marginLeft: '6px' }, text: (100 * a.costMultiplier).toFixed(0) + '%' })),
+            U.el('div', { class: 'pd', text: `Påverkar kostnaden och genereringen` })))))) : null;
 
     const warn = [];
     if (plan.droppedImages) {
@@ -346,6 +373,8 @@ const Motion = (() => {
           stat(st.musicAnalysis.bpm + ' BPM', st.music.name.replace(/\.[^.]+$/, '')),
           stat(st.aiOrder ? 'AI' : 'Manuell', 'bildordning')),
         provRow,
+        resolutionRow,
+        audioRow,
         warn.length ? U.el('div', { class: 'mo-warn' }, ...warn.map(w => U.el('div', { text: w }))) : null,
         U.el('h3', { class: 'sectitle', text: 'Director Plan' }),
         U.el('div', { class: 'hint', style: { padding: '0 0 8px' } },
@@ -472,6 +501,8 @@ const Motion = (() => {
         targetDuration: st.targetDuration, provider: st.provider, aspect: st.aspect,
         overrides: st.overrides,
       });
+      st.plan.resolution = st.resolution;
+      st.plan.audio = st.audio;
       st.planErrors = Director.validate(st.plan, { assets: st.images, musicAnalysis: st.musicAnalysis, provider: st.provider });
       render();
       if (notify) U.toast('Planen omregisserad', 'Ordning, längder och rörelser räknades om.');
