@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "source": "viewly-logo-mark.png (1080×941), traced by colour segmentation",
+  "verification": { "method": "IoU mot originalmasken", "score": 0.9925 },
+  "viewBox": "0 0 858.6 756.3",
+  "limb": "M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z",
+  "dot": { "cx": 705.2, "cy": 153.4, "r": 153.4 },
+  "angles": {
+    "brand": 58.0,
+    "tan": 1.6003,
+    "trailingEdge": 57.43,
+    "bottomCut": 58.31,
+    "note": "58,0° är systemkonstanten. Δy = 1,6003 · Δx"
+  },
+  "colours": {
+    "markBlack": "#141416",
+    "olive": "#6E7266",
+    "note": "Märkets svart är djupare än UI-ink #1C1C1E"
+  },
+  "safeArea": {
+    "canvas": [1080, 1920],
+    "topReserved": 250,
+    "bottomReserved": 320,
+    "sideMargin": 64,
+    "live": { "x": [64, 1016], "y": [250, 1600] },
+    "displayStartsAt": 380
+  }
+}
