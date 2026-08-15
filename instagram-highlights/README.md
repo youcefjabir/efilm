@@ -94,11 +94,11 @@ fotograferat genom hela kedjan (07).
 
 ---
 
-## Nästa steg
+## Faser
 
-- **Fas 4 — Val.** Välj ett av de tre spåren: Arkiv, Skugga eller Konstruktion.
-- **Fas 5 — Systemdesign.** Bygg ut det valda spåret till ett fullständigt Story-system.
-- **Fas 6 — Innehåll.** Producera de skarpa sekvenserna med rätt material.
+- **Fas 1–3** — audit, arkitektur, tre designspår. Levererat, sedan förkastat.
+- **Fas 4** — omtag: brutal audit, ny grafikdriven strategi, tre hero-prototyper. Godkänd.
+- **Fas 5–6** — hela Story-systemet byggt. Ligger i `v3/`. **Här är vi.**
 - **Fas 7 — Publicering.** Diskuteras separat. Ingår inte i detta arbete.
 
 ---
