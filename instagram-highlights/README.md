@@ -2,17 +2,19 @@
 
 Isolerat design- och strukturprojekt för Viewlys Instagram-profil.
 
-**Status: Fas 1–3 klara. Väntar på val av designriktning (Fas 4).**
+**Status: Fas 5 + 6 byggda. Systemet ligger i `v3/`.**
 
 Ingenting här är kopplat till produktion, publicering, databaser eller automation.
 Inga befintliga flöden är rörda. Instagram är inte kopplat.
 
 ---
 
-## Öppna studion
+## Öppna
 
 ```
-instagram-highlights/studio.html
+instagram-highlights/v3/highlights.html     ← systemet (aktuellt)
+instagram-highlights/v2/story-system.html   ← audit, strategi, prototyper
+instagram-highlights/studio.html            ← v1, granskad och förkastad
 ```
 
 Öppna filen direkt i en webbläsare. Den är helt fristående — all typografi och
@@ -98,3 +100,59 @@ fotograferat genom hela kedjan (07).
 - **Fas 5 — Systemdesign.** Bygg ut det valda spåret till ett fullständigt Story-system.
 - **Fas 6 — Innehåll.** Producera de skarpa sekvenserna med rätt material.
 - **Fas 7 — Publicering.** Diskuteras separat. Ingår inte i detta arbete.
+
+---
+
+## v3 — det byggda systemet
+
+Nio Highlights, 53 stories, ritade som SVG i 1080 × 1920. **74 % grafisk design,
+informationsdesign eller illustration.** Fotografi används på de 26 % där
+fotografiet faktiskt är berättelsen.
+
+| # | Highlight | Stories | Grafik |
+|---|-----------|---------|--------|
+| 01 | Viewly | 7 | 86 % |
+| 02 | För mäklare | 7 | 86 % |
+| 03 | Verktyg | 6 | 100 % |
+| 04 | Foto | 6 | 50 % |
+| 05 | 3D | 5 | 80 % |
+| 06 | Motion | 5 | 80 % |
+| 07 | E-styling | 6 | 67 % |
+| 08 | Cases | 6 | 33 % |
+| 09 | Om oss | 5 | 80 % |
+
+### Bärande grepp
+
+**Lokaliseringsdiagrammet.** Produkt-Highlights (04–07) öppnar med samma
+ekosystem-spine där en nod är tänd. Den som bara öppnar 3D förstår ändå helheten.
+Ekosystemet kommuniceras genom upprepning, inte genom en Highlight som påstår det.
+
+**58,0°.** Varje förgrening, konvergens, mask och blockkant använder logotypens
+uppmätta vinkel. Igenkänningen blir strukturell i stället för påklistrad. I
+`01 Viewly` bildar diagrammets ändpunkter själva en 58°-linje — vinkeln uppstår
+ur informationen.
+
+**Covers är pictogram, inte ikoner.** Varje cover är sitt eget Highlights kärnidé
+reducerad till två till fyra streck, ritad för ändamålet. Endast `09 Om oss`
+använder logotypen bokstavligt.
+
+### Safe area
+
+1080 × 1920 · 250 px reserverat upptill · 320 px nedtill · 64 px sidor ·
+levande yta x 64–1016, y 250–1600. Overlay kan slås på över varje ram.
+
+### Filer
+
+```
+v3/highlights.html   fristående bibliotek med uppspelning
+v3/highlights.json   53 stories som data — copy, primitiv, media, luckor
+v3/draw.js           renderarbiblioteket, 8 primitiv
+v3/content.js        innehållsmodellen
+v2/brand-geometry.json  tracead logotyp + safe-area-spec
+```
+
+### Kvar att producera
+
+6 stories saknar rätt material. Två kritiska: **motion-frames** ur faktisk
+bostadsfilm och **ett komplett case** fotograferat genom hela kedjan.
+Se `needsAsset` i `v3/highlights.json`.
