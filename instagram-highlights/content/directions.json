@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "directions": [
+    {
+      "id": "arkiv",
+      "name": "ARKIV",
+      "tagline": "Tryckt monografi",
+      "description": "Boken som referens. Generösa marginaler, hårfina linjer, kapitelnummer och en display-serif satt i ljus vikt. Bilden ligger i en ram på pappret snarare än att spränga den. Närmast NORM Architects monografi eller ett arkitekturmagasin.",
+      "logoLanguage": "Märket förekommer blint — papper på papper — eller som ett överdimensionerat blekt vattenmärke som löper ut ur kanten.",
+      "palette": {
+        "Papper": "#F2EFEF",
+        "Ink": "#1C1C1E",
+        "Oliv": "#6E7266",
+        "Hårlinje": "#D8D2CF",
+        "Meta": "#8A8580"
+      },
+      "typography": "Cormorant Garamond 300 för display · Montserrat 500 / .24em för metadata",
+      "risk": "Kräver marginaldisciplin. Faller isär om bilder tillåts spränga ramen godtyckligt."
+    },
+    {
+      "id": "skugga",
+      "name": "SKUGGA",
+      "tagline": "Cinematisk",
+      "description": "Mörkret är grunden och fotografiet är ljuskällan. Bilder i full bleed eller som 2.39:1-remsor som svävar i svart. Typografin är liten och precis; olivgrönt används som en enda ljuspunkt. Kursiv serif bär de tysta meningarna.",
+      "logoLanguage": "V-formen används som mask — fotografiet framträder genom märket, resten är svart.",
+      "palette": {
+        "Svart": "#0E0E0D",
+        "Ljus": "#EFEDE7",
+        "Oliv lyft": "#98A088",
+        "Linje": "#2A2A27",
+        "Meta": "#A8A6A0"
+      },
+      "typography": "Cormorant Garamond 300 italic för statements · Montserrat 500 / .32em, 2.2cqw",
+      "risk": "Covers blir mörka cirklar i profilraden — lägst igenkänning vid 56 px. Kräver tonal variation."
+    },
+    {
+      "id": "konstruktion",
+      "name": "KONSTRUKTION",
+      "tagline": "Arkitektonisk",
+      "description": "Logotypens vinkel — 57,5° — blir hela layoutsystemet. Diagonala delningar, hårda kolblock, måttmarkeringar och teknisk annotering. Sans dominerar; serifen får endast bära ett citat per sekvens.",
+      "logoLanguage": "Geometrin är bärande, inte dekorativ: V:ets vinkel styr varje delning, mask och blockkant.",
+      "palette": {
+        "Papper": "#EDEBE7",
+        "Block": "#1C1C1E",
+        "Oliv": "#6E7266",
+        "Tick": "#C9C5BE",
+        "Oliv mörk": "#5E6154"
+      },
+      "typography": "Montserrat 600 versal, -.028em för display · Cormorant endast som pull-quote",
+      "risk": "Starkast igenkänning vid 56 px, men mest 'designad'. Får inte konkurrera med fotografiet."
+    }
+  ]
+}

@@ -1,0 +1,139 @@
+{
+  "version": 1,
+  "source": "viewly.se index-CvLv_UTb.css",
+  "colors": [
+    {
+      "hex": "#1C1C1E",
+      "name": "Ink / Charcoal",
+      "cssVar": "--adm-ink",
+      "role": "Primär text, mörka ytor"
+    },
+    {
+      "hex": "#6E7266",
+      "name": "Viewly Oliv",
+      "cssVar": "--adm-accent",
+      "role": "Varumärkesaccent"
+    },
+    {
+      "hex": "#4F5349",
+      "name": "Oliv mörk",
+      "cssVar": "--adm-accent-ink",
+      "role": "Text på oliv, hover"
+    },
+    {
+      "hex": "#EEF0EC",
+      "name": "Oliv pale",
+      "cssVar": "--adm-accent-soft",
+      "role": "Mjuka accentytor"
+    },
+    {
+      "hex": "#F2EFEF",
+      "name": "Varm off-white",
+      "cssVar": "--adm-bg",
+      "role": "Sidbakgrund — papper"
+    },
+    {
+      "hex": "#E8E3E3",
+      "name": "Varm linje",
+      "cssVar": "—",
+      "role": "Hårfina avdelare"
+    },
+    {
+      "hex": "#3A3A3C",
+      "name": "Ink 2",
+      "cssVar": "--adm-ink-2",
+      "role": "Sekundär text"
+    },
+    {
+      "hex": "#8E8E93",
+      "name": "Ink 3",
+      "cssVar": "--adm-ink-3",
+      "role": "Metatext"
+    },
+    {
+      "hex": "#9A5A1F",
+      "name": "Ockra",
+      "cssVar": "--adm-ochre",
+      "role": "Varning / sällsynt accent"
+    }
+  ],
+  "fonts": [
+    {
+      "family": "adobe-caslon-pro",
+      "fallback": "Cormorant Garamond, Georgia",
+      "role": "Redaktionell display-serif",
+      "usedFor": "Rubriker, citat, manifest"
+    },
+    {
+      "family": "Montserrat",
+      "fallback": "system-ui",
+      "role": "Geometrisk sans",
+      "usedFor": "Etiketter, UI, spärrade versaler"
+    },
+    {
+      "family": "Poppins",
+      "fallback": "system-ui",
+      "role": "Sekundär sans",
+      "usedFor": "Brödtext på delar av sajten"
+    },
+    {
+      "family": "Inter Tight",
+      "fallback": "system-ui",
+      "role": "Kompakt sans",
+      "usedFor": "Tät UI-text i portalen"
+    },
+    {
+      "family": "SF Pro Display/Text",
+      "fallback": "—",
+      "role": "Systemstack",
+      "usedFor": "Appytor / mäklarportal"
+    }
+  ],
+  "primitives": [
+    {
+      "id": "mark",
+      "name": "Mark",
+      "description": "V-geometrin bär kompositionen — mask, ram eller överdimensionerat utsnitt."
+    },
+    {
+      "id": "fullbleed",
+      "name": "Full bleed",
+      "description": "Bilden äger hela ytan. Nästan ingen typografi."
+    },
+    {
+      "id": "quiet",
+      "name": "Quiet statement",
+      "description": "Nära tom. En mening som får bära."
+    },
+    {
+      "id": "editorial",
+      "name": "Editorial",
+      "description": "Kontrollerad typografi i komponerad relation till bilden."
+    },
+    {
+      "id": "product",
+      "name": "Product moment",
+      "description": "Ren presentation av 3D, Motion eller portal."
+    },
+    {
+      "id": "split",
+      "name": "Split",
+      "description": "Två ytor: före/efter, still/rörligt, jämförelse."
+    },
+    {
+      "id": "system",
+      "name": "System",
+      "description": "Ekosystemet som typografisk ryggrad — aldrig en ikonlista."
+    },
+    {
+      "id": "case",
+      "name": "Case cover",
+      "description": "Objekt, plats, en bild som får tala."
+    },
+    {
+      "id": "cta",
+      "name": "CTA",
+      "description": "Extremt enkel slutbild."
+    }
+  ]
+}

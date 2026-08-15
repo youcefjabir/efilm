@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "source": "viewly.se — /assets/* och sajtens JS-bundle, hämtat vid audit",
+  "available": [
+    {
+      "ref": "hero",
+      "group": "Foto — interiör",
+      "file": "home-hero-desktop",
+      "usedBy": "01 · 02"
+    },
+    {
+      "ref": "dining",
+      "group": "Foto — interiör",
+      "file": "hero-dining",
+      "usedBy": "02 · 09"
+    },
+    {
+      "ref": "kitchen",
+      "group": "Foto — interiör",
+      "file": "expertise-kitchen",
+      "usedBy": "02"
+    },
+    {
+      "ref": "living",
+      "group": "Foto — interiör",
+      "file": "blog-livingroom",
+      "usedBy": "01 · 09"
+    },
+    {
+      "ref": "boucle",
+      "group": "Foto — detalj",
+      "file": "blog-boucle",
+      "usedBy": "02"
+    },
+    {
+      "ref": "eames",
+      "group": "Foto — detalj",
+      "file": "blog-eames",
+      "usedBy": "02 · 07"
+    },
+    {
+      "ref": "dining2",
+      "group": "Foto — detalj",
+      "file": "blog-dining",
+      "usedBy": "07"
+    },
+    {
+      "ref": "drone",
+      "group": "Foto — exteriör",
+      "file": "service-dronarbilder",
+      "usedBy": "02 · 07"
+    },
+    {
+      "ref": "droneview",
+      "group": "Foto — exteriör",
+      "file": "drone-view",
+      "usedBy": "02"
+    },
+    {
+      "ref": "matterport",
+      "group": "3D",
+      "file": "matterport-poster",
+      "usedBy": "04"
+    },
+    {
+      "ref": "threed",
+      "group": "3D",
+      "file": "service-3d-visning",
+      "usedBy": "04 · 07"
+    },
+    {
+      "ref": "threedcam",
+      "group": "3D",
+      "file": "threed-camera",
+      "usedBy": "04"
+    },
+    {
+      "ref": "portal",
+      "group": "UI / Produkt",
+      "file": "maklare-portal-demo",
+      "usedBy": "01 · 06"
+    },
+    {
+      "ref": "esLivBef",
+      "group": "E-styling",
+      "file": "estyling-living-before",
+      "usedBy": "05"
+    },
+    {
+      "ref": "esLivAft",
+      "group": "E-styling",
+      "file": "estyling-living-after",
+      "usedBy": "05"
+    },
+    {
+      "ref": "esBedBef",
+      "group": "E-styling",
+      "file": "estyling-bedroom-before",
+      "usedBy": "05"
+    },
+    {
+      "ref": "esBedAft",
+      "group": "E-styling",
+      "file": "estyling-bedroom-after",
+      "usedBy": "05"
+    },
+    {
+      "ref": "esDinBef",
+      "group": "E-styling",
+      "file": "estyling-dining-before",
+      "usedBy": "05"
+    },
+    {
+      "ref": "esDinAft",
+      "group": "E-styling",
+      "file": "estyling-dining-after",
+      "usedBy": "05"
+    },
+    {
+      "ref": "skyBef",
+      "group": "Atmosphere",
+      "file": "skymning-before",
+      "usedBy": "05"
+    },
+    {
+      "ref": "skyAft",
+      "group": "Atmosphere",
+      "file": "skymning-after",
+      "usedBy": "05"
+    },
+    {
+      "ref": "vadBef",
+      "group": "Atmosphere",
+      "file": "vader-before",
+      "usedBy": "05"
+    },
+    {
+      "ref": "vadAft",
+      "group": "Atmosphere",
+      "file": "vader-after",
+      "usedBy": "05"
+    },
+    {
+      "ref": "om1",
+      "group": "Brand / Om",
+      "file": "om-kapitel-1",
+      "usedBy": "08"
+    },
+    {
+      "ref": "om3",
+      "group": "Brand / Om",
+      "file": "om-kapitel-3",
+      "usedBy": "08"
+    },
+    {
+      "ref": "om4",
+      "group": "Brand / Om",
+      "file": "om-kapitel-4",
+      "usedBy": "08"
+    },
+    {
+      "ref": "kontakt",
+      "group": "Brand / Om",
+      "file": "kontakt-hero",
+      "usedBy": "08"
+    }
+  ],
+  "missing": [
+    {
+      "asset": "Motion — rörliga frames",
+      "brief": "Stillbilder ur faktiska bostadsfilmer (push-in, pan, tilt). Sajten har motion-seq-1/2.mp4 men inga exporterade nyckelbildrutor.",
+      "highlight": "03",
+      "priority": "Kritisk"
+    },
+    {
+      "asset": "Case — komplett objekt",
+      "brief": "Ett (1) verkligt objekt fotograferat genom hela kedjan: exteriör, 3 interiörer, detalj, 3D-vy, motion-frame, färdig annons.",
+      "highlight": "07",
+      "priority": "Kritisk"
+    },
+    {
+      "asset": "Fotograf på plats",
+      "brief": "Porträtt och reportagebilder av Viewlys fotografer i arbete. Får inte se ut som stockfoto.",
+      "highlight": "08",
+      "priority": "Hög"
+    },
+    {
+      "asset": "Exteriör i skymning",
+      "brief": "Fullscreen premium-exteriör i blue hour, vertikalt format 9:16.",
+      "highlight": "02 · 07",
+      "priority": "Hög"
+    },
+    {
+      "asset": "Portal — vertikala skärmar",
+      "brief": "Skärminspelning/utsnitt ur mäklarportalen i 9:16, inte beskuren desktop.",
+      "highlight": "06",
+      "priority": "Hög"
+    },
+    {
+      "asset": "Annonsskrivare / Ad Studio",
+      "brief": "Produktbilder på de två verktygen. Saknas helt i nuvarande assetbibliotek.",
+      "highlight": "06",
+      "priority": "Medel"
+    },
+    {
+      "asset": "Områdeskarta",
+      "brief": "Renderad områdespresentation. Endast basemap-jpg finns idag.",
+      "highlight": "04",
+      "priority": "Medel"
+    }
+  ]
+}

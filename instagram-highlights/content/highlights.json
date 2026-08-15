@@ -1,0 +1,1063 @@
+{
+  "version": 1,
+  "phase": "1-3 (audit, arkitektur, designspår) — designriktning ej vald",
+  "note": "Numret är sorteringsordningen. Media anges som referens till assets.json, aldrig som filsökväg.",
+  "highlights": [
+    {
+      "id": "viewly",
+      "num": "01",
+      "name": "VIEWLY",
+      "igLabel": "Viewly",
+      "coverAsset": "hero",
+      "answers": "Vad är Viewly?",
+      "rationale": "Manifestet. Sätter ramen: ett ekosystem, inte en tjänst.",
+      "status": "needs-assets",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "mark",
+          "media": [
+            "hero"
+          ],
+          "copy": {
+            "kicker": "VIEWLY",
+            "head": "Bostadspresentation",
+            "emphasis": null,
+            "sub": "byggd för hur bostäder marknadsförs idag.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "01 — Viewly",
+            "head": "Ett objekt är inte en fotografering.",
+            "emphasis": "Det är en presentation.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "system",
+          "media": null,
+          "copy": {
+            "kicker": "Ekosystemet",
+            "head": "En produktion.",
+            "emphasis": null,
+            "sub": "Sju lager. Ett flöde.",
+            "labelA": null,
+            "labelB": null,
+            "items": [
+              "Foto",
+              "Rörelse",
+              "Rum",
+              "Stil",
+              "Område",
+              "Annons",
+              "Kampanj"
+            ]
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "product",
+          "media": [
+            "portal"
+          ],
+          "copy": {
+            "kicker": "Portalen",
+            "head": "Från bokning till färdigt material.",
+            "emphasis": null,
+            "sub": "Allt om bostaden på ett ställe.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Vertikalt portalutsnitt 9:16 — nuvarande bild är beskuren desktop."
+        },
+        {
+          "order": "05",
+          "primitive": "fullbleed",
+          "media": [
+            "living"
+          ],
+          "copy": {
+            "kicker": null,
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "06",
+          "primitive": "editorial",
+          "media": [
+            "kitchen"
+          ],
+          "copy": {
+            "kicker": "För mäklare",
+            "head": "Byggt för mäklare som vill presentera bostäder bättre.",
+            "emphasis": null,
+            "sub": "Inte för att fylla en tjänstelista.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "07",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "01 — Viewly",
+            "head": "Upptäck Viewly",
+            "emphasis": null,
+            "sub": "viewly.se",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "seendet",
+      "num": "02",
+      "name": "SEENDET",
+      "igLabel": "Seendet",
+      "coverAsset": "kitchen",
+      "answers": "Hur ser kvaliteten ut?",
+      "rationale": "Hantverket. Ren fotografi — nästan ingen försäljning.",
+      "status": "needs-assets",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "fullbleed",
+          "media": [
+            "hero"
+          ],
+          "copy": {
+            "kicker": "02 — Seendet",
+            "head": "Bostadsfotografering",
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "02 — Seendet",
+            "head": "Ljus.",
+            "emphasis": "Vi väntar in det.",
+            "sub": "Vi lägger inte till det.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "fullbleed",
+          "media": [
+            "kitchen"
+          ],
+          "copy": {
+            "kicker": null,
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "02 — Seendet",
+            "head": "Rymd.",
+            "emphasis": "Ett rum ska kännas.",
+            "sub": "Inte mätas.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "05",
+          "primitive": "editorial",
+          "media": [
+            "boucle"
+          ],
+          "copy": {
+            "kicker": "Detalj",
+            "head": "Det som gör ett hus till ett hem.",
+            "emphasis": null,
+            "sub": "Textur, material, slitage, ljus.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "06",
+          "primitive": "fullbleed",
+          "media": [
+            "drone"
+          ],
+          "copy": {
+            "kicker": "Exteriör",
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Fullscreen premium-exteriör i blue hour, vertikalt 9:16."
+        },
+        {
+          "order": "07",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "02 — Seendet",
+            "head": "Fotograferingen är början.",
+            "emphasis": null,
+            "sub": "Se hela ekosystemet",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "rorelse",
+      "num": "03",
+      "name": "RÖRELSE",
+      "igLabel": "Rörelse",
+      "coverAsset": "dining",
+      "answers": "Vad kan jag skapa?",
+      "rationale": "Flaggskeppet. Säljer resultatet — aldrig tekniken bakom.",
+      "status": "needs-assets",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "mark",
+          "media": [
+            "dining"
+          ],
+          "copy": {
+            "kicker": "RÖRELSE",
+            "head": "Bostadsfilm",
+            "emphasis": null,
+            "sub": "Stillbild blir berättelse.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Nyckelbildruta ur faktisk bostadsfilm."
+        },
+        {
+          "order": "02",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "03 — Rörelse",
+            "head": "En bostad behöver inte bara visas.",
+            "emphasis": "Den kan berättas.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "split",
+          "media": [
+            "living",
+            "dining"
+          ],
+          "copy": {
+            "kicker": "Transformation",
+            "head": "Samma rum. Ny puls.",
+            "emphasis": null,
+            "sub": null,
+            "labelA": "Stillbild",
+            "labelB": "Rörligt",
+            "items": null
+          },
+          "needsAsset": "Motion-frame som B-sida, inte en andra stillbild."
+        },
+        {
+          "order": "04",
+          "primitive": "product",
+          "media": [
+            "dining2"
+          ],
+          "copy": {
+            "kicker": "Cinematiskt",
+            "head": "Långsam push-in.",
+            "emphasis": null,
+            "sub": "Ingen zoom. Ingen effekt. Bara rörelse.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Faktisk motion-frame med synlig rörelseoskärpa."
+        },
+        {
+          "order": "05",
+          "primitive": "system",
+          "media": null,
+          "copy": {
+            "kicker": "Ett klipp",
+            "head": "Fyra format.",
+            "emphasis": null,
+            "sub": "Samma material — hela kanalen.",
+            "labelA": null,
+            "labelB": null,
+            "items": [
+              "Reel",
+              "Story",
+              "Annons",
+              "Presentation"
+            ]
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "06",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "03 — Rörelse",
+            "head": "Ett objekt.",
+            "emphasis": null,
+            "sub": "Fler sätt att berätta det.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "rummet",
+      "num": "04",
+      "name": "RUMMET",
+      "igLabel": "Rummet",
+      "coverAsset": "matterport",
+      "answers": "Vad kan jag skapa?",
+      "rationale": "3D, planritning och områdeskarta samlat som ett rumsligt lager.",
+      "status": "ready",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "fullbleed",
+          "media": [
+            "matterport"
+          ],
+          "copy": {
+            "kicker": "04 — Rummet",
+            "head": "3D-visning",
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "04 — Rummet",
+            "head": "Låt spekulanten kliva in.",
+            "emphasis": "När som helst.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "product",
+          "media": [
+            "threed"
+          ],
+          "copy": {
+            "kicker": "Planlösning",
+            "head": "Förstå hur rummen hänger ihop.",
+            "emphasis": null,
+            "sub": "Innan första visningen.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "fullbleed",
+          "media": [
+            "threedcam"
+          ],
+          "copy": {
+            "kicker": null,
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "05",
+          "primitive": "editorial",
+          "media": [
+            "hero"
+          ],
+          "copy": {
+            "kicker": "Tillgänglighet",
+            "head": "Visningen tar aldrig slut.",
+            "emphasis": null,
+            "sub": "Öppet dygnet runt, från soffan.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "06",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "04 — Rummet",
+            "head": "En del av presentationen.",
+            "emphasis": null,
+            "sub": "Inte en gimmick.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "forvandling",
+      "num": "05",
+      "name": "FÖRVANDLING",
+      "igLabel": "Förvandling",
+      "coverAsset": "esLivAft",
+      "answers": "Varför är Viewly annorlunda?",
+      "rationale": "Profilens starkaste visuella bevis. Nästan ordlös.",
+      "status": "ready",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "fullbleed",
+          "media": [
+            "esLivAft"
+          ],
+          "copy": {
+            "kicker": "05 — Förvandling",
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "split",
+          "media": [
+            "esLivBef",
+            "esLivAft"
+          ],
+          "copy": {
+            "kicker": "E-styling",
+            "head": "Vardagsrum",
+            "emphasis": null,
+            "sub": null,
+            "labelA": "Före",
+            "labelB": "Efter",
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "split",
+          "media": [
+            "esBedBef",
+            "esBedAft"
+          ],
+          "copy": {
+            "kicker": "E-styling",
+            "head": "Sovrum",
+            "emphasis": null,
+            "sub": null,
+            "labelA": "Före",
+            "labelB": "Efter",
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "split",
+          "media": [
+            "skyBef",
+            "skyAft"
+          ],
+          "copy": {
+            "kicker": "Atmosphere",
+            "head": "Samma timme",
+            "emphasis": null,
+            "sub": null,
+            "labelA": "Dag",
+            "labelB": "Skymning",
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "05",
+          "primitive": "split",
+          "media": [
+            "vadBef",
+            "vadAft"
+          ],
+          "copy": {
+            "kicker": "Atmosphere",
+            "head": "Rätt förutsättningar",
+            "emphasis": null,
+            "sub": null,
+            "labelA": "Grått",
+            "labelB": "Klart",
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "06",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "05 — Förvandling",
+            "head": "Samma bostad.",
+            "emphasis": "Ny känsla.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "07",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "05 — Förvandling",
+            "head": "Bostadens fulla potential.",
+            "emphasis": null,
+            "sub": "Alltid ärligt mot rummet.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "systemet",
+      "num": "06",
+      "name": "SYSTEMET",
+      "igLabel": "Systemet",
+      "coverAsset": "portal",
+      "answers": "Hur fungerar det?",
+      "rationale": "Den kommersiellt viktigaste. Talar direkt till mäklaren.",
+      "status": "needs-assets",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "06 — Systemet",
+            "head": "Mer tid för affären.",
+            "emphasis": "Mindre tid i mappar.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "product",
+          "media": [
+            "portal"
+          ],
+          "copy": {
+            "kicker": "Mäklarportalen",
+            "head": "Ett ställe för hela bostaden.",
+            "emphasis": null,
+            "sub": "Boka, följ, hämta, publicera.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Vertikala portalskärmar 9:16."
+        },
+        {
+          "order": "03",
+          "primitive": "system",
+          "media": null,
+          "copy": {
+            "kicker": "Flödet",
+            "head": "Fyra steg.",
+            "emphasis": null,
+            "sub": "Från bokning till publicerad kampanj.",
+            "labelA": null,
+            "labelB": null,
+            "items": [
+              "Boka",
+              "Produktion",
+              "Leverans",
+              "Publicera"
+            ]
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "product",
+          "media": [
+            "kitchen"
+          ],
+          "copy": {
+            "kicker": "Annonsskrivaren",
+            "head": "Objektbeskrivning på sekunder.",
+            "emphasis": null,
+            "sub": "Din text. Ditt tonläge.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Produktbild Annonsskrivaren + Ad Studio — saknas helt."
+        },
+        {
+          "order": "05",
+          "primitive": "editorial",
+          "media": [
+            "hero"
+          ],
+          "copy": {
+            "kicker": "Skillnaden",
+            "head": "Inte en mapp med filer.",
+            "emphasis": null,
+            "sub": "En färdig presentation, redo att publiceras.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "06",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "06 — Systemet",
+            "head": "Ett objekt.",
+            "emphasis": null,
+            "sub": "Hela kampanjen.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "objekt",
+      "num": "07",
+      "name": "OBJEKT",
+      "igLabel": "Objekt",
+      "coverAsset": "eames",
+      "answers": "Kan jag lita på dem?",
+      "rationale": "Beviset. Varje case är en liten redaktionell feature. Skalar utan omdesign.",
+      "status": "needs-assets",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "case",
+          "media": [
+            "drone"
+          ],
+          "copy": {
+            "kicker": "Objekt 01",
+            "head": "Silvergården 9A",
+            "emphasis": null,
+            "sub": "Landskrona",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Verklig exteriör för caset."
+        },
+        {
+          "order": "02",
+          "primitive": "fullbleed",
+          "media": [
+            "living"
+          ],
+          "copy": {
+            "kicker": null,
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Interiör från samma objekt."
+        },
+        {
+          "order": "03",
+          "primitive": "editorial",
+          "media": [
+            "eames"
+          ],
+          "copy": {
+            "kicker": "Detalj",
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Detalj från samma objekt."
+        },
+        {
+          "order": "04",
+          "primitive": "product",
+          "media": [
+            "threed"
+          ],
+          "copy": {
+            "kicker": "3D",
+            "head": "Planlösningen.",
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "3D-vy från samma objekt."
+        },
+        {
+          "order": "05",
+          "primitive": "fullbleed",
+          "media": [
+            "dining2"
+          ],
+          "copy": {
+            "kicker": "Rörelse",
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Motion-frame från samma objekt."
+        },
+        {
+          "order": "06",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "07 — Objekt",
+            "head": "Ett objekt.",
+            "emphasis": null,
+            "sub": "Hela presentationen.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "inifran",
+      "num": "08",
+      "name": "INIFRÅN",
+      "igLabel": "Inifrån",
+      "coverAsset": "om3",
+      "answers": "Vilka är ni?",
+      "rationale": "Om oss + fotografer sammanslagna. Rekrytering blir en följd av varumärket, inte en jobbannons.",
+      "status": "needs-assets",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "mark",
+          "media": [
+            "om1"
+          ],
+          "copy": {
+            "kicker": "INIFRÅN",
+            "head": "Människorna",
+            "emphasis": null,
+            "sub": "bakom presentationen.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "08 — Inifrån",
+            "head": "Vi bygger inte för hur bostäder presenterades igår.",
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "editorial",
+          "media": [
+            "om3"
+          ],
+          "copy": {
+            "kicker": "Så arbetar vi",
+            "head": "Hantverk och teknik.",
+            "emphasis": null,
+            "sub": "Ingen av delarna räcker ensam.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "fullbleed",
+          "media": [
+            "om4"
+          ],
+          "copy": {
+            "kicker": null,
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "05",
+          "primitive": "editorial",
+          "media": [
+            "kontakt"
+          ],
+          "copy": {
+            "kicker": "Fotograferna",
+            "head": "Fotografen är inte en underleverantör.",
+            "emphasis": null,
+            "sub": "Fotografen är Viewly.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": "Reportagebild: fotograf i arbete på plats."
+        },
+        {
+          "order": "06",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "08 — Inifrån",
+            "head": "Din blick. Ditt hantverk.",
+            "emphasis": "Vår organisation.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "07",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "08 — Inifrån",
+            "head": "Fotografera med Viewly",
+            "emphasis": null,
+            "sub": "viewly.se/fotografer",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    },
+    {
+      "id": "ditthem",
+      "num": "09",
+      "name": "DITT HEM",
+      "igLabel": "Ditt hem",
+      "coverAsset": "dining",
+      "answers": "Hur börjar jag?",
+      "rationale": "Sekundär målgrupp. Medvetet kort — svarar på en enda fråga.",
+      "status": "ready",
+      "stories": [
+        {
+          "order": "01",
+          "primitive": "fullbleed",
+          "media": [
+            "dining"
+          ],
+          "copy": {
+            "kicker": "09 — Ditt hem",
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "02",
+          "primitive": "quiet",
+          "media": null,
+          "copy": {
+            "kicker": "09 — Ditt hem",
+            "head": "Ditt hem säljs en gång.",
+            "emphasis": "Presentationen betyder något.",
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "03",
+          "primitive": "fullbleed",
+          "media": [
+            "living"
+          ],
+          "copy": {
+            "kicker": null,
+            "head": null,
+            "emphasis": null,
+            "sub": null,
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "04",
+          "primitive": "editorial",
+          "media": [
+            "hero"
+          ],
+          "copy": {
+            "kicker": "Vad Viewly tillför",
+            "head": "Foto, rum och rörelse i en presentation.",
+            "emphasis": null,
+            "sub": "Din mäklare beställer. Vi producerar.",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        },
+        {
+          "order": "05",
+          "primitive": "cta",
+          "media": null,
+          "copy": {
+            "kicker": "09 — Ditt hem",
+            "head": "Arbetar din mäklare med Viewly?",
+            "emphasis": null,
+            "sub": "Gör bostadstestet",
+            "labelA": null,
+            "labelB": null,
+            "items": null
+          },
+          "needsAsset": null
+        }
+      ]
+    }
+  ]
+}
