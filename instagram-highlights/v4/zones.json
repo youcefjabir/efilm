@@ -1,0 +1,36 @@
+{
+  "version": 4,
+  "phase": "Fas 4 — omtag. Väntar på godkännande av de tre prototyperna.",
+  "canvas": {
+    "size": [1080, 1920],
+    "owns": ["fotografi", "video", "masker", "brand-geometri", "bakgrunder", "stora former"],
+    "rule": "får blöda ur alla kanter"
+  },
+  "critical": {
+    "box": { "x": [64, 1016], "y": [250, 1600] },
+    "owns": ["rubrik", "brödtext", "etiketter", "datapunkter", "CTA"],
+    "rule": "aldrig utanför"
+  },
+  "brandAngle": { "deg": 58.0, "tan": 1.6003, "source": "viewly-logo-mark.png", "iou": 0.9925 },
+  "layerModel": {
+    "locked": ["grid", "komposition", "masker", "brand-geometri", "spacing-logik", "typskala"],
+    "editable": ["fotografi", "video", "rubrik", "brödtext", "objektsdata", "etiketter", "CTA"],
+    "semiEditable": ["utsnitt", "fokalpunkt", "zoom", "antal element inom bounds", "valfria element"]
+  },
+  "mediaSlot": {
+    "note": "Masken är låst geometri. Bilden är utbytbart innehåll. focal och zoom styr vad som syns, aldrig var masken ligger.",
+    "params": { "focal": "x,y i 0..1", "zoom": ">= 1", "fit": "cover inom masken" }
+  },
+  "measurements": {
+    "v3": [
+      { "id": "A", "bbox_y": [276, 1476], "coverage": 0.024, "outsideLive": 0.0 },
+      { "id": "B", "bbox_y": [276, 1471], "coverage": 0.023, "outsideLive": 0.0 },
+      { "id": "C", "bbox_y": [276, 1585], "coverage": 0.236, "outsideLive": 0.0 }
+    ],
+    "v4": [
+      { "id": "A", "bbox_y": [0, 1919], "coverage": 0.381, "topZone": 0.132, "bottomZone": 0.384 },
+      { "id": "B", "bbox_y": [0, 1809], "coverage": 0.686, "topZone": 0.892, "bottomZone": 0.656 },
+      { "id": "C", "bbox_y": [282, 1919], "coverage": 0.435, "topZone": 0.0, "bottomZone": 0.706 }
+    ]
+  }
+}
