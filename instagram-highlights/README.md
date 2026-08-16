@@ -160,9 +160,17 @@ filmremsa med alla bildrutor, live-scen i mitten, inspektör till höger.
 | Kicker, rubrik, kursiv rad, underrad | Alla primitiv som använder dem |
 | Etiketter | `split` — Före/Efter, Dag/Skymning |
 | Poster, en per rad | `system` |
-| AI-signaler, annonsrubrik, annonsingress | `flow` |
+| Stegetiketter, AI-signaler, tonlägen, annonsrubrik, annonsingress | `flow` |
+| Formatnamn, en per rad | `matrix` |
+| Objektet: adress, ort, fakta, etikett, tid, not | `phases` och vy 04 Format |
 | Bild i slot | Hela biblioteket **plus egna uppladdade bilder** |
 | Fokalpunkt Y och zoom | 0–100 % respektive 100–200 % |
+
+**Objektet.** Adress, ort och faktaraden är samma bostad i alla fyra
+kampanjmallar, så de skrivs till alla på en gång. Etikett, tid och not är per
+mall. Panelen finns både i editorn när `phases` är vald och överst i vy 04
+Format, och en ändring slår igenom i alla artboards direkt — 4:5, 1:1, 9:16,
+miniatyrerna och profilrutnätet.
 
 Texten uppdaterar scenen och filmremsan medan du skriver, utan att fältet tappar
 fokus. `Återställ bildrutan` tar tillbaka originalet för just den rutan.
@@ -176,8 +184,10 @@ webbläsarens `localStorage` under `viewly.highlights.v1` — de överlever omla
 `Exportera JSON` / `Importera JSON` flyttar allt mellan webbläsare eller personer.
 `Återställ allt` nollar tillbaka till originalet.
 
-Redigeringarna ligger aldrig i innehållsmodellen: de lagras i `EDITS` och `SLOTS`
-och läggs på vid rendering, så originalet finns alltid kvar.
+Redigeringarna ligger aldrig i innehållsmodellen: de lagras i `EDITS` (Stories),
+`SLOTS` (media) och `PEDITS` (objektet) och läggs på vid rendering, så originalet
+finns alltid kvar. `Återställ bildrutan`, `Återställ objektet` och `Återställ allt`
+går tillbaka olika långt.
 
 ### Export
 

@@ -754,7 +754,12 @@ var PB = {
  }
 };
 
+/* Objektets text — adress, ort, fakta, visningstid — är innehåll, inte design.
+   Den redigeras precis som en Story och läggs på vid rendering. */
+var PEDITS = {};
 function post(dirId, p, ar){
+  var e = PEDITS[p.id];
+  if(e) p = Object.assign({}, p, e);
   var set = dirId==="skugga" ? PB : PA;
   return (set[p.phase] || set.tillsalu)(p, ar||"4:5");
 }

@@ -291,14 +291,15 @@ function secFormat(){
     var a=AR[f.ar];
     return '<div class="fcol"><div class="fmeta"><b>'+f.n+'</b><span class="mono">'+f.ar+'</span>'
       +'<em>'+f.d+'</em></div>'
-      +'<div class="art" style="aspect-ratio:'+a[0]+'/'+a[1]+'">'
+      +'<div class="art" data-post-pid="'+p.id+'" data-post-ar="'+f.ar+'"'
+      + (state.ig && f.ar==="9:16" ? ' data-post-ig="1"' : '')+' style="aspect-ratio:'+a[0]+'/'+a[1]+'">'
       + post(d,p,f.ar) + (state.ig && f.ar==="9:16" ? igOverlay(5,1) : '') + '</div>'
       + dlBtn("post",{pid:p.id, ar:f.ar, dir:d},"Ladda ner PNG")+'</div>';
   }).join("");
   var tpl = PHASEDOC.map(function(ph,j){
     var pp = POSTS.filter(function(x){return x.phase===ph.id})[0];
     return '<div class="tpl">'
-      +'<div class="art" style="aspect-ratio:4/5">'+post(d,pp,"4:5")+'</div>'
+      +'<div class="art" data-post-pid="'+pp.id+'" data-post-ar="4:5" style="aspect-ratio:4/5">'+post(d,pp,"4:5")+'</div>'
       +'<div class="tplcap"><b>'+ph.n+'</b><span class="mono">'+String(j+1).padStart(2,"0")+'</span></div>'
       +'<p class="specd">'+ph.d+'</p>'
       +'<div class="tplrow">'+dlBtn("post",{pid:pp.id, ar:"4:5", dir:d},"4:5")
@@ -306,12 +307,14 @@ function secFormat(){
         + dlBtn("post",{pid:pp.id, ar:"9:16", dir:d},"9:16")+'</div></div>';
   }).join("");
   var grid = [0,1,2,3,0,1,2,3,0].map(function(j){
-    return '<div class="gcell">'+post(d,POSTS[j],"1:1")+'</div>'}).join("");
+    return '<div class="gcell" data-post-pid="'+POSTS[j].id+'" data-post-ar="1:1">'+post(d,POSTS[j],"1:1")+'</div>'}).join("");
   return sechead("Format","Fyra mallar, tre artboards",
     "Social / Ads Studio exporterar inlägg 4:5, kvadrat 1:1 och story 9:16 ur samma mall. Statusen är inte en etikett i "
    +"hörnet — varje kampanjfas är en egen mall där status bestämmer hela kompositionen: hur mycket bild, hur mycket "
    +"information och vad som får vara störst. Varje artboard går att ladda ner som PNG i 1080 px bredd.")
    +dirbar()+toggles(false)
+   +'<div class="objwrap"><span id="flash" class="flash"></span>'+objectPanel()
+     +'<button class="dlb pri" type="button" data-act="save">Spara</button></div>'
    +'<h3 class="h3" style="margin-top:0">Samma inlägg i tre format</h3>'
    +'<div class="fmts">'+one+'</div>'
    +'<h3 class="h3">Kampanjmallarna · 4:5</h3>'
@@ -334,7 +337,7 @@ var STORE = "viewly.highlights.v1";
 
 function saveAll(msg){
   try {
-    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS}));
+    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS, posts:PEDITS}));
     flash(msg || "Sparat");
   } catch(e){
     flash(UPLOADS && Object.keys(UPLOADS).length
@@ -345,7 +348,8 @@ function loadAll(){
   try {
     var raw = localStorage.getItem(STORE); if(!raw) return false;
     var d = JSON.parse(raw);
-    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{}); Object.assign(UPLOADS, d.uploads||{});
+    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
+    Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
     return true;
   } catch(e){ return false }
 }
@@ -353,6 +357,7 @@ function clearAll(){
   Object.keys(EDITS).forEach(function(k){delete EDITS[k]});
   Object.keys(SLOTS).forEach(function(k){delete SLOTS[k]});
   Object.keys(UPLOADS).forEach(function(k){delete UPLOADS[k]});
+  Object.keys(PEDITS).forEach(function(k){delete PEDITS[k]});
   seedSlots();
   try{ localStorage.removeItem(STORE) }catch(e){}
 }
@@ -373,26 +378,45 @@ function fieldsFor(s){
   if(s.p==="split"){ f.push(["la","Etikett vänster/övre","text"]); f.push(["lb","Etikett höger/undre","text"]) }
   if(s.p==="system") f.push(["items","Poster — en per rad","list"]);
   if(s.p==="flow"){
+    f.push(["flow_inp","Steg 1 — etikett","text"]);
     f.push(["flow_items","AI:ns signaler — en per rad","list"]);
+    f.push(["flow_mid","Steg 2 — etikett","text"]);
+    f.push(["flow_out","Steg 3 — etikett","text"]);
+    f.push(["flow_tones","Tonlägen — en per rad","list"]);
     f.push(["flow_title","Annonsrubrik","text"]);
     f.push(["flow_lead","Annonsingress","area"]);
   }
+  if(s.p==="matrix") f.push(["mx_names","Formatnamn — en per rad","list"]);
   return f;
 }
 function val(s, key){
   var e = EDITS[s.sid] || {};
   if(key==="items")      return (e.items || s.items || []).join("\n");
   if(key==="flow_items") return ((e.mid||s.mid).items || []).join("\n");
+  if(key==="flow_inp")   return (e.inp||s.inp).lab || "";
+  if(key==="flow_mid")   return (e.mid||s.mid).lab || "";
+  if(key==="flow_out")   return (e.out||s.out).lab || "";
+  if(key==="flow_tones") return ((e.out||s.out).tones || []).join("\n");
   if(key==="flow_title") return (e.out||s.out).title || "";
   if(key==="flow_lead")  return (e.out||s.out).lead || "";
+  if(key==="mx_names")   return (e.fmts||s.fmts).map(function(f){return f[1]}).join("\n");
   return e[key] != null ? e[key] : (s[key] || "");
 }
 function setVal(s, key, v){
   var e = EDITS[s.sid] || (EDITS[s.sid] = {});
-  if(key==="items")           e.items = v.split("\n").filter(function(x){return x.trim()});
-  else if(key==="flow_items") e.mid   = Object.assign({}, e.mid||s.mid, {items:v.split("\n").filter(function(x){return x.trim()})});
+  var lines = function(x){ return x.split("\n").filter(function(l){return l.trim()}) };
+  if(key==="items")           e.items = lines(v);
+  else if(key==="flow_items") e.mid   = Object.assign({}, e.mid||s.mid, {items:lines(v)});
+  else if(key==="flow_inp")   e.inp   = Object.assign({}, e.inp||s.inp, {lab:v});
+  else if(key==="flow_mid")   e.mid   = Object.assign({}, e.mid||s.mid, {lab:v});
+  else if(key==="flow_out")   e.out   = Object.assign({}, e.out||s.out, {lab:v});
+  else if(key==="flow_tones") e.out   = Object.assign({}, e.out||s.out, {tones:lines(v)});
   else if(key==="flow_title") e.out   = Object.assign({}, e.out||s.out, {title:v});
   else if(key==="flow_lead")  e.out   = Object.assign({}, e.out||s.out, {lead:v});
+  else if(key==="mx_names"){
+    var nm = lines(v);
+    e.fmts = (e.fmts||s.fmts).map(function(f,j){ return [f[0], nm[j]!=null?nm[j]:f[1], f[2], f[3]] });
+  }
   else                        e[key]  = v;
 }
 function isEdited(s){
@@ -478,7 +502,7 @@ async function downloadSeries(hlId, dir, btn){
 }
 async function exportJSON(btn){
   var lbl = btn.textContent;
-  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS}, null, 1);
+  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS, posts:PEDITS}, null, 1);
   await offer(new Blob([data]), "viewly-highlights-redigeringar.json", btn);
   btn.textContent = lbl;
 }
@@ -487,7 +511,8 @@ function importJSON(file){
   fr.onload = function(){
     try {
       var d = JSON.parse(fr.result);
-      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{}); Object.assign(UPLOADS, d.uploads||{});
+      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
+      Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
       flash("Importerat"); renderEditor();
     } catch(e){ flash("Kunde inte läsa filen", true) }
   };
@@ -584,6 +609,7 @@ function studioEditor(){
        +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
          +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
        +'<div class="edsec"><div class="eyebrow">Media</div>'+media+'</div>'
+       +(s.p==="phases" ? objectPanel() : '')
        +(s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
        +'<div class="edsec"><div class="eyebrow">Ladda ner</div>'
          +'<div class="dlcol">'
@@ -595,6 +621,58 @@ function studioEditor(){
          +'per fil. Kontaktkartan är en enda fil.</p></div>'
      +'</div>'
    +'</div>';
+}
+
+/* ---------------------------------------------------------------------
+   OBJEKTET — texten på kampanjmallarna
+   Adress, ort och fakta är samma objekt i alla fyra mallar, så de skrivs
+   till alla på en gång. Etikett, tid och not är per mall.
+   --------------------------------------------------------------------- */
+function pv(id, key){
+  var p = POSTS.filter(function(x){return x.id===id})[0], e = PEDITS[id] || {};
+  if(key==="facts") return ((e.facts || p.facts || []).map(function(f){return f[0]+" | "+f[1]})).join("\n");
+  return e[key] != null ? e[key] : (p[key] || "");
+}
+function setShared(key, v){
+  POSTS.forEach(function(p){
+    var e = PEDITS[p.id] || (PEDITS[p.id] = {});
+    if(key==="facts") e.facts = v.split("\n").filter(function(l){return l.trim()})
+      .map(function(l){ var q=l.split("|"); return [(q[0]||"").trim(), (q[1]||"").trim()] });
+    else e[key] = v;
+  });
+}
+function setPost(id, key, v){ (PEDITS[id] || (PEDITS[id] = {}))[key] = v }
+function objectPanel(){
+  var per = PHASEDOC.map(function(ph){
+    var p = POSTS.filter(function(x){return x.phase===ph.id})[0];
+    return '<div class="opRow"><div class="opName">'+ph.n+'</div>'
+      +'<label class="fld"><span>Etikett</span><input type="text" data-po="'+p.id+':stage" value="'+esc(pv(p.id,"stage"))+'"></label>'
+      +'<label class="fld"><span>'+(ph.id==="visning"?"Tid":"Rad i kolofonen")+'</span>'
+        +'<input type="text" data-po="'+p.id+':when" value="'+esc(pv(p.id,"when"))+'"></label>'
+      +(ph.id==="visning"||ph.id==="sald"
+        ? '<label class="fld"><span>Not</span><input type="text" data-po="'+p.id+':note" value="'+esc(pv(p.id,"note"))+'"></label>' : '')
+      +'</div>';
+  }).join("");
+  return '<div class="edsec"><div class="eyebrow">Objektet</div>'
+   +'<p class="mut" style="font-size:11px;line-height:1.5">Gäller alla fyra kampanjmallar och vy 04 Format.</p>'
+   +'<label class="fld"><span>Adress</span><input type="text" data-ps="addr" value="'+esc(pv("p1","addr"))+'"></label>'
+   +'<label class="fld"><span>Ort</span><input type="text" data-ps="city" value="'+esc(pv("p1","city"))+'"></label>'
+   +'<label class="fld"><span>Fakta — ett per rad, <code class="mono">värde | etikett</code></span>'
+     +'<textarea data-ps="facts" rows="3">'+esc(pv("p2","facts"))+'</textarea></label>'
+   +'<div class="opGrid">'+per+'</div>'
+   +'<button class="dlb" type="button" data-act="reset-object">Återställ objektet</button></div>';
+}
+
+/* Kampanjmallarna syns på flera ställen samtidigt — scenen, filmremsan och
+   artboardsen i vy 04. Alla ritas om utan att fälten byggs upp på nytt. */
+function refreshPosts(){
+  if(state.edit){ refreshStage(); return }
+  var d = state.dir;
+  document.querySelectorAll("[data-post-ar]").forEach(function(el){
+    var p = POSTS.filter(function(x){return x.id===el.dataset.postPid})[0];
+    if(p) el.innerHTML = post(d, p, el.dataset.postAr)
+      + (el.dataset.postIg==="1" ? igOverlay(5,1) : "");
+  });
 }
 
 function mediaPanel(slot, cur, label){
@@ -759,7 +837,8 @@ $("#nav").innerHTML=SECTIONS.map(function(s){
 $("#railmark").innerHTML=vmark("#1C1C1E","#6E7266")+'<span class="brandname">VIEWLY</span>';
 
 document.addEventListener("click",function(e){
-  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; if(n.dataset.s!=="studio") state.edit=null; render();return}
+  /* Studio i skenan går alltid till kapitellistan — annars sitter man fast i editorn. */
+  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; state.edit=null; render(); return}
   var d=e.target.closest("[data-dir]"); if(d){state.dir=d.dataset.dir;render();return}
   var p=e.target.closest("[data-play]");
   if(p){var q=p.dataset.play.split(":");play(q[0],+q[1],q[2]);return}
@@ -786,6 +865,8 @@ document.addEventListener("click",function(e){
     else if(a==="play"){ play(state.edit.hl, state.edit.i, state.dir) }
     else if(a==="reset-story"){
       var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
+    else if(a==="reset-object"){
+      Object.keys(PEDITS).forEach(function(k){delete PEDITS[k]}); saveAll("Objektet återställt"); render() }
     else if(a==="reset-all"){
       if(confirm("Ta bort alla ändringar, uppladdade bilder och sparat läge?")){ clearAll(); render() } }
     return;
@@ -797,6 +878,10 @@ document.addEventListener("click",function(e){
   if(rs){delete SLOTS[rs.dataset.reset]; afterSlot(rs.dataset.reset); return}
 });
 document.addEventListener("input",function(e){
+  var ps=e.target.dataset&&e.target.dataset.ps;
+  if(ps){ setShared(ps, e.target.value); refreshPosts(); return }
+  var po=e.target.dataset&&e.target.dataset.po;
+  if(po){ var q=po.split(":"); setPost(q[0], q[1], e.target.value); refreshPosts(); return }
   var ed=e.target.dataset&&e.target.dataset.ed;
   if(ed && state.edit){
     var h=hlOf(state.edit.hl);
