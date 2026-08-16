@@ -83,15 +83,14 @@ var HL = [
    {p:"cta", h:"Ett ställe.", s:"Hela produktionen.", k:"06 — Systemet"}
   ]},
 
- /* 07 — Annonsskrivaren + Social / Ads Studio.
-    Två verktyg, ett kapitel: det som händer efter fotograferingen.
-    All copy nedan är hämtad ur viewly.se/annonsskrivaren och viewly.se/some-studio. */
- {id:"kampanjen", num:"07", name:"KAMPANJEN", label:"Kampanjen", cover:"portal", coverFy:.55,
-  q:"Hur når objektet ut?",
-  why:"Annonsskrivaren och Social / Ads Studio som ett lager — text och format ur samma order. Säljer utfallet, inte AI:n.",
+ /* 07 — ANNONSSKRIVAREN. Eget kapitel: texten.
+    Copy hämtad ur viewly.se/annonsskrivaren. */
+ {id:"annonsen", num:"07", name:"ANNONSEN", label:"Annonsen", cover:"kitchen",
+  q:"Vem skriver texten?",
+  why:"Annonsskrivaren som eget kapitel. Säljer utfallet — en färdig text — aldrig AI:n bakom.",
   st:[
-   {p:"mark", m:"hero", k:"KAMPANJEN", h:"Ett objekt", s:"En komplett kampanj."},
-   {p:"quiet", h:"Färdig bostadsannons", em:"på 30 sekunder.", s:"Fyll i bostaden. Ladda upp bilderna.", k:"07 — Kampanjen"},
+   {p:"mark", m:"kitchen", k:"ANNONSSKRIVAREN", h:"Annonsen", s:"skriven på trettio sekunder."},
+   {p:"quiet", h:"Färdig bostadsannons", em:"på 30 sekunder.", s:"Fyll i bostaden. Ladda upp bilderna.", k:"07 — Annonsen"},
    {p:"flow", k:"Annonsskrivaren", h:"Från sex bilder till färdig text.",
     inp:{lab:"Du laddar upp", ims:["hero","kitchen","living","dining","boucle","eames"]},
     mid:{lab:"AI:n läser bilderna", items:["Ljusinsläpp","Takhöjd och volym","Material och ytskikt","Planlösning","Utsikt och läge","Områdets karaktär"]},
@@ -99,19 +98,35 @@ var HL = [
          title:"Ljuset som gör skillnad",
          lead:"Fyra rum med genomgående planlösning och eftermiddagssol rakt in i vardagsrummet.",
          lines:[97,100,88,64]}},
-   {p:"editorial", m:"portal", fy:.52, zoom:1.06, k:"Social / Ads Studio", h:"Kontorets egna mallar.",
-    s:"Inlägg 4:5, kvadrat 1:1 och story 9:16 — samtidigt. Instagram, Facebook och LinkedIn.",
-    need:"Skärmbild ur Social / Ads Studio: samma objekt i tre format."},
+   {p:"system", k:"Tonläge", h:"Tre röster.", s:"Samma bostad, olika tilltal. Två omskrivningar ingår.",
+    items:["Saklig — fakta först","Varm — känslan först","Exklusiv — sparsmakat"]},
+   {p:"editorial", m:"portal", fy:.52, zoom:1.06, k:"Din text", h:"Utkastet är ditt att ändra.",
+    s:"Ingenting publiceras automatiskt. Du redigerar, kortar och godkänner.",
+    need:"Produktbild Annonsskrivaren 9:16: redigeringsvyn med tonlägesval."},
+   {p:"cta", h:"Objektbeskrivningen", s:"är inte längre en flaskhals.", k:"07 — Annonsen"}
+  ]},
+
+ /* 08 — SOCIAL / ADS STUDIO. Eget kapitel: formaten och kampanjen.
+    Copy hämtad ur viewly.se/some-studio. */
+ {id:"kampanjen", num:"08", name:"KAMPANJEN", label:"Kampanjen", cover:"portal", coverFy:.55,
+  q:"Hur når objektet ut?",
+  why:"Social / Ads Studio som eget kapitel. Mallarna, formaten och kampanjfaserna — det som händer efter att texten är skriven.",
+  st:[
+   {p:"mark", m:"hero", k:"SOCIAL / ADS STUDIO", h:"Ett objekt", s:"En komplett kampanj."},
+   {p:"editorial", m:"portal", fy:.52, zoom:1.06, k:"Mallbiblioteket", h:"Kontorets egna mallar.",
+    s:"Obegränsat antal, i valfritt format. Designen är satt — innehållet fylls i åt dig.",
+    need:"Skärmbild ur Social / Ads Studio: mallbiblioteket."},
    {p:"matrix", m:"hero", k:"Format", h:"Ett objekt, alla format.",
     fmts:[["4:5","Inlägg",4,5],["1:1","Kvadrat",1,1],["9:16","Story",9,16]],
     s:"Samma mall exporterar samtliga. Instagram, Facebook och LinkedIn."},
-   {p:"phases", m:"hero", k:"Kampanjfaser", h:"Fyra lägen. En mall.", now:1,
-    items:[["Kommande","Vecka 1"],["Till salu","Vecka 2"],["Visning","Söndag"],["Såld","Vecka 5"]],
-    s:"Samma objekt hela resan — bara statusen byts."},
-   {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"07 — Kampanjen"}
+   {p:"phases", k:"Kampanjfaser", h:"Fyra mallar. En kampanj.", now:1,
+    items:["p1","p2","p3","p4"],
+    s:"Statusen är inte en etikett — den bestämmer hela kompositionen."},
+   {p:"quiet", h:"Under en minut.", em:"När mallarna är satta.", s:"Ladda ner som JPG, PNG eller PDF — eller hela serien som zip.", k:"08 — Kampanjen"},
+   {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"08 — Kampanjen"}
   ]},
 
- {id:"objekt", num:"08", name:"OBJEKT", label:"Objekt", cover:"eames",
+ {id:"objekt", num:"09", name:"OBJEKT", label:"Objekt", cover:"eames",
   q:"Kan jag lita på dem?", why:"Beviset. Varje case är en liten redaktionell feature. Skalar utan omdesign.",
   st:[
    {p:"case", m:"drone", k:"Objekt 01", h:"Silvergården 9A", s:"Landskrona",
@@ -120,30 +135,30 @@ var HL = [
    {p:"editorial", m:"eames", k:"Detalj", h:"", s:"", need:"Detalj från samma objekt."},
    {p:"product", m:"threed", k:"3D", h:"Planlösningen.", s:"", need:"3D-vy från samma objekt."},
    {p:"fullbleed", m:"dining2", k:"Rörelse", h:"", s:"", need:"Motion-frame från samma objekt."},
-   {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"08 — Objekt"}
+   {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"09 — Objekt"}
   ]},
 
- {id:"inifran", num:"09", name:"INIFRÅN", label:"Inifrån", cover:"om3",
+ {id:"inifran", num:"10", name:"INIFRÅN", label:"Inifrån", cover:"om3",
   q:"Vilka är ni?", why:"Om oss + fotografer sammanslagna. Rekrytering blir en följd av varumärket, inte en jobbannons.",
   st:[
    {p:"mark", m:"om1", k:"INIFRÅN", h:"Människorna", s:"bakom presentationen."},
-   {p:"quiet", h:"Vi bygger inte för hur bostäder presenterades igår.", k:"09 — Inifrån"},
+   {p:"quiet", h:"Vi bygger inte för hur bostäder presenterades igår.", k:"10 — Inifrån"},
    {p:"editorial", m:"om3", k:"Så arbetar vi", h:"Hantverk och teknik.", s:"Ingen av delarna räcker ensam."},
    {p:"fullbleed", m:"om4", k:"", h:"", s:""},
    {p:"editorial", m:"kontakt", k:"Fotograferna", h:"Fotografen är inte en underleverantör.", s:"Fotografen är Viewly.",
     need:"Reportagebild: fotograf i arbete på plats."},
-   {p:"quiet", h:"Din blick. Ditt hantverk.", em:"Vår organisation.", k:"09 — Inifrån"},
-   {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"09 — Inifrån"}
+   {p:"quiet", h:"Din blick. Ditt hantverk.", em:"Vår organisation.", k:"10 — Inifrån"},
+   {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"10 — Inifrån"}
   ]},
 
- {id:"ditthem", num:"10", name:"DITT HEM", label:"Ditt hem", cover:"dining",
+ {id:"ditthem", num:"11", name:"DITT HEM", label:"Ditt hem", cover:"dining",
   q:"Hur börjar jag?", why:"Sekundär målgrupp. Medvetet kort — svarar på en enda fråga.",
   st:[
-   {p:"fullbleed", m:"dining", k:"10 — Ditt hem", h:"", s:""},
-   {p:"quiet", h:"Ditt hem säljs en gång.", em:"Presentationen betyder något.", k:"10 — Ditt hem"},
+   {p:"fullbleed", m:"dining", k:"11 — Ditt hem", h:"", s:""},
+   {p:"quiet", h:"Ditt hem säljs en gång.", em:"Presentationen betyder något.", k:"11 — Ditt hem"},
    {p:"fullbleed", m:"living", k:"", h:"", s:""},
    {p:"editorial", m:"hero", k:"Vad Viewly tillför", h:"Foto, rum och rörelse i en presentation.", s:"Din mäklare beställer. Vi producerar."},
-   {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"10 — Ditt hem"}
+   {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"11 — Ditt hem"}
   ]}
 ];
 
@@ -186,9 +201,9 @@ var SPECS = [
   {p:"fullbleed", ref:["seendet",2]},
   {p:"case",      ref:["objekt",0]},
   {p:"cta",       ref:["viewly",6]},
-  {p:"flow",      ref:["kampanjen",2]},
-  {p:"matrix",    ref:["kampanjen",4]},
-  {p:"phases",    ref:["kampanjen",5]}
+  {p:"flow",      ref:["annonsen",2]},
+  {p:"matrix",    ref:["kampanjen",2]},
+  {p:"phases",    ref:["kampanjen",3]}
 ];
 
 /* --------------------------------------------------------------------
@@ -198,15 +213,26 @@ var SPECS = [
    annars är det ingen mall utan en engångslayout.
    -------------------------------------------------------------------- */
 var POSTS = [
-  {id:"p1", m:"hero",   k:"Kommande",  h:"Silvergården 9A", s:"Landskrona · 4 rok · 112 m²", meta:"Snart till salu"},
-  {id:"p2", m:"kitchen",k:"Till salu", h:"Ljuset som gör skillnad", s:"Visning söndag 13–14", meta:"viewly.se"},
-  {id:"p3", m:"boucle", k:"Detalj",    h:"Material och ljus", s:"", meta:"Fotograf · Viewly"},
-  {id:"p4", m:"drone",  k:"Såld",      h:"Såld på tio dagar", s:"", meta:"Tack för förtroendet"}
+  {id:"p1", phase:"kommande", stage:"Vecka 1",  m:"hero",    addr:"Silvergården 9A", city:"Landskrona",
+   when:"Släpps vecka 12"},
+  {id:"p2", phase:"tillsalu", stage:"Vecka 2",  m:"kitchen", addr:"Silvergården 9A", city:"Landskrona",
+   facts:[["4","rum och kök"],["112","kvadratmeter"],["1968","byggår"]], when:"Visning sön 13–14"},
+  {id:"p3", phase:"visning",  stage:"Vecka 3",  m:"living",  addr:"Silvergården 9A", city:"Landskrona",
+   when:"Söndag 13–14", note:"Anmälan via mäklaren"},
+  {id:"p4", phase:"sald",     stage:"Vecka 5",  m:"drone",   addr:"Silvergården 9A", city:"Landskrona",
+   note:"Tio dagar", when:"Utgångspris 3 950 000 kr"}
 ];
 var FORMATS = [
   {ar:"9:16", n:"Story",   d:"Instagram och Facebook Stories. Kritisk zon 250 / 320 px."},
   {ar:"4:5",  n:"Inlägg",  d:"Störst yta i flödet. Standard för objektinlägg."},
   {ar:"1:1",  n:"Kvadrat", d:"Kvadrat i profilrutnätet och som LinkedIn-annons."}
+];
+/* de fyra kampanjmallarna, i ordning */
+var PHASEDOC = [
+  {id:"kommande", n:"Kommande", d:"Bilden dominerar, informationen hålls tillbaka. Hårlinje, spärrad status, adressen som löfte."},
+  {id:"tillsalu", n:"Till salu", d:"Tätaste mallen: adress, faktarad med rum, yta och byggår, samt visningstid."},
+  {id:"visning",  n:"Visning",  d:"En enda uppgift satt stort. Allt annat backar."},
+  {id:"sald",     n:"Såld",     d:"Ordet tar över och bilden backar. Beviset står i kolofonen."}
 ];
 
 var DIRS = [

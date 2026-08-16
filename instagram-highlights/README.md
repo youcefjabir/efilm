@@ -23,7 +23,7 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | 01 | Riktning | ARKIV och SKUGGA sida vid sida, palett, typografi, logotypbruk, risk — och samma Story löst i båda |
 | 02 | Kompositioner | De tolv primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
 | 03 | Profil | Tio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
-| 04 | Format | Samma inlägg som artboards i 9:16, 4:5 och 1:1, kampanjen i flödesformat och rutnätet |
+| 04 | Format | Fyra kampanjmallar och tre artboards: 9:16, 4:5, 1:1 — plus profilrutnätet |
 | 05 | Bibliotek | Alla tio kapitel med sekvensuppspelning |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 
@@ -53,7 +53,7 @@ cirklar med lägst igenkänning vid 56 px.
 ## Tolv kompositionsprimitiv
 
 Varje Story byggs av ett av tolv primitiv. Bara **full bleed** och **case** låter
-fotografiet äga hela ytan — 13 av 64 bildrutor. Resten bärs av typografi, linje,
+fotografiet äga hela ytan — 13 av 69 bildrutor. Resten bärs av typografi, linje,
 plåt och luft, med bilden i en mask.
 
 | Primitiv | Roll |
@@ -116,20 +116,34 @@ och zoom i vy 05 eller i spelaren — masken, marginalerna och typskalan står s
 
 ---
 
-## Format
+## Format och kampanjmallar
 
 Designen är bara ett system om den håller utanför 9:16. Social / Ads Studio
-exporterar tre format ur samma mall, och alla tre finns renderade i vy 04:
+exporterar tre format ur samma mall:
 
 | Format | Px | Roll |
 |---|---|---|
-| 9:16 | 1080 × 1920 | Story. Kritisk zon 250 / 320 px |
+| 9:16 | 1080 × 1920 | Story. Bandet växer och får extra bottenmarginal så inget hamnar under Instagrams svarsfält |
 | 4:5 | 1080 × 1350 | Inlägg. Störst yta i flödet, standard för objektinlägg |
 | 1:1 | 1080 × 1080 | Kvadrat i profilrutnätet och som LinkedIn-annons |
 
+**Statusen är inte en etikett i hörnet.** Varje kampanjfas är en egen mall där
+status bestämmer hela kompositionen — hur mycket bild, hur mycket information,
+och vad som får vara störst:
+
+| Mall | Grepp |
+|---|---|
+| **Kommande** | Bilden dominerar, informationen hålls tillbaka. Hårlinje, spärrad status, adressen som löfte |
+| **Till salu** | Tätast: adress, faktarad med rum, yta och byggår, samt visningstid |
+| **Visning** | En enda uppgift satt stort. Allt annat backar |
+| **Såld** | Ordet tar över och bilden tonas ned. Beviset står i kolofonen |
+
+Samma objekt hela vägen — Silvergården 9A. Bara mallen byts när kampanjen går
+vidare. Alla fyra × tre format × två riktningar finns renderade i vy 04, och
+`phases`-primitivet visar samma fyra mallar inuti en Story.
+
 Post-renderaren delar palett, typskala och logotypgeometri med Story-renderaren
-men har egen vertikal rytm per format — pappersbandet i ARKIV och gradienten i
-SKUGGA skalar med höjden, typografin gör det inte.
+men har egen vertikal rytm per mall och per format.
 
 ---
 
@@ -150,9 +164,9 @@ Webbläsaren visar en bekräftelse innan något sparas. Det finns också ett lit
 API på sidan om exporten behöver skriptas:
 
 ```js
-await viewlyExport.frame("kampanjen", 2, "arkiv");   // Blob, 1080×1920 PNG
-await viewlyExport.sheet("kampanjen", "skugga");     // kontaktkarta
-await viewlyExport.post("p2", "4:5", "arkiv");       // artboard
+await viewlyExport.frame("annonsen", 2, "arkiv");   // Blob, 1080×1920 PNG
+await viewlyExport.sheet("kampanjen", "skugga");    // kontaktkarta
+await viewlyExport.post("p4", "4:5", "arkiv");      // artboard: mallen Såld
 ```
 
 ---
@@ -176,9 +190,9 @@ Se `v6/brand-geometry.json`.
 
 ## Struktur
 
-Tio kapitel, 64 Stories. Briefens tio Highlights är fortfarande tio, men inte
-samma tio — produkter som annars hade blivit egna rubriker är absorberade i
-större berättelser. Det är skillnaden mellan en tjänstekatalog och ett ekosystem.
+Elva kapitel, 69 Stories. Produkter som bara är en rad i en tjänstelista är
+absorberade i större berättelser; de två som bär eget innehåll — Annonsskrivaren
+och Social / Ads Studio — har egna kapitel.
 
 | # | Highlight | Besvarar | Stories |
 |---|-----------|----------|---------|
@@ -188,32 +202,31 @@ större berättelser. Det är skillnaden mellan en tjänstekatalog och ett ekosy
 | 04 | Rummet | Vad kan jag skapa? | 6 |
 | 05 | Förvandling | Varför är Viewly annorlunda? | 7 |
 | 06 | Systemet | Hur fungerar det? | 6 |
-| 07 | Kampanjen | Hur når objektet ut? | 7 |
-| 08 | Objekt | Kan jag lita på dem? | 6 |
-| 09 | Inifrån | Vilka är ni? | 7 |
-| 10 | Ditt hem | Hur börjar jag? | 5 |
+| 07 | Annonsen | Vem skriver texten? | 6 |
+| 08 | Kampanjen | Hur når objektet ut? | 6 |
+| 09 | Objekt | Kan jag lita på dem? | 6 |
+| 10 | Inifrån | Vilka är ni? | 7 |
+| 11 | Ditt hem | Hur börjar jag? | 5 |
 
 Absorberade: planritning och områdeskarta → **04 Rummet** · e-styling och
 Atmosphere → **05 Förvandling** · beställning, mallar och fakturering →
-**06 Systemet** · Annonsskrivaren och Social / Ads Studio → **07 Kampanjen**.
-Om oss och Fotografer är sammanslagna till **09 Inifrån**.
+**06 Systemet**. Om oss och Fotografer är sammanslagna till **10 Inifrån**.
 
-### 07 Kampanjen
+### 07 Annonsen — Annonsskrivaren
 
-Annonsskrivaren och Social / Ads Studio hade blivit två tunna tjänsterubriker var
-för sig. Tillsammans är de ett kapitel med en egen fråga: *det som händer efter
-fotograferingen*. Sekvensen säljer utfallet, aldrig AI:n.
+Eget kapitel. Säljer utfallet — en färdig text — aldrig AI:n bakom. Copy hämtad
+ur `viewly.se/annonsskrivaren`: färdig bostadsannons på 30 sekunder, de sex
+signalerna AI:n läser ur bilderna, tonlägena saklig / varm / exklusiv med två
+omskrivningar. `flow`-ramen ritar hela kedjan och slutar i ett faktiskt
+annonsutkast, inte i ett påstående.
 
-All copy är hämtad ur `viewly.se/annonsskrivaren` och `viewly.se/some-studio`:
-"Färdig bostadsannons på 30 sekunder", de sex sakerna AI:n läser ur bilderna,
-tonlägena saklig / varm / exklusiv, kontorets egna mallar i 4:5, 1:1 och 9:16 för
-Instagram, Facebook och LinkedIn, samt kampanjfaserna kommande → till salu →
-visning → såld. Kapitlet slutar på produktens egen rad: *Ett objekt. Hela
-kampanjen.*
+### 08 Kampanjen — Social / Ads Studio
 
-Sekvensen är medvetet typdriven — sex av sju bildrutor bärs av typografi och
-information, inte av foto. Två `system`-ramar gör tyngdlyftet: de sex signalerna i
-bilden, och de fyra kampanjfaserna.
+Eget kapitel. Copy hämtad ur `viewly.se/some-studio`: kontorets egna mallar,
+obegränsat antal i valfritt format, 4:5 / 1:1 / 9:16 för Instagram, Facebook och
+LinkedIn, kampanjfaserna kommande → till salu → visning → såld, och under en
+minut när mallarna är satta. Kapitlet slutar på produktens egen rad: *Ett objekt.
+Hela kampanjen.*
 
 All copy är förslag och riktning, inte låsta krav.
 
@@ -221,7 +234,7 @@ All copy är förslag och riktning, inte låsta krav.
 
 ## Materialläge
 
-24 verkliga assets hämtade från viewly.se används i underlaget. 15 av 64 Stories
+24 verkliga assets hämtade från viewly.se används i underlaget. 15 av 69 Stories
 saknar rätt material och är märkta med vad som behöver produceras — slå på
 **Markera saknat material** i vy 02 eller 04.
 
@@ -232,8 +245,8 @@ De kritiska luckorna:
 3. **Vertikala portalskärmar 9:16.** Nuvarande `portal`-asset är en beskuren
    desktopvy och används som platshållare i 01, 06 och 07 med fokalpunkt satt så
    att gränssnittet åtminstone går att läsa.
-4. **Produktbilder för 07 Kampanjen:** Annonsskrivaren med tonlägesval, och
-   Social / Ads Studio med samma objekt i 4:5, 1:1 och 9:16.
+4. **Produktbilder för 07 Annonsen och 08 Kampanjen:** Annonsskrivarens
+   redigeringsvy med tonlägesval, och Social / Ads Studios mallbibliotek.
 
 ---
 
@@ -243,7 +256,7 @@ De kritiska luckorna:
 v6/highlights.html      fristående underlag — öppna denna
 v6/shell.html           skalet: tokens, komponenter, layout
 v6/draw.js              geometri, media-slots, riktningsstilar, tolv primitiv × två riktningar,
-                        post-renderare för 9:16 / 4:5 / 1:1
+                        fyra kampanjmallar × tre format × två riktningar
 v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
 v6/app.js               studiovyerna och spelaren
 v6/brand-geometry.json  spårad logotyp + safe-area-spec

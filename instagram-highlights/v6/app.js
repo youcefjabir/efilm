@@ -295,21 +295,31 @@ function secFormat(){
       + post(d,p,f.ar) + (state.ig && f.ar==="9:16" ? igOverlay(5,1) : '') + '</div>'
       + dlBtn("post",{pid:p.id, ar:f.ar, dir:d},"Ladda ner PNG")+'</div>';
   }).join("");
-  var feed = POSTS.map(function(x){return board(d,x,"4:5")}).join("");
-  var grid = POSTS.concat(POSTS).concat(POSTS).slice(0,9).map(function(x,j){
-    return '<div class="gcell">'+post(d,POSTS[j%POSTS.length],"1:1")+'</div>'}).join("");
-  return sechead("Format","Ett objekt, tre artboards",
-    "Social / Ads Studio exporterar inlägg 4:5, kvadrat 1:1 och story 9:16 ur samma mall. Ett format som bara fungerar "
-   +"i 9:16 är ingen mall utan en engångslayout, så här ligger samma inlägg i alla tre — i sanna proportioner, "
-   +"inte skalade miniatyrer. Varje artboard går att ladda ner som PNG i 1080 px bredd.")
+  var tpl = PHASEDOC.map(function(ph,j){
+    var pp = POSTS.filter(function(x){return x.phase===ph.id})[0];
+    return '<div class="tpl">'
+      +'<div class="art" style="aspect-ratio:4/5">'+post(d,pp,"4:5")+'</div>'
+      +'<div class="tplcap"><b>'+ph.n+'</b><span class="mono">'+String(j+1).padStart(2,"0")+'</span></div>'
+      +'<p class="specd">'+ph.d+'</p>'
+      +'<div class="tplrow">'+dlBtn("post",{pid:pp.id, ar:"4:5", dir:d},"4:5")
+        + dlBtn("post",{pid:pp.id, ar:"1:1", dir:d},"1:1")
+        + dlBtn("post",{pid:pp.id, ar:"9:16", dir:d},"9:16")+'</div></div>';
+  }).join("");
+  var grid = [0,1,2,3,0,1,2,3,0].map(function(j){
+    return '<div class="gcell">'+post(d,POSTS[j],"1:1")+'</div>'}).join("");
+  return sechead("Format","Fyra mallar, tre artboards",
+    "Social / Ads Studio exporterar inlägg 4:5, kvadrat 1:1 och story 9:16 ur samma mall. Statusen är inte en etikett i "
+   +"hörnet — varje kampanjfas är en egen mall där status bestämmer hela kompositionen: hur mycket bild, hur mycket "
+   +"information och vad som får vara störst. Varje artboard går att ladda ner som PNG i 1080 px bredd.")
    +dirbar()+toggles(false)
+   +'<h3 class="h3" style="margin-top:0">Samma inlägg i tre format</h3>'
    +'<div class="fmts">'+one+'</div>'
-   +'<h3 class="h3">Kampanjen i flödesformat · 4:5</h3>'
-   +'<p class="mut" style="font-size:12.5px;margin-bottom:16px;max-width:70ch">Fyra inlägg ur samma objekt och samma '
-   +'mall — bara status, bild och rubrik byts. Det är det Social / Ads Studio gör.</p>'
-   +'<div class="boards">'+feed+'</div>'
+   +'<h3 class="h3">Kampanjmallarna · 4:5</h3>'
+   +'<p class="mut" style="font-size:12.5px;margin-bottom:18px;max-width:74ch">Samma objekt hela vägen: '
+   +'Silvergården 9A. Bara mallen byts när kampanjen går vidare — det är hela poängen med studion.</p>'
+   +'<div class="tpls">'+tpl+'</div>'
    +'<h3 class="h3">Rutnätet · 1:1</h3>'
-   +'<p class="mut" style="font-size:12.5px;margin-bottom:16px;max-width:70ch">Så ser kvadraterna ut mot varandra i '
+   +'<p class="mut" style="font-size:12.5px;margin-bottom:16px;max-width:74ch">Så ser kvadraterna ut mot varandra i '
    +'profilens rutnät, där de faktiskt bedöms.</p>'
    +'<div class="fgrid">'+grid+'</div>';
 }
