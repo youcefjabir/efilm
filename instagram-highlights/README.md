@@ -24,10 +24,11 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | 02 | Kompositioner | De tolv primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
 | 03 | Profil | Tio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
 | 04 | Format | Fyra kampanjmallar och tre artboards: 9:16, 4:5, 1:1 — plus profilrutnätet |
-| 05 | Bibliotek | Alla tio kapitel med sekvensuppspelning |
+| 05 | Studio | Redigera: öppna ett kapitel, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 
-Klicka på ett kapitel för att spela sekvensen. `←` `→` bläddrar · `Esc` stänger.
+I Studio öppnar du ett kapitel och får filmremsa, live-scen och inspektör. `▶ Spela
+sekvensen` startar uppspelningen; `←` `→` bläddrar · `Esc` stänger.
 **Instagrams UI** kan slås på i varje vy: det är Instagrams riktiga gränssnitt i
 skala, inte en debug-overlay med färgade zoner.
 
@@ -147,21 +148,53 @@ men har egen vertikal rytm per mall och per format.
 
 ---
 
-## Export
+## Studio — redigera och ladda ner
 
-Ramarna är HTML/CSS, inte bilder. `Ladda ner PNG` serialiserar ramen till ett
-SVG med `foreignObject`, rastrerar den i en canvas och lämnar över filen till
-artefaktens `downloads`-funktion. Typsnitt och foton ligger redan som data-URI,
-så inget hämtas externt och canvasen blir aldrig tainted.
+Vy 05 är en editor, inte en katalog. Öppna ett kapitel och du får tre kolumner:
+filmremsa med alla bildrutor, live-scen i mitten, inspektör till höger.
 
-- **Enskild bildruta** — 1080 × 1920 PNG, i spelaren. Instagram-overlayen följer
-  med om den är påslagen.
-- **Hela kapitlet** — en kontaktkarta med alla bildrutor i en enda PNG, så det
-  blir en dialogruta i stället för sju.
-- **Artboards** — varje format i vy 04, 1080 px bredd.
+**Vad som går att ändra per bildruta**
 
-Webbläsaren visar en bekräftelse innan något sparas. Det finns också ett litet
-API på sidan om exporten behöver skriptas:
+| Fält | Gäller |
+|---|---|
+| Kicker, rubrik, kursiv rad, underrad | Alla primitiv som använder dem |
+| Etiketter | `split` — Före/Efter, Dag/Skymning |
+| Poster, en per rad | `system` |
+| AI-signaler, annonsrubrik, annonsingress | `flow` |
+| Bild i slot | Hela biblioteket **plus egna uppladdade bilder** |
+| Fokalpunkt Y och zoom | 0–100 % respektive 100–200 % |
+
+Texten uppdaterar scenen och filmremsan medan du skriver, utan att fältet tappar
+fokus. `Återställ bildrutan` tar tillbaka originalet för just den rutan.
+
+**Egna bilder.** `Ladda upp egen bild` tar emot en eller flera filer, skalar ned
+till max 1400 px och lägger dem i samma pool som det medföljande biblioteket. De
+går sedan att välja i vilken slot som helst.
+
+**Spara.** `Spara` lägger redigeringar, slot-inställningar och uppladdade bilder i
+webbläsarens `localStorage` under `viewly.highlights.v1` — de överlever omladdning.
+`Exportera JSON` / `Importera JSON` flyttar allt mellan webbläsare eller personer.
+`Återställ allt` nollar tillbaka till originalet.
+
+Redigeringarna ligger aldrig i innehållsmodellen: de lagras i `EDITS` och `SLOTS`
+och läggs på vid rendering, så originalet finns alltid kvar.
+
+### Export
+
+Ramarna är HTML/CSS, inte bilder. Exporten serialiserar ramen till ett SVG med
+`foreignObject`, rastrerar den i en canvas och lämnar över filen till artefaktens
+`downloads`-funktion. Typsnitt och foton ligger redan som data-URI, så inget
+hämtas externt och canvasen blir aldrig tainted. **Alla redigeringar följer med.**
+
+| Knapp | Ger |
+|---|---|
+| Denna bildruta · 1080×1920 | En PNG. Instagram-overlayen följer med om den är påslagen |
+| Hela serien som kontaktkarta | Alla bildrutor i **en** PNG — en dialogruta |
+| Alla N bildrutor separat | En PNG per bildruta, sekventiellt med räknare i knappen |
+| PNG i vy 04 Format | Varje kampanjmall i 9:16, 4:5 och 1:1, 1080 px bredd |
+
+Separat export ger en bekräftelse per fil. Avbryter du en, stannar serien där.
+Det finns också ett litet API på sidan om exporten behöver skriptas:
 
 ```js
 await viewlyExport.frame("annonsen", 2, "arkiv");   // Blob, 1080×1920 PNG
@@ -258,7 +291,7 @@ v6/shell.html           skalet: tokens, komponenter, layout
 v6/draw.js              geometri, media-slots, riktningsstilar, tolv primitiv × två riktningar,
                         fyra kampanjmallar × tre format × två riktningar
 v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
-v6/app.js               studiovyerna och spelaren
+v6/app.js               vyerna, editorn, exporten och spelaren
 v6/brand-geometry.json  spårad logotyp + safe-area-spec
 ```
 

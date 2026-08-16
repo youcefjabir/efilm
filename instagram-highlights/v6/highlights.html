@@ -242,6 +242,81 @@ tr:last-child td{border-bottom:0}
   container-type:inline-size;display:block;text-align:left;background:var(--panel);font-style:normal}
 .hlcard .foot{padding:9px 14px;display:flex;justify-content:space-between;align-items:center;font-size:10.5px;color:var(--mut)}
 
+/* ============ 05 STUDIO ============ */
+.hlcard .body{display:flex;gap:13px;padding:13px 14px;background:var(--raise);align-items:flex-start}
+.hlcard .lead{flex:0 0 62px}
+.hlcard .lead .frame{width:62px;display:block}
+.hlcard .seq{flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:4px;align-content:flex-start}
+.pchip{font-style:normal;font-family:var(--mono);font-size:9px;letter-spacing:.02em;color:var(--mut);
+  background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:2px 5px;white-space:nowrap}
+.pchip.ed{color:var(--edit);border-color:var(--edit);background:var(--editS)}
+.hlcard .chip{margin-left:auto;flex:0 0 auto;font-size:9.5px;font-weight:700;letter-spacing:.07em;
+  padding:3px 7px;border-radius:4px;color:var(--edit);background:var(--editS);white-space:nowrap}
+.hlcard .open{color:var(--acc);font-weight:600}
+.flash{font-size:11.5px;color:var(--edit);opacity:0;transition:opacity .2s;white-space:nowrap}
+.flash[data-on]{opacity:1}
+.flash[data-on="warn"]{color:#9A5A1F}
+:root[data-theme="dark"] .flash[data-on="warn"],
+:root:not([data-theme="light"]) .flash[data-on="warn"]{color:#D6A45F}
+
+.edtop{display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-bottom:18px;
+  margin-bottom:22px;border-bottom:1px solid var(--line)}
+.edtitle b{display:block;font-size:16px;font-weight:650;letter-spacing:.02em}
+.edtitle span{display:block;font-size:11.5px;color:var(--mut);margin-top:2px}
+.edacts{margin-left:auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.edacts .dirbar{margin-bottom:0}
+.edacts .dirb{min-width:0;padding:6px 12px}
+.edacts .dirb span{display:none}
+.dlb.pri{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+.dlb.pri:hover:not(:disabled){background:var(--ink);border-color:var(--ink);color:#fff}
+
+.edgrid{display:grid;grid-template-columns:108px minmax(0,1fr) minmax(300px,360px);gap:26px;align-items:start}
+.film{display:flex;flex-direction:column;gap:8px;max-height:78vh;overflow-y:auto;padding-right:4px;
+  position:sticky;top:18px}
+.filmb{background:none;border:1px solid var(--line);border-radius:6px;padding:6px;cursor:pointer;
+  display:flex;flex-direction:column;gap:5px;font:inherit;color:inherit;text-align:left;transition:border-color .15s}
+.filmb:hover{border-color:var(--line2)}
+.filmb.on{border-color:var(--acc);background:var(--raise);box-shadow:var(--shadow)}
+.filmn{font-family:var(--mono);font-size:9.5px;color:var(--mut);display:flex;align-items:center;gap:5px}
+.filmb.on .filmn{color:var(--acc);font-weight:700}
+.filmn .dot{width:5px;height:5px;border-radius:50%;background:var(--edit);display:block}
+.filmf{display:block;width:100%;aspect-ratio:9/16;container-type:inline-size;position:relative;
+  overflow:hidden;border-radius:3px;text-align:left;background:#EFECE7}
+.filmf *{box-sizing:border-box}
+.filmp{font-size:9px;color:var(--mut);letter-spacing:.04em}
+
+.edstage{position:sticky;top:18px}
+.edstage .frame{box-shadow:var(--shadow);max-width:420px;margin:0 auto}
+.edunder{max-width:420px;margin:12px auto 0;display:flex;justify-content:space-between;align-items:center;
+  font-size:11px;color:var(--mut)}
+.edstep{display:flex;gap:6px}
+.edside{display:flex;flex-direction:column;gap:20px}
+.edsec{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:15px 16px;
+  display:flex;flex-direction:column;gap:10px}
+.fld{display:flex;flex-direction:column;gap:5px;font-size:11px;color:var(--mut)}
+.fld input,.fld textarea{font:inherit;font-size:12.5px;color:var(--ink);background:var(--raise);
+  border:1px solid var(--line);border-radius:6px;padding:7px 9px;width:100%;resize:vertical;line-height:1.5}
+.fld input:focus,.fld textarea:focus{border-color:var(--acc);outline:none}
+.mpan{display:flex;flex-direction:column;gap:2px;padding-bottom:4px}
+.mpan + .mpan{border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
+.mplab{font-size:11px;color:var(--mut);display:flex;gap:6px;align-items:baseline}
+.mplab code{font-size:10px;color:var(--acc)}
+.upl{display:block;text-align:center;border:1px dashed var(--line2);border-radius:7px;padding:9px;
+  font-size:11.5px;color:var(--mut);cursor:pointer;margin-top:7px;transition:border-color .15s,color .15s}
+.upl:hover{border-color:var(--acc);color:var(--ink)}
+.edneed{background:var(--semiS);border-left:2px solid var(--semi);border-radius:0 7px 7px 0;
+  padding:11px 13px;font-size:11.5px;color:var(--semi);line-height:1.5}
+.edneed b{display:block;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.dlcol{display:flex;flex-direction:column;gap:6px}
+.dlcol .dlb{text-align:left}
+@media(max-width:1240px){
+  .edgrid{grid-template-columns:92px minmax(0,1fr)}
+  .edside{grid-column:1/-1}
+  .edstage,.film{position:static}
+  .film{flex-direction:row;max-height:none;overflow-x:auto}
+  .filmb{flex:0 0 84px}
+}
+
 /* ============ 05 LAGER ============ */
 .lgrid{display:grid;grid-template-columns:1fr minmax(300px,384px);gap:26px;align-items:start}
 .lay{display:grid;grid-template-columns:98px 168px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:12px;align-items:baseline}
@@ -350,6 +425,9 @@ tr:last-child td{border-bottom:0}
    så 1cqw = 1 % av ramens bredd = 10,8 px i en 1080 × 1920-Story.
    ===================================================================== */
 var M = window.VMEDIA || {};
+/* egna uppladdade bilder hamnar i samma pool som det medföljande biblioteket */
+var UPLOADS = {};
+function mediaURL(k){ return UPLOADS[k] || M[k] }
 var esc = function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
 
@@ -400,6 +478,7 @@ var SERIF=0.46;
    --------------------------------------------------------------------- */
 var SLOTS = {};
 function pick(k, wide){
+  if(UPLOADS[k]) return UPLOADS[k];
   if(wide && M[k+"_h"]) return M[k+"_h"];
   return M[k];
 }
@@ -725,7 +804,13 @@ var B = {
 
 var RENDER = {arkiv:A, skugga:B};
 
+/* Redigeringar läggs ovanpå originaldatan vid rendering, aldrig i den.
+   Nyckeln är slot-id:t, så ändringen följer sin plats i biblioteket och
+   originalet finns alltid kvar att återställa till. */
+var EDITS = {};
 function story(dirId, s, i, n){
+  var e = s.sid && EDITS[s.sid];
+  if(e) s = Object.assign({}, s, e);
   var r = RENDER[dirId] || A;
   var f = r[s.p] || r.fullbleed;
   return f(s, i, n);
@@ -870,293 +955,6 @@ A.phases = function(s,i,n){
     '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4cqw">'
    +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.6cqw;max-width:76%">'+cards+'</div>'
-   +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
-};
-
-/* ---------------------------------------------------------------- B · SKUGGA */
-var B = {
- shell:function(inner){ return '<div class="b">'+inner+'</div>' },
- kick:function(k){ return k?'<div class="z" style="left:6cqw;top:'+SAFE.top+'cqw"><span class="b-k">'+esc(k)+'</span></div>':'' },
- foot:function(i,n,light){
-   return '<div class="z" style="left:6cqw;right:6cqw;bottom:'+SAFE.bot+'cqw;display:flex;justify-content:space-between;align-items:center">'
-    +'<span class="b-wm">'+vmark(light||"#EFEDE7","#98A088")+'VIEWLY</span>'
-    +'<span class="b-k" style="letter-spacing:.2em;color:#6E6C66">'+fol(i,n)+'</span></div>';
- },
-
- /* 01 · MARK — V:et blir bländaren. Fotografiet finns bara inuti märket. */
- mark:function(s,i,n){
-   var id="m"+Math.random().toString(36).slice(2,8);
-   return B.shell(
-     '<svg viewBox="'+GEO.vb+'" style="position:absolute;left:-8cqw;top:34cqw;width:116cqw;height:'+(116/GEO.ratio).toFixed(1)+'cqw">'
-    +'<defs><clipPath id="'+id+'"><path d="'+GEO.limb+'"/></clipPath></defs>'
-    +'<foreignObject x="0" y="0" width="858.6" height="756.3" clip-path="url(#'+id+')">'
-    +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:858.6px;height:756.3px;'+bg(s.m,sid(s))+'"></div></foreignObject>'
-    +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="#98A088"/></svg>'
-    +B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+11)+'cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b" style="max-width:76%">'+esc(s.s)+'</div>':'')+'</div>'
-    +B.foot(i,n));
- },
-
- /* 02 · FULL BLEED — mörkret som grund, fotografiet som ljuskälla */
- fullbleed:function(s,i,n){
-   return B.shell('<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-    +'<div class="b-v"></div><div class="b-s"></div>'
-    +B.kick(s.k)
-    +(s.h?'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+10)+'cqw"><div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div></div>':'')
-    +B.foot(i,n));
- },
-
- /* 03 · QUIET — en olivpunkt, en mening, svart */
- quiet:function(s,i,n){
-   return B.shell(
-     B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:8cqw;top:50%;transform:translateY(-54%);display:flex;flex-direction:column;gap:3.4cqw">'
-    +'<div class="b-dot"></div>'
-    +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.em?'<div class="b-i" style="color:#98A088">'+esc(s.em)+'</div>':'')
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')
-    +'</div>'+B.foot(i,n));
- },
-
- /* 04 · EDITORIAL — 2.39:1-remsa som svävar i svart */
- editorial:function(s,i,n){
-   return B.shell(
-     '<div style="position:absolute;left:0;right:0;top:44cqw"><div class="b-let">'
-      +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s),true)+'"></div></div></div>'
-    +B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+11)+'cqw;display:flex;flex-direction:column;gap:2.8cqw">'
-    +(s.h?'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>':'')
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
-    +B.foot(i,n));
- },
-
- /* 05 · PRODUCT — hörnmarkeringar i oliv, bilden mätt och ställd */
- product:function(s,i,n){
-   var c='position:absolute;width:5cqw;height:5cqw;border-color:#98A088;border-style:solid;';
-   return B.shell(
-     B.kick(s.k)
-    +'<div style="position:absolute;left:8cqw;right:8cqw;top:34cqw;aspect-ratio:3/4">'
-      +'<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-      +'<div class="b-v"></div>'
-      +'<i style="'+c+'left:-1.4cqw;top:-1.4cqw;border-width:1px 0 0 1px"></i>'
-      +'<i style="'+c+'right:-1.4cqw;top:-1.4cqw;border-width:1px 1px 0 0"></i>'
-      +'<i style="'+c+'left:-1.4cqw;bottom:-1.4cqw;border-width:0 0 1px 1px"></i>'
-      +'<i style="'+c+'right:-1.4cqw;bottom:-1.4cqw;border-width:0 1px 1px 0"></i></div>'
-    +'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+10)+'cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,8.2,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
-    +B.foot(i,n));
- },
-
- /* 06 · SPLIT — två remsor, etiketten på den aktiva i oliv */
- split:function(s,i,n){
-   var row=function(k,lab,on,sd){
-     return '<div style="position:relative"><div class="b-let">'
-      +'<div style="position:absolute;inset:0;'+bg(k,sd,true)+'"></div></div>'
-      +'<span class="b-k" style="position:absolute;left:3cqw;top:50%;transform:translateY(-50%);z-index:3;'
-      +'background:rgba(10,10,9,.86);padding:1.1cqw 2cqw;color:'+(on?"#98A088":"#CFCDC7")+'">'+esc(lab)+'</span></div>';
-   };
-   return B.shell(
-     B.kick(s.k)
-    +'<div style="position:absolute;left:0;right:0;top:36cqw;display:flex;flex-direction:column;gap:2.2cqw">'
-      +row(s.m[0],s.la,false,sid(s))+row(s.m[1],s.lb,true,sid(s,1))+'</div>'
-    +(s.h?'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+10)+'cqw"><div class="b-i" style="'+dsize(s.h,10.4,SERIF)+'">'+esc(s.h)+'</div></div>':'')
-    +B.foot(i,n));
- },
-
- /* 07 · SYSTEM — punkter längs en linje, första ledet tänt */
- system:function(s,i,n){
-   var rows=s.items.map(function(t,j){
-     return '<div style="position:relative;display:flex;align-items:center;min-height:7cqw">'
-      +'<span style="position:absolute;left:-4.05cqw;top:50%;transform:translateY(-50%);width:1.5cqw;height:1.5cqw;'
-      +'border-radius:50%;background:'+(j===0?"#98A088":"#33332F")+'"></span>'
-      +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:6cqw;line-height:1.2;color:'+(j===0?"#EFEDE7":"#8C8A84")+'">'+esc(t)+'</span></div>';
-   }).join("");
-   return B.shell(
-     B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:7cqw;top:34cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,8.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b" style="margin-bottom:1.6cqw">'+esc(s.s)+'</div>':'')
-    +'<div style="border-left:1px solid #2A2A27;padding-left:4.8cqw;display:flex;flex-direction:column">'+rows+'</div></div>'
-    +B.foot(i,n));
- },
-
- /* 08 · CASE — objektet i mörker, plats som liten versal */
- "case":function(s,i,n){
-   return B.shell('<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-    +'<div class="b-v"></div><div class="b-s"></div>'
-    +B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+10)+'cqw;display:flex;flex-direction:column;gap:2cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +'<span class="b-k" style="color:#A8A6A0">'+esc(s.s)+'</span></div>'
-    +B.foot(i,n));
- },
-
- /* 09 · CTA — märket centrerat, en linje, en uppmaning */
- cta:function(s,i,n){
-   return B.shell(
-     B.kick(s.k)
-    +'<div class="z" style="left:0;right:0;top:50%;transform:translateY(-56%);display:flex;flex-direction:column;align-items:center;gap:4cqw;text-align:center;padding:0 8cqw">'
-    +'<div style="width:10cqw">'+vmark("#EFEDE7","#98A088",'style="width:100%;height:auto;display:block"')+'</div>'
-    +'<div class="b-d" style="'+dsize(s.h,8.8,SERIF,8)+'">'+esc(s.h)+'</div>'
-    +'<div style="width:8cqw;height:1px;background:#98A088"></div>'
-    +'<div class="b-b" style="letter-spacing:.16em;text-transform:uppercase;font-size:2.3cqw;color:#98A088">'+esc(s.s)+'</div>'
-    +'</div>'+B.foot(i,n));
- }
-};
-
-var RENDER = {arkiv:A, skugga:B};
-
-function story(dirId, s, i, n){
-  var r = RENDER[dirId] || A;
-  var f = r[s.p] || r.fullbleed;
-  return f(s, i, n);
-}
-
-/* =====================================================================
-   COVERS — bedömda vid 56 px i profilraden
-   ===================================================================== */
-function cover(dirId, h){
-  if(dirId==="skugga"){
-    return '<div style="position:absolute;inset:0;'+bg(h.cover,"cover-"+h.id)+'"></div>'
-      +'<div style="position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 45%,rgba(14,14,13,.42),rgba(14,14,13,.86))"></div>'
-      +'<div style="position:absolute;inset:0;display:grid;place-items:center">'
-      +'<span style="font-family:Montserrat,sans-serif;font-size:19cqw;font-weight:500;letter-spacing:.06em;color:#EFEDE7">'+h.num+'</span></div>'
-      +'<div style="position:absolute;left:50%;bottom:15cqw;transform:translateX(-50%);width:2.6cqw;height:2.6cqw;border-radius:50%;background:#98A088"></div>';
-  }
-  return '<div style="position:absolute;inset:0;background:#F2EFEF;display:flex;flex-direction:column;'
-    +'align-items:center;justify-content:center;gap:3cqw;font-family:\'Cormorant Garamond\',Georgia,serif">'
-    +'<div style="position:absolute;inset:6cqw;border:1px solid #CEC7C3;border-radius:50%"></div>'
-    +'<div style="font-size:33cqw;font-weight:400;line-height:.8;color:#1C1C1E;letter-spacing:-.03em;'
-    +'font-variant-numeric:lining-nums;font-feature-settings:\'lnum\' 1">'+h.num+'</div>'
-    +'<div style="width:13cqw;height:1.5px;background:#6E7266"></div></div>';
-}
-
-/* =====================================================================
-   INSTAGRAMS EGET UI — riktig overlay, ingen debugfärg
-   Måtten är Instagrams, omräknade till cqw (1080 px bred ram).
-   ===================================================================== */
-function igOverlay(n, idx){
-  n = n||5; idx = idx||0;
-  var gp=0.74, pad=2.22, tw=(100-2*pad-gp*(n-1))/n, bars='';
-  for(var j=0;j<n;j++){
-    bars += '<i style="position:absolute;left:'+(pad+j*(tw+gp)).toFixed(2)+'cqw;top:1.85cqw;width:'+tw.toFixed(2)
-      +'cqw;height:.42cqw;border-radius:.21cqw;background:rgba(255,255,255,'+(j<=idx?'.95':'.34')+')"></i>';
-  }
-  return '<div style="position:absolute;inset:0;z-index:30;pointer-events:none;font-family:Montserrat,-apple-system,sans-serif">'
-   +'<div style="position:absolute;left:0;right:0;top:0;height:21.3cqw;background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,0))"></div>'
-   +'<div style="position:absolute;left:0;right:0;bottom:0;height:25.9cqw;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.46))"></div>'
-   +bars
-   +'<div style="position:absolute;left:2.6cqw;top:6.3cqw;display:flex;align-items:center;gap:1.9cqw">'
-     +'<span style="width:5.6cqw;height:5.6cqw;border-radius:50%;background:#F2EFEF;display:grid;place-items:center;overflow:hidden">'
-       +vmark("#1C1C1E","#6E7266",'style="width:56%;height:auto"')+'</span>'
-     +'<span style="font-size:2.78cqw;font-weight:600;color:#fff">viewly.se</span>'
-     +'<span style="font-size:2.5cqw;color:rgba(255,255,255,.7)">2 h</span></div>'
-   +'<span style="position:absolute;right:3cqw;top:7.4cqw;font-size:3.2cqw;font-weight:700;color:#fff;letter-spacing:.06em">···</span>'
-   +'<div style="position:absolute;left:2.8cqw;right:2.8cqw;bottom:5.6cqw;display:flex;align-items:center;gap:2.6cqw">'
-     +'<span style="flex:1;height:8.1cqw;border:1px solid rgba(255,255,255,.85);border-radius:4.05cqw;display:flex;align-items:center;padding:0 3.8cqw;font-size:2.7cqw;color:rgba(255,255,255,.82)">Skicka meddelande</span>'
-     +'<svg viewBox="0 0 24 24" style="width:5.4cqw;height:5.4cqw;flex:0 0 5.4cqw;fill:none;stroke:#fff;stroke-width:1.7"><path d="M20.8 8.6c0 4.6-8.8 9.6-8.8 9.6s-8.8-5-8.8-9.6a4.4 4.4 0 0 1 8.8-1.3 4.4 4.4 0 0 1 8.8 1.3z"/></svg>'
-     +'<svg viewBox="0 0 24 24" style="width:5.4cqw;height:5.4cqw;flex:0 0 5.4cqw;fill:none;stroke:#fff;stroke-width:1.7;stroke-linejoin:round"><path d="M21.5 3.5 2.8 10.2l7.4 2.6 2.6 7.4z"/></svg>'
-   +'</div></div>';
-}
-
-/* =====================================================================
-   INFORMATIONSDESIGN — tre primitiv till
-   Här slutar layouten vara en behållare för text och börjar rita hur
-   något faktiskt fungerar: input → bearbetning → output, en formatmatris
-   i sanna proportioner, och en kampanj som fyra faktiska artboards.
-   ===================================================================== */
-
-/* ---- delade byggstenar ---- */
-function thumbRow(keys, h, gap, brd){
-  return '<div style="display:flex;gap:'+gap+'cqw">'+keys.map(function(k){
-    return '<span style="flex:1;height:'+h+'cqw;'+bg(k)+';border:1px solid '+brd+'"></span>'}).join("")+'</div>';
-}
-function toneRow(o, on, off, act){
-  if(!o.tones) return '';
-  return '<div style="display:flex;gap:1.2cqw;margin-bottom:2.4cqw">'+o.tones.map(function(t,j){
-    var is = j===(o.now||0);
-    return '<span style="font-family:Montserrat,sans-serif;font-size:1.75cqw;letter-spacing:.12em;'
-     +'text-transform:uppercase;padding:.7cqw 1.6cqw;border:1px solid '+(is?act:off)+';'
-     +(is?'background:'+act+';color:'+on+';font-weight:600':'color:'+off)+'">'+esc(t)+'</span>';
-  }).join("")+'</div>';
-}
-function arrowDown(col, h){
-  return '<div style="display:flex;flex-direction:column;align-items:center;height:'+h+'cqw;justify-content:center">'
-   +'<span style="width:1px;flex:1;background:'+col+'"></span>'
-   +'<svg viewBox="0 0 10 10" style="width:2.4cqw;height:2.4cqw;display:block;margin-top:-.2cqw">'
-   +'<path d="M5 9 L1 4 M5 9 L9 4" fill="none" stroke="'+col+'" stroke-width="1"/></svg></div>';
-}
-
-/* ---------------------------------------------------------------- A · ARKIV */
-
-/* 10 · FLOW — input, bearbetning, output som ett tryckt diagram */
-A.flow = function(s,i,n){
-  var sig = s.mid.items.map(function(t,j){
-    return '<div style="display:flex;align-items:baseline;gap:1.6cqw;padding:1.15cqw 0">'
-     +'<span style="width:1.1cqw;height:1.1cqw;border-radius:50%;border:1px solid #6E7266;flex:0 0 1.1cqw"></span>'
-     +'<span style="font-size:3.1cqw;font-weight:300;line-height:1.15">'+esc(t)+'</span></div>';
-  }).join("");
-  var lines = s.out.lines.map(function(w){
-    return '<span style="display:block;height:1.15cqw;background:#DFD9D6;margin-bottom:1.15cqw;width:'+w+'%"></span>';
-  }).join("");
-  var stg = function(t){ return '<div class="a-fig" style="margin-bottom:1.8cqw">'+esc(t)+'</div>' };
-  return A.chrome(s.k,i,n,
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:3cqw 0">'
-   +'<div class="a-d sm" style="'+dsize(s.h,7.4,SERIF)+'margin-bottom:3.4cqw">'+esc(s.h)+'</div>'
-   + stg("01 — "+s.inp.lab)
-   + thumbRow(s.inp.ims, 9.5, 1.2, "#D8D2CF")
-   + arrowDown("#C9C2BE", 5.4)
-   + stg("02 — "+s.mid.lab)
-   +'<div style="columns:2;column-gap:4cqw;border-top:1px solid #E2DCD9;border-bottom:1px solid #E2DCD9;padding:1.4cqw 0">'+sig+'</div>'
-   + arrowDown("#C9C2BE", 5.4)
-   + stg("03 — "+s.out.lab)
-   + toneRow(s.out, "#F2EFEF", "#A9A29E", "#6E7266")
-   +'<div style="border:1px solid #D8D2CF;padding:3cqw 3.2cqw 3.4cqw">'
-     +'<div style="font-size:5.2cqw;font-weight:300;line-height:1.06;margin-bottom:2.4cqw">'+esc(s.out.title)+'</div>'
-     +'<div class="a-l" style="font-size:2.5cqw;line-height:1.55;margin-bottom:2cqw">'+esc(s.out.lead)+'</div>'
-     + lines
-   +'</div></div>');
-};
-
-/* 11 · MATRIX — samma objekt i sanna formatproportioner */
-A.matrix = function(s,i,n){
-  var H = 33;                                   /* gemensam höjd — bredden blir formatet */
-  var cells = s.fmts.map(function(f){
-    var w = (H*f[2]/f[3]).toFixed(1);
-    return '<div style="display:flex;flex-direction:column;gap:1.5cqw;flex:0 0 auto">'
-     +'<div style="width:'+w+'cqw;height:'+H+'cqw;position:relative;border:1px solid #D8D2CF;overflow:hidden">'
-       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-     +'<div><div class="a-c" style="font-size:1.85cqw;color:#1C1C1E">'+esc(f[1])+'</div>'
-       +'<div class="a-fig" style="font-size:1.7cqw;margin-top:.5cqw">'+f[0]+' · 1080×'+Math.round(1080*f[3]/f[2])+'</div></div>'
-     +'</div>';
-  }).join("");
-  return A.chrome(s.k,i,n,
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:4.4cqw">'
-   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
-   +'<div style="display:flex;gap:2.6cqw;align-items:flex-end">'+cells+'</div>'
-   +'<div><div class="a-r" style="margin-bottom:2.2cqw"></div>'
-   +'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div></div></div>');
-};
-
-/* 12 · PHASES — kampanjen som fyra faktiska inlägg */
-A.phases = function(s,i,n){
-  var cards = s.items.map(function(it,j){
-    var on = j===s.now;
-    return '<div style="display:flex;flex-direction:column;gap:1.4cqw">'
-     +'<div style="aspect-ratio:4/5;position:relative;border:1px solid #D8D2CF;overflow:hidden'+(on?'':';opacity:.44')+'">'
-       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div>'
-       +'<span style="position:absolute;left:1.4cqw;top:1.4cqw;padding:.6cqw 1.3cqw;'
-       +'font-family:Montserrat,sans-serif;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;'
-       +(on?'background:#6E7266;color:#F2EFEF':'background:#F2EFEF;color:#1C1C1E')+'">'+esc(it[0])+'</span></div>'
-     +'<span class="a-fig" style="font-size:1.7cqw">'+esc(it[1])+'</span></div>';
-  }).join("");
-  return A.chrome(s.k,i,n,
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.6cqw">'
-   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
-   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.8cqw;max-width:74%">'+cards+'</div>'
    +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
 };
 
@@ -1672,7 +1470,7 @@ var MEDIAKEYS = ["hero","kitchen","living","dining","dining2","boucle","eames","
 (function(){
 "use strict";
 var $=function(s,r){return (r||document).querySelector(s)};
-var state={sec:"riktning", dir:"arkiv", ig:false, needs:false};
+var state={sec:"riktning", dir:"arkiv", ig:false, needs:false, edit:null};
 var byId={}; HL.forEach(function(h){byId[h.id]=h});
 function hlOf(id){return byId[id]}
 var NW=["noll","en","två","tre","fyra","fem","sex","sju","åtta","nio","tio","elva","tolv"];
@@ -1991,25 +1789,305 @@ function secFormat(){
 }
 
 /* =====================================================================
-   04 · BIBLIOTEK
+   05 · STUDIO — redigera ett kapitel
+   Klicka på ett kapitel, gå igenom bildrutorna, byt bild och text, spara,
+   ladda ner. Redigeringarna ligger i EDITS/SLOTS ovanpå originaldatan —
+   originalet går alltid att återställa till, per fält eller per bildruta.
    ===================================================================== */
-function secBib(){
-  var need=0; HL.forEach(function(h){h.st.forEach(function(s){if(s.need)need++})});
-  var cards=HL.map(function(h){
-    var strip=h.st.slice(0,6).map(function(s,i){
-      return '<i>'+story(state.dir,s,i,h.st.length)+'</i>'}).join("");
-    return '<button class="hlcard" type="button" data-play="'+h.id+':0:'+state.dir+'">'
-      +'<span class="top"><span class="cvw">'+coverEl(state.dir,h)+'</span>'
-        +'<span class="tt"><b>'+h.name+'</b><span>'+h.q+'</span></span></span>'
-      +'<span class="strip">'+strip+'</span>'
-      +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="mono">'+h.num+'</span></span></button>';
-  }).join("");
-  return sechead("Bibliotek",cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
-    "Hela biblioteket renderat i den valda riktningen. Klicka på ett kapitel för att spela upp sekvensen — "
-   +need+" bildrutor är markerade som Behöver material och renderas med platshållare tills rätt bild finns.")
-   +dirbar()+toggles(true)
-   +'<div class="hlgrid">'+cards+'</div>';
+var STORE = "viewly.highlights.v1";
+
+function saveAll(msg){
+  try {
+    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS}));
+    flash(msg || "Sparat");
+  } catch(e){
+    flash(UPLOADS && Object.keys(UPLOADS).length
+      ? "Fullt utrymme — exportera JSON istället" : "Kunde inte spara", true);
+  }
 }
+function loadAll(){
+  try {
+    var raw = localStorage.getItem(STORE); if(!raw) return false;
+    var d = JSON.parse(raw);
+    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{}); Object.assign(UPLOADS, d.uploads||{});
+    return true;
+  } catch(e){ return false }
+}
+function clearAll(){
+  Object.keys(EDITS).forEach(function(k){delete EDITS[k]});
+  Object.keys(SLOTS).forEach(function(k){delete SLOTS[k]});
+  Object.keys(UPLOADS).forEach(function(k){delete UPLOADS[k]});
+  seedSlots();
+  try{ localStorage.removeItem(STORE) }catch(e){}
+}
+var flashT;
+function flash(txt, warn){
+  var el = $("#flash"); if(!el) return;
+  el.textContent = txt; el.setAttribute("data-on", warn?"warn":"ok");
+  clearTimeout(flashT); flashT = setTimeout(function(){ el.removeAttribute("data-on") }, 2400);
+}
+
+/* ---------- vilka fält en bildruta faktiskt har ---------- */
+function fieldsFor(s){
+  var f = [];
+  if(s.p!=="fullbleed" || s.k) f.push(["k","Kicker","text"]);
+  f.push(["h","Rubrik","text"]);
+  if(s.p==="quiet" || s.em!=null) f.push(["em","Kursiv rad","text"]);
+  f.push(["s","Underrad","area"]);
+  if(s.p==="split"){ f.push(["la","Etikett vänster/övre","text"]); f.push(["lb","Etikett höger/undre","text"]) }
+  if(s.p==="system") f.push(["items","Poster — en per rad","list"]);
+  if(s.p==="flow"){
+    f.push(["flow_items","AI:ns signaler — en per rad","list"]);
+    f.push(["flow_title","Annonsrubrik","text"]);
+    f.push(["flow_lead","Annonsingress","area"]);
+  }
+  return f;
+}
+function val(s, key){
+  var e = EDITS[s.sid] || {};
+  if(key==="items")      return (e.items || s.items || []).join("\n");
+  if(key==="flow_items") return ((e.mid||s.mid).items || []).join("\n");
+  if(key==="flow_title") return (e.out||s.out).title || "";
+  if(key==="flow_lead")  return (e.out||s.out).lead || "";
+  return e[key] != null ? e[key] : (s[key] || "");
+}
+function setVal(s, key, v){
+  var e = EDITS[s.sid] || (EDITS[s.sid] = {});
+  if(key==="items")           e.items = v.split("\n").filter(function(x){return x.trim()});
+  else if(key==="flow_items") e.mid   = Object.assign({}, e.mid||s.mid, {items:v.split("\n").filter(function(x){return x.trim()})});
+  else if(key==="flow_title") e.out   = Object.assign({}, e.out||s.out, {title:v});
+  else if(key==="flow_lead")  e.out   = Object.assign({}, e.out||s.out, {lead:v});
+  else                        e[key]  = v;
+}
+function isEdited(s){
+  var e = EDITS[s.sid];
+  var slotted = SLOTS[s.sid] && !slotIsDefault(s, s.sid);
+  return !!(e && Object.keys(e).length) || !!slotted;
+}
+function slotIsDefault(s, key){
+  var o = SLOTS[key] || {};
+  return (o.img==null) && (o.fy===s.fy || (o.fy==null && s.fy==null))
+      && (o.zoom===s.zoom || (o.zoom==null && s.zoom==null));
+}
+function resetStory(s){
+  delete EDITS[s.sid]; delete SLOTS[s.sid]; delete SLOTS[s.sid+"-b"];
+  if(s.fy!=null || s.zoom!=null) SLOTS[s.sid] = {fy:s.fy, zoom:s.zoom};
+}
+
+/* ---------- uppladdning ---------- */
+var upN = 0;
+function ingest(file, done){
+  var fr = new FileReader();
+  fr.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var max = 1400, sc = Math.min(1, max/Math.max(img.width, img.height));
+      var c = document.createElement("canvas");
+      c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      var key = "egen" + (++upN) + "-" + Date.now().toString(36).slice(-4);
+      UPLOADS[key] = c.toDataURL("image/jpeg", 0.84);
+      done(key);
+    };
+    img.onerror = function(){ done(null) };
+    img.src = fr.result;
+  };
+  fr.onerror = function(){ done(null) };
+  fr.readAsDataURL(file);
+}
+function handleUpload(files, slot){
+  var list = Array.prototype.slice.call(files).filter(function(f){return /^image\//.test(f.type)});
+  if(!list.length){ flash("Bara bildfiler", true); return }
+  var left = list.length, first = null;
+  list.forEach(function(f){
+    ingest(f, function(key){
+      if(key && !first) first = key;
+      if(--left === 0){
+        if(!first){ flash("Kunde inte läsa bilden", true); return }
+        if(slot) SLOTS[slot] = Object.assign({}, SLOTS[slot], {img:first});
+        flash(list.length>1 ? list.length+" bilder tillagda" : "Bild tillagd");
+        renderEditor();
+      }
+    });
+  });
+}
+function allKeys(){ return Object.keys(UPLOADS).concat(MEDIAKEYS) }
+
+/* ---------- nedladdning av en hel serie ---------- */
+var busy = false;
+async function downloadSeries(hlId, dir, btn){
+  if(busy) return; busy = true;
+  var h = hlOf(hlId), n = h.st.length, lbl = btn.textContent;
+  btn.disabled = true;
+  var dl = await downloads();
+  if(!dl){ btn.textContent = "Export ej tillgänglig här"; btn.disabled = false; busy = false;
+    setTimeout(function(){ btn.textContent = lbl }, 2600); return }
+  for(var i=0; i<n; i++){
+    btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
+    try {
+      var html = story(dir, h.st[i], i, n) + (state.ig ? igOverlay(n, i) : "");
+      var blob = await framePNG(html, 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7");
+      btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
+      await dl.save({filename:"viewly-"+dir+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png", data:blob});
+    } catch(e){
+      btn.disabled = false; busy = false;
+      btn.textContent = (e && e.code==="declined") ? "Avbrutet vid " + (i+1) : "Stoppade vid " + (i+1);
+      setTimeout(function(){ btn.textContent = lbl }, 3000);
+      return;
+    }
+  }
+  btn.disabled = false; busy = false;
+  btn.textContent = n + " filer sparade ✓";
+  setTimeout(function(){ btn.textContent = lbl }, 2600);
+}
+async function exportJSON(btn){
+  var lbl = btn.textContent;
+  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS}, null, 1);
+  await offer(new Blob([data]), "viewly-highlights-redigeringar.json", btn);
+  btn.textContent = lbl;
+}
+function importJSON(file){
+  var fr = new FileReader();
+  fr.onload = function(){
+    try {
+      var d = JSON.parse(fr.result);
+      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{}); Object.assign(UPLOADS, d.uploads||{});
+      flash("Importerat"); renderEditor();
+    } catch(e){ flash("Kunde inte läsa filen", true) }
+  };
+  fr.readAsText(file);
+}
+
+/* ---------- vyn ---------- */
+function secStudio(){
+  if(!state.edit) return studioIndex();
+  return studioEditor();
+}
+function studioIndex(){
+  var need=0; HL.forEach(function(h){h.st.forEach(function(s){if(s.need)need++})});
+  /* Indexet visar en levande bildruta per kapitel plus sekvensen som text.
+     Sex miniatyrer gånger elva kapitel blev 66 container-query-kontexter i
+     samma vy — dyrt, och onödigt när editorn är där bildrutorna ska synas. */
+  var cards = HL.map(function(h){
+    var edits = h.st.filter(isEdited).length;
+    var seq = h.st.map(function(s,j){
+      return '<i class="pchip'+(isEdited(s)?' ed':'')+'">'+String(j+1).padStart(2,"0")+' '+s.p+'</i>';
+    }).join("");
+    return '<button class="hlcard" type="button" data-edit="'+h.id+'">'
+      +'<span class="top"><span class="cvw">'+coverEl(state.dir,h)+'</span>'
+        +'<span class="tt"><b>'+h.name+'</b><span>'+h.q+'</span></span>'
+        +(edits?'<span class="chip">'+edits+' ändrade</span>':'')+'</span>'
+      +'<span class="body"><span class="lead"><span class="frame">'+story(state.dir,h.st[0],0,h.st.length)+'</span></span>'
+        +'<span class="seq">'+seq+'</span></span>'
+      +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="open">Öppna →</span></span></button>';
+  }).join("");
+  return sechead("Studio", cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
+    "Öppna ett kapitel för att gå igenom bildrutorna: byt bild, ladda upp egna, justera utsnitt, skriv om texten. "
+   +"Spara i webbläsaren eller exportera allt som JSON. "+need+" bildrutor är markerade som Behöver material.")
+   +dirbar()+toggles(true)
+   +'<div class="hlgrid">'+cards+'</div>'
+   +'<h3 class="h3">Alla ändringar</h3>'
+   +'<div class="ctl">'
+     +'<button class="dlb" type="button" data-act="save">Spara i webbläsaren</button>'
+     +'<button class="dlb" type="button" data-act="exportjson">Exportera JSON</button>'
+     +'<label class="dlb" style="cursor:pointer">Importera JSON<input type="file" accept="application/json,.json" id="impjson" hidden></label>'
+     +'<button class="dlb" type="button" data-act="reset-all">Återställ allt</button>'
+   +'</div>';
+}
+
+function studioEditor(){
+  var h = hlOf(state.edit.hl), n = h.st.length, i = Math.min(state.edit.i, n-1), s = h.st[i];
+  var eff = Object.assign({}, s, EDITS[s.sid]||{});
+
+  var strip = h.st.map(function(x,j){
+    return '<button class="filmb'+(j===i?" on":"")+'" type="button" data-pick="'+j+'">'
+      +'<span class="filmn">'+String(j+1).padStart(2,"0")+(isEdited(x)?' <i class="dot"></i>':'')+'</span>'
+      +'<span class="filmf">'+story(state.dir,x,j,n)+'</span>'
+      +'<span class="filmp">'+x.p+'</span></button>';
+  }).join("");
+
+  var fields = fieldsFor(s).map(function(f){
+    var v = val(s, f[0]);
+    var id = "f_"+f[0];
+    if(f[2]==="list" || f[2]==="area")
+      return '<label class="fld"><span>'+f[1]+'</span>'
+        +'<textarea data-ed="'+f[0]+'" rows="'+(f[2]==="list"?Math.max(3,v.split("\n").length):2)+'">'+esc(v)+'</textarea></label>';
+    return '<label class="fld"><span>'+f[1]+'</span>'
+      +'<input type="text" data-ed="'+f[0]+'" value="'+esc(v)+'"></label>';
+  }).join("");
+
+  var slots = [];
+  if(eff.m != null){
+    if(Array.isArray(eff.m)){ slots.push([s.sid, eff.m[0], "Bild A"]); slots.push([s.sid+"-b", eff.m[1], "Bild B"]) }
+    else slots.push([s.sid, eff.m, "Bild"]);
+  }
+  var media = slots.length ? slots.map(function(sl){ return mediaPanel(sl[0], sl[1], sl[2]) }).join("")
+    : '<p class="mut" style="font-size:12px;line-height:1.55">Den här bildrutan använder inget fotografi — '
+      +'all information är typografi och form.</p>';
+
+  return '<div class="edtop">'
+    +'<button class="tbtn" type="button" data-act="back">← Alla kapitel</button>'
+    +'<div class="edtitle"><b>'+h.num+' · '+h.name+'</b><span>'+h.q+'</span></div>'
+    +'<div class="edacts">'
+      +'<span id="flash" class="flash"></span>'
+      +dirbar()
+      +'<label class="tg"><input type="checkbox" data-t="ig"'+(state.ig?" checked":"")+'> Instagrams UI</label>'
+      +'<button class="dlb" type="button" data-act="play">▶ Spela sekvensen</button>'
+      +'<button class="dlb pri" type="button" data-act="save">Spara</button>'
+    +'</div></div>'
+   +'<div class="edgrid">'
+     +'<div class="film">'+strip+'</div>'
+     +'<div class="edstage">'
+       +'<div class="frame" id="edframe">'+story(state.dir,s,i,n)+(state.ig?igOverlay(n,i):'')+'</div>'
+       +'<div class="edunder"><span class="mono">'+String(i+1).padStart(2,"0")+' / '+String(n).padStart(2,"0")
+         +' · '+s.p+'</span>'
+         +'<span class="edstep"><button class="tbtn" type="button" data-step="-1">←</button>'
+         +'<button class="tbtn" type="button" data-step="1">→</button></span></div>'
+     +'</div>'
+     +'<div class="edside">'
+       +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
+         +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
+       +'<div class="edsec"><div class="eyebrow">Media</div>'+media+'</div>'
+       +(s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
+       +'<div class="edsec"><div class="eyebrow">Ladda ner</div>'
+         +'<div class="dlcol">'
+           + dlBtn("frame",{hl:h.id, i:i, dir:state.dir},"Denna bildruta · 1080×1920")
+           + dlBtn("sheet",{hl:h.id, dir:state.dir},"Hela serien som kontaktkarta")
+           +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+n+' bildrutor separat</button>'
+         +'</div>'
+         +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:8px">Separat export ger en bekräftelse '
+         +'per fil. Kontaktkartan är en enda fil.</p></div>'
+     +'</div>'
+   +'</div>';
+}
+
+function mediaPanel(slot, cur, label){
+  var o = SLOTS[slot] || {};
+  var active = o.img || cur;
+  return '<div class="mpan">'
+   +'<div class="mplab">'+label+' <code class="mono">'+active+'</code></div>'
+   +'<label class="upl">Ladda upp egen bild'
+     +'<input type="file" accept="image/*" multiple data-up="'+slot+'" hidden></label>'
+   +'<div class="mrow">'+allKeys().map(function(k){
+      return '<button class="mi'+(active===k?" on":"")+'" type="button" data-mi="'+slot+':'+k+'" title="'+k+'">'
+        +'<img src="'+(mediaURL(k)||"")+'" alt=""></button>'}).join("")+'</div>'
+   +'<label class="sl">Fokalpunkt Y <em>'+Math.round((o.fy!=null?o.fy:.5)*100)+'%</em>'
+     +'<input type="range" data-sl="'+slot+':fy" min="0" max="100" value="'+Math.round((o.fy!=null?o.fy:.5)*100)+'"></label>'
+   +'<label class="sl">Zoom <em>'+Math.round((o.zoom||1)*100)+'%</em>'
+     +'<input type="range" data-sl="'+slot+':zoom" min="100" max="200" value="'+Math.round((o.zoom||1)*100)+'"></label>'
+   +'</div>';
+}
+
+/* Bara scenen och remsan ritas om vid tangenttryck — annars tappar fältet fokus. */
+function refreshStage(){
+  if(!state.edit) return;
+  var h = hlOf(state.edit.hl), n = h.st.length, i = state.edit.i, s = h.st[i];
+  var f = $("#edframe");
+  if(f) f.innerHTML = story(state.dir,s,i,n) + (state.ig?igOverlay(n,i):'');
+  var t = document.querySelectorAll(".filmb")[i];
+  if(t){ var fr = t.querySelector(".filmf"); if(fr) fr.innerHTML = story(state.dir,s,i,n) }
+}
+function renderEditor(){ render() }
 
 /* =====================================================================
    05 · LAGER OCH MEDIA
@@ -2069,7 +2147,7 @@ var SECTIONS=[
  {id:"komp",     n:"Kompositioner",num:"02", f:secKomp},
  {id:"profil",   n:"Profil",       num:"03", f:secProfil},
  {id:"format",   n:"Format",       num:"04", f:secFormat},
- {id:"bib",      n:"Bibliotek",    num:"05", f:secBib},
+ {id:"studio",   n:"Studio",       num:"05", f:secStudio},
  {id:"lager",    n:"Lager & media",num:"06", f:secLager}
 ];
 
@@ -2145,7 +2223,7 @@ $("#nav").innerHTML=SECTIONS.map(function(s){
 $("#railmark").innerHTML=vmark("#1C1C1E","#6E7266")+'<span class="brandname">VIEWLY</span>';
 
 document.addEventListener("click",function(e){
-  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s;render();return}
+  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; if(n.dataset.s!=="studio") state.edit=null; render();return}
   var d=e.target.closest("[data-dir]"); if(d){state.dir=d.dataset.dir;render();return}
   var p=e.target.closest("[data-play]");
   if(p){var q=p.dataset.play.split(":");play(q[0],+q[1],q[2]);return}
@@ -2154,6 +2232,28 @@ document.addEventListener("click",function(e){
   if(e.target.closest("#pprev")){step(-1);return}
   var pd=e.target.closest("[data-pd]"); if(pd){P.dir=pd.dataset.pd;drawPlayer();return}
   var dl=e.target.closest("[data-dl]"); if(dl){ runExport(dl); return }
+  var ed=e.target.closest("[data-edit]");
+  if(ed){ state.edit={hl:ed.dataset.edit, i:0}; render(); return }
+  var pk=e.target.closest("[data-pick]");
+  if(pk){ state.edit.i=+pk.dataset.pick; render(); return }
+  var sp=e.target.closest("[data-step]");
+  if(sp){ var h=hlOf(state.edit.hl), j=state.edit.i+ +sp.dataset.step;
+    state.edit.i=(j+h.st.length)%h.st.length; render(); return }
+  var sr=e.target.closest("[data-series]");
+  if(sr){ downloadSeries(sr.dataset.series, state.dir, sr); return }
+  var ac=e.target.closest("[data-act]");
+  if(ac){
+    var a=ac.dataset.act;
+    if(a==="back"){ state.edit=null; render() }
+    else if(a==="save"){ saveAll() }
+    else if(a==="exportjson"){ exportJSON(ac) }
+    else if(a==="play"){ play(state.edit.hl, state.edit.i, state.dir) }
+    else if(a==="reset-story"){
+      var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
+    else if(a==="reset-all"){
+      if(confirm("Ta bort alla ändringar, uppladdade bilder och sparat läge?")){ clearAll(); render() } }
+    return;
+  }
   var mi=e.target.closest("[data-mi]");
   if(mi){var a=mi.dataset.mi.split(":");
     SLOTS[a[0]]=Object.assign({},SLOTS[a[0]],{img:a[1]}); afterSlot(a[0]); return}
@@ -2161,6 +2261,12 @@ document.addEventListener("click",function(e){
   if(rs){delete SLOTS[rs.dataset.reset]; afterSlot(rs.dataset.reset); return}
 });
 document.addEventListener("input",function(e){
+  var ed=e.target.dataset&&e.target.dataset.ed;
+  if(ed && state.edit){
+    var h=hlOf(state.edit.hl);
+    setVal(h.st[state.edit.i], ed, e.target.value);
+    refreshStage(); return;
+  }
   var k=e.target.dataset&&e.target.dataset.sl; if(!k) return;
   var a=k.split(":"), v=+e.target.value;
   SLOTS[a[0]]=Object.assign({},SLOTS[a[0]], a[1]==="fy"?{fy:v/100}:{zoom:v/100});
@@ -2168,6 +2274,7 @@ document.addEventListener("input",function(e){
   afterSlot(a[0], true);
 });
 function afterSlot(slot, live){
+  if(state.edit){ if(live) refreshStage(); else render(); return }
   if(P.hl){ drawPlayer(); if(live) restoreFocus(slot); return }
   if(state.sec==="lager"){
     var r=(function(){var h=byId["seendet"];return {s:h.st[4],i:4,n:h.st.length}})();
@@ -2179,6 +2286,8 @@ function afterSlot(slot, live){
 }
 function restoreFocus(){}
 document.addEventListener("change",function(e){
+  if(e.target.dataset && e.target.dataset.up!=null){ handleUpload(e.target.files, e.target.dataset.up); return }
+  if(e.target.id==="impjson" && e.target.files[0]){ importJSON(e.target.files[0]); return }
   var t=e.target.dataset&&e.target.dataset.t;
   if(t==="ig"){state.ig=e.target.checked; if(P.hl) drawPlayer(); else render(); return}
   if(t==="needs"){state.needs=e.target.checked; render(); return}
@@ -2195,6 +2304,15 @@ $("#theme").onclick=function(){
   var d=window.matchMedia("(prefers-color-scheme:dark)").matches;
   r.setAttribute("data-theme", c ? (c==="dark"?"light":"dark") : (d?"light":"dark"));
 };
+/* slot-defaultvärden ur innehållsmodellen, så "Återställ" har något att gå till */
+function seedSlots(){
+  HL.forEach(function(h){
+    h.st.forEach(function(x){ if(x.fy!=null || x.zoom!=null) SLOTS[x.sid] = {fy:x.fy, zoom:x.zoom} });
+    if(h.coverFy!=null) SLOTS["cover-"+h.id] = {fy:h.coverFy};
+  });
+}
+loadAll();
+
 var s=document.createElement("style"); s.textContent=CSS; document.head.appendChild(s);
 
 /* liten publik export-API — samma väg som knapparna använder, så den går

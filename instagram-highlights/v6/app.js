@@ -6,7 +6,7 @@
 (function(){
 "use strict";
 var $=function(s,r){return (r||document).querySelector(s)};
-var state={sec:"riktning", dir:"arkiv", ig:false, needs:false};
+var state={sec:"riktning", dir:"arkiv", ig:false, needs:false, edit:null};
 var byId={}; HL.forEach(function(h){byId[h.id]=h});
 function hlOf(id){return byId[id]}
 var NW=["noll","en","två","tre","fyra","fem","sex","sju","åtta","nio","tio","elva","tolv"];
@@ -325,25 +325,305 @@ function secFormat(){
 }
 
 /* =====================================================================
-   04 · BIBLIOTEK
+   05 · STUDIO — redigera ett kapitel
+   Klicka på ett kapitel, gå igenom bildrutorna, byt bild och text, spara,
+   ladda ner. Redigeringarna ligger i EDITS/SLOTS ovanpå originaldatan —
+   originalet går alltid att återställa till, per fält eller per bildruta.
    ===================================================================== */
-function secBib(){
-  var need=0; HL.forEach(function(h){h.st.forEach(function(s){if(s.need)need++})});
-  var cards=HL.map(function(h){
-    var strip=h.st.slice(0,6).map(function(s,i){
-      return '<i>'+story(state.dir,s,i,h.st.length)+'</i>'}).join("");
-    return '<button class="hlcard" type="button" data-play="'+h.id+':0:'+state.dir+'">'
-      +'<span class="top"><span class="cvw">'+coverEl(state.dir,h)+'</span>'
-        +'<span class="tt"><b>'+h.name+'</b><span>'+h.q+'</span></span></span>'
-      +'<span class="strip">'+strip+'</span>'
-      +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="mono">'+h.num+'</span></span></button>';
-  }).join("");
-  return sechead("Bibliotek",cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
-    "Hela biblioteket renderat i den valda riktningen. Klicka på ett kapitel för att spela upp sekvensen — "
-   +need+" bildrutor är markerade som Behöver material och renderas med platshållare tills rätt bild finns.")
-   +dirbar()+toggles(true)
-   +'<div class="hlgrid">'+cards+'</div>';
+var STORE = "viewly.highlights.v1";
+
+function saveAll(msg){
+  try {
+    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS}));
+    flash(msg || "Sparat");
+  } catch(e){
+    flash(UPLOADS && Object.keys(UPLOADS).length
+      ? "Fullt utrymme — exportera JSON istället" : "Kunde inte spara", true);
+  }
 }
+function loadAll(){
+  try {
+    var raw = localStorage.getItem(STORE); if(!raw) return false;
+    var d = JSON.parse(raw);
+    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{}); Object.assign(UPLOADS, d.uploads||{});
+    return true;
+  } catch(e){ return false }
+}
+function clearAll(){
+  Object.keys(EDITS).forEach(function(k){delete EDITS[k]});
+  Object.keys(SLOTS).forEach(function(k){delete SLOTS[k]});
+  Object.keys(UPLOADS).forEach(function(k){delete UPLOADS[k]});
+  seedSlots();
+  try{ localStorage.removeItem(STORE) }catch(e){}
+}
+var flashT;
+function flash(txt, warn){
+  var el = $("#flash"); if(!el) return;
+  el.textContent = txt; el.setAttribute("data-on", warn?"warn":"ok");
+  clearTimeout(flashT); flashT = setTimeout(function(){ el.removeAttribute("data-on") }, 2400);
+}
+
+/* ---------- vilka fält en bildruta faktiskt har ---------- */
+function fieldsFor(s){
+  var f = [];
+  if(s.p!=="fullbleed" || s.k) f.push(["k","Kicker","text"]);
+  f.push(["h","Rubrik","text"]);
+  if(s.p==="quiet" || s.em!=null) f.push(["em","Kursiv rad","text"]);
+  f.push(["s","Underrad","area"]);
+  if(s.p==="split"){ f.push(["la","Etikett vänster/övre","text"]); f.push(["lb","Etikett höger/undre","text"]) }
+  if(s.p==="system") f.push(["items","Poster — en per rad","list"]);
+  if(s.p==="flow"){
+    f.push(["flow_items","AI:ns signaler — en per rad","list"]);
+    f.push(["flow_title","Annonsrubrik","text"]);
+    f.push(["flow_lead","Annonsingress","area"]);
+  }
+  return f;
+}
+function val(s, key){
+  var e = EDITS[s.sid] || {};
+  if(key==="items")      return (e.items || s.items || []).join("\n");
+  if(key==="flow_items") return ((e.mid||s.mid).items || []).join("\n");
+  if(key==="flow_title") return (e.out||s.out).title || "";
+  if(key==="flow_lead")  return (e.out||s.out).lead || "";
+  return e[key] != null ? e[key] : (s[key] || "");
+}
+function setVal(s, key, v){
+  var e = EDITS[s.sid] || (EDITS[s.sid] = {});
+  if(key==="items")           e.items = v.split("\n").filter(function(x){return x.trim()});
+  else if(key==="flow_items") e.mid   = Object.assign({}, e.mid||s.mid, {items:v.split("\n").filter(function(x){return x.trim()})});
+  else if(key==="flow_title") e.out   = Object.assign({}, e.out||s.out, {title:v});
+  else if(key==="flow_lead")  e.out   = Object.assign({}, e.out||s.out, {lead:v});
+  else                        e[key]  = v;
+}
+function isEdited(s){
+  var e = EDITS[s.sid];
+  var slotted = SLOTS[s.sid] && !slotIsDefault(s, s.sid);
+  return !!(e && Object.keys(e).length) || !!slotted;
+}
+function slotIsDefault(s, key){
+  var o = SLOTS[key] || {};
+  return (o.img==null) && (o.fy===s.fy || (o.fy==null && s.fy==null))
+      && (o.zoom===s.zoom || (o.zoom==null && s.zoom==null));
+}
+function resetStory(s){
+  delete EDITS[s.sid]; delete SLOTS[s.sid]; delete SLOTS[s.sid+"-b"];
+  if(s.fy!=null || s.zoom!=null) SLOTS[s.sid] = {fy:s.fy, zoom:s.zoom};
+}
+
+/* ---------- uppladdning ---------- */
+var upN = 0;
+function ingest(file, done){
+  var fr = new FileReader();
+  fr.onload = function(){
+    var img = new Image();
+    img.onload = function(){
+      var max = 1400, sc = Math.min(1, max/Math.max(img.width, img.height));
+      var c = document.createElement("canvas");
+      c.width = Math.round(img.width*sc); c.height = Math.round(img.height*sc);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      var key = "egen" + (++upN) + "-" + Date.now().toString(36).slice(-4);
+      UPLOADS[key] = c.toDataURL("image/jpeg", 0.84);
+      done(key);
+    };
+    img.onerror = function(){ done(null) };
+    img.src = fr.result;
+  };
+  fr.onerror = function(){ done(null) };
+  fr.readAsDataURL(file);
+}
+function handleUpload(files, slot){
+  var list = Array.prototype.slice.call(files).filter(function(f){return /^image\//.test(f.type)});
+  if(!list.length){ flash("Bara bildfiler", true); return }
+  var left = list.length, first = null;
+  list.forEach(function(f){
+    ingest(f, function(key){
+      if(key && !first) first = key;
+      if(--left === 0){
+        if(!first){ flash("Kunde inte läsa bilden", true); return }
+        if(slot) SLOTS[slot] = Object.assign({}, SLOTS[slot], {img:first});
+        flash(list.length>1 ? list.length+" bilder tillagda" : "Bild tillagd");
+        renderEditor();
+      }
+    });
+  });
+}
+function allKeys(){ return Object.keys(UPLOADS).concat(MEDIAKEYS) }
+
+/* ---------- nedladdning av en hel serie ---------- */
+var busy = false;
+async function downloadSeries(hlId, dir, btn){
+  if(busy) return; busy = true;
+  var h = hlOf(hlId), n = h.st.length, lbl = btn.textContent;
+  btn.disabled = true;
+  var dl = await downloads();
+  if(!dl){ btn.textContent = "Export ej tillgänglig här"; btn.disabled = false; busy = false;
+    setTimeout(function(){ btn.textContent = lbl }, 2600); return }
+  for(var i=0; i<n; i++){
+    btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
+    try {
+      var html = story(dir, h.st[i], i, n) + (state.ig ? igOverlay(n, i) : "");
+      var blob = await framePNG(html, 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7");
+      btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
+      await dl.save({filename:"viewly-"+dir+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png", data:blob});
+    } catch(e){
+      btn.disabled = false; busy = false;
+      btn.textContent = (e && e.code==="declined") ? "Avbrutet vid " + (i+1) : "Stoppade vid " + (i+1);
+      setTimeout(function(){ btn.textContent = lbl }, 3000);
+      return;
+    }
+  }
+  btn.disabled = false; busy = false;
+  btn.textContent = n + " filer sparade ✓";
+  setTimeout(function(){ btn.textContent = lbl }, 2600);
+}
+async function exportJSON(btn){
+  var lbl = btn.textContent;
+  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS}, null, 1);
+  await offer(new Blob([data]), "viewly-highlights-redigeringar.json", btn);
+  btn.textContent = lbl;
+}
+function importJSON(file){
+  var fr = new FileReader();
+  fr.onload = function(){
+    try {
+      var d = JSON.parse(fr.result);
+      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{}); Object.assign(UPLOADS, d.uploads||{});
+      flash("Importerat"); renderEditor();
+    } catch(e){ flash("Kunde inte läsa filen", true) }
+  };
+  fr.readAsText(file);
+}
+
+/* ---------- vyn ---------- */
+function secStudio(){
+  if(!state.edit) return studioIndex();
+  return studioEditor();
+}
+function studioIndex(){
+  var need=0; HL.forEach(function(h){h.st.forEach(function(s){if(s.need)need++})});
+  /* Indexet visar en levande bildruta per kapitel plus sekvensen som text.
+     Sex miniatyrer gånger elva kapitel blev 66 container-query-kontexter i
+     samma vy — dyrt, och onödigt när editorn är där bildrutorna ska synas. */
+  var cards = HL.map(function(h){
+    var edits = h.st.filter(isEdited).length;
+    var seq = h.st.map(function(s,j){
+      return '<i class="pchip'+(isEdited(s)?' ed':'')+'">'+String(j+1).padStart(2,"0")+' '+s.p+'</i>';
+    }).join("");
+    return '<button class="hlcard" type="button" data-edit="'+h.id+'">'
+      +'<span class="top"><span class="cvw">'+coverEl(state.dir,h)+'</span>'
+        +'<span class="tt"><b>'+h.name+'</b><span>'+h.q+'</span></span>'
+        +(edits?'<span class="chip">'+edits+' ändrade</span>':'')+'</span>'
+      +'<span class="body"><span class="lead"><span class="frame">'+story(state.dir,h.st[0],0,h.st.length)+'</span></span>'
+        +'<span class="seq">'+seq+'</span></span>'
+      +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="open">Öppna →</span></span></button>';
+  }).join("");
+  return sechead("Studio", cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
+    "Öppna ett kapitel för att gå igenom bildrutorna: byt bild, ladda upp egna, justera utsnitt, skriv om texten. "
+   +"Spara i webbläsaren eller exportera allt som JSON. "+need+" bildrutor är markerade som Behöver material.")
+   +dirbar()+toggles(true)
+   +'<div class="hlgrid">'+cards+'</div>'
+   +'<h3 class="h3">Alla ändringar</h3>'
+   +'<div class="ctl">'
+     +'<button class="dlb" type="button" data-act="save">Spara i webbläsaren</button>'
+     +'<button class="dlb" type="button" data-act="exportjson">Exportera JSON</button>'
+     +'<label class="dlb" style="cursor:pointer">Importera JSON<input type="file" accept="application/json,.json" id="impjson" hidden></label>'
+     +'<button class="dlb" type="button" data-act="reset-all">Återställ allt</button>'
+   +'</div>';
+}
+
+function studioEditor(){
+  var h = hlOf(state.edit.hl), n = h.st.length, i = Math.min(state.edit.i, n-1), s = h.st[i];
+  var eff = Object.assign({}, s, EDITS[s.sid]||{});
+
+  var strip = h.st.map(function(x,j){
+    return '<button class="filmb'+(j===i?" on":"")+'" type="button" data-pick="'+j+'">'
+      +'<span class="filmn">'+String(j+1).padStart(2,"0")+(isEdited(x)?' <i class="dot"></i>':'')+'</span>'
+      +'<span class="filmf">'+story(state.dir,x,j,n)+'</span>'
+      +'<span class="filmp">'+x.p+'</span></button>';
+  }).join("");
+
+  var fields = fieldsFor(s).map(function(f){
+    var v = val(s, f[0]);
+    var id = "f_"+f[0];
+    if(f[2]==="list" || f[2]==="area")
+      return '<label class="fld"><span>'+f[1]+'</span>'
+        +'<textarea data-ed="'+f[0]+'" rows="'+(f[2]==="list"?Math.max(3,v.split("\n").length):2)+'">'+esc(v)+'</textarea></label>';
+    return '<label class="fld"><span>'+f[1]+'</span>'
+      +'<input type="text" data-ed="'+f[0]+'" value="'+esc(v)+'"></label>';
+  }).join("");
+
+  var slots = [];
+  if(eff.m != null){
+    if(Array.isArray(eff.m)){ slots.push([s.sid, eff.m[0], "Bild A"]); slots.push([s.sid+"-b", eff.m[1], "Bild B"]) }
+    else slots.push([s.sid, eff.m, "Bild"]);
+  }
+  var media = slots.length ? slots.map(function(sl){ return mediaPanel(sl[0], sl[1], sl[2]) }).join("")
+    : '<p class="mut" style="font-size:12px;line-height:1.55">Den här bildrutan använder inget fotografi — '
+      +'all information är typografi och form.</p>';
+
+  return '<div class="edtop">'
+    +'<button class="tbtn" type="button" data-act="back">← Alla kapitel</button>'
+    +'<div class="edtitle"><b>'+h.num+' · '+h.name+'</b><span>'+h.q+'</span></div>'
+    +'<div class="edacts">'
+      +'<span id="flash" class="flash"></span>'
+      +dirbar()
+      +'<label class="tg"><input type="checkbox" data-t="ig"'+(state.ig?" checked":"")+'> Instagrams UI</label>'
+      +'<button class="dlb" type="button" data-act="play">▶ Spela sekvensen</button>'
+      +'<button class="dlb pri" type="button" data-act="save">Spara</button>'
+    +'</div></div>'
+   +'<div class="edgrid">'
+     +'<div class="film">'+strip+'</div>'
+     +'<div class="edstage">'
+       +'<div class="frame" id="edframe">'+story(state.dir,s,i,n)+(state.ig?igOverlay(n,i):'')+'</div>'
+       +'<div class="edunder"><span class="mono">'+String(i+1).padStart(2,"0")+' / '+String(n).padStart(2,"0")
+         +' · '+s.p+'</span>'
+         +'<span class="edstep"><button class="tbtn" type="button" data-step="-1">←</button>'
+         +'<button class="tbtn" type="button" data-step="1">→</button></span></div>'
+     +'</div>'
+     +'<div class="edside">'
+       +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
+         +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
+       +'<div class="edsec"><div class="eyebrow">Media</div>'+media+'</div>'
+       +(s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
+       +'<div class="edsec"><div class="eyebrow">Ladda ner</div>'
+         +'<div class="dlcol">'
+           + dlBtn("frame",{hl:h.id, i:i, dir:state.dir},"Denna bildruta · 1080×1920")
+           + dlBtn("sheet",{hl:h.id, dir:state.dir},"Hela serien som kontaktkarta")
+           +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+n+' bildrutor separat</button>'
+         +'</div>'
+         +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:8px">Separat export ger en bekräftelse '
+         +'per fil. Kontaktkartan är en enda fil.</p></div>'
+     +'</div>'
+   +'</div>';
+}
+
+function mediaPanel(slot, cur, label){
+  var o = SLOTS[slot] || {};
+  var active = o.img || cur;
+  return '<div class="mpan">'
+   +'<div class="mplab">'+label+' <code class="mono">'+active+'</code></div>'
+   +'<label class="upl">Ladda upp egen bild'
+     +'<input type="file" accept="image/*" multiple data-up="'+slot+'" hidden></label>'
+   +'<div class="mrow">'+allKeys().map(function(k){
+      return '<button class="mi'+(active===k?" on":"")+'" type="button" data-mi="'+slot+':'+k+'" title="'+k+'">'
+        +'<img src="'+(mediaURL(k)||"")+'" alt=""></button>'}).join("")+'</div>'
+   +'<label class="sl">Fokalpunkt Y <em>'+Math.round((o.fy!=null?o.fy:.5)*100)+'%</em>'
+     +'<input type="range" data-sl="'+slot+':fy" min="0" max="100" value="'+Math.round((o.fy!=null?o.fy:.5)*100)+'"></label>'
+   +'<label class="sl">Zoom <em>'+Math.round((o.zoom||1)*100)+'%</em>'
+     +'<input type="range" data-sl="'+slot+':zoom" min="100" max="200" value="'+Math.round((o.zoom||1)*100)+'"></label>'
+   +'</div>';
+}
+
+/* Bara scenen och remsan ritas om vid tangenttryck — annars tappar fältet fokus. */
+function refreshStage(){
+  if(!state.edit) return;
+  var h = hlOf(state.edit.hl), n = h.st.length, i = state.edit.i, s = h.st[i];
+  var f = $("#edframe");
+  if(f) f.innerHTML = story(state.dir,s,i,n) + (state.ig?igOverlay(n,i):'');
+  var t = document.querySelectorAll(".filmb")[i];
+  if(t){ var fr = t.querySelector(".filmf"); if(fr) fr.innerHTML = story(state.dir,s,i,n) }
+}
+function renderEditor(){ render() }
 
 /* =====================================================================
    05 · LAGER OCH MEDIA
@@ -403,7 +683,7 @@ var SECTIONS=[
  {id:"komp",     n:"Kompositioner",num:"02", f:secKomp},
  {id:"profil",   n:"Profil",       num:"03", f:secProfil},
  {id:"format",   n:"Format",       num:"04", f:secFormat},
- {id:"bib",      n:"Bibliotek",    num:"05", f:secBib},
+ {id:"studio",   n:"Studio",       num:"05", f:secStudio},
  {id:"lager",    n:"Lager & media",num:"06", f:secLager}
 ];
 
@@ -479,7 +759,7 @@ $("#nav").innerHTML=SECTIONS.map(function(s){
 $("#railmark").innerHTML=vmark("#1C1C1E","#6E7266")+'<span class="brandname">VIEWLY</span>';
 
 document.addEventListener("click",function(e){
-  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s;render();return}
+  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; if(n.dataset.s!=="studio") state.edit=null; render();return}
   var d=e.target.closest("[data-dir]"); if(d){state.dir=d.dataset.dir;render();return}
   var p=e.target.closest("[data-play]");
   if(p){var q=p.dataset.play.split(":");play(q[0],+q[1],q[2]);return}
@@ -488,6 +768,28 @@ document.addEventListener("click",function(e){
   if(e.target.closest("#pprev")){step(-1);return}
   var pd=e.target.closest("[data-pd]"); if(pd){P.dir=pd.dataset.pd;drawPlayer();return}
   var dl=e.target.closest("[data-dl]"); if(dl){ runExport(dl); return }
+  var ed=e.target.closest("[data-edit]");
+  if(ed){ state.edit={hl:ed.dataset.edit, i:0}; render(); return }
+  var pk=e.target.closest("[data-pick]");
+  if(pk){ state.edit.i=+pk.dataset.pick; render(); return }
+  var sp=e.target.closest("[data-step]");
+  if(sp){ var h=hlOf(state.edit.hl), j=state.edit.i+ +sp.dataset.step;
+    state.edit.i=(j+h.st.length)%h.st.length; render(); return }
+  var sr=e.target.closest("[data-series]");
+  if(sr){ downloadSeries(sr.dataset.series, state.dir, sr); return }
+  var ac=e.target.closest("[data-act]");
+  if(ac){
+    var a=ac.dataset.act;
+    if(a==="back"){ state.edit=null; render() }
+    else if(a==="save"){ saveAll() }
+    else if(a==="exportjson"){ exportJSON(ac) }
+    else if(a==="play"){ play(state.edit.hl, state.edit.i, state.dir) }
+    else if(a==="reset-story"){
+      var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
+    else if(a==="reset-all"){
+      if(confirm("Ta bort alla ändringar, uppladdade bilder och sparat läge?")){ clearAll(); render() } }
+    return;
+  }
   var mi=e.target.closest("[data-mi]");
   if(mi){var a=mi.dataset.mi.split(":");
     SLOTS[a[0]]=Object.assign({},SLOTS[a[0]],{img:a[1]}); afterSlot(a[0]); return}
@@ -495,6 +797,12 @@ document.addEventListener("click",function(e){
   if(rs){delete SLOTS[rs.dataset.reset]; afterSlot(rs.dataset.reset); return}
 });
 document.addEventListener("input",function(e){
+  var ed=e.target.dataset&&e.target.dataset.ed;
+  if(ed && state.edit){
+    var h=hlOf(state.edit.hl);
+    setVal(h.st[state.edit.i], ed, e.target.value);
+    refreshStage(); return;
+  }
   var k=e.target.dataset&&e.target.dataset.sl; if(!k) return;
   var a=k.split(":"), v=+e.target.value;
   SLOTS[a[0]]=Object.assign({},SLOTS[a[0]], a[1]==="fy"?{fy:v/100}:{zoom:v/100});
@@ -502,6 +810,7 @@ document.addEventListener("input",function(e){
   afterSlot(a[0], true);
 });
 function afterSlot(slot, live){
+  if(state.edit){ if(live) refreshStage(); else render(); return }
   if(P.hl){ drawPlayer(); if(live) restoreFocus(slot); return }
   if(state.sec==="lager"){
     var r=(function(){var h=byId["seendet"];return {s:h.st[4],i:4,n:h.st.length}})();
@@ -513,6 +822,8 @@ function afterSlot(slot, live){
 }
 function restoreFocus(){}
 document.addEventListener("change",function(e){
+  if(e.target.dataset && e.target.dataset.up!=null){ handleUpload(e.target.files, e.target.dataset.up); return }
+  if(e.target.id==="impjson" && e.target.files[0]){ importJSON(e.target.files[0]); return }
   var t=e.target.dataset&&e.target.dataset.t;
   if(t==="ig"){state.ig=e.target.checked; if(P.hl) drawPlayer(); else render(); return}
   if(t==="needs"){state.needs=e.target.checked; render(); return}
@@ -529,6 +840,15 @@ $("#theme").onclick=function(){
   var d=window.matchMedia("(prefers-color-scheme:dark)").matches;
   r.setAttribute("data-theme", c ? (c==="dark"?"light":"dark") : (d?"light":"dark"));
 };
+/* slot-defaultvärden ur innehållsmodellen, så "Återställ" har något att gå till */
+function seedSlots(){
+  HL.forEach(function(h){
+    h.st.forEach(function(x){ if(x.fy!=null || x.zoom!=null) SLOTS[x.sid] = {fy:x.fy, zoom:x.zoom} });
+    if(h.coverFy!=null) SLOTS["cover-"+h.id] = {fy:h.coverFy};
+  });
+}
+loadAll();
+
 var s=document.createElement("style"); s.textContent=CSS; document.head.appendChild(s);
 
 /* liten publik export-API — samma väg som knapparna använder, så den går

@@ -7,6 +7,9 @@
    så 1cqw = 1 % av ramens bredd = 10,8 px i en 1080 × 1920-Story.
    ===================================================================== */
 var M = window.VMEDIA || {};
+/* egna uppladdade bilder hamnar i samma pool som det medföljande biblioteket */
+var UPLOADS = {};
+function mediaURL(k){ return UPLOADS[k] || M[k] }
 var esc = function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
 
@@ -57,6 +60,7 @@ var SERIF=0.46;
    --------------------------------------------------------------------- */
 var SLOTS = {};
 function pick(k, wide){
+  if(UPLOADS[k]) return UPLOADS[k];
   if(wide && M[k+"_h"]) return M[k+"_h"];
   return M[k];
 }
@@ -382,7 +386,13 @@ var B = {
 
 var RENDER = {arkiv:A, skugga:B};
 
+/* Redigeringar läggs ovanpå originaldatan vid rendering, aldrig i den.
+   Nyckeln är slot-id:t, så ändringen följer sin plats i biblioteket och
+   originalet finns alltid kvar att återställa till. */
+var EDITS = {};
 function story(dirId, s, i, n){
+  var e = s.sid && EDITS[s.sid];
+  if(e) s = Object.assign({}, s, e);
   var r = RENDER[dirId] || A;
   var f = r[s.p] || r.fullbleed;
   return f(s, i, n);
@@ -527,293 +537,6 @@ A.phases = function(s,i,n){
     '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4cqw">'
    +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.6cqw;max-width:76%">'+cards+'</div>'
-   +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
-};
-
-/* ---------------------------------------------------------------- B · SKUGGA */
-var B = {
- shell:function(inner){ return '<div class="b">'+inner+'</div>' },
- kick:function(k){ return k?'<div class="z" style="left:6cqw;top:'+SAFE.top+'cqw"><span class="b-k">'+esc(k)+'</span></div>':'' },
- foot:function(i,n,light){
-   return '<div class="z" style="left:6cqw;right:6cqw;bottom:'+SAFE.bot+'cqw;display:flex;justify-content:space-between;align-items:center">'
-    +'<span class="b-wm">'+vmark(light||"#EFEDE7","#98A088")+'VIEWLY</span>'
-    +'<span class="b-k" style="letter-spacing:.2em;color:#6E6C66">'+fol(i,n)+'</span></div>';
- },
-
- /* 01 · MARK — V:et blir bländaren. Fotografiet finns bara inuti märket. */
- mark:function(s,i,n){
-   var id="m"+Math.random().toString(36).slice(2,8);
-   return B.shell(
-     '<svg viewBox="'+GEO.vb+'" style="position:absolute;left:-8cqw;top:34cqw;width:116cqw;height:'+(116/GEO.ratio).toFixed(1)+'cqw">'
-    +'<defs><clipPath id="'+id+'"><path d="'+GEO.limb+'"/></clipPath></defs>'
-    +'<foreignObject x="0" y="0" width="858.6" height="756.3" clip-path="url(#'+id+')">'
-    +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:858.6px;height:756.3px;'+bg(s.m,sid(s))+'"></div></foreignObject>'
-    +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="#98A088"/></svg>'
-    +B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+11)+'cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b" style="max-width:76%">'+esc(s.s)+'</div>':'')+'</div>'
-    +B.foot(i,n));
- },
-
- /* 02 · FULL BLEED — mörkret som grund, fotografiet som ljuskälla */
- fullbleed:function(s,i,n){
-   return B.shell('<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-    +'<div class="b-v"></div><div class="b-s"></div>'
-    +B.kick(s.k)
-    +(s.h?'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+10)+'cqw"><div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div></div>':'')
-    +B.foot(i,n));
- },
-
- /* 03 · QUIET — en olivpunkt, en mening, svart */
- quiet:function(s,i,n){
-   return B.shell(
-     B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:8cqw;top:50%;transform:translateY(-54%);display:flex;flex-direction:column;gap:3.4cqw">'
-    +'<div class="b-dot"></div>'
-    +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.em?'<div class="b-i" style="color:#98A088">'+esc(s.em)+'</div>':'')
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')
-    +'</div>'+B.foot(i,n));
- },
-
- /* 04 · EDITORIAL — 2.39:1-remsa som svävar i svart */
- editorial:function(s,i,n){
-   return B.shell(
-     '<div style="position:absolute;left:0;right:0;top:44cqw"><div class="b-let">'
-      +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s),true)+'"></div></div></div>'
-    +B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+11)+'cqw;display:flex;flex-direction:column;gap:2.8cqw">'
-    +(s.h?'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>':'')
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
-    +B.foot(i,n));
- },
-
- /* 05 · PRODUCT — hörnmarkeringar i oliv, bilden mätt och ställd */
- product:function(s,i,n){
-   var c='position:absolute;width:5cqw;height:5cqw;border-color:#98A088;border-style:solid;';
-   return B.shell(
-     B.kick(s.k)
-    +'<div style="position:absolute;left:8cqw;right:8cqw;top:34cqw;aspect-ratio:3/4">'
-      +'<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-      +'<div class="b-v"></div>'
-      +'<i style="'+c+'left:-1.4cqw;top:-1.4cqw;border-width:1px 0 0 1px"></i>'
-      +'<i style="'+c+'right:-1.4cqw;top:-1.4cqw;border-width:1px 1px 0 0"></i>'
-      +'<i style="'+c+'left:-1.4cqw;bottom:-1.4cqw;border-width:0 0 1px 1px"></i>'
-      +'<i style="'+c+'right:-1.4cqw;bottom:-1.4cqw;border-width:0 1px 1px 0"></i></div>'
-    +'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+10)+'cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,8.2,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
-    +B.foot(i,n));
- },
-
- /* 06 · SPLIT — två remsor, etiketten på den aktiva i oliv */
- split:function(s,i,n){
-   var row=function(k,lab,on,sd){
-     return '<div style="position:relative"><div class="b-let">'
-      +'<div style="position:absolute;inset:0;'+bg(k,sd,true)+'"></div></div>'
-      +'<span class="b-k" style="position:absolute;left:3cqw;top:50%;transform:translateY(-50%);z-index:3;'
-      +'background:rgba(10,10,9,.86);padding:1.1cqw 2cqw;color:'+(on?"#98A088":"#CFCDC7")+'">'+esc(lab)+'</span></div>';
-   };
-   return B.shell(
-     B.kick(s.k)
-    +'<div style="position:absolute;left:0;right:0;top:36cqw;display:flex;flex-direction:column;gap:2.2cqw">'
-      +row(s.m[0],s.la,false,sid(s))+row(s.m[1],s.lb,true,sid(s,1))+'</div>'
-    +(s.h?'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+10)+'cqw"><div class="b-i" style="'+dsize(s.h,10.4,SERIF)+'">'+esc(s.h)+'</div></div>':'')
-    +B.foot(i,n));
- },
-
- /* 07 · SYSTEM — punkter längs en linje, första ledet tänt */
- system:function(s,i,n){
-   var rows=s.items.map(function(t,j){
-     return '<div style="position:relative;display:flex;align-items:center;min-height:7cqw">'
-      +'<span style="position:absolute;left:-4.05cqw;top:50%;transform:translateY(-50%);width:1.5cqw;height:1.5cqw;'
-      +'border-radius:50%;background:'+(j===0?"#98A088":"#33332F")+'"></span>'
-      +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:6cqw;line-height:1.2;color:'+(j===0?"#EFEDE7":"#8C8A84")+'">'+esc(t)+'</span></div>';
-   }).join("");
-   return B.shell(
-     B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:7cqw;top:34cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,8.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b" style="margin-bottom:1.6cqw">'+esc(s.s)+'</div>':'')
-    +'<div style="border-left:1px solid #2A2A27;padding-left:4.8cqw;display:flex;flex-direction:column">'+rows+'</div></div>'
-    +B.foot(i,n));
- },
-
- /* 08 · CASE — objektet i mörker, plats som liten versal */
- "case":function(s,i,n){
-   return B.shell('<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-    +'<div class="b-v"></div><div class="b-s"></div>'
-    +B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+10)+'cqw;display:flex;flex-direction:column;gap:2cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
-    +'<span class="b-k" style="color:#A8A6A0">'+esc(s.s)+'</span></div>'
-    +B.foot(i,n));
- },
-
- /* 09 · CTA — märket centrerat, en linje, en uppmaning */
- cta:function(s,i,n){
-   return B.shell(
-     B.kick(s.k)
-    +'<div class="z" style="left:0;right:0;top:50%;transform:translateY(-56%);display:flex;flex-direction:column;align-items:center;gap:4cqw;text-align:center;padding:0 8cqw">'
-    +'<div style="width:10cqw">'+vmark("#EFEDE7","#98A088",'style="width:100%;height:auto;display:block"')+'</div>'
-    +'<div class="b-d" style="'+dsize(s.h,8.8,SERIF,8)+'">'+esc(s.h)+'</div>'
-    +'<div style="width:8cqw;height:1px;background:#98A088"></div>'
-    +'<div class="b-b" style="letter-spacing:.16em;text-transform:uppercase;font-size:2.3cqw;color:#98A088">'+esc(s.s)+'</div>'
-    +'</div>'+B.foot(i,n));
- }
-};
-
-var RENDER = {arkiv:A, skugga:B};
-
-function story(dirId, s, i, n){
-  var r = RENDER[dirId] || A;
-  var f = r[s.p] || r.fullbleed;
-  return f(s, i, n);
-}
-
-/* =====================================================================
-   COVERS — bedömda vid 56 px i profilraden
-   ===================================================================== */
-function cover(dirId, h){
-  if(dirId==="skugga"){
-    return '<div style="position:absolute;inset:0;'+bg(h.cover,"cover-"+h.id)+'"></div>'
-      +'<div style="position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 45%,rgba(14,14,13,.42),rgba(14,14,13,.86))"></div>'
-      +'<div style="position:absolute;inset:0;display:grid;place-items:center">'
-      +'<span style="font-family:Montserrat,sans-serif;font-size:19cqw;font-weight:500;letter-spacing:.06em;color:#EFEDE7">'+h.num+'</span></div>'
-      +'<div style="position:absolute;left:50%;bottom:15cqw;transform:translateX(-50%);width:2.6cqw;height:2.6cqw;border-radius:50%;background:#98A088"></div>';
-  }
-  return '<div style="position:absolute;inset:0;background:#F2EFEF;display:flex;flex-direction:column;'
-    +'align-items:center;justify-content:center;gap:3cqw;font-family:\'Cormorant Garamond\',Georgia,serif">'
-    +'<div style="position:absolute;inset:6cqw;border:1px solid #CEC7C3;border-radius:50%"></div>'
-    +'<div style="font-size:33cqw;font-weight:400;line-height:.8;color:#1C1C1E;letter-spacing:-.03em;'
-    +'font-variant-numeric:lining-nums;font-feature-settings:\'lnum\' 1">'+h.num+'</div>'
-    +'<div style="width:13cqw;height:1.5px;background:#6E7266"></div></div>';
-}
-
-/* =====================================================================
-   INSTAGRAMS EGET UI — riktig overlay, ingen debugfärg
-   Måtten är Instagrams, omräknade till cqw (1080 px bred ram).
-   ===================================================================== */
-function igOverlay(n, idx){
-  n = n||5; idx = idx||0;
-  var gp=0.74, pad=2.22, tw=(100-2*pad-gp*(n-1))/n, bars='';
-  for(var j=0;j<n;j++){
-    bars += '<i style="position:absolute;left:'+(pad+j*(tw+gp)).toFixed(2)+'cqw;top:1.85cqw;width:'+tw.toFixed(2)
-      +'cqw;height:.42cqw;border-radius:.21cqw;background:rgba(255,255,255,'+(j<=idx?'.95':'.34')+')"></i>';
-  }
-  return '<div style="position:absolute;inset:0;z-index:30;pointer-events:none;font-family:Montserrat,-apple-system,sans-serif">'
-   +'<div style="position:absolute;left:0;right:0;top:0;height:21.3cqw;background:linear-gradient(180deg,rgba(0,0,0,.42),rgba(0,0,0,0))"></div>'
-   +'<div style="position:absolute;left:0;right:0;bottom:0;height:25.9cqw;background:linear-gradient(180deg,rgba(0,0,0,0),rgba(0,0,0,.46))"></div>'
-   +bars
-   +'<div style="position:absolute;left:2.6cqw;top:6.3cqw;display:flex;align-items:center;gap:1.9cqw">'
-     +'<span style="width:5.6cqw;height:5.6cqw;border-radius:50%;background:#F2EFEF;display:grid;place-items:center;overflow:hidden">'
-       +vmark("#1C1C1E","#6E7266",'style="width:56%;height:auto"')+'</span>'
-     +'<span style="font-size:2.78cqw;font-weight:600;color:#fff">viewly.se</span>'
-     +'<span style="font-size:2.5cqw;color:rgba(255,255,255,.7)">2 h</span></div>'
-   +'<span style="position:absolute;right:3cqw;top:7.4cqw;font-size:3.2cqw;font-weight:700;color:#fff;letter-spacing:.06em">···</span>'
-   +'<div style="position:absolute;left:2.8cqw;right:2.8cqw;bottom:5.6cqw;display:flex;align-items:center;gap:2.6cqw">'
-     +'<span style="flex:1;height:8.1cqw;border:1px solid rgba(255,255,255,.85);border-radius:4.05cqw;display:flex;align-items:center;padding:0 3.8cqw;font-size:2.7cqw;color:rgba(255,255,255,.82)">Skicka meddelande</span>'
-     +'<svg viewBox="0 0 24 24" style="width:5.4cqw;height:5.4cqw;flex:0 0 5.4cqw;fill:none;stroke:#fff;stroke-width:1.7"><path d="M20.8 8.6c0 4.6-8.8 9.6-8.8 9.6s-8.8-5-8.8-9.6a4.4 4.4 0 0 1 8.8-1.3 4.4 4.4 0 0 1 8.8 1.3z"/></svg>'
-     +'<svg viewBox="0 0 24 24" style="width:5.4cqw;height:5.4cqw;flex:0 0 5.4cqw;fill:none;stroke:#fff;stroke-width:1.7;stroke-linejoin:round"><path d="M21.5 3.5 2.8 10.2l7.4 2.6 2.6 7.4z"/></svg>'
-   +'</div></div>';
-}
-
-/* =====================================================================
-   INFORMATIONSDESIGN — tre primitiv till
-   Här slutar layouten vara en behållare för text och börjar rita hur
-   något faktiskt fungerar: input → bearbetning → output, en formatmatris
-   i sanna proportioner, och en kampanj som fyra faktiska artboards.
-   ===================================================================== */
-
-/* ---- delade byggstenar ---- */
-function thumbRow(keys, h, gap, brd){
-  return '<div style="display:flex;gap:'+gap+'cqw">'+keys.map(function(k){
-    return '<span style="flex:1;height:'+h+'cqw;'+bg(k)+';border:1px solid '+brd+'"></span>'}).join("")+'</div>';
-}
-function toneRow(o, on, off, act){
-  if(!o.tones) return '';
-  return '<div style="display:flex;gap:1.2cqw;margin-bottom:2.4cqw">'+o.tones.map(function(t,j){
-    var is = j===(o.now||0);
-    return '<span style="font-family:Montserrat,sans-serif;font-size:1.75cqw;letter-spacing:.12em;'
-     +'text-transform:uppercase;padding:.7cqw 1.6cqw;border:1px solid '+(is?act:off)+';'
-     +(is?'background:'+act+';color:'+on+';font-weight:600':'color:'+off)+'">'+esc(t)+'</span>';
-  }).join("")+'</div>';
-}
-function arrowDown(col, h){
-  return '<div style="display:flex;flex-direction:column;align-items:center;height:'+h+'cqw;justify-content:center">'
-   +'<span style="width:1px;flex:1;background:'+col+'"></span>'
-   +'<svg viewBox="0 0 10 10" style="width:2.4cqw;height:2.4cqw;display:block;margin-top:-.2cqw">'
-   +'<path d="M5 9 L1 4 M5 9 L9 4" fill="none" stroke="'+col+'" stroke-width="1"/></svg></div>';
-}
-
-/* ---------------------------------------------------------------- A · ARKIV */
-
-/* 10 · FLOW — input, bearbetning, output som ett tryckt diagram */
-A.flow = function(s,i,n){
-  var sig = s.mid.items.map(function(t,j){
-    return '<div style="display:flex;align-items:baseline;gap:1.6cqw;padding:1.15cqw 0">'
-     +'<span style="width:1.1cqw;height:1.1cqw;border-radius:50%;border:1px solid #6E7266;flex:0 0 1.1cqw"></span>'
-     +'<span style="font-size:3.1cqw;font-weight:300;line-height:1.15">'+esc(t)+'</span></div>';
-  }).join("");
-  var lines = s.out.lines.map(function(w){
-    return '<span style="display:block;height:1.15cqw;background:#DFD9D6;margin-bottom:1.15cqw;width:'+w+'%"></span>';
-  }).join("");
-  var stg = function(t){ return '<div class="a-fig" style="margin-bottom:1.8cqw">'+esc(t)+'</div>' };
-  return A.chrome(s.k,i,n,
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:3cqw 0">'
-   +'<div class="a-d sm" style="'+dsize(s.h,7.4,SERIF)+'margin-bottom:3.4cqw">'+esc(s.h)+'</div>'
-   + stg("01 — "+s.inp.lab)
-   + thumbRow(s.inp.ims, 9.5, 1.2, "#D8D2CF")
-   + arrowDown("#C9C2BE", 5.4)
-   + stg("02 — "+s.mid.lab)
-   +'<div style="columns:2;column-gap:4cqw;border-top:1px solid #E2DCD9;border-bottom:1px solid #E2DCD9;padding:1.4cqw 0">'+sig+'</div>'
-   + arrowDown("#C9C2BE", 5.4)
-   + stg("03 — "+s.out.lab)
-   + toneRow(s.out, "#F2EFEF", "#A9A29E", "#6E7266")
-   +'<div style="border:1px solid #D8D2CF;padding:3cqw 3.2cqw 3.4cqw">'
-     +'<div style="font-size:5.2cqw;font-weight:300;line-height:1.06;margin-bottom:2.4cqw">'+esc(s.out.title)+'</div>'
-     +'<div class="a-l" style="font-size:2.5cqw;line-height:1.55;margin-bottom:2cqw">'+esc(s.out.lead)+'</div>'
-     + lines
-   +'</div></div>');
-};
-
-/* 11 · MATRIX — samma objekt i sanna formatproportioner */
-A.matrix = function(s,i,n){
-  var H = 33;                                   /* gemensam höjd — bredden blir formatet */
-  var cells = s.fmts.map(function(f){
-    var w = (H*f[2]/f[3]).toFixed(1);
-    return '<div style="display:flex;flex-direction:column;gap:1.5cqw;flex:0 0 auto">'
-     +'<div style="width:'+w+'cqw;height:'+H+'cqw;position:relative;border:1px solid #D8D2CF;overflow:hidden">'
-       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
-     +'<div><div class="a-c" style="font-size:1.85cqw;color:#1C1C1E">'+esc(f[1])+'</div>'
-       +'<div class="a-fig" style="font-size:1.7cqw;margin-top:.5cqw">'+f[0]+' · 1080×'+Math.round(1080*f[3]/f[2])+'</div></div>'
-     +'</div>';
-  }).join("");
-  return A.chrome(s.k,i,n,
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:4.4cqw">'
-   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
-   +'<div style="display:flex;gap:2.6cqw;align-items:flex-end">'+cells+'</div>'
-   +'<div><div class="a-r" style="margin-bottom:2.2cqw"></div>'
-   +'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div></div></div>');
-};
-
-/* 12 · PHASES — kampanjen som fyra faktiska inlägg */
-A.phases = function(s,i,n){
-  var cards = s.items.map(function(it,j){
-    var on = j===s.now;
-    return '<div style="display:flex;flex-direction:column;gap:1.4cqw">'
-     +'<div style="aspect-ratio:4/5;position:relative;border:1px solid #D8D2CF;overflow:hidden'+(on?'':';opacity:.44')+'">'
-       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div>'
-       +'<span style="position:absolute;left:1.4cqw;top:1.4cqw;padding:.6cqw 1.3cqw;'
-       +'font-family:Montserrat,sans-serif;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;'
-       +(on?'background:#6E7266;color:#F2EFEF':'background:#F2EFEF;color:#1C1C1E')+'">'+esc(it[0])+'</span></div>'
-     +'<span class="a-fig" style="font-size:1.7cqw">'+esc(it[1])+'</span></div>';
-  }).join("");
-  return A.chrome(s.k,i,n,
-    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.6cqw">'
-   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
-   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.8cqw;max-width:74%">'+cards+'</div>'
    +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
 };
 
