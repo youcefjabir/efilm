@@ -92,15 +92,22 @@ var HL = [
   st:[
    {p:"mark", m:"hero", k:"KAMPANJEN", h:"Ett objekt", s:"En komplett kampanj."},
    {p:"quiet", h:"Färdig bostadsannons", em:"på 30 sekunder.", s:"Fyll i bostaden. Ladda upp bilderna.", k:"07 — Kampanjen"},
-   {p:"system", k:"Annonsskrivaren", h:"AI:n läser bilderna.", s:"Och plockar ut det som faktiskt säljer.",
-    items:["Ljusinsläpp","Takhöjd och volym","Material och ytskikt","Planlösning","Utsikt och läge","Områdets karaktär"]},
-   {p:"product", m:"kitchen", k:"Tonläge", h:"Din text. Ditt tonläge.", s:"Saklig, varm eller exklusiv. Två omskrivningar ingår.",
-    need:"Produktbild Annonsskrivaren 9:16: färdig annons med tonlägesval."},
+   {p:"flow", k:"Annonsskrivaren", h:"Från sex bilder till färdig text.",
+    inp:{lab:"Du laddar upp", ims:["hero","kitchen","living","dining","boucle","eames"]},
+    mid:{lab:"AI:n läser bilderna", items:["Ljusinsläpp","Takhöjd och volym","Material och ytskikt","Planlösning","Utsikt och läge","Områdets karaktär"]},
+    out:{lab:"Färdig annons — exempel", tones:["Saklig","Varm","Exklusiv"], now:1,
+         title:"Ljuset som gör skillnad",
+         lead:"Fyra rum med genomgående planlösning och eftermiddagssol rakt in i vardagsrummet.",
+         lines:[97,100,88,64]}},
    {p:"editorial", m:"portal", fy:.52, zoom:1.06, k:"Social / Ads Studio", h:"Kontorets egna mallar.",
     s:"Inlägg 4:5, kvadrat 1:1 och story 9:16 — samtidigt. Instagram, Facebook och LinkedIn.",
     need:"Skärmbild ur Social / Ads Studio: samma objekt i tre format."},
-   {p:"system", k:"Kampanjfaser", h:"Fyra lägen.", s:"Samma mall. Samma objekt. Hela resan.",
-    items:["Kommande","Till salu","Visning","Såld"]},
+   {p:"matrix", m:"hero", k:"Format", h:"Ett objekt, alla format.",
+    fmts:[["4:5","Inlägg",4,5],["1:1","Kvadrat",1,1],["9:16","Story",9,16]],
+    s:"Samma mall exporterar samtliga. Instagram, Facebook och LinkedIn."},
+   {p:"phases", m:"hero", k:"Kampanjfaser", h:"Fyra lägen. En mall.", now:1,
+    items:[["Kommande","Vecka 1"],["Till salu","Vecka 2"],["Visning","Söndag"],["Såld","Vecka 5"]],
+    s:"Samma objekt hela resan — bara statusen byts."},
    {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"07 — Kampanjen"}
   ]},
 
@@ -161,7 +168,11 @@ var PRIMS = [
   {id:"split",     n:"Split",           d:"Två ytor: före/efter, still/rörligt, jämförelse."},
   {id:"system",    n:"System",          d:"Ekosystemet som typografisk ryggrad — aldrig en ikonlista."},
   {id:"case",      n:"Case cover",      d:"Objekt, plats, en bild som får tala."},
-  {id:"cta",       n:"CTA",             d:"Extremt enkel slutbild."}
+  {id:"cta",       n:"CTA",             d:"Extremt enkel slutbild."},
+  /* --- informationsdesign: ritar hur något fungerar, inte bara vad det heter --- */
+  {id:"flow",      n:"Flow",            d:"Input → bearbetning → output. Visar processen, med ett faktiskt resultat i slutet."},
+  {id:"matrix",    n:"Format matrix",   d:"Samma objekt i sanna formatproportioner. 4:5, 1:1 och 9:16 mätbart mot varandra."},
+  {id:"phases",    n:"Phases",          d:"En kampanj som fyra faktiska artboards, med aktuellt läge tänt."}
 ];
 
 /* ett representativt exempel per primitiv, för specimen-rutnätet */
@@ -174,7 +185,28 @@ var SPECS = [
   {p:"split",     ref:["forvandling",1]},
   {p:"fullbleed", ref:["seendet",2]},
   {p:"case",      ref:["objekt",0]},
-  {p:"cta",       ref:["viewly",6]}
+  {p:"cta",       ref:["viewly",6]},
+  {p:"flow",      ref:["kampanjen",2]},
+  {p:"matrix",    ref:["kampanjen",4]},
+  {p:"phases",    ref:["kampanjen",5]}
+];
+
+/* --------------------------------------------------------------------
+   ANDRA FORMAT
+   Social / Ads Studio exporterar inlägg 4:5, kvadrat 1:1 och story 9:16.
+   Samma fyra inlägg renderade i alla tre — designen ska hålla i alla,
+   annars är det ingen mall utan en engångslayout.
+   -------------------------------------------------------------------- */
+var POSTS = [
+  {id:"p1", m:"hero",   k:"Kommande",  h:"Silvergården 9A", s:"Landskrona · 4 rok · 112 m²", meta:"Snart till salu"},
+  {id:"p2", m:"kitchen",k:"Till salu", h:"Ljuset som gör skillnad", s:"Visning söndag 13–14", meta:"viewly.se"},
+  {id:"p3", m:"boucle", k:"Detalj",    h:"Material och ljus", s:"", meta:"Fotograf · Viewly"},
+  {id:"p4", m:"drone",  k:"Såld",      h:"Såld på tio dagar", s:"", meta:"Tack för förtroendet"}
+];
+var FORMATS = [
+  {ar:"9:16", n:"Story",   d:"Instagram och Facebook Stories. Kritisk zon 250 / 320 px."},
+  {ar:"4:5",  n:"Inlägg",  d:"Störst yta i flödet. Standard för objektinlägg."},
+  {ar:"1:1",  n:"Kvadrat", d:"Kvadrat i profilrutnätet och som LinkedIn-annons."}
 ];
 
 var DIRS = [
@@ -208,8 +240,9 @@ var LAYERS = [
  {s:"LÅST",         n:"Typskala och vikter",     d:"Display 8,2–12,4 cqw · brödtext 2,75–3,05 cqw · meta 2,05–2,25 cqw."},
  {s:"LÅST",         n:"Kompositionsmask",        d:"Bildens form och plats i primitivet. Bilden byts — masken flyttas inte."},
  {s:"LÅST",         n:"Palett",                  d:"Fem värden per riktning. Inga tillfälliga färger."},
+ {s:"LÅST",         n:"Formatramar",             d:"9:16, 4:5 och 1:1. Samma typskala, olika vertikal rytm — inga fria format."},
  {s:"HALV",         n:"Kicker och folio",        d:"Texten är fri, positionen och graden är det inte."},
- {s:"HALV",         n:"Primitivval",             d:"Valfritt bland nio — men max två full bleed i rad per sekvens."},
+ {s:"HALV",         n:"Primitivval",             d:"Valfritt bland tolv — men max två full bleed i rad per sekvens."},
  {s:"HALV",         n:"Sekvenslängd",            d:"5–7 Stories. Under fem bär inte kapitlet, över sju tappar tittaren."},
  {s:"REDIGERBAR",   n:"Bild i slot",             d:"Vilket foto som helst ur biblioteket. Masken tar hand om utsnittet."},
  {s:"REDIGERBAR",   n:"Fokalpunkt och zoom",     d:"Y-fokus 0–100 %, zoom 100–170 %. Kompositionen står still."},

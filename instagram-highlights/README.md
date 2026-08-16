@@ -21,10 +21,11 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | # | Vy | Vad den visar |
 |---|----|----|
 | 01 | Riktning | ARKIV och SKUGGA sida vid sida, palett, typografi, logotypbruk, risk — och samma Story löst i båda |
-| 02 | Kompositioner | De nio primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
+| 02 | Kompositioner | De tolv primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
 | 03 | Profil | Tio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
-| 04 | Bibliotek | Alla tio kapitel med sekvensuppspelning |
-| 05 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
+| 04 | Format | Samma inlägg som artboards i 9:16, 4:5 och 1:1, kampanjen i flödesformat och rutnätet |
+| 05 | Bibliotek | Alla tio kapitel med sekvensuppspelning |
+| 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 
 Klicka på ett kapitel för att spela sekvensen. `←` `→` bläddrar · `Esc` stänger.
 **Instagrams UI** kan slås på i varje vy: det är Instagrams riktiga gränssnitt i
@@ -49,9 +50,9 @@ cirklar med lägst igenkänning vid 56 px.
 
 ---
 
-## Nio kompositionsprimitiv
+## Tolv kompositionsprimitiv
 
-Varje Story byggs av ett av nio primitiv. Bara **full bleed** och **case** låter
+Varje Story byggs av ett av tolv primitiv. Bara **full bleed** och **case** låter
 fotografiet äga hela ytan — 13 av 64 bildrutor. Resten bärs av typografi, linje,
 plåt och luft, med bilden i en mask.
 
@@ -66,6 +67,14 @@ plåt och luft, med bilden i en mask.
 | `system` | Ekosystemet som typografisk ryggrad — aldrig en ikonlista |
 | `case` | Objekt, plats, en bild som får tala |
 | `cta` | Extremt enkel slutbild |
+
+De tre sista ritar hur något fungerar i stället för att beskriva det:
+
+| Primitiv | Roll |
+|---|---|
+| `flow` | Input → bearbetning → output. Slutar i ett faktiskt resultat, inte en påstådd fördel |
+| `matrix` | Samma objekt i sanna formatproportioner, med px-mått. 4:5, 1:1 och 9:16 mätbart mot varandra |
+| `phases` | En kampanj som fyra faktiska artboards, med aktuellt läge tänt |
 
 ---
 
@@ -104,6 +113,47 @@ defaultvärde, inte en låsning — *Återställ slot* nollar tillbaka till syst
 
 Media-sloten är implementerad, inte bara beskriven: byt bild, dra i fokalpunkt
 och zoom i vy 05 eller i spelaren — masken, marginalerna och typskalan står still.
+
+---
+
+## Format
+
+Designen är bara ett system om den håller utanför 9:16. Social / Ads Studio
+exporterar tre format ur samma mall, och alla tre finns renderade i vy 04:
+
+| Format | Px | Roll |
+|---|---|---|
+| 9:16 | 1080 × 1920 | Story. Kritisk zon 250 / 320 px |
+| 4:5 | 1080 × 1350 | Inlägg. Störst yta i flödet, standard för objektinlägg |
+| 1:1 | 1080 × 1080 | Kvadrat i profilrutnätet och som LinkedIn-annons |
+
+Post-renderaren delar palett, typskala och logotypgeometri med Story-renderaren
+men har egen vertikal rytm per format — pappersbandet i ARKIV och gradienten i
+SKUGGA skalar med höjden, typografin gör det inte.
+
+---
+
+## Export
+
+Ramarna är HTML/CSS, inte bilder. `Ladda ner PNG` serialiserar ramen till ett
+SVG med `foreignObject`, rastrerar den i en canvas och lämnar över filen till
+artefaktens `downloads`-funktion. Typsnitt och foton ligger redan som data-URI,
+så inget hämtas externt och canvasen blir aldrig tainted.
+
+- **Enskild bildruta** — 1080 × 1920 PNG, i spelaren. Instagram-overlayen följer
+  med om den är påslagen.
+- **Hela kapitlet** — en kontaktkarta med alla bildrutor i en enda PNG, så det
+  blir en dialogruta i stället för sju.
+- **Artboards** — varje format i vy 04, 1080 px bredd.
+
+Webbläsaren visar en bekräftelse innan något sparas. Det finns också ett litet
+API på sidan om exporten behöver skriptas:
+
+```js
+await viewlyExport.frame("kampanjen", 2, "arkiv");   // Blob, 1080×1920 PNG
+await viewlyExport.sheet("kampanjen", "skugga");     // kontaktkarta
+await viewlyExport.post("p2", "4:5", "arkiv");       // artboard
+```
 
 ---
 
@@ -192,7 +242,8 @@ De kritiska luckorna:
 ```
 v6/highlights.html      fristående underlag — öppna denna
 v6/shell.html           skalet: tokens, komponenter, layout
-v6/draw.js              geometri, media-slots, riktningsstilar, nio primitiv × två riktningar
+v6/draw.js              geometri, media-slots, riktningsstilar, tolv primitiv × två riktningar,
+                        post-renderare för 9:16 / 4:5 / 1:1
 v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
 v6/app.js               studiovyerna och spelaren
 v6/brand-geometry.json  spårad logotyp + safe-area-spec

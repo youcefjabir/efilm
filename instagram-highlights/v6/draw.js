@@ -430,3 +430,211 @@ function igOverlay(n, idx){
      +'<svg viewBox="0 0 24 24" style="width:5.4cqw;height:5.4cqw;flex:0 0 5.4cqw;fill:none;stroke:#fff;stroke-width:1.7;stroke-linejoin:round"><path d="M21.5 3.5 2.8 10.2l7.4 2.6 2.6 7.4z"/></svg>'
    +'</div></div>';
 }
+
+/* =====================================================================
+   INFORMATIONSDESIGN — tre primitiv till
+   Här slutar layouten vara en behållare för text och börjar rita hur
+   något faktiskt fungerar: input → bearbetning → output, en formatmatris
+   i sanna proportioner, och en kampanj som fyra faktiska artboards.
+   ===================================================================== */
+
+/* ---- delade byggstenar ---- */
+function thumbRow(keys, h, gap, brd){
+  return '<div style="display:flex;gap:'+gap+'cqw">'+keys.map(function(k){
+    return '<span style="flex:1;height:'+h+'cqw;'+bg(k)+';border:1px solid '+brd+'"></span>'}).join("")+'</div>';
+}
+function toneRow(o, on, off, act){
+  if(!o.tones) return '';
+  return '<div style="display:flex;gap:1.2cqw;margin-bottom:2.4cqw">'+o.tones.map(function(t,j){
+    var is = j===(o.now||0);
+    return '<span style="font-family:Montserrat,sans-serif;font-size:1.75cqw;letter-spacing:.12em;'
+     +'text-transform:uppercase;padding:.7cqw 1.6cqw;border:1px solid '+(is?act:off)+';'
+     +(is?'background:'+act+';color:'+on+';font-weight:600':'color:'+off)+'">'+esc(t)+'</span>';
+  }).join("")+'</div>';
+}
+function arrowDown(col, h){
+  return '<div style="display:flex;flex-direction:column;align-items:center;height:'+h+'cqw;justify-content:center">'
+   +'<span style="width:1px;flex:1;background:'+col+'"></span>'
+   +'<svg viewBox="0 0 10 10" style="width:2.4cqw;height:2.4cqw;display:block;margin-top:-.2cqw">'
+   +'<path d="M5 9 L1 4 M5 9 L9 4" fill="none" stroke="'+col+'" stroke-width="1"/></svg></div>';
+}
+
+/* ---------------------------------------------------------------- A · ARKIV */
+
+/* 10 · FLOW — input, bearbetning, output som ett tryckt diagram */
+A.flow = function(s,i,n){
+  var sig = s.mid.items.map(function(t,j){
+    return '<div style="display:flex;align-items:baseline;gap:1.6cqw;padding:1.15cqw 0">'
+     +'<span style="width:1.1cqw;height:1.1cqw;border-radius:50%;border:1px solid #6E7266;flex:0 0 1.1cqw"></span>'
+     +'<span style="font-size:3.1cqw;font-weight:300;line-height:1.15">'+esc(t)+'</span></div>';
+  }).join("");
+  var lines = s.out.lines.map(function(w){
+    return '<span style="display:block;height:1.15cqw;background:#DFD9D6;margin-bottom:1.15cqw;width:'+w+'%"></span>';
+  }).join("");
+  var stg = function(t){ return '<div class="a-fig" style="margin-bottom:1.8cqw">'+esc(t)+'</div>' };
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;padding:3cqw 0">'
+   +'<div class="a-d sm" style="'+dsize(s.h,7.4,SERIF)+'margin-bottom:3.4cqw">'+esc(s.h)+'</div>'
+   + stg("01 — "+s.inp.lab)
+   + thumbRow(s.inp.ims, 9.5, 1.2, "#D8D2CF")
+   + arrowDown("#C9C2BE", 5.4)
+   + stg("02 — "+s.mid.lab)
+   +'<div style="columns:2;column-gap:4cqw;border-top:1px solid #E2DCD9;border-bottom:1px solid #E2DCD9;padding:1.4cqw 0">'+sig+'</div>'
+   + arrowDown("#C9C2BE", 5.4)
+   + stg("03 — "+s.out.lab)
+   + toneRow(s.out, "#F2EFEF", "#A9A29E", "#6E7266")
+   +'<div style="border:1px solid #D8D2CF;padding:3cqw 3.2cqw 3.4cqw">'
+     +'<div style="font-size:5.2cqw;font-weight:300;line-height:1.06;margin-bottom:2.4cqw">'+esc(s.out.title)+'</div>'
+     +'<div class="a-l" style="font-size:2.5cqw;line-height:1.55;margin-bottom:2cqw">'+esc(s.out.lead)+'</div>'
+     + lines
+   +'</div></div>');
+};
+
+/* 11 · MATRIX — samma objekt i sanna formatproportioner */
+A.matrix = function(s,i,n){
+  var H = 33;                                   /* gemensam höjd — bredden blir formatet */
+  var cells = s.fmts.map(function(f){
+    var w = (H*f[2]/f[3]).toFixed(1);
+    return '<div style="display:flex;flex-direction:column;gap:1.5cqw;flex:0 0 auto">'
+     +'<div style="width:'+w+'cqw;height:'+H+'cqw;position:relative;border:1px solid #D8D2CF;overflow:hidden">'
+       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
+     +'<div><div class="a-c" style="font-size:1.85cqw;color:#1C1C1E">'+esc(f[1])+'</div>'
+       +'<div class="a-fig" style="font-size:1.7cqw;margin-top:.5cqw">'+f[0]+' · 1080×'+Math.round(1080*f[3]/f[2])+'</div></div>'
+     +'</div>';
+  }).join("");
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:4.4cqw">'
+   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="display:flex;gap:2.6cqw;align-items:flex-end">'+cells+'</div>'
+   +'<div><div class="a-r" style="margin-bottom:2.2cqw"></div>'
+   +'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div></div></div>');
+};
+
+/* 12 · PHASES — kampanjen som fyra faktiska inlägg */
+A.phases = function(s,i,n){
+  var cards = s.items.map(function(it,j){
+    var on = j===s.now;
+    return '<div style="display:flex;flex-direction:column;gap:1.4cqw">'
+     +'<div style="aspect-ratio:4/5;position:relative;border:1px solid #D8D2CF;overflow:hidden'+(on?'':';opacity:.44')+'">'
+       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div>'
+       +'<span style="position:absolute;left:1.4cqw;top:1.4cqw;padding:.6cqw 1.3cqw;'
+       +'font-family:Montserrat,sans-serif;font-size:1.7cqw;letter-spacing:.14em;text-transform:uppercase;'
+       +(on?'background:#6E7266;color:#F2EFEF':'background:#F2EFEF;color:#1C1C1E')+'">'+esc(it[0])+'</span></div>'
+     +'<span class="a-fig" style="font-size:1.7cqw">'+esc(it[1])+'</span></div>';
+  }).join("");
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.6cqw">'
+   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.8cqw;max-width:74%">'+cards+'</div>'
+   +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
+};
+
+/* ---------------------------------------------------------------- B · SKUGGA */
+
+B.flow = function(s,i,n){
+  var sig = s.mid.items.map(function(t){
+    return '<div style="display:flex;align-items:baseline;gap:1.6cqw;padding:.95cqw 0">'
+     +'<span style="width:.9cqw;height:.9cqw;border-radius:50%;background:#98A088;flex:0 0 .9cqw"></span>'
+     +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:3.2cqw;font-weight:300;color:#CFCDC7">'+esc(t)+'</span></div>';
+  }).join("");
+  var lines = s.out.lines.map(function(w){
+    return '<span style="display:block;height:1.05cqw;background:#2C2C28;margin-bottom:1.1cqw;width:'+w+'%"></span>';
+  }).join("");
+  var stg = function(t){ return '<div class="b-k" style="font-size:1.75cqw;color:#6E6C66;margin-bottom:1.6cqw">'+esc(t)+'</div>' };
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+8)+'cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,7.4,SERIF)+'margin-bottom:3.4cqw">'+esc(s.h)+'</div>'
+   + stg("01 — "+s.inp.lab)
+   + thumbRow(s.inp.ims, 9.5, 1.2, "#23231F")
+   + arrowDown("#3A3A34", 5.4)
+   + stg("02 — "+s.mid.lab)
+   +'<div style="columns:2;column-gap:4cqw;border-top:1px solid #26261F;border-bottom:1px solid #26261F;padding:1.2cqw 0">'+sig+'</div>'
+   + arrowDown("#3A3A34", 5.4)
+   + stg("03 — "+s.out.lab)
+   + toneRow(s.out, "#14150F", "#6E6C66", "#98A088")
+   +'<div style="border:1px solid #26261F;padding:2.8cqw 3cqw 3.2cqw;background:#141412">'
+     +'<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-size:5.2cqw;font-weight:300;line-height:1.06;margin-bottom:2.2cqw">'+esc(s.out.title)+'</div>'
+     +'<div class="b-b" style="font-size:2.4cqw;line-height:1.5;margin-bottom:2cqw">'+esc(s.out.lead)+'</div>'
+     + lines
+   +'</div></div>'
+   +B.foot(i,n));
+};
+
+B.matrix = function(s,i,n){
+  var H = 33;
+  var cells = s.fmts.map(function(f){
+    var w = (H*f[2]/f[3]).toFixed(1);
+    return '<div style="display:flex;flex-direction:column;gap:1.4cqw;flex:0 0 auto">'
+     +'<div style="width:'+w+'cqw;height:'+H+'cqw;position:relative;overflow:hidden;outline:1px solid #26261F">'
+       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
+     +'<div><div class="b-k" style="font-size:1.7cqw;letter-spacing:.2em;color:#EFEDE7">'+esc(f[1])+'</div>'
+       +'<div class="b-k" style="font-size:1.6cqw;letter-spacing:.14em;color:#6E6C66;margin-top:.5cqw">'
+       +f[0]+' · 1080×'+Math.round(1080*f[3]/f[2])+'</div></div>'
+     +'</div>';
+  }).join("");
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+24)+'cqw;display:flex;flex-direction:column;gap:4.4cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="display:flex;gap:2.4cqw;align-items:flex-end">'+cells+'</div>'
+   +'<div><div style="width:8cqw;height:1px;background:#98A088;margin-bottom:2.4cqw"></div>'
+   +'<div class="b-b">'+esc(s.s)+'</div></div></div>'
+   +B.foot(i,n));
+};
+
+B.phases = function(s,i,n){
+  var cards = s.items.map(function(it,j){
+    var on = j===s.now;
+    return '<div style="display:flex;flex-direction:column;gap:1.3cqw">'
+     +'<div style="aspect-ratio:4/5;position:relative;overflow:hidden'+(on?'':';opacity:.5')+'">'
+       +'<div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div>'
+       +'<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,14,13,.42),rgba(14,14,13,.04) 45%,rgba(14,14,13,.45))"></div>'
+       +'<span style="position:absolute;left:1.3cqw;top:1.3cqw;padding:.55cqw 1.2cqw;font-size:1.65cqw;'
+       +'letter-spacing:.14em;text-transform:uppercase;font-weight:600;'
+       +(on?'background:#98A088;color:#14150F':'background:rgba(10,10,9,.72);color:#CFCDC7')+'">'+esc(it[0])+'</span></div>'
+     +'<span class="b-k" style="font-size:1.65cqw;color:#6E6C66;letter-spacing:.14em">'+esc(it[1])+'</span></div>';
+  }).join("");
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:50%;transform:translateY(-54%);display:flex;flex-direction:column;gap:3.4cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.6cqw;max-width:74%">'+cards+'</div>'
+   +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
+   +B.foot(i,n));
+};
+
+/* =====================================================================
+   ANDRA FORMAT — samma system utanför 9:16
+   Social / Ads Studio exporterar inlägg 4:5, kvadrat 1:1 och story 9:16.
+   Designen måste hålla i alla tre, annars är den inte ett system.
+   ===================================================================== */
+var AR = {"9:16":[9,16], "4:5":[4,5], "1:1":[1,1]};
+function post(dirId, p, ar){
+  var a = AR[ar]||AR["4:5"], tall = a[1]/a[0];       /* höjd i enheter av bredden */
+  var pad = 5.6, band = ar==="9:16" ? 26 : ar==="4:5" ? 17 : 15;
+  if(dirId==="skugga"){
+    return '<div class="b" style="overflow:hidden">'
+     +'<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(p.m,"post-"+p.id)+'"></div></div>'
+     +'<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,14,13,.52) 0%,rgba(14,14,13,.05) 30%,rgba(14,14,13,.08) 48%,rgba(14,14,13,.82) 100%)"></div>'
+     +'<div class="z" style="left:'+pad+'cqw;top:'+pad+'cqw"><span class="b-k" style="font-size:2.4cqw">'+esc(p.k)+'</span></div>'
+     +'<div class="z" style="left:'+pad+'cqw;right:'+pad+'cqw;bottom:'+(pad+7)+'cqw">'
+       +'<div class="b-d" style="'+dsize(p.h, ar==="1:1"?7.4:8.6, SERIF, pad)+'">'+esc(p.h)+'</div>'
+       +(p.s?'<div class="b-b" style="font-size:2.5cqw;margin-top:1.6cqw">'+esc(p.s)+'</div>':'')+'</div>'
+     +'<div class="z" style="left:'+pad+'cqw;right:'+pad+'cqw;bottom:'+pad+'cqw;display:flex;justify-content:space-between;align-items:center">'
+       +'<span class="b-wm" style="font-size:2.1cqw">'+vmark("#EFEDE7","#98A088")+'VIEWLY</span>'
+       +'<span class="b-k" style="font-size:1.9cqw;color:#8C8A84">'+esc(p.meta||"viewly.se")+'</span></div>'
+     +'</div>';
+  }
+  return '<div class="a" style="overflow:hidden">'
+   +'<div style="position:absolute;left:0;right:0;top:0;height:'+((tall-band/100)*100).toFixed(1)+'cqw;overflow:hidden">'
+     +'<div style="position:absolute;inset:0;'+bg(p.m,"post-"+p.id)+'"></div></div>'
+   +'<div style="position:absolute;left:0;right:0;bottom:0;background:#F2EFEF;padding:'+(pad*.72)+'cqw '+pad+'cqw '+(pad*.8)+'cqw;'
+     +'display:flex;flex-direction:column;gap:1.6cqw">'
+     +'<span class="a-k" style="font-size:2.1cqw">'+esc(p.k)+'</span>'
+     +'<div class="a-d" style="'+dsize(p.h, ar==="1:1"?6.6:7.4, SERIF, pad)+'line-height:1.02">'+esc(p.h)+'</div>'
+     +'<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:.8cqw">'
+       +'<span class="a-wm" style="font-size:1.95cqw">'+vmark("#1C1C1E","#6E7266")+'VIEWLY</span>'
+       +'<span class="a-c" style="font-size:1.85cqw">'+esc(p.meta||"viewly.se")+'</span></div>'
+   +'</div></div>';
+}

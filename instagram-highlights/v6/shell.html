@@ -188,6 +188,36 @@ tr:last-child td{border-bottom:0}
 .minicap{font-size:11.5px;color:var(--mut);margin-top:11px}
 .minicap b{color:var(--ink);letter-spacing:.06em}
 
+/* ============ EXPORT ============ */
+.dlb{background:var(--panel);border:1px solid var(--line2);color:var(--ink2);font:inherit;font-size:11px;
+  letter-spacing:.02em;padding:6px 11px;border-radius:6px;cursor:pointer;transition:border-color .15s,color .15s}
+.dlb:hover:not(:disabled){border-color:var(--acc);color:var(--ink)}
+.dlb:disabled{opacity:.55;cursor:progress}
+.pdl{display:flex;flex-direction:column;gap:6px;border-top:1px solid rgba(255,255,255,.12);padding-top:11px}
+.pside .dlb{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#E8E7E4;text-align:left}
+.pside .dlb:hover:not(:disabled){border-color:#98A088;color:#fff}
+
+/* ============ 04 FORMAT ============ */
+.art{width:100%;position:relative;overflow:hidden;border-radius:3px;container-type:inline-size;
+  isolation:isolate;text-align:left;background:#EFECE7;box-shadow:var(--shadow)}
+.art *{box-sizing:border-box}
+.fmts{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;align-items:end;margin-bottom:8px}
+.fcol{display:flex;flex-direction:column;gap:12px}
+.fcol .dlb{align-self:flex-start}
+.fmeta{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline}
+.fmeta b{font-size:13.5px;font-weight:650}
+.fmeta .mono{font-size:11px;color:var(--acc)}
+.fmeta em{flex:0 0 100%;font-style:normal;font-size:11.5px;color:var(--mut);line-height:1.5}
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px}
+.bd{display:flex;flex-direction:column;gap:9px}
+.bdcap{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.bdcap .mono{font-size:10.5px;color:var(--mut);letter-spacing:.08em}
+.fgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:460px;
+  border:1px solid var(--line);padding:3px;background:var(--line);border-radius:4px}
+.gcell{position:relative;aspect-ratio:1;overflow:hidden;container-type:inline-size;text-align:left;background:#EFECE7}
+.gcell *{box-sizing:border-box}
+@media(max-width:900px){.fmts{grid-template-columns:1fr}}
+
 /* ============ 04 BIBLIOTEK ============ */
 .hlgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
 .hlcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;

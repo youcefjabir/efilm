@@ -42,6 +42,122 @@ function toggles(withNeeds){
 }
 
 /* =====================================================================
+   EXPORT — PNG rakt ur webbläsaren
+   Ramarna är HTML/CSS, inte bilder. De serialiseras till ett SVG med
+   foreignObject, rastreras i en canvas och lämnas över till claude.use
+   ("downloads"). Allt — typsnitt och foton — ligger redan som data-URI,
+   så inget externt hämtas och canvasen blir aldrig tainted.
+   ===================================================================== */
+var FRAMECSS = '.__fr *{box-sizing:border-box}.__fr{text-align:left;position:relative;overflow:hidden;'
+  + 'container-type:inline-size;font-family:Montserrat,sans-serif}';
+var DL = null, dlTried = false;
+async function downloads(){
+  if(!dlTried){ dlTried = true;
+    try { DL = (window.claude && claude.use) ? await claude.use("downloads") : null } catch(e){ DL = null }
+  }
+  return DL;
+}
+function xhtml(html, w, h, bgc){
+  var d = document.createElement("div");
+  d.setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+  d.className = "__fr";
+  d.setAttribute("style","width:"+w+"px;height:"+h+"px;background:"+(bgc||"#EFECE7"));
+  d.innerHTML = html;
+  return new XMLSerializer().serializeToString(d);
+}
+function svgDoc(w, h, body){
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'
+   +'<style type="text/css">/*<![CDATA[*/'+(window.VFONTS||"")+FRAMECSS+CSS+'/*]]>*/</style>'
+   + body +'</svg>';
+}
+function rasterize(svg, w, h){
+  return new Promise(function(res, rej){
+    var img = new Image();
+    img.onload = function(){
+      var c = document.createElement("canvas"); c.width = w; c.height = h;
+      c.getContext("2d").drawImage(img, 0, 0, w, h);
+      c.toBlob(function(b){ b ? res(b) : rej(new Error("toBlob")) }, "image/png");
+    };
+    img.onerror = function(){ rej(new Error("rasterize")) };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  });
+}
+/* en ram i full Story-upplösning */
+function framePNG(html, w, h, bgc){
+  return rasterize(svgDoc(w, h,
+    '<foreignObject x="0" y="0" width="'+w+'" height="'+h+'">'+xhtml(html,w,h,bgc)+'</foreignObject>'), w, h);
+}
+/* hela kapitlet som en kontaktkarta — en fil istället för sju dialoger */
+function sheetPNG(dirId, hl, cw){
+  var ch = Math.round(cw*16/9), gap = Math.round(cw*.05), pad = gap, n = hl.st.length;
+  var W = pad*2 + n*cw + (n-1)*gap, H = pad*2 + ch + Math.round(cw*.13);
+  var bgc = dirId==="skugga" ? "#0E0E0D" : "#EFECE7";
+  var body = '<rect width="'+W+'" height="'+H+'" fill="'+(dirId==="skugga"?"#141414":"#E9E8E5")+'"/>';
+  hl.st.forEach(function(s,i){
+    var x = pad + i*(cw+gap);
+    body += '<foreignObject x="'+x+'" y="'+pad+'" width="'+cw+'" height="'+ch+'">'
+          + xhtml(story(dirId,s,i,n), cw, ch, bgc) + '</foreignObject>'
+          + '<text x="'+x+'" y="'+(pad+ch+Math.round(cw*.075))+'" font-family="Montserrat,sans-serif" '
+          + 'font-size="'+Math.round(cw*.042)+'" letter-spacing="'+(cw*.006).toFixed(1)+'" '
+          + 'fill="'+(dirId==="skugga"?"#8C8A84":"#63676A")+'">'
+          + String(i+1).padStart(2,"0") + '  ' + esc(s.p).toUpperCase() + '</text>';
+  });
+  return rasterize(svgDoc(W, H, body), W, H);
+}
+function slug(t){
+  return String(t).toLowerCase().replace(/[åä]/g,"a").replace(/ö/g,"o")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+}
+async function offer(blob, filename, btn){
+  var dl = await downloads();
+  var lbl = btn && btn.textContent;
+  if(!dl){ if(btn){ btn.textContent = "Export ej tillgänglig här"; } return }
+  try {
+    await dl.save({filename:filename, data:blob});
+    if(btn){ btn.textContent = "Sparad ✓"; setTimeout(function(){ btn.textContent = lbl }, 2200) }
+  } catch(e){
+    if(!btn) return;
+    btn.textContent = (e && e.code==="declined") ? lbl
+      : (e && e.code==="too_large") ? "För stor fil" : "Kunde inte spara";
+    setTimeout(function(){ btn.textContent = lbl }, 2600);
+  }
+}
+async function runExport(btn){
+  if(P.hl){ P.paused = true; clearTimeout(P.timer) }
+  var kind = btn.dataset.dl, lbl = btn.textContent;
+  btn.textContent = "Renderar…"; btn.disabled = true;
+  try {
+    if(kind === "frame"){
+      var h = hlOf(btn.dataset.hl), i = +btn.dataset.i, d = btn.dataset.dir;
+      var html = story(d, h.st[i], i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "");
+      var b = await framePNG(html, 1080, 1920, d==="skugga"?"#0E0E0D":"#EFECE7");
+      btn.textContent = lbl; btn.disabled = false;
+      await offer(b, "viewly-"+d+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png", btn);
+    } else if(kind === "sheet"){
+      var h2 = hlOf(btn.dataset.hl), d2 = btn.dataset.dir;
+      var b2 = await sheetPNG(d2, h2, 540);
+      btn.textContent = lbl; btn.disabled = false;
+      await offer(b2, "viewly-"+d2+"-"+slug(h2.name)+"-kontaktkarta.png", btn);
+    } else if(kind === "post"){
+      var p = POSTS.filter(function(x){return x.id===btn.dataset.pid})[0];
+      var ar = btn.dataset.ar, a = AR[ar], d3 = btn.dataset.dir;
+      var W = 1080, H = Math.round(1080*a[1]/a[0]);
+      var b3 = await framePNG(post(d3, p, ar), W, H, d3==="skugga"?"#0E0E0D":"#EFECE7");
+      btn.textContent = lbl; btn.disabled = false;
+      await offer(b3, "viewly-"+d3+"-"+p.id+"-"+ar.replace(":","x")+".png", btn);
+    }
+  } catch(e){
+    btn.disabled = false;
+    btn.textContent = "Rendering misslyckades";
+    setTimeout(function(){ btn.textContent = lbl }, 2600);
+  }
+}
+function dlBtn(kind, attrs, label){
+  var a = Object.keys(attrs).map(function(k){return ' data-'+k+'="'+attrs[k]+'"'}).join("");
+  return '<button class="dlb" type="button" data-dl="'+kind+'"'+a+'>'+label+'</button>';
+}
+
+/* =====================================================================
    01 · RIKTNING
    ===================================================================== */
 var CMP=[["viewly",1],["seendet",4],["forvandling",1]];
@@ -75,7 +191,7 @@ function secRiktning(){
   }).join("");
 
   return sechead("Riktning","Två riktningar, inte tre",
-    "ARKIV och SKUGGA är vidareutvecklade ur de ursprungliga spåren. Båda bygger på samma nio kompositionsprimitiv och "
+    "ARKIV och SKUGGA är vidareutvecklade ur de ursprungliga spåren. Båda bygger på samma tolv kompositionsprimitiv och "
    +"samma innehåll — skillnaden ligger i grund, ljus och hur fotografiet används. Ingen riktning är vald.")
    +'<div class="dps">'+panels+'</div>'
    +'<h3 class="h3">Samma Story, två riktningar</h3>'
@@ -97,17 +213,19 @@ function secKomp(){
   }).join("");
   var counts={}; HL.forEach(function(h){h.st.forEach(function(s){counts[s.p]=(counts[s.p]||0)+1})});
   var total=totalStories();
+  var mx=PRIMS.reduce(function(a,p){return Math.max(a,counts[p.id]||0)},1);
   var bars=PRIMS.map(function(p){
     var c=counts[p.id]||0, pct=Math.round(c/total*100);
     return '<div class="bar"><span class="bn">'+p.n+'</span>'
-      +'<span class="bt"><i style="width:'+(c/12*100)+'%"></i></span>'
+      +'<span class="bt"><i style="width:'+(c/mx*100).toFixed(1)+'%"></i></span>'
       +'<span class="bv">'+c+' <em>'+pct+'%</em></span></div>';
   }).join("");
   var owns=(counts.fullbleed||0)+(counts["case"]||0);
-  return sechead("Kompositioner","Nio primitiv — inte helbild på allt",
-    "Varje Story byggs av ett av nio primitiv. Bara två av dem — full bleed och case — låter fotografiet äga hela ytan, "
+  return sechead("Kompositioner",cap(nw(PRIMS.length))+" primitiv — inte helbild på allt",
+    "Varje Story byggs av ett av "+nw(PRIMS.length)+" primitiv. Bara två av dem — full bleed och case — låter fotografiet äga hela ytan, "
    +"och de är "+owns+" av "+total+" bildrutor ("+Math.round(owns/total*100)+" %). Övriga "+(total-owns)+" bärs av typografi, "
-   +"linje, plåt och luft, med bilden i en mask. Fördelningen nedan är den faktiska fördelningen i biblioteket.")
+   +"linje, plåt och luft, med bilden i en mask. De tre sista — flow, matrix och phases — ritar hur något fungerar "
+   +"i stället för att beskriva det. Fördelningen nedan är den faktiska fördelningen i biblioteket.")
    +dirbar()+toggles(true)
    +'<div class="specimens">'+cards+'</div>'
    +'<h3 class="h3">Fördelning över biblioteket</h3><div class="bars">'+bars+'</div>';
@@ -155,6 +273,45 @@ function secProfil(){
    +HL.map(function(h){return '<tr><td class="mono">'+h.num+'</td><td><b>'+h.name+'</b></td>'
      +'<td class="mut">'+h.q+'</td><td class="mut">'+h.why+'</td><td class="mono">'+h.st.length+'</td></tr>'}).join("")
    +'</tbody></table></div>';
+}
+
+/* =====================================================================
+   04 · FORMAT — samma system utanför 9:16
+   ===================================================================== */
+function board(d, p, ar, cls){
+  var a=AR[ar];
+  return '<div class="bd '+(cls||'')+'" style="--ar:'+a[0]+'/'+a[1]+'">'
+    +'<div class="art" style="aspect-ratio:'+a[0]+'/'+a[1]+'">'+post(d,p,ar)+'</div>'
+    +'<div class="bdcap"><span class="mono">'+ar+'</span>'
+    + dlBtn("post",{pid:p.id, ar:ar, dir:d},"PNG")+'</div></div>';
+}
+function secFormat(){
+  var d=state.dir, p=POSTS[1];
+  var one = FORMATS.map(function(f){
+    var a=AR[f.ar];
+    return '<div class="fcol"><div class="fmeta"><b>'+f.n+'</b><span class="mono">'+f.ar+'</span>'
+      +'<em>'+f.d+'</em></div>'
+      +'<div class="art" style="aspect-ratio:'+a[0]+'/'+a[1]+'">'
+      + post(d,p,f.ar) + (state.ig && f.ar==="9:16" ? igOverlay(5,1) : '') + '</div>'
+      + dlBtn("post",{pid:p.id, ar:f.ar, dir:d},"Ladda ner PNG")+'</div>';
+  }).join("");
+  var feed = POSTS.map(function(x){return board(d,x,"4:5")}).join("");
+  var grid = POSTS.concat(POSTS).concat(POSTS).slice(0,9).map(function(x,j){
+    return '<div class="gcell">'+post(d,POSTS[j%POSTS.length],"1:1")+'</div>'}).join("");
+  return sechead("Format","Ett objekt, tre artboards",
+    "Social / Ads Studio exporterar inlägg 4:5, kvadrat 1:1 och story 9:16 ur samma mall. Ett format som bara fungerar "
+   +"i 9:16 är ingen mall utan en engångslayout, så här ligger samma inlägg i alla tre — i sanna proportioner, "
+   +"inte skalade miniatyrer. Varje artboard går att ladda ner som PNG i 1080 px bredd.")
+   +dirbar()+toggles(false)
+   +'<div class="fmts">'+one+'</div>'
+   +'<h3 class="h3">Kampanjen i flödesformat · 4:5</h3>'
+   +'<p class="mut" style="font-size:12.5px;margin-bottom:16px;max-width:70ch">Fyra inlägg ur samma objekt och samma '
+   +'mall — bara status, bild och rubrik byts. Det är det Social / Ads Studio gör.</p>'
+   +'<div class="boards">'+feed+'</div>'
+   +'<h3 class="h3">Rutnätet · 1:1</h3>'
+   +'<p class="mut" style="font-size:12.5px;margin-bottom:16px;max-width:70ch">Så ser kvadraterna ut mot varandra i '
+   +'profilens rutnät, där de faktiskt bedöms.</p>'
+   +'<div class="fgrid">'+grid+'</div>';
 }
 
 /* =====================================================================
@@ -235,8 +392,9 @@ var SECTIONS=[
  {id:"riktning", n:"Riktning",     num:"01", f:secRiktning},
  {id:"komp",     n:"Kompositioner",num:"02", f:secKomp},
  {id:"profil",   n:"Profil",       num:"03", f:secProfil},
- {id:"bib",      n:"Bibliotek",    num:"04", f:secBib},
- {id:"lager",    n:"Lager & media",num:"05", f:secLager}
+ {id:"format",   n:"Format",       num:"04", f:secFormat},
+ {id:"bib",      n:"Bibliotek",    num:"05", f:secBib},
+ {id:"lager",    n:"Lager & media",num:"06", f:secLager}
 ];
 
 /* =====================================================================
@@ -279,6 +437,10 @@ function drawPlayer(){
    +(s.p==="cta"||s.p==="quiet"||s.p==="system"
       ? '<p class="mut" style="font-size:11.5px;line-height:1.55">Den här bildrutan använder inget fotografi.</p>'
       : slots.map(function(sl){return '<div class="pslot">'+mediaCtl(sl.id, sl.k)+'</div>'}).join(""))
+   +'<div class="pdl">'
+     + dlBtn("frame",{hl:h.id, i:P.i, dir:P.dir},"Ladda ner PNG · 1080×1920")
+     + dlBtn("sheet",{hl:h.id, dir:P.dir},"Hela kapitlet som kontaktkarta")
+   +'</div>'
    +'<div class="phint">← → bläddrar · Esc stänger</div>';
   clearTimeout(P.timer);
   if(!P.paused) P.timer=setTimeout(function(){step(1)}, P.DUR);
@@ -315,6 +477,7 @@ document.addEventListener("click",function(e){
   if(e.target.closest("#pnext")){step(1);return}
   if(e.target.closest("#pprev")){step(-1);return}
   var pd=e.target.closest("[data-pd]"); if(pd){P.dir=pd.dataset.pd;drawPlayer();return}
+  var dl=e.target.closest("[data-dl]"); if(dl){ runExport(dl); return }
   var mi=e.target.closest("[data-mi]");
   if(mi){var a=mi.dataset.mi.split(":");
     SLOTS[a[0]]=Object.assign({},SLOTS[a[0]],{img:a[1]}); afterSlot(a[0]); return}
@@ -357,5 +520,15 @@ $("#theme").onclick=function(){
   r.setAttribute("data-theme", c ? (c==="dark"?"light":"dark") : (d?"light":"dark"));
 };
 var s=document.createElement("style"); s.textContent=CSS; document.head.appendChild(s);
+
+/* liten publik export-API — samma väg som knapparna använder, så den går
+   att skripta och att testa utan att klicka sig igenom gränssnittet */
+window.viewlyExport = {
+  frame:function(hlId, i, dir){ var h=hlOf(hlId);
+    return framePNG(story(dir,h.st[i],i,h.st.length), 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7") },
+  sheet:function(hlId, dir, cw){ return sheetPNG(dir, hlOf(hlId), cw||540) },
+  post:function(pid, ar, dir){ var p=POSTS.filter(function(x){return x.id===pid})[0], a=AR[ar];
+    return framePNG(post(dir,p,ar), 1080, Math.round(1080*a[1]/a[0]), dir==="skugga"?"#0E0E0D":"#EFECE7") }
+};
 render();
 })();
