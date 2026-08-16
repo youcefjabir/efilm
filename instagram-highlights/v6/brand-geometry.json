@@ -1,0 +1,17 @@
+{
+  "source": "viewly-logo-mark.png (1080 × 941), traced",
+  "iou": 0.9925,
+  "viewBox": "0 0 858.6 756.3",
+  "limb": "M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z",
+  "dot": {"cx": 705.2, "cy": 153.4, "r": 153.4},
+  "angle_deg": 58.0,
+  "angle_tan": 1.6003,
+  "angle_notes": "trailing edge 57.43°, bottom cut 58.31°, mean 58.0°",
+  "mark_black": "#141416",
+  "ui_ink": "#1C1C1E",
+  "olive": "#6E7266",
+  "olive_lift": "#98A088",
+  "story": {"w": 1080, "h": 1920},
+  "safe_area_cqw": {"top": 23.2, "bottom": 26.0},
+  "safe_area_px": {"top": 250, "bottom": 280, "sides": 64}
+}

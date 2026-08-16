@@ -2,67 +2,129 @@
 
 Isolerat design- och strukturprojekt för Viewlys Instagram-profil.
 
-**Status: Fas 5 + 6 byggda. Systemet ligger i `v3/`.**
+**Status: designunderlag för granskning. Ingen riktning är vald.**
 
 Ingenting här är kopplat till produktion, publicering, databaser eller automation.
-Inga befintliga flöden är rörda. Instagram är inte kopplat.
+Inga befintliga flöden är rörda. Instagram är inte kopplat. Fas 7 är orörd.
 
 ---
 
 ## Öppna
 
 ```
-instagram-highlights/v3/highlights.html     ← systemet (aktuellt)
-instagram-highlights/v2/story-system.html   ← audit, strategi, prototyper
-instagram-highlights/studio.html            ← v1, granskad och förkastad
+instagram-highlights/v6/highlights.html   ← aktuellt underlag (ARKIV + SKUGGA)
 ```
 
-Öppna filen direkt i en webbläsare. Den är helt fristående — all typografi och
-all bild ligger inbäddad, inga externa anrop.
-
-Innehåller fem vyer:
+Öppna filen direkt i en webbläsare. Den är helt fristående — typografi och all
+bild ligger inbäddad som data-URI, inga externa anrop.
 
 | # | Vy | Vad den visar |
 |---|----|----|
-| 01 | Audit | Viewlys faktiska färger, typsnitt och bildbibliotek, hämtat från viewly.se |
-| 02 | Arkitektur | Rekommenderad Highlight-struktur med motivering |
-| 03 | Designspår | Tre art directions, varje kompositionsprimitiv renderad |
-| 04 | Profilvy | Alla nio covers i verklig Instagram-skala, alla tre spår sida vid sida |
-| 05 | Bibliotek | Samtliga Highlights, med uppspelning av varje sekvens |
+| 01 | Riktning | ARKIV och SKUGGA sida vid sida, palett, typografi, logotypbruk, risk — och samma Story löst i båda |
+| 02 | Kompositioner | De nio primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
+| 03 | Profil | Nio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
+| 04 | Bibliotek | Alla nio kapitel med sekvensuppspelning |
+| 05 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 
-Klicka på ett Highlight för att spela sekvensen som på Instagram.
-`←` `→` bläddrar · `mellanslag` pausar · `Esc` stänger.
+Klicka på ett kapitel för att spela sekvensen. `←` `→` bläddrar · `Esc` stänger.
+**Instagrams UI** kan slås på i varje vy: det är Instagrams riktiga gränssnitt i
+skala, inte en debug-overlay med färgade zoner.
+
+---
+
+## Två riktningar
+
+Tredje spåret (KONSTRUKTION) och de senare A/B/C-spåren är avförda. Kvar står de
+två som faktiskt bär varumärket:
+
+**ARKIV** — tryckt monografi. Papper `#F2EFEF`, ink `#1C1C1E`, oliv `#6E7266`.
+Cormorant Garamond 300 för display, Montserrat 500 / .24em för metadata. Bilden
+ligger i en ram på pappret. Covers är kapitelnummer i cirkel — högst kontrast mot
+Instagrams vita gränssnitt.
+
+**SKUGGA** — cinematisk. Svart `#0E0E0D`, ljus `#EFEDE7`, oliv lyft `#98A088`.
+Mörkret är grunden, fotografiet är ljuskällan. V-formen används som bländare:
+fotografiet framträder genom märket. Risken är dokumenterad — covers blir mörka
+cirklar med lägst igenkänning vid 56 px.
+
+---
+
+## Nio kompositionsprimitiv
+
+Varje Story byggs av ett av nio primitiv. Bara **full bleed** och **case** låter
+fotografiet äga hela ytan — 13 av 57 bildrutor. Resten bärs av typografi, linje,
+plåt och luft, med bilden i en mask.
+
+| Primitiv | Roll |
+|---|---|
+| `mark` | V-geometrin bär kompositionen — mask, ram eller överdimensionerat vattenmärke |
+| `fullbleed` | Bilden äger hela ytan. Nästan ingen typografi |
+| `quiet` | Nära tom. En mening som får bära |
+| `editorial` | Kontrollerad typografi i komponerad relation till bilden |
+| `product` | Ren presentation av 3D, motion eller portal |
+| `split` | Två ytor: före/efter, still/rörligt, jämförelse |
+| `system` | Ekosystemet som typografisk ryggrad — aldrig en ikonlista |
+| `case` | Objekt, plats, en bild som får tala |
+| `cta` | Extremt enkel slutbild |
+
+---
+
+## Två zoner
+
+**Canvas** — hela 1080 × 1920. Fotografi, papper, masker, gradienter och geometri
+får bo här och gå ut i kant.
+
+**Kritisk** — 250 px topp och 320 px botten tillhör Instagram. Rubrik, brödtext,
+kicker, folio, watermark och CTA håller sig innanför: 23,2 cqw uppe, 26,0 cqw
+nere, 6,4 cqw sidor. Detta är inte en krympning av designen — bilden och
+geometrin använder fortfarande hela ytan.
+
+Allt ritas i HTML/CSS inuti `container-type: inline-size`, så `1cqw` = 1 % av
+ramens bredd = 10,8 px i en 1080-px-Story. Måtten är därför upplösningsoberoende.
+
+---
+
+## Lagermodell
+
+Systemet är bara användbart om någon annan kan producera i det utan att designen
+glider.
+
+**Låst:** rutnät och marginaler · logotypgeometri · typskala och vikter ·
+kompositionsmask · palett.
+
+**Halvlåst:** kicker och folio (texten fri, positionen inte) · primitivval (max
+två full bleed i rad) · sekvenslängd (5–7 Stories).
+
+**Redigerbart:** bild i slot · fokalpunkt och zoom · rubrik och brödtext ·
+etiketter i split.
+
+Media-sloten är implementerad, inte bara beskriven: byt bild, dra i fokalpunkt
+och zoom i vy 05 eller i spelaren — masken, marginalerna och typskalan står still.
+
+---
+
+## Verifierad logotypgeometri
+
+Spårad ur `viewly-logo-mark.png` (1080 × 941), **IoU 0,9925** mot originalet.
+Ingen approximerad V-form.
+
+```
+viewBox  0 0 858.6 756.3
+limb     M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z
+punkt    cx 705.2 · cy 153.4 · r 153.4
+vinkel   58.0° · tan 1.6003
+svart    #141416   (djupare än UI-ink #1C1C1E)
+```
+
+Se `v6/brand-geometry.json`.
 
 ---
 
 ## Struktur
 
-```
-instagram-highlights/
-├── README.md
-├── studio.html              Preview-appen (fristående)
-└── content/
-    ├── highlights.json      9 Highlights, 57 Stories: copy, primitiv, mediareferenser
-    ├── directions.json      De tre designspårens tokens
-    ├── assets.json          27 tillgängliga assets + 7 identifierade luckor
-    └── brand.json           Färg, typografi och kompositionsprimitiv
-```
-
-Tre principer i datamodellen:
-
-1. **Numret är ordningen.** Ingen separat sorteringskolumn som kan hamna i otakt.
-2. **Assets ägs aldrig av en Story.** Stories refererar via `media`-nycklar till
-   `assets.json`, så samma bild kan användas i flera Highlights utan dubbletter.
-3. **Designspåret är ett lager ovanpå innehållet.** Byte av spår ändrar ingen
-   copy och ingen mediakoppling.
-
----
-
-## Rekommenderad struktur
-
-Briefens tio Highlights har blivit nio. Fem produkter som annars hade blivit egna
-rubriker är i stället absorberade i större berättelser — det är skillnaden mellan
-en tjänstekatalog och ett ekosystem.
+Nio kapitel, 57 Stories. Briefens tio Highlights har blivit nio — fem produkter
+som annars hade blivit egna rubriker är absorberade i större berättelser. Det är
+skillnaden mellan en tjänstekatalog och ett ekosystem.
 
 | # | Highlight | Besvarar | Stories |
 |---|-----------|----------|---------|
@@ -80,79 +142,51 @@ Absorberade: planritning och områdeskarta → **04 Rummet** · e-styling och
 Atmosphere → **05 Förvandling** · Annonsskrivaren och Ad Studio → **06 Systemet**.
 Om oss och Fotografer är sammanslagna till **08 Inifrån**.
 
+All copy är förslag och riktning, inte låsta krav.
+
 ---
 
 ## Materialläge
 
-27 verkliga assets hämtade från viewly.se används i previewen. 13 av 57 Stories
-saknar rätt material och är märkta `needsAsset` med en beskrivning av vad som
-behöver produceras. De renderas med en tydligt angiven ersättningsbild — slå på
-**Visa asset-status** i vyn Designspår för att se dem markerade.
+24 verkliga assets hämtade från viewly.se används i underlaget. 13 av 57 Stories
+saknar rätt material och är märkta med vad som behöver produceras — slå på
+**Markera saknat material** i vy 02 eller 04.
 
-De två kritiska luckorna är **motion-frames** (03) och **ett komplett case**
-fotograferat genom hela kedjan (07).
-
----
-
-## Faser
-
-- **Fas 1–3** — audit, arkitektur, tre designspår. Levererat, sedan förkastat.
-- **Fas 4** — omtag: brutal audit, ny grafikdriven strategi, tre hero-prototyper. Godkänd.
-- **Fas 5–6** — hela Story-systemet byggt. Ligger i `v3/`. **Här är vi.**
-- **Fas 7 — Publicering.** Diskuteras separat. Ingår inte i detta arbete.
+De två kritiska luckorna: **motion-frames** ur faktisk bostadsfilm (03) och
+**ett komplett case** fotograferat genom hela kedjan (07). Därutöver saknas
+vertikala portalskärmar 9:16 och en produktbild för Annonsskrivaren.
 
 ---
 
-## v3 — det byggda systemet
-
-Nio Highlights, 53 stories, ritade som SVG i 1080 × 1920. **74 % grafisk design,
-informationsdesign eller illustration.** Fotografi används på de 26 % där
-fotografiet faktiskt är berättelsen.
-
-| # | Highlight | Stories | Grafik |
-|---|-----------|---------|--------|
-| 01 | Viewly | 7 | 86 % |
-| 02 | För mäklare | 7 | 86 % |
-| 03 | Verktyg | 6 | 100 % |
-| 04 | Foto | 6 | 50 % |
-| 05 | 3D | 5 | 80 % |
-| 06 | Motion | 5 | 80 % |
-| 07 | E-styling | 6 | 67 % |
-| 08 | Cases | 6 | 33 % |
-| 09 | Om oss | 5 | 80 % |
-
-### Bärande grepp
-
-**Lokaliseringsdiagrammet.** Produkt-Highlights (04–07) öppnar med samma
-ekosystem-spine där en nod är tänd. Den som bara öppnar 3D förstår ändå helheten.
-Ekosystemet kommuniceras genom upprepning, inte genom en Highlight som påstår det.
-
-**58,0°.** Varje förgrening, konvergens, mask och blockkant använder logotypens
-uppmätta vinkel. Igenkänningen blir strukturell i stället för påklistrad. I
-`01 Viewly` bildar diagrammets ändpunkter själva en 58°-linje — vinkeln uppstår
-ur informationen.
-
-**Covers är pictogram, inte ikoner.** Varje cover är sitt eget Highlights kärnidé
-reducerad till två till fyra streck, ritad för ändamålet. Endast `09 Om oss`
-använder logotypen bokstavligt.
-
-### Safe area
-
-1080 × 1920 · 250 px reserverat upptill · 320 px nedtill · 64 px sidor ·
-levande yta x 64–1016, y 250–1600. Overlay kan slås på över varje ram.
-
-### Filer
+## Filer
 
 ```
-v3/highlights.html   fristående bibliotek med uppspelning
-v3/highlights.json   53 stories som data — copy, primitiv, media, luckor
-v3/draw.js           renderarbiblioteket, 8 primitiv
-v3/content.js        innehållsmodellen
-v2/brand-geometry.json  tracead logotyp + safe-area-spec
+v6/highlights.html      fristående underlag — öppna denna
+v6/shell.html           skalet: tokens, komponenter, layout
+v6/draw.js              geometri, media-slots, riktningsstilar, nio primitiv × två riktningar
+v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
+v6/app.js               studiovyerna och spelaren
+v6/brand-geometry.json  spårad logotyp + safe-area-spec
 ```
 
-### Kvar att producera
+---
 
-6 stories saknar rätt material. Två kritiska: **motion-frames** ur faktisk
-bostadsfilm och **ett komplett case** fotograferat genom hela kedjan.
-Se `needsAsset` i `v3/highlights.json`.
+## Historik
+
+- **v1** `studio.html` — audit, arkitektur, tre spår (ARKIV, SKUGGA, KONSTRUKTION).
+- **v2** `v2/` — brutal audit, spårad logotypgeometri, tre hero-prototyper.
+- **v3** `v3/` — hela biblioteket i SVG. Övertolkade safe area, all komposition
+  drogs in mot mitten.
+- **v4** `v4/` — tvåzonsmodell och media-slots. Fel creative direction.
+- **v5** `v5/` — tre nya spår. Förkastade: helbild på nästan varje ram.
+- **v6** `v6/` — **här är vi.** Tillbaka till ARKIV och SKUGGA från v1, med
+  verifierad geometri, skarpare media, riktig Instagram-overlay och
+  implementerade media-slots.
+
+---
+
+## Nästa steg
+
+Granska vy 01 och välj riktning — eller be om en tredje som blandar. Ingenting
+migreras, ingenting publiceras och ingen automation rörs förrän riktningen är
+godkänd.
