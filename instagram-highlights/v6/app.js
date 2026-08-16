@@ -113,43 +113,81 @@ function slug(t){
   return String(t).toLowerCase().replace(/[åä]/g,"a").replace(/ö/g,"o")
     .replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 }
-async function offer(blob, filename, btn){
+/* Bara en dialogruta åt gången får vara öppen. Kommer nästa för tätt svarar
+   runtimen rate_limited — det är inte ett fel utan "vänta". Serien stannade
+   på första filen för att det behandlades som dödligt. */
+var lastCode = "";
+function wait(ms){ return new Promise(function(r){ setTimeout(r, ms) }) }
+
+async function saveOnce(blob, filename){
   var dl = await downloads();
-  var lbl = btn && btn.textContent;
-  if(!dl){
-    if(btn) btn.textContent = (window.claude && window.claude.use)
-      ? "Nedladdning nekad" : "Öppna sidan på claude.ai för att ladda ner";
-    return;
+  if(!dl) throw {code:"unavailable"};
+  return dl.save({filename:filename, data:blob});
+}
+/* försöker om vid rate_limited, ger upp vid declined */
+async function saveRetry(blob, filename, onWait){
+  var delay = 700;
+  for(var attempt = 0; attempt < 8; attempt++){
+    try { await saveOnce(blob, filename); lastCode = "saved"; return true }
+    catch(e){
+      var code = (e && e.code) || "unknown";
+      lastCode = code;
+      if(code !== "rate_limited") throw e;
+      if(onWait) onWait(attempt + 1);
+      await wait(delay);
+      delay = Math.min(delay * 1.6, 4000);
+    }
   }
+  throw {code:"rate_limited"};
+}
+function codeText(code){
+  return code==="declined"    ? "Du avbröt" :
+         code==="unavailable" ? "Öppna sidan på claude.ai för att ladda ner" :
+         code==="too_large"   ? "Filen är för stor" :
+         code==="rate_limited"? "Dialogrutan hann inte stängas" :
+         code==="rejected_extension" || code==="extension_not_enabled" ? "Filtypen tillåts inte" :
+         "Kunde inte spara (" + code + ")";
+}
+function status(txt){
+  var el = document.getElementById("dlstat");
+  if(el) el.textContent = txt || "";
+}
+async function offer(blob, filename, btn){
+  var lbl = btn && btn.textContent;
   try {
-    await dl.save({filename:filename, data:blob});
+    await saveRetry(blob, filename, function(n){
+      if(btn) btn.textContent = "Väntar på dialogrutan… " + n;
+    });
     if(btn){ btn.textContent = "Sparad ✓"; setTimeout(function(){ btn.textContent = lbl }, 2200) }
+    status("Sparad: " + filename);
+    return true;
   } catch(e){
-    if(!btn) return;
-    btn.textContent = (e && e.code==="declined") ? lbl
-      : (e && e.code==="too_large") ? "För stor fil" : "Kunde inte spara";
-    setTimeout(function(){ btn.textContent = lbl }, 2600);
+    var code = (e && e.code) || "unknown";
+    if(btn){ btn.textContent = codeText(code); setTimeout(function(){ btn.textContent = lbl }, 3400) }
+    status(codeText(code) + " · kod " + code);
+    return false;
   }
 }
+
 async function runExport(btn){
   if(P.hl){ P.paused = true; clearTimeout(P.timer) }
   var kind = btn.dataset.dl, lbl = btn.textContent;
   btn.textContent = "Renderar…"; btn.disabled = true;
   try {
     if(kind === "frame"){
-      var h = hlOf(btn.dataset.hl), i = +btn.dataset.i, d = btn.dataset.dir;
+      var h = hlOf(btn.dataset.hl), i = +btn.dataset.i, d = btn.dataset.ddir;
       var html = story(d, h.st[i], i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "");
       var b = await framePNG(html, 1080, 1920, d==="skugga"?"#0E0E0D":"#EFECE7");
       btn.textContent = lbl; btn.disabled = false;
       await offer(b, "viewly-"+d+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png", btn);
     } else if(kind === "sheet"){
-      var h2 = hlOf(btn.dataset.hl), d2 = btn.dataset.dir;
+      var h2 = hlOf(btn.dataset.hl), d2 = btn.dataset.ddir;
       var b2 = await sheetPNG(d2, h2, 540);
       btn.textContent = lbl; btn.disabled = false;
       await offer(b2, "viewly-"+d2+"-"+slug(h2.name)+"-kontaktkarta.png", btn);
     } else if(kind === "post"){
       var p = POSTS.filter(function(x){return x.id===btn.dataset.pid})[0];
-      var ar = btn.dataset.ar, a = AR[ar], d3 = btn.dataset.dir;
+      var ar = btn.dataset.ar, a = AR[ar], d3 = btn.dataset.ddir;
       var W = 1080, H = Math.round(1080*a[1]/a[0]);
       var b3 = await framePNG(post(d3, p, ar), W, H, d3==="skugga"?"#0E0E0D":"#EFECE7");
       btn.textContent = lbl; btn.disabled = false;
@@ -293,6 +331,7 @@ async function exportVideo(btn){
     btn.disabled = false; busy = false;
     btn.textContent = (e && e.message==="no-recorder") ? "Webbläsaren stödjer inte inspelning"
                     : (e && e.message==="empty") ? "Inspelningen blev tom"
+                    : (e && e.message==="truncated") ? "Inspelningen blev avhuggen"
                     : (e && e.message==="no-video") ? "Ingen video i den här rutan" : "Inspelningen misslyckades";
     setTimeout(function(){ btn.textContent = lbl }, 3000);
   }
@@ -358,13 +397,35 @@ async function renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, skip){
   rec.stop(); vids.forEach(function(v){ v.pause() });
   await stopped;
   var blob = new Blob(chunks, {type:mime});
-  if(!blob.size){
-    /* muxen gav ingenting — prova nästa format en gång */
+  /* Muxen ljuger ibland: den säger sig klara formatet men skriver en tom
+     eller avhuggen fil. Kontrollera resultatet i stället för att lita på det. */
+  var okLen = await verifyClip(blob, dur);
+  if(!okLen){
     var next = (skip||[]).concat([mime]);
     if(pickMime(next)) return renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, next);
-    throw new Error("empty");
+    if(!blob.size) throw new Error("empty");
+    throw new Error("truncated");
   }
   return {blob: blob, ext: mime.indexOf("mp4")>=0 ? "mp4" : "webm"};
+}
+/* Spelar upp resultatet och läser längden. Rapporterar muxen ingen längd
+   faller vi tillbaka på en storleksgräns. */
+function verifyClip(blob, expected){
+  if(!blob.size) return Promise.resolve(false);
+  return new Promise(function(res){
+    var url = URL.createObjectURL(blob), v = document.createElement("video");
+    var done = function(ok){ URL.revokeObjectURL(url); res(ok) };
+    var t = setTimeout(function(){ done(blob.size > 20000 * Math.max(1, expected/2)) }, 3000);
+    v.preload = "metadata"; v.muted = true;
+    v.onloadedmetadata = function(){
+      clearTimeout(t);
+      var d = v.duration;
+      if(!isFinite(d) || d <= 0) return done(blob.size > 20000 * Math.max(1, expected/2));
+      done(d >= expected * 0.6);
+    };
+    v.onerror = function(){ clearTimeout(t); done(false) };
+    v.src = url;
+  });
 }
 
 /* =====================================================================
@@ -493,7 +554,7 @@ function board(d, p, ar, cls){
   return '<div class="bd '+(cls||'')+'" style="--ar:'+a[0]+'/'+a[1]+'">'
     +'<div class="art" style="aspect-ratio:'+a[0]+'/'+a[1]+'">'+post(d,p,ar)+'</div>'
     +'<div class="bdcap"><span class="mono">'+ar+'</span>'
-    + dlBtn("post",{pid:p.id, ar:ar, dir:d},"PNG")+'</div></div>';
+    + dlBtn("post",{pid:p.id, ar:ar, ddir:d},"PNG")+'</div></div>';
 }
 function secFormat(){
   var d=state.dir, p=POSTS[1];
@@ -504,7 +565,7 @@ function secFormat(){
       +'<div class="art" data-post-pid="'+p.id+'" data-post-ar="'+f.ar+'"'
       + (state.ig && f.ar==="9:16" ? ' data-post-ig="1"' : '')+' style="aspect-ratio:'+a[0]+'/'+a[1]+'">'
       + post(d,p,f.ar) + (state.ig && f.ar==="9:16" ? igOverlay(5,1) : '') + '</div>'
-      + dlBtn("post",{pid:p.id, ar:f.ar, dir:d},"Ladda ner PNG")+'</div>';
+      + dlBtn("post",{pid:p.id, ar:f.ar, ddir:d},"Ladda ner PNG")+'</div>';
   }).join("");
   var tpl = PHASEDOC.map(function(ph,j){
     var pp = POSTS.filter(function(x){return x.phase===ph.id})[0];
@@ -512,9 +573,9 @@ function secFormat(){
       +'<div class="art" data-post-pid="'+pp.id+'" data-post-ar="4:5" style="aspect-ratio:4/5">'+post(d,pp,"4:5")+'</div>'
       +'<div class="tplcap"><b>'+ph.n+'</b><span class="mono">'+String(j+1).padStart(2,"0")+'</span></div>'
       +'<p class="specd">'+ph.d+'</p>'
-      +'<div class="tplrow">'+dlBtn("post",{pid:pp.id, ar:"4:5", dir:d},"4:5")
-        + dlBtn("post",{pid:pp.id, ar:"1:1", dir:d},"1:1")
-        + dlBtn("post",{pid:pp.id, ar:"9:16", dir:d},"9:16")+'</div></div>';
+      +'<div class="tplrow">'+dlBtn("post",{pid:pp.id, ar:"4:5", ddir:d},"4:5")
+        + dlBtn("post",{pid:pp.id, ar:"1:1", ddir:d},"1:1")
+        + dlBtn("post",{pid:pp.id, ar:"9:16", ddir:d},"9:16")+'</div></div>';
   }).join("");
   var grid = [0,1,2,3,0,1,2,3,0].map(function(j){
     return '<div class="gcell" data-post-pid="'+POSTS[j].id+'" data-post-ar="1:1">'+post(d,POSTS[j],"1:1")+'</div>'}).join("");
@@ -695,26 +756,41 @@ async function downloadSeries(hlId, dir, btn){
   var h = hlOf(hlId), n = h.st.length, lbl = btn.textContent;
   btn.disabled = true;
   var dl = await downloads();
-  if(!dl){ btn.textContent = "Export ej tillgänglig här"; btn.disabled = false; busy = false;
-    setTimeout(function(){ btn.textContent = lbl }, 2600); return }
-  for(var i=0; i<n; i++){
+  if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
+    status(codeText("unavailable")); setTimeout(function(){ btn.textContent = lbl }, 3400); return }
+  var okCount = 0, failed = [];
+  for(var i = 0; i < n; i++){
     btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
+    var blob;
     try {
       var html = story(dir, h.st[i], i, n) + (state.ig ? igOverlay(n, i) : "");
-      var blob = await framePNG(html, 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7");
-      btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
-      await dl.save({filename:"viewly-"+dir+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png", data:blob});
+      blob = await framePNG(html, 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7");
+    } catch(e){ failed.push(i+1); continue }
+    btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
+    try {
+      await saveRetry(blob, "viewly-"+dir+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png",
+        function(k){ btn.textContent = "Väntar " + (i+1) + " / " + n + "… " + k });
+      okCount++;
     } catch(e){
-      btn.disabled = false; busy = false;
-      btn.textContent = (e && e.code==="declined") ? "Avbrutet vid " + (i+1) : "Stoppade vid " + (i+1);
-      setTimeout(function(){ btn.textContent = lbl }, 3000);
-      return;
+      var code = (e && e.code) || "unknown";
+      if(code === "declined"){                 /* medvetet nej — sluta fråga */
+        btn.disabled = false; busy = false;
+        btn.textContent = okCount + " av " + n + " sparade";
+        status("Avbrutet vid bildruta " + (i+1) + ". " + okCount + " sparade.");
+        setTimeout(function(){ btn.textContent = lbl }, 3800);
+        return;
+      }
+      failed.push(i+1);
     }
+    await wait(650);                            /* låt dialogrutan stängas helt */
   }
   btn.disabled = false; busy = false;
-  btn.textContent = n + " filer sparade ✓";
-  setTimeout(function(){ btn.textContent = lbl }, 2600);
+  btn.textContent = okCount + " av " + n + " sparade" + (failed.length ? " ✕" : " ✓");
+  status(failed.length ? (okCount+" sparade, misslyckades på "+failed.join(", "))
+                       : ("Alla "+okCount+" bildrutor sparade"));
+  setTimeout(function(){ btn.textContent = lbl }, 3800);
 }
+
 async function exportJSON(btn){
   var lbl = btn.textContent;
   var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS, posts:PEDITS}, null, 1);
@@ -828,15 +904,16 @@ function studioEditor(){
        +(s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
        +'<div class="edsec"><div class="eyebrow">Ladda ner</div>'
          +'<div class="dlcol">'
-           + dlBtn("frame",{hl:h.id, i:i, dir:state.dir},"Denna bildruta · 1080×1920")
-           + dlBtn("sheet",{hl:h.id, dir:state.dir},"Hela serien som kontaktkarta")
+           + dlBtn("frame",{hl:h.id, i:i, ddir:state.dir},"Denna bildruta · 1080×1920")
+           + dlBtn("sheet",{hl:h.id, ddir:state.dir},"Hela serien som kontaktkarta")
            +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+n+' bildrutor separat</button>'
            + (videoRects(story(state.dir,s,i,n), 1080, 1920).length
               ? '<button class="dlb pri" type="button" data-vhl="'+h.id+'" data-vi="'+i+'" data-vdir="'+state.dir+'">'
                 +'Denna bildruta som video</button>' : '')
          +'</div>'
          +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:8px">Separat export ger en bekräftelse '
-         +'per fil. Kontaktkartan är en enda fil.</p></div>'
+         +'per fil — godkänn varje ruta, annars stannar serien.</p>'
+         +'<div id="dlstat" class="dlstat"></div></div>'
      +'</div>'
    +'</div>';
 }
@@ -1029,8 +1106,8 @@ function drawPlayer(){
       ? '<p class="mut" style="font-size:11.5px;line-height:1.55">Den här bildrutan använder inget fotografi.</p>'
       : slots.map(function(sl){return '<div class="pslot">'+mediaCtl(sl.id, sl.k)+'</div>'}).join(""))
    +'<div class="pdl">'
-     + dlBtn("frame",{hl:h.id, i:P.i, dir:P.dir},"Ladda ner PNG · 1080×1920")
-     + dlBtn("sheet",{hl:h.id, dir:P.dir},"Hela kapitlet som kontaktkarta")
+     + dlBtn("frame",{hl:h.id, i:P.i, ddir:P.dir},"Ladda ner PNG · 1080×1920")
+     + dlBtn("sheet",{hl:h.id, ddir:P.dir},"Hela kapitlet som kontaktkarta")
    +'</div>'
    +'<div class="phint">← → bläddrar · Esc stänger</div>';
   clearTimeout(P.timer);
@@ -1063,7 +1140,10 @@ $("#railmark").innerHTML=vmark("#1C1C1E","#6E7266")+'<span class="brandname">VIE
 document.addEventListener("click",function(e){
   /* Studio i skenan går alltid till kapitellistan — annars sitter man fast i editorn. */
   var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; state.edit=null; render(); return}
-  var d=e.target.closest("[data-dir]"); if(d){state.dir=d.dataset.dir;render();return}
+  /* Bara riktningsknapparna — nedladdningsknapparna bär också ett riktnings-
+     attribut, och matchade tidigare här först: klicket bytte riktning och
+     scrollade upp i stället för att exportera. */
+  var d=e.target.closest(".dirb[data-dir]"); if(d){state.dir=d.dataset.dir;render();return}
   var p=e.target.closest("[data-play]");
   if(p){var q=p.dataset.play.split(":");play(q[0],+q[1],q[2]);return}
   if(e.target.closest("#pclose")){closeP();return}

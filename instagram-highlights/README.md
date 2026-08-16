@@ -185,7 +185,9 @@ sessionen; `Spara` behåller stillbilden, inte filmen.
 Exporten rastrerar designen en gång med videorutan genomskinlig, ritar sedan
 klippet i rutan bildruta för bildruta med designen ovanpå, och spelar in
 canvasen med `MediaRecorder`. Resultatet är 1080 × 1920, MP4 där webbläsaren
-klarar det och annars WebM. Ljudet från klippet följer med när webbläsaren
+klarar det och annars WebM. Filen kontrolleras efteråt — muxen säger sig ibland
+klara MP4 men skriver en tom eller avhuggen fil, och då körs exporten om med
+nästa format. Ljudet från klippet följer med när webbläsaren
 tillåter det. Max 20 sekunder.
 
 **Spara.** `Spara` lägger redigeringar, slot-inställningar och uppladdade bilder i
@@ -212,7 +214,10 @@ hämtas externt och canvasen blir aldrig tainted. **Alla redigeringar följer me
 | Alla N bildrutor separat | En PNG per bildruta, sekventiellt med räknare i knappen |
 | PNG i vy 04 Format | Varje kampanjmall i 9:16, 4:5 och 1:1, 1080 px bredd |
 
-Separat export ger en bekräftelse per fil. Avbryter du en, stannar serien där.
+Separat export ger en bekräftelse per fil. Bara en dialogruta får vara öppen åt
+gången — kommer nästa för tätt svarar runtimen `rate_limited`, och exporten
+väntar och försöker igen i stället för att stanna. Avbryter du en fil medvetet
+stannar serien där. En statusrad under knapparna visar utfallet och felkoden.
 Det finns också ett litet API på sidan om exporten behöver skriptas:
 
 ```js
