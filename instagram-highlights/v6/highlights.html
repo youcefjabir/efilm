@@ -340,6 +340,9 @@ tr:last-child td{border-bottom:0}
 .mi{width:38px;height:38px;padding:0;border:2px solid var(--line);border-radius:5px;overflow:hidden;cursor:pointer;background:none}
 .mi img{width:100%;height:100%;object-fit:cover;display:block}
 .mi.on{border-color:var(--acc)}
+.mi{position:relative}
+.vbadge{position:absolute;right:2px;bottom:2px;font-style:normal;font-size:7px;line-height:1;
+  background:rgba(0,0,0,.66);color:#fff;border-radius:2px;padding:2px 3px}
 .sl{display:block;font-size:11px;color:var(--mut);margin-bottom:12px}
 .sl em{font-style:normal;font-family:var(--mono);color:var(--ink2);float:right}
 .sl input{width:100%;margin-top:5px;accent-color:var(--acc)}
@@ -435,6 +438,14 @@ var M = window.VMEDIA || {};
 /* egna uppladdade bilder hamnar i samma pool som det medföljande biblioteket */
 var UPLOADS = {};
 function mediaURL(k){ return UPLOADS[k] || M[k] }
+
+/* Video i en slot: UPLOADS håller en stillbild ur klippet så all statisk
+   rendering fungerar oförändrat, och VIDEOS håller själva klippet. Elementet
+   märks med --vk så både uppspelningen i studion och videoexporten hittar det.
+   VIDEO_HOLE lämnar rutan genomskinlig när overlayen ska rastreras. */
+var VIDEOS = {};
+var VIDEO_HOLE = false;
+function isVideo(k){ return !!VIDEOS[k] }
 var esc = function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
 
@@ -496,8 +507,13 @@ function bg(k, sid, wide){
   if(!u) return 'background:repeating-linear-gradient(135deg,#DAD6D0 0 8px,#D2CDC6 8px 16px);';
   var fy = (o.fy!=null ? o.fy : 0.5)*100;
   var z  = o.zoom || 1;
-  return 'background-image:url('+u+');background-size:cover;background-position:50% '+fy.toFixed(1)+'%;'
-   + (z!==1 ? 'transform:scale('+z.toFixed(3)+');transform-origin:50% '+fy.toFixed(1)+'%;' : '');
+  var vid = isVideo(key);
+  var out = (vid && VIDEO_HOLE)
+    ? 'background:transparent;'
+    : 'background-image:url('+u+');background-size:cover;background-position:50% '+fy.toFixed(1)+'%;';
+  if(z!==1) out += 'transform:scale('+z.toFixed(3)+');transform-origin:50% '+fy.toFixed(1)+'%;';
+  if(vid) out += '--vk:'+key+';--vfy:'+fy.toFixed(1)+';';
+  return out;
 }
 /* varje media-slot i biblioteket får ett stabilt id: <highlight>-<index>[-b] */
 function sid(s, b){ return s.sid ? (s.sid+(b?"-b":"")) : null }
@@ -540,7 +556,9 @@ var CSS = ''
 /* miniatyr-artboard: egen container så cqw räknas mot kortet, inte mot ramen */
 +'.mini{display:flex;flex-direction:column;gap:1.2cqw;opacity:.5}'
 +'.mini.on{opacity:1}'
-+'.miniart{width:100%;aspect-ratio:4/5;position:relative;overflow:hidden;container-type:inline-size;text-align:left}';
++'.miniart{width:100%;aspect-ratio:4/5;position:relative;overflow:hidden;container-type:inline-size;text-align:left}'
+/* videoslot: klippet ligger i samma ruta som stillbilden skulle ha legat i */
++'.vfill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}';
 
 /* =====================================================================
    RENDERARE
@@ -1541,9 +1559,9 @@ function xhtml(html, w, h, bgc){
   d.innerHTML = html;
   return new XMLSerializer().serializeToString(d);
 }
-function svgDoc(w, h, body){
+function svgDoc(w, h, body, extraCSS){
   return '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'
-   +'<style type="text/css">/*<![CDATA[*/'+(window.VFONTS||"")+FRAMECSS+CSS+'/*]]>*/</style>'
+   +'<style type="text/css">/*<![CDATA[*/'+(window.VFONTS||"")+FRAMECSS+CSS+(extraCSS||"")+'/*]]>*/</style>'
    + body +'</svg>';
 }
 function rasterize(svg, w, h){
@@ -1559,10 +1577,15 @@ function rasterize(svg, w, h){
   });
 }
 /* en ram i full Story-upplösning */
-function framePNG(html, w, h, bgc){
+function framePNG(html, w, h, bgc, extraCSS){
   return rasterize(svgDoc(w, h,
-    '<foreignObject x="0" y="0" width="'+w+'" height="'+h+'">'+xhtml(html,w,h,bgc)+'</foreignObject>'), w, h);
+    '<foreignObject x="0" y="0" width="'+w+'" height="'+h+'">'+xhtml(html,w,h,bgc)+'</foreignObject>', extraCSS), w, h);
 }
+/* Videoexportens overlay: riktningens grundyta måste bort, annars ligger
+   ARKIV:s papper respektive SKUGGAs svarta bakom videorutan och täcker den.
+   Grundfärgen målas i stället direkt i canvasen, under klippet. */
+var HOLE_CSS = '.a,.b{background:transparent!important}';
+var SHELL_BG = {arkiv:"#F2EFEF", skugga:"#0E0E0D"};
 /* hela kapitlet som en kontaktkarta — en fil istället för sju dialoger */
 function sheetPNG(dirId, hl, cw){
   var ch = Math.round(cw*16/9), gap = Math.round(cw*.05), pad = gap, n = hl.st.length;
@@ -1587,7 +1610,11 @@ function slug(t){
 async function offer(blob, filename, btn){
   var dl = await downloads();
   var lbl = btn && btn.textContent;
-  if(!dl){ if(btn){ btn.textContent = "Export ej tillgänglig här"; } return }
+  if(!dl){
+    if(btn) btn.textContent = (window.claude && window.claude.use)
+      ? "Nedladdning nekad" : "Öppna sidan på claude.ai för att ladda ner";
+    return;
+  }
   try {
     await dl.save({filename:filename, data:blob});
     if(btn){ btn.textContent = "Sparad ✓"; setTimeout(function(){ btn.textContent = lbl }, 2200) }
@@ -1631,6 +1658,207 @@ async function runExport(btn){
 function dlBtn(kind, attrs, label){
   var a = Object.keys(attrs).map(function(k){return ' data-'+k+'="'+attrs[k]+'"'}).join("");
   return '<button class="dlb" type="button" data-dl="'+kind+'"'+a+'>'+label+'</button>';
+}
+
+/* =====================================================================
+   VIDEO
+   Ett uppladdat klipp läggs i samma slot som en bild. En stillbild ur
+   klippet sparas som poster, så allt statiskt — miniatyrer, kontaktkarta,
+   PNG-export — fungerar oförändrat. I studion spelas klippet i rutan.
+
+   Videoexporten komponerar i en canvas: designen rastreras en gång med
+   videorutan genomskinlig, sedan ritas klippet in i rutan bildruta för
+   bildruta med designen ovanpå. MediaRecorder spelar in canvasen.
+   ===================================================================== */
+var VMAX = 20;                                    /* sekunder — en Story är kort */
+
+function ingestVideo(file, done){
+  var url = URL.createObjectURL(file);
+  var v = document.createElement("video");
+  v.preload = "auto"; v.muted = true; v.playsInline = true; v.src = url;
+  var failed = function(){ done(null) };
+  v.onerror = failed;
+  v.onloadeddata = function(){
+    var grab = function(){
+      var c = document.createElement("canvas");
+      var sc = Math.min(1, 1400/Math.max(v.videoWidth||1, v.videoHeight||1));
+      c.width  = Math.max(2, Math.round((v.videoWidth||720)*sc));
+      c.height = Math.max(2, Math.round((v.videoHeight||1280)*sc));
+      try { c.getContext("2d").drawImage(v, 0, 0, c.width, c.height) } catch(e){ return failed() }
+      var key = "video" + (++upN) + "-" + Date.now().toString(36).slice(-4);
+      UPLOADS[key] = c.toDataURL("image/jpeg", 0.82);
+      VIDEOS[key]  = {url:url, w:v.videoWidth, h:v.videoHeight,
+                      dur:Math.min(isFinite(v.duration)?v.duration:5, VMAX), name:file.name};
+      done(key);
+    };
+    if(v.duration && isFinite(v.duration) && v.duration > 0.4){
+      v.onseeked = function(){ v.onseeked = null; grab() };
+      try { v.currentTime = Math.min(0.35, v.duration/3) } catch(e){ grab() }
+    } else grab();
+  };
+}
+
+/* Efter varje rendering: lägg ett <video> i varje ruta som pekar på ett klipp. */
+function mountVideos(root){
+  root = root || document;
+  root.querySelectorAll('[style*="--vk:"]').forEach(function(el){
+    var k = (el.style.getPropertyValue("--vk") || "").trim();
+    var v = VIDEOS[k];
+    if(!v || el.querySelector("video.vfill")) return;
+    var vd = document.createElement("video");
+    vd.className = "vfill";
+    vd.src = v.url; vd.muted = true; vd.loop = true; vd.autoplay = true;
+    vd.playsInline = true; vd.setAttribute("playsinline", "");
+    vd.style.objectPosition = "50% " + ((el.style.getPropertyValue("--vfy")||"50").trim()) + "%";
+    el.appendChild(vd);
+    var go = vd.play(); if(go && go.catch) go.catch(function(){});
+  });
+}
+
+/* Var ligger videorutorna i en 1080-bred ram? Mät på en kopia utanför skärmen. */
+function videoRects(html, w, h){
+  var host = document.createElement("div");
+  host.className = "__fr";
+  host.setAttribute("style", "position:fixed;left:-99999px;top:0;width:"+w+"px;height:"+h+"px;"
+    + "container-type:inline-size;overflow:hidden;text-align:left");
+  host.innerHTML = html;
+  document.body.appendChild(host);
+  var hb = host.getBoundingClientRect(), out = [];
+  host.querySelectorAll('[style*="--vk:"]').forEach(function(el){
+    var k = (el.style.getPropertyValue("--vk")||"").trim();
+    if(!VIDEOS[k]) return;
+    var r = el.getBoundingClientRect();
+    out.push({k:k, x:r.x-hb.x, y:r.y-hb.y, w:r.width, h:r.height,
+              fy:parseFloat(el.style.getPropertyValue("--vfy")||"50")/100});
+  });
+  document.body.removeChild(host);
+  return out;
+}
+
+function loadImg(src){
+  return new Promise(function(res, rej){
+    var i = new Image(); i.onload = function(){res(i)}; i.onerror = rej; i.src = src;
+  });
+}
+/* MP4 först — det är vad Instagram tar emot — men vissa webbläsare säger sig
+   klara det och muxar ändå en tom fil, så exporten faller tillbaka på WebM
+   om resultatet blir noll byte. */
+var MIMES = ["video/mp4;codecs=avc1.42E01E", "video/mp4",
+             "video/webm;codecs=vp9", "video/webm;codecs=vp8", "video/webm"];
+function pickMime(skip){
+  for(var i=0;i<MIMES.length;i++){
+    var m = MIMES[i];
+    if(skip && skip.indexOf(m)>=0) continue;
+    if(window.MediaRecorder && MediaRecorder.isTypeSupported(m)) return m;
+  }
+  return null;
+}
+
+/* draw source into dest rect, cover-fit, honouring the slot's focal point */
+function drawCover(g, src, sw, sh, r){
+  if(!sw || !sh) return;
+  var s = Math.max(r.w/sw, r.h/sh), dw = sw*s, dh = sh*s;
+  var dx = r.x + (r.w - dw)/2;
+  var dy = r.y + (r.h - dh)*(r.fy!=null ? r.fy : 0.5);
+  g.drawImage(src, dx, dy, dw, dh);
+}
+
+async function exportVideo(btn){
+  if(busy) return; busy = true;
+  var lbl = btn.textContent;
+  var h = hlOf(btn.dataset.vhl), i = +btn.dataset.vi, d = btn.dataset.vdir, n = h.st.length;
+  btn.disabled = true; btn.textContent = "Förbereder…";
+  try {
+    VIDEO_HOLE = true;
+    var holeHtml = story(d, h.st[i], i, n) + (state.ig ? igOverlay(n, i) : "");
+    VIDEO_HOLE = false;
+    var full = story(d, h.st[i], i, n);
+    var rects = videoRects(full, 1080, 1920);
+    if(!rects.length){
+      btn.textContent = "Ingen video i den här rutan"; btn.disabled = false; busy = false;
+      setTimeout(function(){ btn.textContent = lbl }, 2800); return;
+    }
+    var res = await renderVideoFrom(holeHtml, full, d, function(p){
+      btn.textContent = "Spelar in " + Math.round(p*100) + " %";
+    });
+    btn.textContent = lbl; btn.disabled = false; busy = false;
+    await offer(res.blob, "viewly-"+d+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+"."+res.ext, btn);
+  } catch(e){
+    btn.disabled = false; busy = false;
+    btn.textContent = (e && e.message==="no-recorder") ? "Webbläsaren stödjer inte inspelning"
+                    : (e && e.message==="empty") ? "Inspelningen blev tom"
+                    : (e && e.message==="no-video") ? "Ingen video i den här rutan" : "Inspelningen misslyckades";
+    setTimeout(function(){ btn.textContent = lbl }, 3000);
+  }
+}
+/* separat så att overlay-HTML och mät-HTML kan skilja sig åt */
+async function renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, skip){
+  var w = 1080, h = 1920, bgc = SHELL_BG[dirId] || SHELL_BG.arkiv;
+  var rects = videoRects(measureHtml, w, h);
+  if(!rects.length) throw new Error("no-video");
+  var mime = pickMime(skip);
+  if(!mime) throw new Error("no-recorder");
+  var overlay = await loadImg(URL.createObjectURL(
+    await framePNG(holeHtml, w, h, "transparent", HOLE_CSS)));
+  var vids = rects.map(function(r){
+    var v = document.createElement("video");
+    v.src = VIDEOS[r.k].url; v.muted = true; v.loop = true; v.playsInline = true;
+    v.setAttribute("playsinline",""); return v;
+  });
+  await Promise.all(vids.map(function(v){
+    return new Promise(function(res){ v.oncanplay = res; v.onerror = res; v.load() });
+  }));
+  var dur = Math.min.apply(null, rects.map(function(r){ return VIDEOS[r.k].dur }).concat([VMAX]));
+  var c = document.createElement("canvas"); c.width = w; c.height = h;
+  var g = c.getContext("2d");
+  var stream = c.captureStream(30);
+  try {
+    var s0 = vids[0].captureStream ? vids[0].captureStream()
+           : (vids[0].mozCaptureStream ? vids[0].mozCaptureStream() : null);
+    if(s0) s0.getAudioTracks().forEach(function(t){ stream.addTrack(t) });
+  } catch(e){}
+  var rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:8000000});
+  var chunks = [];
+  rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) chunks.push(ev.data) };
+  var stopped = new Promise(function(res){ rec.onstop = res });
+  rec.onerror = function(){ try{ rec.stop() }catch(e){} };
+  await Promise.all(vids.map(function(v){
+    try { v.currentTime = 0 } catch(e){}
+    var pr = v.play(); return (pr && pr.catch) ? pr.catch(function(){}) : Promise.resolve();
+  }));
+  /* rita en bildruta innan inspelningen startar — en tom ström ger en tom fil */
+  var paint = function(){
+    g.fillStyle = bgc; g.fillRect(0,0,w,h);
+    rects.forEach(function(r,i){ drawCover(g, vids[i], vids[i].videoWidth, vids[i].videoHeight, r) });
+    g.drawImage(overlay, 0, 0, w, h);
+  };
+  paint();
+  await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r) }) });
+  rec.start(250);                       /* periodiska chunks — annars tappar vissa muxar allt */
+  var t0 = performance.now();
+  await new Promise(function(res){
+    var tick = function(){
+      var el = (performance.now() - t0)/1000;
+      paint();
+      if(onProgress) onProgress(Math.min(1, el/dur));
+      if(el >= dur){ res(); return }
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+  /* låt sista chunken skrivas ut innan vi stoppar */
+  try { rec.requestData() } catch(e){}
+  await new Promise(function(r){ setTimeout(r, 320) });
+  rec.stop(); vids.forEach(function(v){ v.pause() });
+  await stopped;
+  var blob = new Blob(chunks, {type:mime});
+  if(!blob.size){
+    /* muxen gav ingenting — prova nästa format en gång */
+    var next = (skip||[]).concat([mime]);
+    if(pickMime(next)) return renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, next);
+    throw new Error("empty");
+  }
+  return {blob: blob, ext: mime.indexOf("mp4")>=0 ? "mp4" : "webm"};
 }
 
 /* =====================================================================
@@ -1932,16 +2160,21 @@ function ingest(file, done){
   fr.readAsDataURL(file);
 }
 function handleUpload(files, slot){
-  var list = Array.prototype.slice.call(files).filter(function(f){return /^image\//.test(f.type)});
-  if(!list.length){ flash("Bara bildfiler", true); return }
-  var left = list.length, first = null;
+  var list = Array.prototype.slice.call(files).filter(function(f){
+    return /^image\//.test(f.type) || /^video\//.test(f.type) });
+  if(!list.length){ flash("Bara bild- eller videofiler", true); return }
+  var left = list.length, first = null, vids = 0;
+  flash("Läser in…");
   list.forEach(function(f){
-    ingest(f, function(key){
+    var isVid = /^video\//.test(f.type);
+    (isVid ? ingestVideo : ingest)(f, function(key){
       if(key && !first) first = key;
+      if(key && isVid) vids++;
       if(--left === 0){
-        if(!first){ flash("Kunde inte läsa bilden", true); return }
+        if(!first){ flash("Kunde inte läsa filen", true); return }
         if(slot) SLOTS[slot] = Object.assign({}, SLOTS[slot], {img:first});
-        flash(list.length>1 ? list.length+" bilder tillagda" : "Bild tillagd");
+        flash(vids ? (vids>1 ? vids+" klipp tillagda" : "Klipp tillagt")
+                   : (list.length>1 ? list.length+" bilder tillagda" : "Bild tillagd"));
         renderEditor();
       }
     });
@@ -2092,6 +2325,9 @@ function studioEditor(){
            + dlBtn("frame",{hl:h.id, i:i, dir:state.dir},"Denna bildruta · 1080×1920")
            + dlBtn("sheet",{hl:h.id, dir:state.dir},"Hela serien som kontaktkarta")
            +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+n+' bildrutor separat</button>'
+           + (videoRects(story(state.dir,s,i,n), 1080, 1920).length
+              ? '<button class="dlb pri" type="button" data-vhl="'+h.id+'" data-vi="'+i+'" data-vdir="'+state.dir+'">'
+                +'Denna bildruta som video</button>' : '')
          +'</div>'
          +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:8px">Separat export ger en bekräftelse '
          +'per fil. Kontaktkartan är en enda fil.</p></div>'
@@ -2146,8 +2382,8 @@ function refreshPosts(){
   var d = state.dir;
   document.querySelectorAll("[data-post-ar]").forEach(function(el){
     var p = POSTS.filter(function(x){return x.id===el.dataset.postPid})[0];
-    if(p) el.innerHTML = post(d, p, el.dataset.postAr)
-      + (el.dataset.postIg==="1" ? igOverlay(5,1) : "");
+    if(p){ el.innerHTML = post(d, p, el.dataset.postAr)
+      + (el.dataset.postIg==="1" ? igOverlay(5,1) : ""); mountVideos(el) }
   });
 }
 
@@ -2156,15 +2392,20 @@ function mediaPanel(slot, cur, label){
   var active = o.img || cur;
   return '<div class="mpan">'
    +'<div class="mplab">'+label+' <code class="mono">'+active+'</code></div>'
-   +'<label class="upl">Ladda upp egen bild'
-     +'<input type="file" accept="image/*" multiple data-up="'+slot+'" hidden></label>'
+   +'<label class="upl">Ladda upp bild eller video'
+     +'<input type="file" accept="image/*,video/*" multiple data-up="'+slot+'" hidden></label>'
    +'<div class="mrow">'+allKeys().map(function(k){
-      return '<button class="mi'+(active===k?" on":"")+'" type="button" data-mi="'+slot+':'+k+'" title="'+k+'">'
-        +'<img src="'+(mediaURL(k)||"")+'" alt=""></button>'}).join("")+'</div>'
+      return '<button class="mi'+(active===k?" on":"")+(isVideo(k)?" vid":"")+'" type="button" '
+        +'data-mi="'+slot+':'+k+'" title="'+k+'">'
+        +'<img src="'+(mediaURL(k)||"")+'" alt="">'+(isVideo(k)?'<i class="vbadge">▶</i>':'')+'</button>'}).join("")+'</div>'
    +'<label class="sl">Fokalpunkt Y <em>'+Math.round((o.fy!=null?o.fy:.5)*100)+'%</em>'
      +'<input type="range" data-sl="'+slot+':fy" min="0" max="100" value="'+Math.round((o.fy!=null?o.fy:.5)*100)+'"></label>'
    +'<label class="sl">Zoom <em>'+Math.round((o.zoom||1)*100)+'%</em>'
      +'<input type="range" data-sl="'+slot+':zoom" min="100" max="200" value="'+Math.round((o.zoom||1)*100)+'"></label>'
+   +(isVideo(active)
+     ? '<p class="mut" style="font-size:10.5px;line-height:1.5">Klipp: '
+       +VIDEOS[active].dur.toFixed(1)+' s. Videon ligger kvar under sessionen — '
+       +'Spara behåller stillbilden ur klippet, inte filmen. Ladda upp igen efter omladdning.</p>' : '')
    +'</div>';
 }
 
@@ -2173,7 +2414,7 @@ function refreshStage(){
   if(!state.edit) return;
   var h = hlOf(state.edit.hl), n = h.st.length, i = state.edit.i, s = h.st[i];
   var f = $("#edframe");
-  if(f) f.innerHTML = story(state.dir,s,i,n) + (state.ig?igOverlay(n,i):'');
+  if(f){ f.innerHTML = story(state.dir,s,i,n) + (state.ig?igOverlay(n,i):''); mountVideos(f) }
   var t = document.querySelectorAll(".filmb")[i];
   if(t){ var fr = t.querySelector(".filmf"); if(fr) fr.innerHTML = story(state.dir,s,i,n) }
 }
@@ -2303,6 +2544,7 @@ function step(d){
 function render(){
   var s=SECTIONS.filter(function(x){return x.id===state.sec})[0];
   $("#canvas").innerHTML='<div class="sec" data-on>'+s.f()+'</div>';
+  mountVideos($("#canvas"));
   document.querySelectorAll(".navb").forEach(function(b){
     b.setAttribute("aria-current", String(b.dataset.s===state.sec))});
   window.scrollTo(0,0);
@@ -2330,6 +2572,7 @@ document.addEventListener("click",function(e){
   var sp=e.target.closest("[data-step]");
   if(sp){ var h=hlOf(state.edit.hl), j=state.edit.i+ +sp.dataset.step;
     state.edit.i=(j+h.st.length)%h.st.length; render(); return }
+  var vx=e.target.closest("[data-vhl]"); if(vx){ exportVideo(vx); return }
   var sr=e.target.closest("[data-series]");
   if(sr){ downloadSeries(sr.dataset.series, state.dir, sr); return }
   var ac=e.target.closest("[data-act]");
@@ -2419,7 +2662,14 @@ window.viewlyExport = {
     return framePNG(story(dir,h.st[i],i,h.st.length), 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7") },
   sheet:function(hlId, dir, cw){ return sheetPNG(dir, hlOf(hlId), cw||540) },
   post:function(pid, ar, dir){ var p=POSTS.filter(function(x){return x.id===pid})[0], a=AR[ar];
-    return framePNG(post(dir,p,ar), 1080, Math.round(1080*a[1]/a[0]), dir==="skugga"?"#0E0E0D":"#EFECE7") }
+    return framePNG(post(dir,p,ar), 1080, Math.round(1080*a[1]/a[0]), dir==="skugga"?"#0E0E0D":"#EFECE7") },
+  video:function(hlId, i, dir, onProgress){
+    var h=hlOf(hlId), n=h.st.length;
+    VIDEO_HOLE = true;
+    var hole = story(dir,h.st[i],i,n) + (state.ig ? igOverlay(n,i) : "");
+    VIDEO_HOLE = false;
+    return renderVideoFrom(hole, story(dir,h.st[i],i,n), dir, onProgress);
+  }
 };
 render();
 })();

@@ -10,6 +10,14 @@ var M = window.VMEDIA || {};
 /* egna uppladdade bilder hamnar i samma pool som det medföljande biblioteket */
 var UPLOADS = {};
 function mediaURL(k){ return UPLOADS[k] || M[k] }
+
+/* Video i en slot: UPLOADS håller en stillbild ur klippet så all statisk
+   rendering fungerar oförändrat, och VIDEOS håller själva klippet. Elementet
+   märks med --vk så både uppspelningen i studion och videoexporten hittar det.
+   VIDEO_HOLE lämnar rutan genomskinlig när overlayen ska rastreras. */
+var VIDEOS = {};
+var VIDEO_HOLE = false;
+function isVideo(k){ return !!VIDEOS[k] }
 var esc = function(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){
   return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})};
 
@@ -71,8 +79,13 @@ function bg(k, sid, wide){
   if(!u) return 'background:repeating-linear-gradient(135deg,#DAD6D0 0 8px,#D2CDC6 8px 16px);';
   var fy = (o.fy!=null ? o.fy : 0.5)*100;
   var z  = o.zoom || 1;
-  return 'background-image:url('+u+');background-size:cover;background-position:50% '+fy.toFixed(1)+'%;'
-   + (z!==1 ? 'transform:scale('+z.toFixed(3)+');transform-origin:50% '+fy.toFixed(1)+'%;' : '');
+  var vid = isVideo(key);
+  var out = (vid && VIDEO_HOLE)
+    ? 'background:transparent;'
+    : 'background-image:url('+u+');background-size:cover;background-position:50% '+fy.toFixed(1)+'%;';
+  if(z!==1) out += 'transform:scale('+z.toFixed(3)+');transform-origin:50% '+fy.toFixed(1)+'%;';
+  if(vid) out += '--vk:'+key+';--vfy:'+fy.toFixed(1)+';';
+  return out;
 }
 /* varje media-slot i biblioteket får ett stabilt id: <highlight>-<index>[-b] */
 function sid(s, b){ return s.sid ? (s.sid+(b?"-b":"")) : null }
@@ -115,7 +128,9 @@ var CSS = ''
 /* miniatyr-artboard: egen container så cqw räknas mot kortet, inte mot ramen */
 +'.mini{display:flex;flex-direction:column;gap:1.2cqw;opacity:.5}'
 +'.mini.on{opacity:1}'
-+'.miniart{width:100%;aspect-ratio:4/5;position:relative;overflow:hidden;container-type:inline-size;text-align:left}';
++'.miniart{width:100%;aspect-ratio:4/5;position:relative;overflow:hidden;container-type:inline-size;text-align:left}'
+/* videoslot: klippet ligger i samma ruta som stillbilden skulle ha legat i */
++'.vfill{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;border:0}';
 
 /* =====================================================================
    RENDERARE

@@ -175,9 +175,18 @@ miniatyrerna och profilrutnätet.
 Texten uppdaterar scenen och filmremsan medan du skriver, utan att fältet tappar
 fokus. `Återställ bildrutan` tar tillbaka originalet för just den rutan.
 
-**Egna bilder.** `Ladda upp egen bild` tar emot en eller flera filer, skalar ned
-till max 1400 px och lägger dem i samma pool som det medföljande biblioteket. De
-går sedan att välja i vilken slot som helst.
+**Egna bilder och video.** `Ladda upp bild eller video` tar emot en eller flera
+filer. Bilder skalas ned till max 1400 px. Ett videoklipp får en stillbild
+sparad som poster — så miniatyrer, kontaktkarta och PNG-export fungerar
+oförändrat — och spelas upp i rutan i studion. Klippen ligger kvar under
+sessionen; `Spara` behåller stillbilden, inte filmen.
+
+**Video ut.** Har bildrutan ett klipp dyker `Denna bildruta som video` upp.
+Exporten rastrerar designen en gång med videorutan genomskinlig, ritar sedan
+klippet i rutan bildruta för bildruta med designen ovanpå, och spelar in
+canvasen med `MediaRecorder`. Resultatet är 1080 × 1920, MP4 där webbläsaren
+klarar det och annars WebM. Ljudet från klippet följer med när webbläsaren
+tillåter det. Max 20 sekunder.
 
 **Spara.** `Spara` lägger redigeringar, slot-inställningar och uppladdade bilder i
 webbläsarens `localStorage` under `viewly.highlights.v1` — de överlever omladdning.
@@ -210,7 +219,12 @@ Det finns också ett litet API på sidan om exporten behöver skriptas:
 await viewlyExport.frame("annonsen", 2, "arkiv");   // Blob, 1080×1920 PNG
 await viewlyExport.sheet("kampanjen", "skugga");    // kontaktkarta
 await viewlyExport.post("p4", "4:5", "arkiv");      // artboard: mallen Såld
+await viewlyExport.video("seendet", 0, "arkiv");    // {blob, ext} — 1080×1920
 ```
+
+Nedladdningen använder artefaktens `downloads`-funktion, som bara finns när
+sidan körs på claude.ai. Öppnas filen lokalt säger knappen det rakt ut i stället
+för att tyst göra ingenting.
 
 ---
 
