@@ -185,6 +185,15 @@ async function runExport(btn){
       var b2 = await sheetPNG(d2, h2, 540);
       btn.textContent = lbl; btn.disabled = false;
       await offer(b2, "viewly-"+d2+"-"+slug(h2.name)+"-kontaktkarta.png", btn);
+    } else if(kind === "cover"){
+      var hc = hlOf(btn.dataset.hl), dc = btn.dataset.ddir;
+      var bc = await framePNG('<div style="position:absolute;inset:0">'+cover(dc,hc,"9:16")+'</div>',
+                              1080, 1920, dc==="skugga"?"#0E0E0D":"#F2EFEF");
+      btn.textContent = lbl; btn.disabled = false;
+      await offer(bc, "viewly-omslag-"+dc+"-"+slug(hc.name)+".png", btn);
+    } else if(kind === "covers"){
+      btn.disabled = false; busy = false;
+      await downloadCovers(btn.dataset.ddir, btn);
     } else if(kind === "post"){
       var p = POSTS.filter(function(x){return x.id===btn.dataset.pid})[0];
       var ar = btn.dataset.ar, a = AR[ar], d3 = btn.dataset.ddir;
@@ -608,7 +617,8 @@ var STORE = "viewly.highlights.v1";
 
 function saveAll(msg){
   try {
-    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS, posts:PEDITS}));
+    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS,
+                                                posts:PEDITS, covers:CEDITS}));
     flash(msg || "Sparat");
   } catch(e){
     flash(UPLOADS && Object.keys(UPLOADS).length
@@ -621,6 +631,7 @@ function loadAll(){
     var d = JSON.parse(raw);
     Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
     Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
+    Object.assign(CEDITS, d.covers||{});
     return true;
   } catch(e){ return false }
 }
@@ -629,6 +640,7 @@ function clearAll(){
   Object.keys(SLOTS).forEach(function(k){delete SLOTS[k]});
   Object.keys(UPLOADS).forEach(function(k){delete UPLOADS[k]});
   Object.keys(PEDITS).forEach(function(k){delete PEDITS[k]});
+  Object.keys(CEDITS).forEach(function(k){delete CEDITS[k]});
   seedSlots();
   try{ localStorage.removeItem(STORE) }catch(e){}
 }
@@ -639,26 +651,38 @@ function flash(txt, warn){
   clearTimeout(flashT); flashT = setTimeout(function(){ el.removeAttribute("data-on") }, 2400);
 }
 
-/* ---------- vilka fält en bildruta faktiskt har ---------- */
+/* ---------- vilka fält en bildruta faktiskt har ----------
+   Listan speglar vad varje primitiv verkligen renderar. Förut erbjöds
+   Underrad på fullbleed och split, som aldrig ritar den — fältet fanns,
+   men ingenting hände när man skrev i det. */
+var RENDERED = {
+  mark:      ["k","h","s"],
+  fullbleed: ["k","h"],
+  quiet:     ["k","h","em","s"],
+  editorial: ["k","h","s"],
+  product:   ["k","h","s"],
+  split:     ["k","h","la","lb"],
+  system:    ["k","h","s","items"],
+  "case":    ["k","h","s"],
+  cta:       ["k","h","s"],
+  flow:      ["k","h","flow_inp","flow_items","flow_mid","flow_out","flow_tones","flow_title","flow_lead"],
+  matrix:    ["k","h","s","mx_names"],
+  phases:    ["k","h","s"]
+};
+var FIELDLAB = {
+  k:["Kicker","text"], h:["Rubrik","text"], em:["Kursiv rad","text"], s:["Underrad","area"],
+  la:["Etikett vänster/övre","text"], lb:["Etikett höger/undre","text"],
+  items:["Poster — en per rad","list"],
+  flow_inp:["Steg 1 — etikett","text"], flow_items:["AI:ns signaler — en per rad","list"],
+  flow_mid:["Steg 2 — etikett","text"], flow_out:["Steg 3 — etikett","text"],
+  flow_tones:["Tonlägen — en per rad","list"],
+  flow_title:["Annonsrubrik","text"], flow_lead:["Annonsingress","area"],
+  mx_names:["Formatnamn — en per rad","list"]
+};
 function fieldsFor(s){
-  var f = [];
-  if(s.p!=="fullbleed" || s.k) f.push(["k","Kicker","text"]);
-  f.push(["h","Rubrik","text"]);
-  if(s.p==="quiet" || s.em!=null) f.push(["em","Kursiv rad","text"]);
-  f.push(["s","Underrad","area"]);
-  if(s.p==="split"){ f.push(["la","Etikett vänster/övre","text"]); f.push(["lb","Etikett höger/undre","text"]) }
-  if(s.p==="system") f.push(["items","Poster — en per rad","list"]);
-  if(s.p==="flow"){
-    f.push(["flow_inp","Steg 1 — etikett","text"]);
-    f.push(["flow_items","AI:ns signaler — en per rad","list"]);
-    f.push(["flow_mid","Steg 2 — etikett","text"]);
-    f.push(["flow_out","Steg 3 — etikett","text"]);
-    f.push(["flow_tones","Tonlägen — en per rad","list"]);
-    f.push(["flow_title","Annonsrubrik","text"]);
-    f.push(["flow_lead","Annonsingress","area"]);
-  }
-  if(s.p==="matrix") f.push(["mx_names","Formatnamn — en per rad","list"]);
-  return f;
+  return (RENDERED[s.p] || ["k","h","s"]).map(function(k){
+    return [k, FIELDLAB[k][0], FIELDLAB[k][1]];
+  });
 }
 function val(s, key){
   var e = EDITS[s.sid] || {};
@@ -791,9 +815,57 @@ async function downloadSeries(hlId, dir, btn){
   setTimeout(function(){ btn.textContent = lbl }, 3800);
 }
 
+function handleCoverUpload(files, hlId){
+  var f = Array.prototype.slice.call(files).filter(function(x){return /^image\//.test(x.type)})[0];
+  if(!f){ flash("Bara bildfiler", true); return }
+  ingest(f, function(key){
+    if(!key){ flash("Kunde inte läsa bilden", true); return }
+    CEDITS[hlId] = Object.assign({}, CEDITS[hlId], {cover:key});
+    flash("Omslagsbild bytt"); render();
+  });
+}
+async function downloadCovers(dir, btn){
+  if(busy) return; busy = true;
+  var lbl = btn.textContent, n = HL.length, ok = 0, failed = [];
+  btn.disabled = true;
+  var dl = await downloads();
+  if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
+    status(codeText("unavailable")); setTimeout(function(){ btn.textContent = lbl }, 3400); return }
+  for(var i = 0; i < n; i++){
+    var h = HL[i];
+    btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
+    var blob;
+    try {
+      blob = await framePNG('<div style="position:absolute;inset:0">'+cover(dir,h,"9:16")+'</div>',
+                            1080, 1920, dir==="skugga"?"#0E0E0D":"#F2EFEF");
+    } catch(e){ failed.push(h.name); continue }
+    btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
+    try {
+      await saveRetry(blob, "viewly-omslag-"+dir+"-"+slug(h.name)+".png",
+        function(k){ btn.textContent = "Väntar " + (i+1) + " / " + n + "… " + k });
+      ok++;
+    } catch(e){
+      if((e && e.code) === "declined"){
+        btn.disabled = false; busy = false;
+        btn.textContent = ok + " av " + n + " sparade";
+        status("Avbrutet. " + ok + " omslag sparade."); setTimeout(function(){ btn.textContent = lbl }, 3800);
+        return;
+      }
+      failed.push(h.name);
+    }
+    await wait(650);
+  }
+  btn.disabled = false; busy = false;
+  btn.textContent = ok + " av " + n + " sparade" + (failed.length ? " ✕" : " ✓");
+  status(failed.length ? (ok+" omslag sparade, misslyckades: "+failed.join(", "))
+                       : ("Alla "+ok+" omslag sparade"));
+  setTimeout(function(){ btn.textContent = lbl }, 3800);
+}
+
 async function exportJSON(btn){
   var lbl = btn.textContent;
-  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS, posts:PEDITS}, null, 1);
+  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS,
+                             posts:PEDITS, covers:CEDITS}, null, 1);
   await offer(new Blob([data]), "viewly-highlights-redigeringar.json", btn);
   btn.textContent = lbl;
 }
@@ -804,6 +876,7 @@ function importJSON(file){
       var d = JSON.parse(fr.result);
       Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
       Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
+      Object.assign(CEDITS, d.covers||{});
       flash("Importerat"); renderEditor();
     } catch(e){ flash("Kunde inte läsa filen", true) }
   };
@@ -899,6 +972,7 @@ function studioEditor(){
      +'<div class="edside">'
        +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
          +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
+       + coverPanel(h)
        +'<div class="edsec"><div class="eyebrow">Media</div>'+media+'</div>'
        +(s.p==="phases" ? objectPanel() : '')
        +(s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
@@ -968,6 +1042,45 @@ function refreshPosts(){
     if(p){ el.innerHTML = post(d, p, el.dataset.postAr)
       + (el.dataset.postIg==="1" ? igOverlay(5,1) : ""); mountVideos(el) }
   });
+}
+
+/* ---------------------------------------------------------------------
+   OMSLAGET
+   Symbolen är kapitlets identitet, inte dess plats i ordningen. Byt märke,
+   byt bild bakom det i SKUGGA, ladda ner som 1080 × 1920 — Instagram
+   beskär själv till cirkeln.
+   --------------------------------------------------------------------- */
+function coverPanel(h){
+  var d = state.dir;
+  var glyphs = GLYPH_IDS.map(function(g){
+    return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
+      +'title="'+GLYPHS[g].n+'"><span class="giw">'
+      +'<svg viewBox="0 0 100 100">'+GLYPHS[g].svg("currentColor","#6E7266")+'</svg></span></button>';
+  }).join("");
+  var e = CEDITS[h.id] || {};
+  var img = e.cover || h.cover;
+  return '<div class="edsec"><div class="eyebrow">Omslag</div>'
+   +'<div class="covprev"><span class="cvbig">'+coverEl(d,h)+'</span>'
+     +'<span class="cvsm">'+coverEl(d,h)+'</span>'
+     +'<span class="mut" style="font-size:10.5px;line-height:1.5">Så ser det ut i profilraden,<br>64 px och 56 px.</span></div>'
+   +'<div class="mplab">Märke <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
+   +'<div class="grow">'+glyphs+'</div>'
+   +(d==="skugga"
+     ? '<div class="mplab" style="margin-top:6px">Bild bakom märket <code class="mono">'+img+'</code></div>'
+       +'<label class="upl"><input type="file" accept="image/*" data-upc="'+h.id+'" hidden>Ladda upp egen bild</label>'
+       +'<div class="mrow">'+allKeys().map(function(k){
+          return '<button class="mi'+(img===k?" on":"")+'" type="button" data-ci="'+h.id+':'+k+'" title="'+k+'">'
+            +'<img src="'+(mediaURL(k)||"")+'" alt=""></button>'}).join("")+'</div>'
+       +'<label class="sl">Fokalpunkt Y <em>'+Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'%</em>'
+       +'<input type="range" data-sl="cover-'+h.id+':fy" min="0" max="100" value="'
+       +Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'"></label>'
+     : '<p class="mut" style="font-size:10.5px;line-height:1.5">ARKIV använder inget foto i omslaget — '
+       +'märket står på papper.</p>')
+   +'<div class="dlcol" style="margin-top:6px">'
+     + dlBtn("cover",{hl:h.id, ddir:d},"Ladda ner omslaget · 1080×1920")
+     + dlBtn("covers",{ddir:d},"Alla "+HL.length+" omslag")
+   +'</div>'
+   +'<button class="dlb" type="button" data-act="reset-cover">Återställ omslaget</button></div>';
 }
 
 function mediaPanel(slot, cur, label){
@@ -1170,12 +1283,22 @@ document.addEventListener("click",function(e){
     else if(a==="play"){ play(state.edit.hl, state.edit.i, state.dir) }
     else if(a==="reset-story"){
       var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
+    else if(a==="reset-cover"){
+      if(state.edit){ delete CEDITS[state.edit.hl]; delete SLOTS["cover-"+state.edit.hl];
+        var hh0=hlOf(state.edit.hl); if(hh0.coverFy!=null) SLOTS["cover-"+hh0.id]={fy:hh0.coverFy};
+        saveAll("Omslaget återställt"); render() } }
     else if(a==="reset-object"){
       Object.keys(PEDITS).forEach(function(k){delete PEDITS[k]}); saveAll("Objektet återställt"); render() }
     else if(a==="reset-all"){
       if(confirm("Ta bort alla ändringar, uppladdade bilder och sparat läge?")){ clearAll(); render() } }
     return;
   }
+  var gl=e.target.closest("[data-gl]");
+  if(gl){ var q1=gl.dataset.gl.split(":");
+    CEDITS[q1[0]] = Object.assign({}, CEDITS[q1[0]], {glyph:q1[1]}); render(); return }
+  var ci=e.target.closest("[data-ci]");
+  if(ci){ var q2=ci.dataset.ci.split(":");
+    CEDITS[q2[0]] = Object.assign({}, CEDITS[q2[0]], {cover:q2[1]}); render(); return }
   var mi=e.target.closest("[data-mi]");
   if(mi){var a=mi.dataset.mi.split(":");
     SLOTS[a[0]]=Object.assign({},SLOTS[a[0]],{img:a[1]}); afterSlot(a[0]); return}
@@ -1213,6 +1336,7 @@ function afterSlot(slot, live){
 function restoreFocus(){}
 document.addEventListener("change",function(e){
   if(e.target.dataset && e.target.dataset.up!=null){ handleUpload(e.target.files, e.target.dataset.up); return }
+  if(e.target.dataset && e.target.dataset.upc){ handleCoverUpload(e.target.files, e.target.dataset.upc); return }
   if(e.target.id==="impjson" && e.target.files[0]){ importJSON(e.target.files[0]); return }
   var t=e.target.dataset&&e.target.dataset.t;
   if(t==="ig"){state.ig=e.target.checked; if(P.hl) drawPlayer(); else render(); return}

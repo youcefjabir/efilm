@@ -315,6 +315,16 @@ tr:last-child td{border-bottom:0}
 .objwrap .edsec{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;
   padding:15px 16px;display:flex;flex-direction:column;gap:10px}
 .dlcol{display:flex;flex-direction:column;gap:6px}
+.covprev{display:flex;gap:12px;align-items:center;margin:2px 0 6px}
+.cvbig,.cvsm{border-radius:50%;overflow:hidden;border:1px solid var(--line2);display:block;flex:0 0 auto}
+.cvbig{width:64px;height:64px}.cvsm{width:56px;height:56px}
+.grow{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin:8px 0 4px}
+.gi{aspect-ratio:1;padding:5px;border:1px solid var(--line);border-radius:6px;background:var(--raise);
+  cursor:pointer;color:var(--ink2);display:grid;place-items:center}
+.gi:hover{border-color:var(--line2)}
+.gi.on{border-color:var(--acc);color:var(--acc);background:var(--accS)}
+.giw{display:block;width:100%}
+.gi svg{width:100%;height:auto;display:block;stroke-linecap:round}
 .dlstat{font-size:11px;line-height:1.5;color:var(--acc);margin-top:8px;min-height:1em;word-break:break-word}
 .dlcol .dlb{text-align:left}
 @media(max-width:1240px){

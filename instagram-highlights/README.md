@@ -22,7 +22,7 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 |---|----|----|
 | 01 | Riktning | ARKIV och SKUGGA sida vid sida, palett, typografi, logotypbruk, risk — och samma Story löst i båda |
 | 02 | Kompositioner | De tolv primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
-| 03 | Profil | Tio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
+| 03 | Profil | Elva omslag i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
 | 04 | Format | Fyra kampanjmallar och tre artboards: 9:16, 4:5, 1:1 — plus profilrutnätet |
 | 05 | Studio | Redigera: öppna ett kapitel, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
@@ -41,13 +41,14 @@ två som faktiskt bär varumärket:
 
 **ARKIV** — tryckt monografi. Papper `#F2EFEF`, ink `#1C1C1E`, oliv `#6E7266`.
 Cormorant Garamond 300 för display, Montserrat 500 / .24em för metadata. Bilden
-ligger i en ram på pappret. Covers är kapitelnummer i cirkel — högst kontrast mot
+ligger i en ram på pappret. Omslaget är kapitlets märke i en hårfin cirkel — högst kontrast mot
 Instagrams vita gränssnitt.
 
 **SKUGGA** — cinematisk. Svart `#0E0E0D`, ljus `#EFEDE7`, oliv lyft `#98A088`.
 Mörkret är grunden, fotografiet är ljuskällan. V-formen används som bländare:
 fotografiet framträder genom märket. Risken är dokumenterad — covers blir mörka
-cirklar med lägst igenkänning vid 56 px.
+cirklar med lägst igenkänning vid 56 px, så scrimen är kraftigare i mitten
+än i kanten för att märket ska bära.
 
 ---
 
@@ -84,7 +85,7 @@ De tre sista ritar hur något fungerar i stället för att beskriva det:
 **Canvas** — hela 1080 × 1920. Fotografi, papper, masker, gradienter och geometri
 får bo här och gå ut i kant.
 
-**Kritisk** — 250 px topp och 320 px botten tillhör Instagram. Rubrik, brödtext,
+**Kritisk** — 250 px topp och 280 px botten tillhör Instagram. Rubrik, brödtext,
 kicker, folio, watermark och CTA håller sig innanför: 23,2 cqw uppe, 26,0 cqw
 nere, 6,4 cqw sidor. Detta är inte en krympning av designen — bilden och
 geometrin använder fortfarande hela ytan.
@@ -148,6 +149,34 @@ men har egen vertikal rytm per mall och per format.
 
 ---
 
+## Omslagen är märken, inte nummer
+
+Ett nummer på omslaget låser ordningen: lägger man till ett kapitel, eller
+flyttar ett, måste alla omslag ritas om och laddas upp igen. Därför har varje
+kapitel i stället **ett eget märke**, tecknat med två till fyra streck i samma
+hårlinje som resten av systemet. Ordningen är fri.
+
+| Kapitel | Märke | Grepp |
+|---|---|---|
+| Viewly | V-märket | logotypen själv, det enda kapitlet som får använda den bokstavligt |
+| Seendet | Bländare | cirkel med ljusstreck och olivpunkt |
+| Rörelse | Rörelse | tre staplar i olika höjd |
+| Rummet | Rum | volym med gavel |
+| Förvandling | Förvandling | cirkel till hälften fylld |
+| Systemet | Ryggrad | linje med fyra noder |
+| Annonsen | Text | tre rader, den sista kortare |
+| Kampanjen | Format | tre rutor i olika proportion |
+| Objekt | Objekt | gavel i logotypens vinkel |
+| Inifrån | Människor | två överlappande cirklar |
+| Ditt hem | Hem | dörr med handtag |
+
+I studion sitter panelen **Omslag** överst i inspektören: förhandsvisning i 64
+och 56 px, alla elva märken som väljare, bild bakom märket i SKUGGA, och
+nedladdning — `Ladda ner omslaget` eller `Alla 11 omslag`. Exporten är
+1080 × 1920 PNG med märket centrerat; Instagram beskär själv till cirkeln.
+
+---
+
 ## Studio — redigera och ladda ner
 
 Vy 05 är en editor, inte en katalog. Öppna ett kapitel och du får tre kolumner:
@@ -157,7 +186,7 @@ filmremsa med alla bildrutor, live-scen i mitten, inspektör till höger.
 
 | Fält | Gäller |
 |---|---|
-| Kicker, rubrik, kursiv rad, underrad | Alla primitiv som använder dem |
+| Kicker, rubrik, kursiv rad, underrad | Endast de primitiv som faktiskt renderar dem |
 | Etiketter | `split` — Före/Efter, Dag/Skymning |
 | Poster, en per rad | `system` |
 | Stegetiketter, AI-signaler, tonlägen, annonsrubrik, annonsingress | `flow` |
@@ -165,6 +194,11 @@ filmremsa med alla bildrutor, live-scen i mitten, inspektör till höger.
 | Objektet: adress, ort, fakta, etikett, tid, not | `phases` och vy 04 Format |
 | Bild i slot | Hela biblioteket **plus egna uppladdade bilder** |
 | Fokalpunkt Y och zoom | 0–100 % respektive 100–200 % |
+| Omslag: märke, bild, fokalpunkt | Per kapitel |
+
+Fältlistan speglar vad primitivet verkligen ritar. `fullbleed` och `split`
+renderar ingen underrad och `flow` ingen heller — de fälten erbjuds inte längre,
+i stället för att stå kvar och inte göra någonting.
 
 **Objektet.** Adress, ort och faktaraden är samma bostad i alla fyra
 kampanjmallar, så de skrivs till alla på en gång. Etikett, tid och not är per

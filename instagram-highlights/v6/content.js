@@ -4,7 +4,7 @@
    ===================================================================== */
 
 var HL = [
- {id:"viewly", num:"01", name:"VIEWLY", label:"Viewly", cover:"hero",
+ {glyph:"vmark", id:"viewly", num:"01", name:"VIEWLY", label:"Viewly", cover:"hero",
   q:"Vad är Viewly?", why:"Manifestet. Sätter ramen: ett ekosystem, inte en tjänst.",
   st:[
    {p:"mark", m:"hero", k:"VIEWLY", h:"Bostadspresentation", s:"byggd för hur bostäder marknadsförs idag."},
@@ -18,7 +18,7 @@ var HL = [
    {p:"cta", h:"Upptäck Viewly", s:"viewly.se", k:"01 — Viewly"}
   ]},
 
- {id:"seendet", num:"02", name:"SEENDET", label:"Seendet", cover:"kitchen",
+ {glyph:"aperture", id:"seendet", num:"02", name:"SEENDET", label:"Seendet", cover:"kitchen",
   q:"Hur ser kvaliteten ut?", why:"Hantverket. Ren fotografi — nästan ingen försäljning.",
   st:[
    {p:"fullbleed", m:"hero", k:"02 — Seendet", h:"Bostadsfotografering", s:""},
@@ -31,7 +31,7 @@ var HL = [
    {p:"cta", h:"Fotograferingen är början.", s:"Se hela ekosystemet", k:"02 — Seendet"}
   ]},
 
- {id:"rorelse", num:"03", name:"RÖRELSE", label:"Rörelse", cover:"dining",
+ {glyph:"motion", id:"rorelse", num:"03", name:"RÖRELSE", label:"Rörelse", cover:"dining",
   q:"Vad kan jag skapa?", why:"Flaggskeppet. Säljer resultatet — aldrig tekniken bakom.",
   st:[
    {p:"mark", m:"dining", k:"RÖRELSE", h:"Bostadsfilm", s:"Stillbild blir berättelse.",
@@ -46,7 +46,7 @@ var HL = [
    {p:"cta", h:"Ett objekt.", s:"Fler sätt att berätta det.", k:"03 — Rörelse"}
   ]},
 
- {id:"rummet", num:"04", name:"RUMMET", label:"Rummet", cover:"matterport",
+ {glyph:"room", id:"rummet", num:"04", name:"RUMMET", label:"Rummet", cover:"matterport",
   q:"Vad kan jag skapa?", why:"3D, planritning och områdeskarta samlat som ett rumsligt lager.",
   st:[
    {p:"fullbleed", m:"matterport", k:"04 — Rummet", h:"3D-visning", s:""},
@@ -57,7 +57,7 @@ var HL = [
    {p:"cta", h:"En del av presentationen.", s:"Inte en gimmick.", k:"04 — Rummet"}
   ]},
 
- {id:"forvandling", num:"05", name:"FÖRVANDLING", label:"Förvandling", cover:"esLivAft",
+ {glyph:"halves", id:"forvandling", num:"05", name:"FÖRVANDLING", label:"Förvandling", cover:"esLivAft",
   q:"Varför är Viewly annorlunda?", why:"Profilens starkaste visuella bevis. Nästan ordlös.",
   st:[
    {p:"fullbleed", m:"esLivAft", k:"05 — Förvandling", h:"", s:""},
@@ -69,7 +69,7 @@ var HL = [
    {p:"cta", h:"Bostadens fulla potential.", s:"Alltid ärligt mot rummet.", k:"05 — Förvandling"}
   ]},
 
- {id:"systemet", num:"06", name:"SYSTEMET", label:"Systemet", cover:"portal", coverFy:.55,
+ {glyph:"spine", id:"systemet", num:"06", name:"SYSTEMET", label:"Systemet", cover:"portal", coverFy:.55,
   q:"Hur fungerar det?", why:"Den kommersiellt viktigaste. Talar direkt till mäklaren.",
   st:[
    {p:"quiet", h:"Mer tid för affären.", em:"Mindre tid i mappar.", k:"06 — Systemet"},
@@ -85,7 +85,7 @@ var HL = [
 
  /* 07 — ANNONSSKRIVAREN. Eget kapitel: texten.
     Copy hämtad ur viewly.se/annonsskrivaren. */
- {id:"annonsen", num:"07", name:"ANNONSEN", label:"Annonsen", cover:"kitchen",
+ {glyph:"lines", id:"annonsen", num:"07", name:"ANNONSEN", label:"Annonsen", cover:"kitchen",
   q:"Vem skriver texten?",
   why:"Annonsskrivaren som eget kapitel. Säljer utfallet — en färdig text — aldrig AI:n bakom.",
   st:[
@@ -108,7 +108,7 @@ var HL = [
 
  /* 08 — SOCIAL / ADS STUDIO. Eget kapitel: formaten och kampanjen.
     Copy hämtad ur viewly.se/some-studio. */
- {id:"kampanjen", num:"08", name:"KAMPANJEN", label:"Kampanjen", cover:"portal", coverFy:.55,
+ {glyph:"formats", id:"kampanjen", num:"08", name:"KAMPANJEN", label:"Kampanjen", cover:"portal", coverFy:.55,
   q:"Hur når objektet ut?",
   why:"Social / Ads Studio som eget kapitel. Mallarna, formaten och kampanjfaserna — det som händer efter att texten är skriven.",
   st:[
@@ -126,7 +126,7 @@ var HL = [
    {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"08 — Kampanjen"}
   ]},
 
- {id:"objekt", num:"09", name:"OBJEKT", label:"Objekt", cover:"eames",
+ {glyph:"gable", id:"objekt", num:"09", name:"OBJEKT", label:"Objekt", cover:"eames",
   q:"Kan jag lita på dem?", why:"Beviset. Varje case är en liten redaktionell feature. Skalar utan omdesign.",
   st:[
    {p:"case", m:"drone", k:"Objekt 01", h:"Silvergården 9A", s:"Landskrona",
@@ -138,7 +138,7 @@ var HL = [
    {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"09 — Objekt"}
   ]},
 
- {id:"inifran", num:"10", name:"INIFRÅN", label:"Inifrån", cover:"om3",
+ {glyph:"people", id:"inifran", num:"10", name:"INIFRÅN", label:"Inifrån", cover:"om3",
   q:"Vilka är ni?", why:"Om oss + fotografer sammanslagna. Rekrytering blir en följd av varumärket, inte en jobbannons.",
   st:[
    {p:"mark", m:"om1", k:"INIFRÅN", h:"Människorna", s:"bakom presentationen."},
@@ -151,7 +151,7 @@ var HL = [
    {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"10 — Inifrån"}
   ]},
 
- {id:"ditthem", num:"11", name:"DITT HEM", label:"Ditt hem", cover:"dining",
+ {glyph:"door", id:"ditthem", num:"11", name:"DITT HEM", label:"Ditt hem", cover:"dining",
   q:"Hur börjar jag?", why:"Sekundär målgrupp. Medvetet kort — svarar på en enda fråga.",
   st:[
    {p:"fullbleed", m:"dining", k:"11 — Ditt hem", h:"", s:""},

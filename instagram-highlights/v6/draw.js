@@ -414,22 +414,73 @@ function story(dirId, s, i, n){
 }
 
 /* =====================================================================
-   COVERS — bedömda vid 56 px i profilraden
+   COVERS — symboler, inte siffror
+   Ett nummer låser ordningen: lägger man till ett kapitel eller flyttar
+   ett måste alla omslag ritas om. Varje kapitel har i stället ett eget
+   märke, tecknat med två till fyra streck i samma hårlinje som resten
+   av systemet. Ordningen är fri.
    ===================================================================== */
-function cover(dirId, h){
+var GW = 100;                                       /* glyfernas viewBox */
+var GLYPHS = {
+  vmark:   {n:"V-märket",   svg:function(c,a){ return '<g transform="translate(14 20) scale(.084)">'
+              +'<path d="'+GEO.limb+'" fill="'+c+'"/>'
+              +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+a+'"/></g>' }},
+  aperture:{n:"Bländare",   svg:function(c,a){ return '<circle cx="50" cy="50" r="21" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
+              +'<path d="M18 50 H32 M68 50 H82" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
+              +'<circle cx="50" cy="50" r="5.5" fill="'+a+'"/>' }},
+  motion:  {n:"Rörelse",    svg:function(c,a){ return '<path d="M31 66 V34 M50 74 V26 M69 62 V38" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
+              +'<circle cx="50" cy="16" r="4" fill="'+a+'"/>' }},
+  room:    {n:"Rum",        svg:function(c,a){ return '<path d="M28 70 V32 H72 V70 Z" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
+              +'<path d="M28 32 L50 18 L72 32" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
+              +'<circle cx="50" cy="55" r="4.5" fill="'+a+'"/>' }},
+  halves:  {n:"Förvandling",svg:function(c,a){ return '<circle cx="50" cy="50" r="23" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
+              +'<path d="M50 27 A23 23 0 0 0 50 73 Z" fill="'+a+'"/>' }},
+  spine:   {n:"Ryggrad",    svg:function(c,a){ return '<path d="M50 24 V76" stroke="'+c+'" stroke-width="2.2"/>'
+              +'<circle cx="50" cy="24" r="5" fill="'+a+'"/>'
+              +'<circle cx="50" cy="41" r="4" fill="'+c+'"/><circle cx="50" cy="58" r="4" fill="'+c+'"/>'
+              +'<circle cx="50" cy="76" r="4" fill="'+c+'"/>' }},
+  lines:   {n:"Text",       svg:function(c,a){ return '<path d="M26 38 H74 M26 50 H74 M26 62 H58" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
+              +'<circle cx="70" cy="62" r="4" fill="'+a+'"/>' }},
+  formats: {n:"Format",     svg:function(c,a){ return '<rect x="24" y="30" width="30" height="40" fill="none" stroke="'+c+'" stroke-width="3.2"/>'
+              +'<rect x="46" y="38" width="30" height="30" fill="none" stroke="'+c+'" stroke-width="3.2"/>'
+              +'<circle cx="76" cy="30" r="4.5" fill="'+a+'"/>' }},
+  gable:   {n:"Objekt",     svg:function(c,a){ return '<path d="M24 70 L50 28 L76 70" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
+              +'<path d="M24 70 H76" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
+              +'<circle cx="50" cy="58" r="4.5" fill="'+a+'"/>' }},
+  people:  {n:"Människor",  svg:function(c,a){ return '<circle cx="40" cy="50" r="17" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
+              +'<circle cx="60" cy="50" r="17" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
+              +'<circle cx="50" cy="50" r="4.5" fill="'+a+'"/>' }},
+  door:    {n:"Hem",        svg:function(c,a){ return '<path d="M32 74 V36 A18 18 0 0 1 68 36 V74 Z" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
+              +'<circle cx="60" cy="56" r="4" fill="'+a+'"/>' }}
+};
+var GLYPH_IDS = Object.keys(GLYPHS);
+
+/* omslagsredigeringar: symbol, bild, utsnitt — per kapitel */
+var CEDITS = {};
+function cov(h, key){
+  var e = CEDITS[h.id] || {};
+  return e[key] != null ? e[key] : h[key];
+}
+function glyphSVG(h, col, accent, sizeCqw){
+  var g = GLYPHS[cov(h,"glyph")] || GLYPHS.vmark;
+  return '<svg viewBox="0 0 '+GW+' '+GW+'" style="width:'+sizeCqw+'cqw;height:'+sizeCqw
+    +'cqw;display:block;overflow:visible" aria-hidden="true">'+g.svg(col, accent)+'</svg>';
+}
+/* ar: "1:1" i profilraden, "9:16" vid export — märket sitter still, ytan växer */
+function cover(dirId, h, ar){
+  var sq = ar !== "9:16";
+  var gsz = sq ? 34 : 30;
   if(dirId==="skugga"){
-    return '<div style="position:absolute;inset:0;'+bg(h.cover,"cover-"+h.id)+'"></div>'
-      +'<div style="position:absolute;inset:0;background:radial-gradient(70% 70% at 50% 45%,rgba(14,14,13,.42),rgba(14,14,13,.86))"></div>'
+    return '<div style="position:absolute;inset:0;'+bg(cov(h,"cover"),"cover-"+h.id)+'"></div>'
+      +'<div style="position:absolute;inset:0;background:radial-gradient(58% 58% at 50% 50%,'
+      +'rgba(14,14,13,.80),rgba(14,14,13,.52) 62%,rgba(14,14,13,.93))"></div>'
       +'<div style="position:absolute;inset:0;display:grid;place-items:center">'
-      +'<span style="font-family:Montserrat,sans-serif;font-size:19cqw;font-weight:500;letter-spacing:.06em;color:#EFEDE7">'+h.num+'</span></div>'
-      +'<div style="position:absolute;left:50%;bottom:15cqw;transform:translateX(-50%);width:2.6cqw;height:2.6cqw;border-radius:50%;background:#98A088"></div>';
+      + glyphSVG(h, "#EFEDE7", "#98A088", gsz) +'</div>';
   }
-  return '<div style="position:absolute;inset:0;background:#F2EFEF;display:flex;flex-direction:column;'
-    +'align-items:center;justify-content:center;gap:3cqw;font-family:\'Cormorant Garamond\',Georgia,serif">'
-    +'<div style="position:absolute;inset:6cqw;border:1px solid #CEC7C3;border-radius:50%"></div>'
-    +'<div style="font-size:33cqw;font-weight:400;line-height:.8;color:#1C1C1E;letter-spacing:-.03em;'
-    +'font-variant-numeric:lining-nums;font-feature-settings:\'lnum\' 1">'+h.num+'</div>'
-    +'<div style="width:13cqw;height:1.5px;background:#6E7266"></div></div>';
+  return '<div style="position:absolute;inset:0;background:#F2EFEF;display:grid;place-items:center">'
+    +'<div style="position:absolute;'+(sq?'inset:6cqw':'left:9cqw;right:9cqw;top:50%;transform:translateY(-50%);aspect-ratio:1')
+    +';border:1px solid #CEC7C3;border-radius:50%"></div>'
+    + glyphSVG(h, "#1C1C1E", "#6E7266", gsz) +'</div>';
 }
 
 /* =====================================================================
@@ -551,7 +602,7 @@ A.phases = function(s,i,n){
   return A.chrome(s.k,i,n,
     '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4cqw">'
    +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
-   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.6cqw;max-width:76%">'+cards+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw;max-width:64%">'+cards+'</div>'
    +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
 };
 
@@ -621,7 +672,7 @@ B.phases = function(s,i,n){
     B.kick(s.k)
    +'<div class="z" style="left:6cqw;right:6cqw;top:50%;transform:translateY(-54%);display:flex;flex-direction:column;gap:3.2cqw">'
    +'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
-   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.4cqw;max-width:76%">'+cards+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.2cqw;max-width:66%">'+cards+'</div>'
    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
    +B.foot(i,n));
 };
