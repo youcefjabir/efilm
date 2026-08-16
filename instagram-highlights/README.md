@@ -21,8 +21,8 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | # | Vy | Vad den visar |
 |---|----|----|
 | 01 | Riktning | ARKIV och SKUGGA sida vid sida, palett, typografi, logotypbruk, risk — och samma Story löst i båda |
-| 02 | Kompositioner | De tolv primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
-| 03 | Profil | Elva omslag i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
+| 02 | Kompositioner | De tretton primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
+| 03 | Profil | Fjorton omslag i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
 | 04 | Format | Fyra kampanjmallar och tre artboards: 9:16, 4:5, 1:1 — plus profilrutnätet |
 | 05 | Studio | Redigera: öppna ett kapitel, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
@@ -52,11 +52,11 @@ cirklar med lägst igenkänning vid 56 px, så scrimen är kraftigare i mitten
 
 ---
 
-## Tolv kompositionsprimitiv
+## Tretton kompositionsprimitiv
 
-Varje Story byggs av ett av tolv primitiv. Bara **full bleed** och **case** låter
-fotografiet äga hela ytan — 13 av 69 bildrutor. Resten bärs av typografi, linje,
-plåt och luft, med bilden i en mask.
+Varje Story byggs av ett av tretton primitiv. Bara **full bleed** och **case**
+låter fotografiet äga hela ytan — 13 av 90 bildrutor. Resten bärs av typografi,
+linje, plåt och luft, med bilden i en mask.
 
 | Primitiv | Roll |
 |---|---|
@@ -77,6 +77,7 @@ De tre sista ritar hur något fungerar i stället för att beskriva det:
 | `flow` | Input → bearbetning → output. Slutar i ett faktiskt resultat, inte en påstådd fördel |
 | `matrix` | Samma objekt i sanna formatproportioner, med px-mått. 4:5, 1:1 och 9:16 mätbart mot varandra |
 | `phases` | En kampanj som fyra faktiska artboards, med aktuellt läge tänt |
+| `whitelabel` | Samma leverans i två kontors varumärken, sida vid sida |
 
 ---
 
@@ -159,20 +160,27 @@ hårlinje som resten av systemet. Ordningen är fri.
 | Kapitel | Märke | Grepp |
 |---|---|---|
 | Viewly | V-märket | logotypen själv, det enda kapitlet som får använda den bokstavligt |
-| Seendet | Bländare | cirkel med ljusstreck och olivpunkt |
-| Rörelse | Rörelse | tre staplar i olika höjd |
-| Rummet | Rum | volym med gavel |
-| Förvandling | Förvandling | cirkel till hälften fylld |
-| Systemet | Ryggrad | linje med fyra noder |
+| Fotografering | Bländare | cirkel med ljusstreck och olivpunkt |
+| 3D visning | Kub | wireframe-volym med olivnod i mitten |
+| E-styling | Förvandling | cirkel till hälften fylld |
+| Atmosphere | Sol | horisontlinje, båge och olivstrålar |
+| Drönare | Drönare | fyra rotorer i kors med olivnav |
+| Områdeskarta | Karta | vikt karta med olivnål |
+| Motion | Rörelse | tre staplar i olika höjd |
 | Annonsen | Text | tre rader, den sista kortare |
 | Kampanjen | Format | tre rutor i olika proportion |
+| Systemet | Ryggrad | linje med fyra noder |
 | Objekt | Objekt | gavel i logotypens vinkel |
 | Inifrån | Människor | två överlappande cirklar |
 | Ditt hem | Hem | dörr med handtag |
 
+Två märken är omritade efter test i verklig storlek: drönarens fyra tunna ringar
+försvann vid 56 px och är nu fyllda rotorer, och ryggradens stam och noder är
+kraftigare av samma skäl.
+
 I studion sitter panelen **Omslag** överst i inspektören: förhandsvisning i 64
-och 56 px, alla elva märken som väljare, bild bakom märket i SKUGGA, och
-nedladdning — `Ladda ner omslaget` eller `Alla 11 omslag`. Exporten är
+och 56 px, alla femton märken som väljare, bild bakom märket i SKUGGA, och
+nedladdning — `Ladda ner omslaget` eller `Alla 14 omslag`. Exporten är
 1080 × 1920 PNG med märket centrerat; Instagram beskär själv till cirkeln.
 
 ---
@@ -258,7 +266,7 @@ Det finns också ett litet API på sidan om exporten behöver skriptas:
 await viewlyExport.frame("annonsen", 2, "arkiv");   // Blob, 1080×1920 PNG
 await viewlyExport.sheet("kampanjen", "skugga");    // kontaktkarta
 await viewlyExport.post("p4", "4:5", "arkiv");      // artboard: mallen Såld
-await viewlyExport.video("seendet", 0, "arkiv");    // {blob, ext} — 1080×1920
+await viewlyExport.video("foto", 0, "arkiv");       // {blob, ext} — 1080×1920
 ```
 
 Nedladdningen använder artefaktens `downloads`-funktion, som bara finns när
@@ -284,31 +292,64 @@ Se `v6/brand-geometry.json`.
 
 ---
 
-## Struktur
+## Struktur — en tjänst, ett kapitel
 
-Elva kapitel, 69 Stories. Produkter som bara är en rad i en tjänstelista är
-absorberade i större berättelser; de två som bär eget innehåll — Annonsskrivaren
-och Social / Ads Studio — har egna kapitel.
+Fjorton kapitel, 90 Stories. Segmenteringen följer `viewly.se`, inte en tänkt
+gruppering: varje tjänst på `/tjanster` äger sitt eget kapitel, plus Motion som
+har egen sida. Apparna är inte tjänster och ligger som egna kapitel efter dem.
 
-| # | Highlight | Besvarar | Stories |
-|---|-----------|----------|---------|
-| 01 | Viewly | Vad är Viewly? | 7 |
-| 02 | Seendet | Hur ser kvaliteten ut? | 7 |
-| 03 | Rörelse | Vad kan jag skapa? | 6 |
-| 04 | Rummet | Vad kan jag skapa? | 6 |
-| 05 | Förvandling | Varför är Viewly annorlunda? | 7 |
-| 06 | Systemet | Hur fungerar det? | 6 |
-| 07 | Annonsen | Vem skriver texten? | 6 |
-| 08 | Kampanjen | Hur når objektet ut? | 6 |
-| 09 | Objekt | Kan jag lita på dem? | 6 |
-| 10 | Inifrån | Vilka är ni? | 7 |
-| 11 | Ditt hem | Hur börjar jag? | 5 |
+| # | Highlight | Källa | Besvarar | Stories |
+|---|-----------|-------|----------|---------|
+| 01 | Viewly | `/` | Vad är Viewly? | 7 |
+| 02 | Fotografering | `/bostadsfotografering` | Hur ser kvaliteten ut? | 7 |
+| 03 | 3D visning | `/3d-visning` | Vad kan jag skapa? | 7 |
+| 04 | E-styling | `/e-styling` | Varför är Viewly annorlunda? | 7 |
+| 05 | Atmosphere | `/atmosphere` | Varför är Viewly annorlunda? | 7 |
+| 06 | Drönarfotografering | `/dronarfotografering` | Vad kan jag skapa? | 6 |
+| 07 | Områdeskarta | `/omradeskarta` | Vad kan jag skapa? | 6 |
+| 08 | Motion | `/motion` | Vad kan jag skapa? | 7 |
+| 09 | Annonsen | `/annonsskrivaren` | Vem skriver texten? | 6 |
+| 10 | Kampanjen | `/some-studio` | Hur når objektet ut? | 6 |
+| 11 | Systemet | portalen | Hur fungerar det? | 6 |
+| 12 | Objekt | case | Kan jag lita på dem? | 6 |
+| 13 | Inifrån | `/om-oss`, `/fotografer` | Vilka är ni? | 7 |
+| 14 | Ditt hem | bostadsägare | Hur börjar jag? | 5 |
 
-Absorberade: planritning och områdeskarta → **04 Rummet** · e-styling och
-Atmosphere → **05 Förvandling** · beställning, mallar och fakturering →
-**06 Systemet**. Om oss och Fotografer är sammanslagna till **10 Inifrån**.
+Tidigare låg tjänsterna hopslagna: *Rummet* bar 3D och områdeskarta, *Förvandling*
+bar e-styling och Atmosphere, *Rörelse* bar Motion. Det gick inte att länka en
+enskild tjänst, och en kund som bara vill se e-styling fick fyra bildrutor om
+något annat först. Nu är de sju tjänsterna sju kapitel, och 01 Viewly är index:
+`system`-ramen namnger dem en gång, i samma ordning som webbplatsen.
 
-### 07 Annonsen — Annonsskrivaren
+Kapitel 11–14 är kontext, inte tjänster: systemet som håller ihop dem, beviset
+på ett objekt, människorna bakom och bostadsägarens ingång.
+
+### White label — 03 och 07
+
+Två leveranser bär **kundens** varumärke, inte Viewlys: 3D-visningssidan och
+områdeskartan. Det står uttryckligen på båda sidorna, och ett påstående av den
+sorten går inte att skriva sig ur — det måste visas. Därför primitivet
+`whitelabel`: samma leverans renderad som två miniatyrsidor bredvid varandra,
+med två kontors logotypfärg, textrytm och knappstil. Färgerna i korten tillhör
+de fiktiva kontoren och ingår inte i Viewlys palett.
+
+- **03 · 3D visning** — *"Kontoret sätter logotyp, färger, typografi och
+  knappstil en gång. Därefter skapas varje ny visningssida automatiskt i rätt
+  uttryck."*
+- **07 · Områdeskarta** — *"Färger, typsnitt och format anpassas efter kontorets
+  grafiska profil. Samma formspråk på varje objekt gör kontorets annonser
+  igenkännbara."*
+
+### Copy
+
+All copy i tjänstekapitlen är hämtad ur respektive sida på `viewly.se` —
+omfattning och pris i 02, dollhouse, planritning och mätverktyg i 03,
+transparenskravet på märkta e-stylade bilder i 04, de tre effekterna skymning /
+blå himmel / sommar i 05, regelverket i 06, högupplöst PNG på 1–2 arbetsdagar i
+07, och de fyra stegen Bilderna → Rörelsen → Redigeringen → Filmen i 08.
+Ingenting är påhittat. Den är fortfarande förslag och riktning, inte låsta krav.
+
+### 09 Annonsen — Annonsskrivaren
 
 Eget kapitel. Säljer utfallet — en färdig text — aldrig AI:n bakom. Copy hämtad
 ur `viewly.se/annonsskrivaren`: färdig bostadsannons på 30 sekunder, de sex
@@ -316,7 +357,7 @@ signalerna AI:n läser ur bilderna, tonlägena saklig / varm / exklusiv med två
 omskrivningar. `flow`-ramen ritar hela kedjan och slutar i ett faktiskt
 annonsutkast, inte i ett påstående.
 
-### 08 Kampanjen — Social / Ads Studio
+### 10 Kampanjen — Social / Ads Studio
 
 Eget kapitel. Copy hämtad ur `viewly.se/some-studio`: kontorets egna mallar,
 obegränsat antal i valfritt format, 4:5 / 1:1 / 9:16 för Instagram, Facebook och
@@ -324,24 +365,32 @@ LinkedIn, kampanjfaserna kommande → till salu → visning → såld, och under
 minut när mallarna är satta. Kapitlet slutar på produktens egen rad: *Ett objekt.
 Hela kampanjen.*
 
-All copy är förslag och riktning, inte låsta krav.
-
 ---
 
 ## Materialläge
 
-24 verkliga assets hämtade från viewly.se används i underlaget. 15 av 69 Stories
+24 verkliga assets hämtade från viewly.se används i underlaget. 22 av 90 Stories
 saknar rätt material och är märkta med vad som behöver produceras — slå på
 **Markera saknat material** i vy 02 eller 04.
 
-De kritiska luckorna:
+Uppdelningen i en tjänst per kapitel gör luckorna synliga i stället för att dölja
+dem: så länge tre tjänster delade ett kapitel räckte en bild per tjänst.
 
-1. **Motion-frames** ur faktisk bostadsfilm (03 Rörelse).
-2. **Ett komplett case** fotograferat genom hela kedjan (08 Objekt).
-3. **Vertikala portalskärmar 9:16.** Nuvarande `portal`-asset är en beskuren
-   desktopvy och används som platshållare i 01, 06 och 07 med fokalpunkt satt så
-   att gränssnittet åtminstone går att läsa.
-4. **Produktbilder för 07 Annonsen och 08 Kampanjen:** Annonsskrivarens
+De kritiska luckorna, i ordning:
+
+1. **Områdeskarta — hela kapitel 07.** Ingen renderad karta finns i biblioteket.
+   Alla fyra bildslots i kapitlet använder en drönarbild som platshållare, och
+   `whitelabel`-korten behöver två faktiska kartor i respektive kontors färger.
+2. **Motion-frames** ur faktisk bostadsfilm (08 Motion) — split-ramens B-sida är
+   i dag en andra stillbild.
+3. **Sommareffekten** (05 Atmosphere). Skymning och blå himmel har verkliga
+   före/efter-par; sommar saknar par — behövs: samma tomt grå respektive
+   grönskande.
+4. **Ett komplett case** fotograferat genom hela kedjan (12 Objekt).
+5. **Vertikala portalskärmar 9:16.** Nuvarande `portal`-asset är en beskuren
+   desktopvy och används som platshållare i 01, 09, 10 och 11 med fokalpunkt satt
+   så att gränssnittet åtminstone går att läsa.
+6. **Produktbilder för 09 Annonsen och 10 Kampanjen:** Annonsskrivarens
    redigeringsvy med tonlägesval, och Social / Ads Studios mallbibliotek.
 
 ---
@@ -351,8 +400,8 @@ De kritiska luckorna:
 ```
 v6/highlights.html      fristående underlag — öppna denna
 v6/shell.html           skalet: tokens, komponenter, layout
-v6/draw.js              geometri, media-slots, riktningsstilar, tolv primitiv × två riktningar,
-                        fyra kampanjmallar × tre format × två riktningar
+v6/draw.js              geometri, media-slots, riktningsstilar, tretton primitiv × två riktningar,
+                        femton kapitelmärken, fyra kampanjmallar × tre format × två riktningar
 v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
 v6/app.js               vyerna, editorn, exporten och spelaren
 v6/brand-geometry.json  spårad logotyp + safe-area-spec
@@ -370,7 +419,9 @@ v6/brand-geometry.json  spårad logotyp + safe-area-spec
 - **v5** `v5/` — tre nya spår. Förkastade: helbild på nästan varje ram.
 - **v6** `v6/` — **här är vi.** Tillbaka till ARKIV och SKUGGA från v1, med
   verifierad geometri, skarpare media, riktig Instagram-overlay och
-  implementerade media-slots.
+  implementerade media-slots. Senast: tjänsterna uppdelade i ett kapitel var,
+  efter `viewly.se`, med `whitelabel` för de två leveranser som bär kundens
+  varumärke.
 
 ---
 

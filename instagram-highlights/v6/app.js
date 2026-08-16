@@ -440,7 +440,7 @@ function verifyClip(blob, expected){
 /* =====================================================================
    01 · RIKTNING
    ===================================================================== */
-var CMP=[["viewly",1],["seendet",4],["forvandling",1]];
+var CMP=[["viewly",1],["foto",3],["estyling",2]];
 function secRiktning(){
   var panels=DIRS.map(function(d){
     var r=refOf(d.hero);
@@ -667,7 +667,8 @@ var RENDERED = {
   cta:       ["k","h","s"],
   flow:      ["k","h","flow_inp","flow_items","flow_mid","flow_out","flow_tones","flow_title","flow_lead"],
   matrix:    ["k","h","s","mx_names"],
-  phases:    ["k","h","s"]
+  phases:    ["k","h","s"],
+  whitelabel:["k","h","s"]
 };
 var FIELDLAB = {
   k:["Kicker","text"], h:["Rubrik","text"], em:["Kursiv rad","text"], s:["Underrad","area"],
@@ -1124,7 +1125,7 @@ function secLager(){
     var c=l.s==="LÅST"?"lock":l.s==="REDIGERBAR"?"edit":"semi";
     return '<div class="lay '+c+'"><b>'+l.s+'</b><span class="ln">'+l.n+'</span><span class="ld">'+l.d+'</span></div>';
   }).join("");
-  var r=refOf(["seendet",4]);
+  var r=refOf(["foto",3]);
   return sechead("Lager och media","Vad som är låst och vad som får röra sig",
     "Systemet är bara användbart om någon annan kan producera i det utan att designen glider. Därför är varje lager "
    +"klassat. Media-sloten till höger är live: byt bild, dra i fokalpunkt och zoom — masken, marginalerna och typskalan "
@@ -1326,7 +1327,7 @@ function afterSlot(slot, live){
   if(state.edit){ if(live) refreshStage(); else render(); return }
   if(P.hl){ drawPlayer(); if(live) restoreFocus(slot); return }
   if(state.sec==="lager"){
-    var r=(function(){var h=byId["seendet"];return {s:h.st[4],i:4,n:h.st.length}})();
+    var r=(function(){var h=byId["foto"];return {s:h.st[3],i:3,n:h.st.length}})();
     var stg=$("#mstage"); if(stg) stg.innerHTML=frame(state.dir,r.s,r.i,r.n);
     if(!live){var c=$("#mctl"); if(c) c.innerHTML=mediaCtl(r.s.sid, r.s.m)}
     return;

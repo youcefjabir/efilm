@@ -61,6 +61,14 @@ function dsize(text, cap, adv, pad){
 }
 var SERIF=0.46;
 
+/* dsize mäter längsta ORD — rätt för rubriker som får radbrytas.
+   Listrader bryts inte, så där måste hela strängen rymmas. Utan detta
+   spränger en lång post ("Lägenhet — 15–35 redigerade bilder") ramen tyst. */
+function lsize(items, cap, adv, avail){
+  var m = (items||[]).reduce(function(a,x){ return Math.max(a, String(x).length) }, 1);
+  return "font-size:"+Math.min(cap, avail/(adv*m)).toFixed(2)+"cqw;";
+}
+
 /* ---------------------------------------------------------------------
    MEDIA-SLOTS
    Masken och kompositionen är LÅSTA. Bilden, fokalpunkten och zoomen
@@ -230,10 +238,11 @@ var A = {
 
  /* 07 · SYSTEM — ekosystemet som typografisk ryggrad, aldrig en ikonlista */
  system:function(s,i,n){
+   var fs = lsize(s.items, 6.2, SERIF, 79.2);
    var rows = s.items.map(function(t,j){
      return '<div style="display:flex;align-items:baseline;gap:3cqw;padding:2.4cqw 0;border-bottom:1px solid #E2DCD9">'
       +'<span class="a-fol" style="width:5cqw;flex:0 0 5cqw;color:#6E7266">'+String(j+1).padStart(2,"0")+'</span>'
-      +'<span style="font-size:6.2cqw;font-weight:300;line-height:1">'+esc(t)+'</span></div>';
+      +'<span style="'+fs+'font-weight:300;line-height:1.06">'+esc(t)+'</span></div>';
    }).join("");
    return A.chrome(s.k,i,n,
      '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4cqw">'
@@ -284,6 +293,11 @@ var B = {
     +'<foreignObject x="0" y="0" width="858.6" height="756.3" clip-path="url(#'+id+')">'
     +'<div xmlns="http://www.w3.org/1999/xhtml" style="width:858.6px;height:756.3px;'+bg(s.m,sid(s))+'"></div></foreignObject>'
     +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="#98A088"/></svg>'
+    /* V:ets spets korsar rubriken. Med en ljus bild blev vit text på ljus
+       plåt — mörkret får därför tillbaka underkanten, utan att dämpa
+       märket. */
+    +'<div style="position:absolute;left:0;right:0;bottom:0;height:64cqw;z-index:3;'
+      +'background:linear-gradient(180deg,rgba(14,14,13,0) 0%,rgba(14,14,13,.70) 46%,rgba(14,14,13,.95) 100%)"></div>'
     +B.kick(s.k)
     +'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+11)+'cqw;display:flex;flex-direction:column;gap:2.4cqw">'
     +'<div class="b-d" style="'+dsize(s.h,11.4,SERIF)+'">'+esc(s.h)+'</div>'
@@ -326,19 +340,24 @@ var B = {
 
  /* 05 · PRODUCT — hörnmarkeringar i oliv, bilden mätt och ställd */
  product:function(s,i,n){
+   /* Plåten hade fast 3:4 och texten låg absolut mot underkanten — vid
+      två rader rubrik hamnade texten INNE i bilden. Nu delar de en
+      kolumn: bilden tar det som blir över, texten tar vad den behöver. */
    var c='position:absolute;width:5cqw;height:5cqw;border-color:#98A088;border-style:solid;';
    return B.shell(
      B.kick(s.k)
-    +'<div style="position:absolute;left:8cqw;right:8cqw;top:34cqw;aspect-ratio:3/4">'
+    +'<div class="z" style="left:8cqw;right:8cqw;top:34cqw;bottom:'+(SAFE.bot+4)+'cqw;'
+      +'display:flex;flex-direction:column;gap:5cqw">'
+    +'<div style="flex:1;min-height:0;position:relative">'
       +'<div style="position:absolute;inset:0;overflow:hidden"><div style="position:absolute;inset:0;'+bg(s.m,sid(s))+'"></div></div>'
       +'<div class="b-v"></div>'
       +'<i style="'+c+'left:-1.4cqw;top:-1.4cqw;border-width:1px 0 0 1px"></i>'
       +'<i style="'+c+'right:-1.4cqw;top:-1.4cqw;border-width:1px 1px 0 0"></i>'
       +'<i style="'+c+'left:-1.4cqw;bottom:-1.4cqw;border-width:0 0 1px 1px"></i>'
       +'<i style="'+c+'right:-1.4cqw;bottom:-1.4cqw;border-width:0 1px 1px 0"></i></div>'
-    +'<div class="z" style="left:6cqw;right:7cqw;bottom:'+(SAFE.bot+10)+'cqw;display:flex;flex-direction:column;gap:2.4cqw">'
-    +'<div class="b-d" style="'+dsize(s.h,8.2,SERIF)+'">'+esc(s.h)+'</div>'
-    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
+    +'<div style="flex:0 0 auto;display:flex;flex-direction:column;gap:2.4cqw">'
+    +'<div class="b-d" style="'+dsize(s.h,8.2,SERIF,8)+'">'+esc(s.h)+'</div>'
+    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div></div>'
     +B.foot(i,n));
  },
 
@@ -360,15 +379,19 @@ var B = {
 
  /* 07 · SYSTEM — punkter längs en linje, första ledet tänt */
  system:function(s,i,n){
+   var fs = lsize(s.items, 6, SERIF, 82.2);
    var rows=s.items.map(function(t,j){
      return '<div style="position:relative;display:flex;align-items:center;min-height:7cqw">'
       +'<span style="position:absolute;left:-4.05cqw;top:50%;transform:translateY(-50%);width:1.5cqw;height:1.5cqw;'
       +'border-radius:50%;background:'+(j===0?"#98A088":"#33332F")+'"></span>'
-      +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:6cqw;line-height:1.2;color:'+(j===0?"#EFEDE7":"#8C8A84")+'">'+esc(t)+'</span></div>';
+      +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;'+fs+'line-height:1.2;color:'+(j===0?"#EFEDE7":"#8C8A84")+'">'+esc(t)+'</span></div>';
    }).join("");
    return B.shell(
      B.kick(s.k)
-    +'<div class="z" style="left:6cqw;right:7cqw;top:34cqw;display:flex;flex-direction:column;gap:2.4cqw">'
+    /* Listan var förankrad i överkanten och tre poster lämnade halva
+       ramen tom. Blocket centreras i stället — det håller för tre lika
+       väl som för sju. */
+    +'<div class="z" style="left:6cqw;right:7cqw;top:50%;transform:translateY(-52%);display:flex;flex-direction:column;gap:2.4cqw">'
     +'<div class="b-d" style="'+dsize(s.h,8.4,SERIF)+'">'+esc(s.h)+'</div>'
     +(s.s?'<div class="b-b" style="margin-bottom:1.6cqw">'+esc(s.s)+'</div>':'')
     +'<div style="border-left:1px solid #2A2A27;padding-left:4.8cqw;display:flex;flex-direction:column">'+rows+'</div></div>'
@@ -435,10 +458,12 @@ var GLYPHS = {
               +'<circle cx="50" cy="55" r="4.5" fill="'+a+'"/>' }},
   halves:  {n:"Förvandling",svg:function(c,a){ return '<circle cx="50" cy="50" r="23" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
               +'<path d="M50 27 A23 23 0 0 0 50 73 Z" fill="'+a+'"/>' }},
-  spine:   {n:"Ryggrad",    svg:function(c,a){ return '<path d="M50 24 V76" stroke="'+c+'" stroke-width="2.2"/>'
-              +'<circle cx="50" cy="24" r="5" fill="'+a+'"/>'
-              +'<circle cx="50" cy="41" r="4" fill="'+c+'"/><circle cx="50" cy="58" r="4" fill="'+c+'"/>'
-              +'<circle cx="50" cy="76" r="4" fill="'+c+'"/>' }},
+  /* Ryggraden var nästan osynlig vid 56 px — stammen och noderna
+     kraftigare, annars tappar kapitlet sin markör i profilraden. */
+  spine:   {n:"Ryggrad",    svg:function(c,a){ return '<path d="M50 22 V78" stroke="'+c+'" stroke-width="3.2"/>'
+              +'<circle cx="50" cy="22" r="6.5" fill="'+a+'"/>'
+              +'<circle cx="50" cy="41" r="5.5" fill="'+c+'"/><circle cx="50" cy="59" r="5.5" fill="'+c+'"/>'
+              +'<circle cx="50" cy="78" r="5.5" fill="'+c+'"/>' }},
   lines:   {n:"Text",       svg:function(c,a){ return '<path d="M26 38 H74 M26 50 H74 M26 62 H58" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
               +'<circle cx="70" cy="62" r="4" fill="'+a+'"/>' }},
   formats: {n:"Format",     svg:function(c,a){ return '<rect x="24" y="30" width="30" height="40" fill="none" stroke="'+c+'" stroke-width="3.2"/>'
@@ -450,6 +475,21 @@ var GLYPHS = {
   people:  {n:"Människor",  svg:function(c,a){ return '<circle cx="40" cy="50" r="17" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
               +'<circle cx="60" cy="50" r="17" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
               +'<circle cx="50" cy="50" r="4.5" fill="'+a+'"/>' }},
+  cube:    {n:"3D",         svg:function(c,a){ return '<path d="M50 22 L74 34 V62 L50 74 L26 62 V34 Z" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linejoin="round"/>'
+              +'<path d="M26 34 L50 46 L74 34 M50 46 V74" fill="none" stroke="'+c+'" stroke-width="2.2"/>'
+              +'<circle cx="50" cy="46" r="4.5" fill="'+a+'"/>' }},
+  sun:     {n:"Atmosphere", svg:function(c,a){ return '<path d="M22 66 H78" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
+              +'<path d="M32 66 A18 18 0 0 1 68 66" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
+              +'<path d="M50 26 V34 M24 44 L30 48 M76 44 L70 48" stroke="'+a+'" stroke-width="3.2" stroke-linecap="round"/>' }},
+  /* Fyra tunna ringar försvann vid 44 px i profilraden — rotorerna är
+     fyllda i stället, så kvadkoptern läses även som liten. */
+  drone:   {n:"Drönare",    svg:function(c,a){ return '<path d="M34 34 L66 66 M66 34 L34 66" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
+              +'<circle cx="30" cy="30" r="7.5" fill="'+c+'"/><circle cx="70" cy="30" r="7.5" fill="'+c+'"/>'
+              +'<circle cx="30" cy="70" r="7.5" fill="'+c+'"/><circle cx="70" cy="70" r="7.5" fill="'+c+'"/>'
+              +'<circle cx="50" cy="50" r="6" fill="'+a+'"/>' }},
+  map:     {n:"Områdeskarta",svg:function(c,a){ return '<path d="M24 34 L42 28 L58 34 L76 28 V66 L58 72 L42 66 L24 72 Z" fill="none" stroke="'+c+'" stroke-width="3"/>'
+              +'<path d="M42 28 V66 M58 34 V72" stroke="'+c+'" stroke-width="2"/>'
+              +'<circle cx="50" cy="47" r="5.5" fill="'+a+'"/>' }},
   door:    {n:"Hem",        svg:function(c,a){ return '<path d="M32 74 V36 A18 18 0 0 1 68 36 V74 Z" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
               +'<circle cx="60" cy="56" r="4" fill="'+a+'"/>' }}
 };
@@ -674,6 +714,54 @@ B.phases = function(s,i,n){
    +'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.2cqw;max-width:66%">'+cards+'</div>'
    +(s.s?'<div class="b-b">'+esc(s.s)+'</div>':'')+'</div>'
+   +B.foot(i,n));
+};
+
+/* ---------------------------------------------------------------------
+   13 · WHITE LABEL
+   3D-visningssidan och områdeskartan levereras i kundens varumärke, inte
+   i Viewlys. Det påståendet går inte att skriva sig ur — det måste visas.
+   Samma leverans, två kontor, två uttryck. Färgerna inne i korten tillhör
+   de fiktiva kontoren och ingår inte i Viewlys palett.
+   --------------------------------------------------------------------- */
+function wlCard(b, dark, m, sid_){
+  var line = dark ? "rgba(239,237,231,.18)" : "#D8D2CF";
+  var ink  = dark ? "#EFEDE7" : "#1C1C1E";
+  var mute = dark ? "#8C8A84" : "#A9A29E";
+  var pane = dark ? "#141412" : "#FFFFFF";
+  return '<div style="border:1px solid '+line+';background:'+pane+';overflow:hidden">'
+   +'<div style="display:flex;align-items:center;gap:1.4cqw;padding:2cqw 2.2cqw;border-bottom:1px solid '+line+'">'
+     +'<span style="width:3cqw;height:3cqw;border-radius:.5cqw;background:'+b[1]+';flex:0 0 auto"></span>'
+     +'<span style="font-family:Montserrat,sans-serif;font-size:1.75cqw;font-weight:700;letter-spacing:.14em;'
+     +'text-transform:uppercase;color:'+ink+'">'+esc(b[0])+'</span></div>'
+   +'<div style="height:16cqw;position:relative;overflow:hidden">'
+     +'<div style="position:absolute;inset:0;'+bg(m, sid_)+'"></div></div>'
+   +'<div style="padding:2cqw 2.2cqw 2.4cqw">'
+     +'<div style="height:1.1cqw;width:74%;background:'+b[1]+';opacity:.85;margin-bottom:1.2cqw"></div>'
+     +'<div style="height:1cqw;width:96%;background:'+line+';margin-bottom:.9cqw"></div>'
+     +'<div style="height:1cqw;width:60%;background:'+line+'"></div>'
+     +'<div style="margin-top:2cqw;display:inline-block;padding:.9cqw 2cqw;background:'+b[1]+';'
+     +'font-family:Montserrat,sans-serif;font-size:1.6cqw;letter-spacing:.12em;text-transform:uppercase;color:#fff">'
+     + esc(b[2] || "Visa") +'</div></div></div>';
+}
+A.whitelabel = function(s,i,n){
+  var cards = (s.brands||[]).map(function(b){ return wlCard(b, false, s.m, sid(s)) }).join("");
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.6cqw">'
+   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:3cqw">'+cards+'</div>'
+   +'<div><div class="a-r" style="margin-bottom:2.2cqw"></div>'
+   +'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div></div></div>');
+};
+B.whitelabel = function(s,i,n){
+  var cards = (s.brands||[]).map(function(b){ return wlCard(b, true, s.m, sid(s)) }).join("");
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:50%;transform:translateY(-54%);display:flex;flex-direction:column;gap:3.4cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.8cqw">'+cards+'</div>'
+   +'<div><div style="width:8cqw;height:1px;background:#98A088;margin-bottom:2.2cqw"></div>'
+   +'<div class="b-b">'+esc(s.s)+'</div></div></div>'
    +B.foot(i,n));
 };
 
