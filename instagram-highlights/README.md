@@ -22,8 +22,8 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 |---|----|----|
 | 01 | Riktning | ARKIV och SKUGGA sida vid sida, palett, typografi, logotypbruk, risk — och samma Story löst i båda |
 | 02 | Kompositioner | De nio primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
-| 03 | Profil | Nio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
-| 04 | Bibliotek | Alla nio kapitel med sekvensuppspelning |
+| 03 | Profil | Tio covers i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
+| 04 | Bibliotek | Alla tio kapitel med sekvensuppspelning |
 | 05 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 
 Klicka på ett kapitel för att spela sekvensen. `←` `→` bläddrar · `Esc` stänger.
@@ -52,7 +52,7 @@ cirklar med lägst igenkänning vid 56 px.
 ## Nio kompositionsprimitiv
 
 Varje Story byggs av ett av nio primitiv. Bara **full bleed** och **case** låter
-fotografiet äga hela ytan — 13 av 57 bildrutor. Resten bärs av typografi, linje,
+fotografiet äga hela ytan — 13 av 64 bildrutor. Resten bärs av typografi, linje,
 plåt och luft, med bilden i en mask.
 
 | Primitiv | Roll |
@@ -98,6 +98,10 @@ två full bleed i rad) · sekvenslängd (5–7 Stories).
 **Redigerbart:** bild i slot · fokalpunkt och zoom · rubrik och brödtext ·
 etiketter i split.
 
+En Story kan ange `fy` och `zoom` som utgångsläge för sin slot. Det är ett
+defaultvärde, inte en låsning — *Återställ slot* nollar tillbaka till systemets
+50 % / 100 %.
+
 Media-sloten är implementerad, inte bara beskriven: byt bild, dra i fokalpunkt
 och zoom i vy 05 eller i spelaren — masken, marginalerna och typskalan står still.
 
@@ -122,9 +126,9 @@ Se `v6/brand-geometry.json`.
 
 ## Struktur
 
-Nio kapitel, 57 Stories. Briefens tio Highlights har blivit nio — fem produkter
-som annars hade blivit egna rubriker är absorberade i större berättelser. Det är
-skillnaden mellan en tjänstekatalog och ett ekosystem.
+Tio kapitel, 64 Stories. Briefens tio Highlights är fortfarande tio, men inte
+samma tio — produkter som annars hade blivit egna rubriker är absorberade i
+större berättelser. Det är skillnaden mellan en tjänstekatalog och ett ekosystem.
 
 | # | Highlight | Besvarar | Stories |
 |---|-----------|----------|---------|
@@ -134,13 +138,32 @@ skillnaden mellan en tjänstekatalog och ett ekosystem.
 | 04 | Rummet | Vad kan jag skapa? | 6 |
 | 05 | Förvandling | Varför är Viewly annorlunda? | 7 |
 | 06 | Systemet | Hur fungerar det? | 6 |
-| 07 | Objekt | Kan jag lita på dem? | 6 |
-| 08 | Inifrån | Vilka är ni? | 7 |
-| 09 | Ditt hem | Hur börjar jag? | 5 |
+| 07 | Kampanjen | Hur når objektet ut? | 7 |
+| 08 | Objekt | Kan jag lita på dem? | 6 |
+| 09 | Inifrån | Vilka är ni? | 7 |
+| 10 | Ditt hem | Hur börjar jag? | 5 |
 
 Absorberade: planritning och områdeskarta → **04 Rummet** · e-styling och
-Atmosphere → **05 Förvandling** · Annonsskrivaren och Ad Studio → **06 Systemet**.
-Om oss och Fotografer är sammanslagna till **08 Inifrån**.
+Atmosphere → **05 Förvandling** · beställning, mallar och fakturering →
+**06 Systemet** · Annonsskrivaren och Social / Ads Studio → **07 Kampanjen**.
+Om oss och Fotografer är sammanslagna till **09 Inifrån**.
+
+### 07 Kampanjen
+
+Annonsskrivaren och Social / Ads Studio hade blivit två tunna tjänsterubriker var
+för sig. Tillsammans är de ett kapitel med en egen fråga: *det som händer efter
+fotograferingen*. Sekvensen säljer utfallet, aldrig AI:n.
+
+All copy är hämtad ur `viewly.se/annonsskrivaren` och `viewly.se/some-studio`:
+"Färdig bostadsannons på 30 sekunder", de sex sakerna AI:n läser ur bilderna,
+tonlägena saklig / varm / exklusiv, kontorets egna mallar i 4:5, 1:1 och 9:16 för
+Instagram, Facebook och LinkedIn, samt kampanjfaserna kommande → till salu →
+visning → såld. Kapitlet slutar på produktens egen rad: *Ett objekt. Hela
+kampanjen.*
+
+Sekvensen är medvetet typdriven — sex av sju bildrutor bärs av typografi och
+information, inte av foto. Två `system`-ramar gör tyngdlyftet: de sex signalerna i
+bilden, och de fyra kampanjfaserna.
 
 All copy är förslag och riktning, inte låsta krav.
 
@@ -148,13 +171,19 @@ All copy är förslag och riktning, inte låsta krav.
 
 ## Materialläge
 
-24 verkliga assets hämtade från viewly.se används i underlaget. 13 av 57 Stories
+24 verkliga assets hämtade från viewly.se används i underlaget. 15 av 64 Stories
 saknar rätt material och är märkta med vad som behöver produceras — slå på
 **Markera saknat material** i vy 02 eller 04.
 
-De två kritiska luckorna: **motion-frames** ur faktisk bostadsfilm (03) och
-**ett komplett case** fotograferat genom hela kedjan (07). Därutöver saknas
-vertikala portalskärmar 9:16 och en produktbild för Annonsskrivaren.
+De kritiska luckorna:
+
+1. **Motion-frames** ur faktisk bostadsfilm (03 Rörelse).
+2. **Ett komplett case** fotograferat genom hela kedjan (08 Objekt).
+3. **Vertikala portalskärmar 9:16.** Nuvarande `portal`-asset är en beskuren
+   desktopvy och används som platshållare i 01, 06 och 07 med fokalpunkt satt så
+   att gränssnittet åtminstone går att läsa.
+4. **Produktbilder för 07 Kampanjen:** Annonsskrivaren med tonlägesval, och
+   Social / Ads Studio med samma objekt i 4:5, 1:1 och 9:16.
 
 ---
 

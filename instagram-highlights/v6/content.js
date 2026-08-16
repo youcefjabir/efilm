@@ -11,7 +11,7 @@ var HL = [
    {p:"quiet", h:"Ett objekt är inte en fotografering.", em:"Det är en presentation.", k:"01 — Viewly"},
    {p:"system", k:"Ekosystemet", h:"En produktion.", s:"Sju lager. Ett flöde.",
     items:["Foto","Rörelse","Rum","Stil","Område","Annons","Kampanj"]},
-   {p:"product", m:"portal", k:"Portalen", h:"Från bokning till färdigt material.", s:"Allt om bostaden på ett ställe.",
+   {p:"product", m:"portal", fy:.55, zoom:1.12, k:"Portalen", h:"Från bokning till färdigt material.", s:"Allt om bostaden på ett ställe.",
     need:"Vertikalt portalutsnitt 9:16 — nuvarande bild är beskuren desktop."},
    {p:"fullbleed", m:"living", k:"", h:"", s:""},
    {p:"editorial", m:"kitchen", k:"För mäklare", h:"Byggt för mäklare som vill presentera bostäder bättre.", s:"Inte för att fylla en tjänstelista."},
@@ -69,21 +69,42 @@ var HL = [
    {p:"cta", h:"Bostadens fulla potential.", s:"Alltid ärligt mot rummet.", k:"05 — Förvandling"}
   ]},
 
- {id:"systemet", num:"06", name:"SYSTEMET", label:"Systemet", cover:"portal",
+ {id:"systemet", num:"06", name:"SYSTEMET", label:"Systemet", cover:"portal", coverFy:.55,
   q:"Hur fungerar det?", why:"Den kommersiellt viktigaste. Talar direkt till mäklaren.",
   st:[
    {p:"quiet", h:"Mer tid för affären.", em:"Mindre tid i mappar.", k:"06 — Systemet"},
-   {p:"product", m:"portal", k:"Mäklarportalen", h:"Ett ställe för hela bostaden.", s:"Boka, följ, hämta, publicera.",
+   {p:"product", m:"portal", fy:.55, zoom:1.12, k:"Mäklarportalen", h:"Ett ställe för hela bostaden.", s:"Boka, följ, hämta, publicera.",
     need:"Vertikala portalskärmar 9:16."},
    {p:"system", k:"Flödet", h:"Fyra steg.", s:"Från bokning till publicerad kampanj.",
     items:["Boka","Produktion","Leverans","Publicera"]},
-   {p:"product", m:"kitchen", k:"Annonsskrivaren", h:"Objektbeskrivning på sekunder.", s:"Din text. Ditt tonläge.",
-    need:"Produktbild Annonsskrivaren + Ad Studio — saknas helt."},
    {p:"editorial", m:"hero", k:"Skillnaden", h:"Inte en mapp med filer.", s:"En färdig presentation, redo att publiceras."},
-   {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"06 — Systemet"}
+   {p:"product", m:"portal", fy:.6, zoom:1.12, k:"Samlat", h:"En faktura. Ett konto.", s:"Beställning, mallar, material och fakturering på samma ställe.",
+    need:"Vertikal portalvy 9:16: faktureringsöversikt."},
+   {p:"cta", h:"Ett ställe.", s:"Hela produktionen.", k:"06 — Systemet"}
   ]},
 
- {id:"objekt", num:"07", name:"OBJEKT", label:"Objekt", cover:"eames",
+ /* 07 — Annonsskrivaren + Social / Ads Studio.
+    Två verktyg, ett kapitel: det som händer efter fotograferingen.
+    All copy nedan är hämtad ur viewly.se/annonsskrivaren och viewly.se/some-studio. */
+ {id:"kampanjen", num:"07", name:"KAMPANJEN", label:"Kampanjen", cover:"portal", coverFy:.55,
+  q:"Hur når objektet ut?",
+  why:"Annonsskrivaren och Social / Ads Studio som ett lager — text och format ur samma order. Säljer utfallet, inte AI:n.",
+  st:[
+   {p:"mark", m:"hero", k:"KAMPANJEN", h:"Ett objekt", s:"En komplett kampanj."},
+   {p:"quiet", h:"Färdig bostadsannons", em:"på 30 sekunder.", s:"Fyll i bostaden. Ladda upp bilderna.", k:"07 — Kampanjen"},
+   {p:"system", k:"Annonsskrivaren", h:"AI:n läser bilderna.", s:"Och plockar ut det som faktiskt säljer.",
+    items:["Ljusinsläpp","Takhöjd och volym","Material och ytskikt","Planlösning","Utsikt och läge","Områdets karaktär"]},
+   {p:"product", m:"kitchen", k:"Tonläge", h:"Din text. Ditt tonläge.", s:"Saklig, varm eller exklusiv. Två omskrivningar ingår.",
+    need:"Produktbild Annonsskrivaren 9:16: färdig annons med tonlägesval."},
+   {p:"editorial", m:"portal", fy:.52, zoom:1.06, k:"Social / Ads Studio", h:"Kontorets egna mallar.",
+    s:"Inlägg 4:5, kvadrat 1:1 och story 9:16 — samtidigt. Instagram, Facebook och LinkedIn.",
+    need:"Skärmbild ur Social / Ads Studio: samma objekt i tre format."},
+   {p:"system", k:"Kampanjfaser", h:"Fyra lägen.", s:"Samma mall. Samma objekt. Hela resan.",
+    items:["Kommande","Till salu","Visning","Såld"]},
+   {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"07 — Kampanjen"}
+  ]},
+
+ {id:"objekt", num:"08", name:"OBJEKT", label:"Objekt", cover:"eames",
   q:"Kan jag lita på dem?", why:"Beviset. Varje case är en liten redaktionell feature. Skalar utan omdesign.",
   st:[
    {p:"case", m:"drone", k:"Objekt 01", h:"Silvergården 9A", s:"Landskrona",
@@ -92,36 +113,44 @@ var HL = [
    {p:"editorial", m:"eames", k:"Detalj", h:"", s:"", need:"Detalj från samma objekt."},
    {p:"product", m:"threed", k:"3D", h:"Planlösningen.", s:"", need:"3D-vy från samma objekt."},
    {p:"fullbleed", m:"dining2", k:"Rörelse", h:"", s:"", need:"Motion-frame från samma objekt."},
-   {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"07 — Objekt"}
+   {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"08 — Objekt"}
   ]},
 
- {id:"inifran", num:"08", name:"INIFRÅN", label:"Inifrån", cover:"om3",
+ {id:"inifran", num:"09", name:"INIFRÅN", label:"Inifrån", cover:"om3",
   q:"Vilka är ni?", why:"Om oss + fotografer sammanslagna. Rekrytering blir en följd av varumärket, inte en jobbannons.",
   st:[
    {p:"mark", m:"om1", k:"INIFRÅN", h:"Människorna", s:"bakom presentationen."},
-   {p:"quiet", h:"Vi bygger inte för hur bostäder presenterades igår.", k:"08 — Inifrån"},
+   {p:"quiet", h:"Vi bygger inte för hur bostäder presenterades igår.", k:"09 — Inifrån"},
    {p:"editorial", m:"om3", k:"Så arbetar vi", h:"Hantverk och teknik.", s:"Ingen av delarna räcker ensam."},
    {p:"fullbleed", m:"om4", k:"", h:"", s:""},
    {p:"editorial", m:"kontakt", k:"Fotograferna", h:"Fotografen är inte en underleverantör.", s:"Fotografen är Viewly.",
     need:"Reportagebild: fotograf i arbete på plats."},
-   {p:"quiet", h:"Din blick. Ditt hantverk.", em:"Vår organisation.", k:"08 — Inifrån"},
-   {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"08 — Inifrån"}
+   {p:"quiet", h:"Din blick. Ditt hantverk.", em:"Vår organisation.", k:"09 — Inifrån"},
+   {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"09 — Inifrån"}
   ]},
 
- {id:"ditthem", num:"09", name:"DITT HEM", label:"Ditt hem", cover:"dining",
+ {id:"ditthem", num:"10", name:"DITT HEM", label:"Ditt hem", cover:"dining",
   q:"Hur börjar jag?", why:"Sekundär målgrupp. Medvetet kort — svarar på en enda fråga.",
   st:[
-   {p:"fullbleed", m:"dining", k:"09 — Ditt hem", h:"", s:""},
-   {p:"quiet", h:"Ditt hem säljs en gång.", em:"Presentationen betyder något.", k:"09 — Ditt hem"},
+   {p:"fullbleed", m:"dining", k:"10 — Ditt hem", h:"", s:""},
+   {p:"quiet", h:"Ditt hem säljs en gång.", em:"Presentationen betyder något.", k:"10 — Ditt hem"},
    {p:"fullbleed", m:"living", k:"", h:"", s:""},
    {p:"editorial", m:"hero", k:"Vad Viewly tillför", h:"Foto, rum och rörelse i en presentation.", s:"Din mäklare beställer. Vi producerar."},
-   {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"09 — Ditt hem"}
+   {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"10 — Ditt hem"}
   ]}
 ];
 
-/* varje media-slot får ett stabilt id så fokalpunkt och bildval
-   kan sparas per plats i biblioteket */
-HL.forEach(function(h){ h.st.forEach(function(s,i){ s.sid = h.id+"-"+i }) });
+/* Varje media-slot får ett stabilt id så bildval, fokalpunkt och zoom kan
+   sparas per plats i biblioteket. En Story kan ange fy/zoom som utgångsläge —
+   det är slotens defaultvärde, inte en låsning. "Återställ slot" i studion
+   nollar tillbaka till systemets 50 % / 100 %. */
+HL.forEach(function(h){
+  h.st.forEach(function(s,i){
+    s.sid = h.id+"-"+i;
+    if(s.fy!=null || s.zoom!=null) SLOTS[s.sid] = {fy:s.fy, zoom:s.zoom};
+  });
+  if(h.coverFy!=null) SLOTS["cover-"+h.id] = {fy:h.coverFy};
+});
 
 var PRIMS = [
   {id:"mark",      n:"Mark",            d:"V-geometrin bär kompositionen — mask, ram eller överdimensionerat vattenmärke."},

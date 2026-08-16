@@ -9,6 +9,10 @@ var $=function(s,r){return (r||document).querySelector(s)};
 var state={sec:"riktning", dir:"arkiv", ig:false, needs:false};
 var byId={}; HL.forEach(function(h){byId[h.id]=h});
 function hlOf(id){return byId[id]}
+var NW=["noll","en","två","tre","fyra","fem","sex","sju","åtta","nio","tio","elva","tolv"];
+function nw(n){return NW[n]||String(n)}
+function cap(t){return t.charAt(0).toUpperCase()+t.slice(1)}
+function totalStories(){return HL.reduce(function(a,h){return a+h.st.length},0)}
 function refOf(r){var h=byId[r[0]]; return {h:h, s:h.st[r[1]], i:r[1], n:h.st.length}}
 
 /* ---------- ram ---------- */
@@ -92,7 +96,7 @@ function secKomp(){
       +'<p class="specd">'+p.d+'</p></div>';
   }).join("");
   var counts={}; HL.forEach(function(h){h.st.forEach(function(s){counts[s.p]=(counts[s.p]||0)+1})});
-  var total=HL.reduce(function(a,h){return a+h.st.length},0);
+  var total=totalStories();
   var bars=PRIMS.map(function(p){
     var c=counts[p.id]||0, pct=Math.round(c/total*100);
     return '<div class="bar"><span class="bn">'+p.n+'</span>'
@@ -142,7 +146,7 @@ function secProfil(){
   }).join("");
 
   return sechead("Profil","Raden är ett eget designproblem",
-    "Nio covers, 64 px breda, som en horisontell rad ovanför rutnätet. De ska gå att skilja åt i ögonvrån, i den "
+    cap(nw(HL.length))+" covers, 64 px breda, som en horisontell rad ovanför rutnätet. De ska gå att skilja åt i ögonvrån, i den "
    +"ordning en ny besökare läser dem: vad är det, hur ser det ut, vad kan jag få, funkar det, vilka är ni, hur börjar jag.")
    +'<div class="phones">'+phones+'</div>'
    +'<h3 class="h3">Igenkänning i verklig storlek</h3><div class="minis">'+strip+'</div>'
@@ -167,7 +171,7 @@ function secBib(){
       +'<span class="strip">'+strip+'</span>'
       +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="mono">'+h.num+'</span></span></button>';
   }).join("");
-  return sechead("Bibliotek","Nio kapitel, "+HL.reduce(function(a,h){return a+h.st.length},0)+" Stories",
+  return sechead("Bibliotek",cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
     "Hela biblioteket renderat i den valda riktningen. Klicka på ett kapitel för att spela upp sekvensen — "
    +need+" bildrutor är markerade som Behöver material och renderas med platshållare tills rätt bild finns.")
    +dirbar()+toggles(true)
