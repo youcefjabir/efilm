@@ -1409,13 +1409,16 @@ function mediaCtl(slot, cur){
 function sechead(eb,t,l){
   return '<div class="sechead"><div class="eyebrow">'+eb+'</div><h2>'+t+'</h2><p class="lede">'+l+'</p></div>';
 }
+/*__MOTION__*/
+
 var SECTIONS=[
  {id:"riktning", n:"Riktning",     num:"01", f:secRiktning},
  {id:"komp",     n:"Kompositioner",num:"02", f:secKomp},
  {id:"profil",   n:"Profil",       num:"03", f:secProfil},
  {id:"format",   n:"Format",       num:"04", f:secFormat},
  {id:"studio",   n:"Studio",       num:"05", f:secStudio},
- {id:"lager",    n:"Lager & media",num:"06", f:secLager}
+ {id:"lager",    n:"Lager & media",num:"06", f:secLager},
+ {id:"motion",   n:"Motion",       num:"07", f:secMotion}
 ];
 
 /* =====================================================================

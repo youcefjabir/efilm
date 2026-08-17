@@ -367,6 +367,34 @@ tr:last-child td{border-bottom:0}
   opacity:.75;transition:opacity .12s,background .12s,color .12s}
 .mislot:hover .midel,.midel:focus-visible{opacity:1}
 .midel:hover{background:#B4453B;border-color:#B4453B;color:#fff}
+/* ============ 07 MOTION ============ */
+.mstat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:8px}
+.mstat>div{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+.mstat b{display:block;font-family:var(--mono);font-size:24px;font-weight:600;line-height:1}
+.mstat span{display:block;font-size:11.5px;color:var(--mut);margin-top:5px}
+.mcand{border:1px solid var(--line);border-radius:11px;background:var(--panel);padding:20px 22px;margin-bottom:18px}
+.mcandh{display:flex;gap:14px;align-items:flex-start;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.mcandh>div{flex:1;min-width:0}
+.mcandh b{font-size:16px}
+.mnum{font-family:var(--mono);font-size:11px;color:var(--acc);letter-spacing:.08em;padding-top:4px}
+.mcandh code{font-size:10.5px;color:var(--mut);white-space:nowrap;padding-top:4px}
+.mdir{padding:16px 0;border-top:1px solid var(--line)}
+.mdir:first-of-type{border-top:0;padding-top:0}
+.mdirh{margin-bottom:12px}
+.mdirh b{display:block;font-size:13px;letter-spacing:.02em}
+.mdirh span{display:block;font-size:11.5px;color:var(--mut);line-height:1.55;margin-top:3px;max-width:78ch}
+.mkfs{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.mkf{width:150px}
+.mkf .frame{box-shadow:var(--shadow)}
+.mkfl{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--mut);margin-top:6px}
+.mboard{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;max-width:92ch}
+.mboard li{display:flex;gap:12px;font-size:12.5px;line-height:1.6}
+.mboard .t{flex:0 0 52px;font-family:var(--mono);font-size:11px;color:var(--acc);padding-top:2px}
+.mboard .w{color:var(--ink2)}
+.mboard i{color:var(--mut);font-style:italic}
+@media(max-width:900px){.mkf{width:118px}}
+
 /* Omslagsväljaren: tre system, renderade i verklig storlek. */
 .csets{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:9px 0 4px}
 .cset{padding:8px 6px 6px;border:2px solid var(--line);border-radius:8px;background:var(--card);
