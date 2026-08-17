@@ -1073,25 +1073,60 @@ B.phases = function(s,i,n){
    Samma leverans, två kontor, två uttryck. Färgerna inne i korten tillhör
    de fiktiva kontoren och ingår inte i Viewlys palett.
    --------------------------------------------------------------------- */
+/* Visningssidan i miniatyr, efter den faktiska.
+
+   Den förra ritade en produktsida med rubrikstreck och textrader — en
+   trådmodell. Viewlys visningssida är en enda yta av bostaden med
+   kontorets logotyp uppe till vänster, adressen och EN knapp i mitten,
+   mäklaren och kontaktvägarna nertill. Det är den som ska stå här, för
+   det är den kunden får.
+
+   b = [namn, färg, knapptext, typsnitt, hörnradie] — de tre sista
+   posterna är valfria och styr just det som byts med kontoret. */
 function wlCard(b, dark, m, sid_){
   var line = dark ? "rgba(239,237,231,.18)" : "#D8D2CF";
-  var ink  = dark ? "#EFEDE7" : "#1C1C1E";
-  var mute = dark ? "#8C8A84" : "#A9A29E";
-  var pane = dark ? "#141412" : "#FFFFFF";
-  return '<div style="border:1px solid '+line+';background:'+pane+';overflow:hidden">'
-   +'<div style="display:flex;align-items:center;gap:1.4cqw;padding:2cqw 2.2cqw;border-bottom:1px solid '+line+'">'
-     +'<span style="width:3cqw;height:3cqw;border-radius:.5cqw;background:'+b[1]+';flex:0 0 auto"></span>'
-     +'<span style="font-family:Montserrat,sans-serif;font-size:1.75cqw;font-weight:700;letter-spacing:.14em;'
-     +'text-transform:uppercase;color:'+ink+'">'+esc(b[0])+'</span></div>'
-   +'<div style="height:16cqw;position:relative;overflow:hidden">'
-     +'<div style="position:absolute;inset:0;'+bg(m, sid_)+'"></div></div>'
-   +'<div style="padding:2cqw 2.2cqw 2.4cqw">'
-     +'<div style="height:1.1cqw;width:74%;background:'+b[1]+';opacity:.85;margin-bottom:1.2cqw"></div>'
-     +'<div style="height:1cqw;width:96%;background:'+line+';margin-bottom:.9cqw"></div>'
-     +'<div style="height:1cqw;width:60%;background:'+line+'"></div>'
-     +'<div style="margin-top:2cqw;display:inline-block;padding:.9cqw 2cqw;background:'+b[1]+';'
-     +'font-family:Montserrat,sans-serif;font-size:1.6cqw;letter-spacing:.12em;text-transform:uppercase;color:#fff">'
-     + esc(b[2] || "Visa") +'</div></div></div>';
+  var col  = b[1] || "#6E7266";
+  var font = b[3] || "Montserrat,sans-serif";
+  var rad  = b[4] == null ? 0 : b[4];
+  var serif = /Cormorant/.test(font);
+  var pill = function(t){
+    return '<span style="border:1px solid rgba(255,255,255,.7);padding:.8cqw 1.4cqw;'
+     +'font-family:Montserrat,sans-serif;font-size:1.15cqw;font-weight:500;letter-spacing:.2em;'
+     +'text-transform:uppercase;color:#fff;white-space:nowrap">'+esc(t)+'</span>';
+  };
+  return '<div style="position:relative;width:100%;aspect-ratio:4/3;overflow:hidden;'
+   +'container-type:inline-size;text-align:left;border:1px solid '+line+';background:#2A2A28">'
+   +'<div style="position:absolute;inset:0;'+bg(m, sid_)+'"></div>'
+   +'<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,18,.30),'
+   +'rgba(20,20,18,.08) 36%,rgba(20,20,18,.60))"></div>'
+   /* kontorets logotyp */
+   +'<div style="position:absolute;left:3.4cqw;top:3.4cqw;background:'+col+';padding:1.8cqw 2.6cqw">'
+     +'<span style="font-family:'+font+';font-weight:'+(serif?300:600)+';font-size:3cqw;'
+     +'letter-spacing:'+(serif?".01em":".14em")+';color:#fff;'
+     +'text-transform:'+(serif?"none":"uppercase")+'">'+esc(b[0])+'</span></div>'
+   /* Viewlys märke, tillbakadraget */
+   +'<div style="position:absolute;right:3.4cqw;top:4cqw;display:flex;align-items:center;gap:1.1cqw;opacity:.9">'
+     +'<span style="width:2.4cqw;display:block">'+vmark("#fff","#fff",'style="width:100%;height:auto;display:block"')+'</span>'
+     +'<span style="font-family:Montserrat,sans-serif;font-size:1.4cqw;font-weight:600;'
+     +'letter-spacing:.28em;color:#fff">VIEWLY</span></div>'
+   /* adressen och den enda knappen */
+   +'<div style="position:absolute;left:5cqw;right:5cqw;top:50%;transform:translateY(-50%);'
+   +'display:flex;flex-direction:column;align-items:center;gap:3cqw">'
+     +'<span style="font-family:'+font+';font-weight:'+(serif?300:500)+';font-size:6.4cqw;'
+     +'color:#fff;text-align:center;line-height:1.1">'+esc(typeof mo==="function"?mo("addr"):"Silvergården 9A")+'</span>'
+     +'<span style="background:'+col+';border-radius:'+rad+'px;padding:2cqw 5cqw;font-family:'+font+';'
+     +'font-weight:'+(serif?300:500)+';font-size:2.4cqw;color:#fff">'+esc(b[2] || "Upplev bostaden")+'</span>'
+   +'</div>'
+   /* mäklaren och kontaktvägarna */
+   +'<div style="position:absolute;left:3.4cqw;bottom:3.4cqw;display:flex;align-items:center;gap:1.8cqw">'
+     +'<span style="width:5cqw;height:5cqw;border-radius:50%;border:1px solid rgba(255,255,255,.55)"></span>'
+     +'<span style="display:flex;flex-direction:column;gap:.3cqw">'
+       +'<span style="font-family:Montserrat,sans-serif;font-size:1.2cqw;font-weight:500;'
+       +'letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.75)">Presenteras av</span>'
+       +'<span style="font-family:'+font+';font-weight:'+(serif?300:500)+';font-size:2.4cqw;color:#fff">'
+       +'Anna Lindqvist</span></span></div>'
+   +'<div style="position:absolute;right:3.4cqw;bottom:3.8cqw;display:flex;gap:1cqw">'
+   + pill("Mejla")+pill("Ring") +'</div></div>';
 }
 A.whitelabel = function(s,i,n){
   var cards = (s.brands||[]).map(function(b){ return wlCard(b, false, s.m, sid(s)) }).join("");
@@ -1123,7 +1158,7 @@ B.whitelabel = function(s,i,n){
      VISNING   en enda uppgift, satt stort
      SÅLD      ordet tar över, bilden backar
    ===================================================================== */
-var AR = {"9:16":[9,16], "4:5":[4,5], "1:1":[1,1]};
+var AR = {"9:16":[9,16], "4:5":[4,5], "1:1":[1,1], "16:9":[16,9], "4:3":[4,3], "3:2":[3,2]};
 
 /* ---------------------------------------------------------------- A · ARKIV */
 /* I 9:16 ligger Instagrams svarsfält över de nedersta 26 cqw. Bandet växer

@@ -642,148 +642,250 @@ MK.format = {
  }
 };
 
-/* ---------- 06 WHITE LABEL ----------
-   Samma fel igen: den förra versionen visade en TRÅDMODELL — grå staplar
-   där texten skulle stå. Men påståendet är att visningssidan levereras
-   färdig i kontorets varumärke, och en trådmodell bevisar inte att en
-   sida är färdig. Den bevisar tvärtom att den inte är det.
+/* ---------------------------------------------------------------------
+   VISNINGSSIDAN — efter den riktiga
 
-   msite() ritar därför den faktiska sidstrukturen: varumärkeslist,
-   hero, status, adress, faktarad, tre ingångar och en handlingsknapp.
-   Allt utom loggan och accentfärgen är identiskt mellan kontoren — det
-   är hela poängen, och den syns bara när sidan är satt. */
-/* Kontorsnamnen är objektsdata de också — de byggs vid rendering. */
+   Den förra msite() var påhittad: vit sida, hero, faktarad, tre
+   miniatyrer, olivknapp. Viewlys faktiska visningssida ser inte alls ut
+   så. Den är en enda full yta av bostaden med fyra saker ovanpå:
+
+     uppe vänster   kontorets logotyp på en platta
+     uppe höger     Viewlys märke, litet och tillbakadraget
+     mitten         adressen och EN knapp — Upplev bostaden
+     nederkant      mäklaren till vänster, kontaktvägarna till höger
+
+   Ingenting annat. Sidan är bostaden, inte en produktsida om bostaden.
+
+   Det som gör den till white label är att TRE saker byts med kontoret,
+   och det är precis de tre som ska gå att se i rörelse:
+
+     1  logotypen och plattan den ligger på
+     2  typsnittet i adressen och i knappen
+     3  knappens färg, form och hörnradie
+
+   VBRAND bär de tre. Allt annat — bilden, adressen, mäklaren,
+   kontaktvägarna — står stilla, för det är hela poängen.
+   --------------------------------------------------------------------- */
+/* Namnen kommer ur objektet, inte ur koden — annars går kontoren inte
+   att byta ut, och då är white label ett påstående igen. */
+var VBRAND = [
+  {id:"vy", key:null, col:"#6E7266", plate:"#1C1C1E", pcol:"#F2EFEF",
+   font:"Montserrat,sans-serif", fw:500, ls:".02em", rad:0, btn:"fill"},
+  {id:"nv", key:"b1", col:"#1F3A2E", plate:"#1F3A2E", pcol:"#FFFFFF",
+   font:"Montserrat,sans-serif", fw:600, ls:".14em", rad:0, btn:"fill"},
+  {id:"al", key:"b2", col:"#7A3B2E", plate:"#F5F1EC", pcol:"#7A3B2E",
+   font:"'Cormorant Garamond',Georgia,serif", fw:300, ls:".01em", rad:999, btn:"fill"},
+  {id:"lg", key:"b3", col:"#1C3A5E", plate:"transparent", pcol:"#FFFFFF",
+   font:"Montserrat,sans-serif", fw:300, ls:".28em", rad:3, btn:"outline"}
+];
+function vbrand(i){
+  var b = VBRAND[((i % VBRAND.length) + VBRAND.length) % VBRAND.length];
+  return Object.assign({}, b, {name: b.key ? mo(b.key) : "Viewly"});
+}
+
+/* Sidan i miniatyr. Alla mått i sidans egna cqw, så samma funktion
+   fungerar på 40 cqw och på 96, och i vilket bildförhållande som helst. */
+function vsite(D, bi, x, y, w, ar, extra, opts){
+  var b = vbrand(bi), o = opts || {};
+  var q = (typeof AR !== "undefined" && AR[ar]) || [16,9];
+  var h = w*q[1]/q[0];
+  /* smalare sida = mindre yta att sätta i; skalan följer bredden ändå */
+  var tall = q[1]/q[0] > 1.1;
+  var addr = o.addr || mo("addr");
+  var btnBg = b.btn === "outline" ? "transparent" : b.col;
+  var btnBd = b.btn === "outline" ? "1px solid rgba(255,255,255,.85)" : "1px solid "+b.col;
+  var btnCol = b.btn === "outline" ? "#FFFFFF" : "#FFFFFF";
+  var pill = function(t){
+    return '<span style="border:1px solid rgba(255,255,255,.7);padding:'+(tall?1.6:1.1)+'cqw '
+     +(tall?3:2.2)+'cqw;font-family:Montserrat,sans-serif;font-size:'+(tall?2.1:1.55)+'cqw;'
+     +'font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#FFFFFF;'
+     +'white-space:nowrap">'+esc(t)+'</span>';
+  };
+  return '<div style="position:absolute;left:'+x.toFixed(2)+'cqw;top:'+y.toFixed(2)+'cqw;width:'+w.toFixed(2)
+   +'cqw;height:'+h.toFixed(2)+'cqw;overflow:hidden;container-type:inline-size;text-align:left;'
+   +'background:#2A2A28;'+(extra||'')+'">'
+   /* bostaden fyller hela ytan */
+   +'<div style="position:absolute;inset:0;'+bg(o.img||"matterport","m-site-hero")+'"></div>'
+   +'<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,20,18,.30) 0%,'
+   +'rgba(20,20,18,.10) 34%,rgba(20,20,18,.16) 62%,rgba(20,20,18,.62) 100%)"></div>'
+   /* 1 · kontorets logotyp */
+   +'<div style="position:absolute;left:'+(tall?4:2.6)+'cqw;top:'+(tall?3.4:2.6)+'cqw;'
+   +'background:'+b.plate+';padding:'+(tall?2.4:1.9)+'cqw '+(tall?3.4:2.8)+'cqw;'
+   +'display:flex;flex-direction:column;gap:.5cqw'+(b.plate==="transparent"?';border:1px solid rgba(255,255,255,.5)':'')+'">'
+     +'<span style="font-family:'+b.font+';font-weight:'+b.fw+';font-size:'+(tall?3.4:2.5)
+     +'cqw;letter-spacing:'+b.ls+';color:'+b.pcol+';text-transform:'+(b.ls===".28em"?"uppercase":"none")+'">'
+     + esc(b.name) +'</span></div>'
+   /* 2 · Viewlys märke, tillbakadraget */
+   +'<div style="position:absolute;right:'+(tall?4:2.6)+'cqw;top:'+(tall?3.8:3)+'cqw;'
+   +'display:flex;align-items:center;gap:'+(tall?1.4:1)+'cqw;opacity:.9">'
+     +'<span style="width:'+(tall?3:2.2)+'cqw;display:block">'
+     + vmark("#FFFFFF","#FFFFFF",'style="width:100%;height:auto;display:block"') +'</span>'
+     +'<span style="font-family:Montserrat,sans-serif;font-size:'+(tall?1.9:1.4)+'cqw;font-weight:600;'
+     +'letter-spacing:.3em;color:#FFFFFF">VIEWLY</span></div>'
+   /* 3 · adressen och den enda knappen */
+   +'<div style="position:absolute;left:6cqw;right:6cqw;top:50%;transform:translateY(-50%);'
+   +'display:flex;flex-direction:column;align-items:center;gap:'+(tall?4:3)+'cqw">'
+     +'<span style="font-family:'+b.font+';font-weight:'+b.fw+';font-size:'+(tall?7.6:5.4)
+     +'cqw;letter-spacing:'+b.ls+';color:#FFFFFF;text-align:center;line-height:1.1">'+esc(addr)+'</span>'
+     +'<span style="background:'+btnBg+';border:'+btnBd+';border-radius:'+b.rad+'px;'
+     +'padding:'+(tall?2.6:1.9)+'cqw '+(tall?7:5.2)+'cqw;font-family:'+b.font+';font-weight:'+b.fw+';'
+     +'font-size:'+(tall?2.9:2.1)+'cqw;letter-spacing:'+b.ls+';color:'+btnCol+'">Upplev bostaden</span>'
+   +'</div>'
+   /* 4 · mäklaren och kontaktvägarna */
+   +'<div style="position:absolute;left:'+(tall?4:3)+'cqw;bottom:'+(tall?4:3)+'cqw;'
+   +'display:flex;align-items:center;gap:'+(tall?2.4:1.8)+'cqw">'
+     +'<span style="width:'+(tall?7:5)+'cqw;height:'+(tall?7:5)+'cqw;border-radius:50%;'
+     +'border:1px solid rgba(255,255,255,.55);flex:0 0 auto"></span>'
+     +'<span style="display:flex;flex-direction:column;gap:.4cqw">'
+       +'<span style="font-family:Montserrat,sans-serif;font-size:'+(tall?1.7:1.25)+'cqw;font-weight:500;'
+       +'letter-spacing:.24em;text-transform:uppercase;color:rgba(255,255,255,.75)">Presenteras av</span>'
+       +'<span style="font-family:'+b.font+';font-weight:'+b.fw+';font-size:'+(tall?3:2.2)
+       +'cqw;color:#FFFFFF">'+esc(o.agent||"Anna Lindqvist")+'</span>'
+       +'<span style="font-family:Montserrat,sans-serif;font-size:'+(tall?1.6:1.2)+'cqw;'
+       +'letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.65)">Fastighetsmäklare · '
+       + esc(b.name) +'</span></span></div>'
+   +'<div style="position:absolute;right:'+(tall?4:3)+'cqw;bottom:'+(tall?4.6:3.4)+'cqw;'
+   +'display:flex;gap:'+(tall?1.6:1.2)+'cqw">'+ pill("Mejla")+pill("Ring")+pill("SMS") +'</div>'
+   +'</div>';
+}
+
+/* ---------- 06 WHITE LABEL ----------
+   Omritad mot den faktiska visningssidan. Den förra ritade en påhittad
+   produktsida med faktarad och miniatyrer; verkligheten är en enda yta
+   av bostaden med logotyp, adress, en knapp och kontaktvägar.
+
+   Och påståendet var fel formulerat. Att sidan "levereras i kontorets
+   varumärke" bevisas inte av att en accentfärg byts — det ska synas att
+   TRE saker byts samtidigt: logotypen, typsnittet och knappen. Det är
+   just de tre riktningarna nedan ägnar sig åt.
+
+   Bildförhållandet är också en del av leveransen: samma sida sätts om
+   för desktop, surfplatta och mobil. Object-riktningen visar det. */
 function mwb(){
   return [["", "", "Utan varumärke"],
           [mo("b1"), "#1F3A2E", mo("b1")],
           [mo("b2"), "#7A3B2E", mo("b2")]];
 }
 
-/* Visningssidan i miniatyr. Egen container: allt inuti räknas mot
-   sidans bredd, så samma funktion fungerar på 41 cqw och på 86. */
-function msite(D, bi, x, y, w, extra){
-  var T = mtone(D), b = mwb()[bi], c = b[1] || T.mut, on = !!b[1];
-  var plate = T.dark ? "#141416" : "#FFFFFF";
-  var line  = T.dark ? "#26262A" : "#E4DEDB";
-  var ink   = T.dark ? "#EFEDE7" : "#1C1C1E";
-  var mut   = T.dark ? "#8C8A84" : "#8A8580";
-  var thumbs = ["threed","om3","drone"].map(function(k,j){
-    return '<div style="flex:1;position:relative;aspect-ratio:4/3;overflow:hidden;border:1px solid '+line+'">'
-     +'<div style="position:absolute;inset:0;'+bg(k,"m-site-"+j)+'"></div></div>';
-  }).join("");
-  return '<div style="position:absolute;left:'+x.toFixed(2)+'cqw;top:'+y.toFixed(2)+'cqw;width:'+w.toFixed(2)
-   +'cqw;container-type:inline-size;text-align:left;background:'+plate+';border:1px solid '+line+';'
-   +'overflow:hidden;'+(extra||'')+'">'
-   /* varumärkeslist */
-   +'<div style="height:11cqw;display:flex;align-items:center;gap:2.6cqw;padding:0 5cqw;border-bottom:1px solid '+line+'">'
-   + (on ? '<span style="width:4.6cqw;height:4.6cqw;background:'+c+';flex:0 0 4.6cqw"></span>'
-          +'<span style="font-family:Montserrat,sans-serif;font-size:3.2cqw;font-weight:700;letter-spacing:.18em;'
-          +'text-transform:uppercase;color:'+ink+'">'+esc(b[0])+'</span>'
-        : '<span style="width:4.6cqw;height:4.6cqw;border:1px solid '+line+';flex:0 0 4.6cqw"></span>'
-          +'<span style="width:24cqw;height:2.6cqw;background:'+line+'"></span>')
-   +'</div>'
-   /* hero */
-   +'<div style="position:relative;height:44cqw;overflow:hidden">'
-   +'<div style="position:absolute;inset:0;'+bg("matterport","m-site-hero")+'"></div></div>'
-   /* innehåll */
-   +'<div style="padding:5cqw">'
-   +'<div style="font-family:Montserrat,sans-serif;font-size:2.9cqw;font-weight:500;letter-spacing:.3em;'
-   +'text-transform:uppercase;color:'+c+'">Till salu</div>'
-   +'<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:9.4cqw;'
-   +'line-height:1.04;color:'+ink+';margin-top:1.6cqw">'+esc(mo("addr"))+'</div>'
-   +'<div style="font-family:Montserrat,sans-serif;font-size:3cqw;color:'+mut+';margin-top:1.6cqw">'
-   + esc(mo("city")+" · "+mo("rooms")+" · "+mo("area")+" · "+mo("year")) +'</div>'
-   +'<div style="height:1px;background:'+line+';margin:4.4cqw 0"></div>'
-   +'<div style="display:flex;gap:2.4cqw">'+thumbs+'</div>'
-   +'<div style="margin-top:5cqw;display:inline-block;padding:2.6cqw 5.4cqw;background:'+(on?c:line)+';'
-   +'font-family:Montserrat,sans-serif;font-size:2.9cqw;font-weight:500;letter-spacing:.16em;'
-   +'text-transform:uppercase;color:'+(on?"#FFFFFF":mut)+'">Se bostaden i 3D</div>'
-   +'</div>'
-   /* kolofon — det enda stället Viewly nämns */
-   +'<div style="height:8cqw;border-top:1px solid '+line+';display:flex;align-items:center;'
-   +'justify-content:space-between;padding:0 5cqw;font-family:Montserrat,sans-serif;font-size:2.4cqw;'
-   +'letter-spacing:.18em;text-transform:uppercase;color:'+mut+'">'
-   +'<span>'+esc(on ? b[0].toLowerCase()+'.se' : '')+'</span><span>Produktion Viewly</span></div>'
-   +'</div>';
-}
-
 MK.white = {
- /* 01 EDITORIAL — en sida, satt tre gånger. Bara loggan och accentfärgen
-    byts; adress, faktarad, ingångar och knapp står stilla. */
+ /* 01 EDITORIAL — sidan i full bredd, kontoret sveper in maskerat.
+    Ingen förklaring behövs: bilden, adressen och mäklaren står still
+    medan allt som är kontorets byter skepnad. */
  editorial:function(D, t){
-   var ph = mphN(t, 0, .96, 3), i = ph.i;
-   var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
-   /* accentfärgen sveper över sidan — maskerat byte, ingen korsfade */
+   var ph = mphN(t, 0, .96, 4), i = ph.i;
    var w  = i>0 ? eInOut(Math.min(1, ph.local/.28)) : 1;
-   var CAP = [["Strukturen.","En sida, samma varje gång."],
-              [mo("b1")+".", "Logga och accentfärg satta av kontoret."],
-              [mo("b2")+".", "Samma sida, ett annat varumärke."]];
-   var prv = CAP[i>0?i-1:0], cur = CAP[i];
+   var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
+   var b = vbrand(i), pb = vbrand(i>0?i-1:0);
+   var nm = function(x){
+     return '<div style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:500;'
+      +'letter-spacing:.34em;text-transform:uppercase;color:'+mtone(D).oli+'">'+esc(x)+'</div>';
+   };
+   var cap = function(x){ return mdisp(D, x, 8.2) };
+   var Y = 46, W = 88, X = 6;
    return mshell(D, mkick(D,"White label")
-     + (i>0 ? msite(D, i-1, 15, 30, 70) : '')
-     + msite(D, i, 15, 30, 70, w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
-     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:127.5cqw">'
-     + mswap2(mdisp(D, prv[0], 8.6), mdisp(D, cur[0], 8.6), sp) +'</div>'
-     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:139cqw">'
-     + mswap2(mbody(D, prv[1]), mbody(D, cur[1]), sp) +'</div>'
+     + (i>0 ? vsite(D, i-1, X, Y, W, "16:9") : '')
+     + vsite(D, i, X, Y, W, "16:9",
+             w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:29cqw">'
+     + mswap2(nm("Visningssidan · "+pb.name), nm("Visningssidan · "+b.name), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:104cqw">'
+     + mswap2(cap(pb.name+"."), cap(b.name+"."), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:116cqw">'
+     + mbody(D, "Logotyp, typsnitt och knapp är kontorets. Bostaden, adressen och mäklaren står still.") +'</div>'
      + mfoot(D));
  },
- /* 02 SYSTEM — de två kontoren sida vid sida. Samma sida, två varumärken,
-    inget annat skiljer. Att de står bredvid varandra är beviset. */
+ /* 02 SYSTEM — vad som faktiskt byts, utplockat.
+    Tre rader: logotypen, typsnittet, knappen. Det är hela white
+    label-leveransen, och den syns inte förrän man plockar isär den. */
  system:function(D, t){
-   var T = mtone(D), now = mphN(t, .06, .94, 3).i;
-   var lab = function(k, x){
-     var cur = now === k;
-     return '<div style="position:absolute;left:'+x+'cqw;top:122cqw;font-family:Montserrat,sans-serif;'
-      +'font-size:1.9cqw;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:'
-      +(cur?T.oli:T.mut)+'">'+esc(mwb()[k][2])+'</div>';
+   var T = mtone(D), ph = mphN(t, .04, .96, 4), i = ph.i;
+   var b = vbrand(i);
+   var plate = T.dark ? "#141416" : "#FFFFFF";
+   var line  = T.dark ? "#26262A" : "#E4DEDB";
+   var row = function(lab, inner, y){
+     return '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+y+'cqw">'
+      +'<div style="font-family:Montserrat,sans-serif;font-size:1.85cqw;font-weight:500;'
+      +'letter-spacing:.24em;text-transform:uppercase;color:'+T.mut+';margin-bottom:2cqw">'+esc(lab)+'</div>'
+      +'<div style="background:'+plate+';border:1px solid '+line+';padding:4cqw;'
+      +'display:flex;align-items:center;justify-content:center;min-height:15cqw">'+inner+'</div></div>';
    };
-   return mshell(D, mkick(D,"Ett uttryck, satt en gång")
+   var logo = '<span style="background:'+(b.plate==="transparent"?"transparent":b.plate)
+     +';padding:2.2cqw 3.4cqw;'+(b.plate==="transparent"?'border:1px solid '+T.line+';':'')
+     +'font-family:'+b.font+';font-weight:'+b.fw+';font-size:4.4cqw;letter-spacing:'+b.ls+';color:'
+     +(b.plate==="transparent"?T.ink:b.pcol)+';text-transform:'+(b.ls===".28em"?"uppercase":"none")+'">'
+     + esc(b.name) +'</span>';
+   var typ = '<span style="font-family:'+b.font+';font-weight:'+b.fw+';font-size:6.6cqw;'
+     +'letter-spacing:'+b.ls+';color:'+T.ink+'">'+esc(mo("addr"))+'</span>';
+   var knapp = '<span style="background:'+(b.btn==="outline"?"transparent":b.col)+';border:1px solid '
+     +b.col+';border-radius:'+b.rad+'px;padding:2.4cqw 6cqw;font-family:'+b.font+';font-weight:'+b.fw+';'
+     +'font-size:2.9cqw;letter-spacing:'+b.ls+';color:'+(b.btn==="outline"?b.col:"#FFFFFF")+'">'
+     +'Upplev bostaden</span>';
+   return mshell(D, mkick(D,"Vad som byts")
      + mrule(D, 30, 6.4, 6.4)
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:33.5cqw">'
-     + mdisp(D, "Kontoret sätter, systemet upprepar", 6.6) +'</div>'
-     + msite(D, 1, 6.4, 48, 41, now===1?'outline:2px solid '+T.oli+';':'opacity:'+(now>1?.62:.4)+';')
-     + msite(D, 2, 52.6, 48, 41, now===2?'outline:2px solid '+T.oli+';':'opacity:'+(now>2?.62:.4)+';')
-     + lab(1, 6.4) + lab(2, 52.6)
-     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:130cqw">'
-     + mbody(D, "Innehållet är identiskt. Bara uttrycket byts.",
-             lerp(.42, 1, eOut(seg(t,.70,.94)))) +'</div>'
+     + mdisp(D, "Tre saker, resten står still", 6.6) +'</div>'
+     + row("01 · Logotyp", logo, 48)
+     + row("02 · Typsnitt", typ, 83)
+     + row("03 · Knapp", knapp, 118)
      + mfoot(D));
  },
- /* 03 OBJECT — sidan i stort sett i full storlek. Ingen förklaring:
-    leveransen får stå för sig själv, och kontorets namn står i listen. */
+ /* 03 OBJECT — samma sida i tre bildförhållanden.
+    Desktop, surfplatta och mobil är inte tre sidor utan en, omsatt. */
  object:function(D, t){
-   var T = mtone(D), ph = mphN(t, 0, .96, 3), i = ph.i;
-   var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
-   var w  = i>0 ? eInOut(Math.min(1, ph.local/.28)) : 1;
-   var nm = function(j){
-     return '<div style="font-family:Montserrat,sans-serif;font-size:2.25cqw;font-weight:500;'
-      +'letter-spacing:.24em;text-transform:uppercase;color:'+T.oli+'">'
-      + esc("White label · " + mwb()[j][2]) +'</div>';
+   var T = mtone(D), ph = mphN(t, .04, .96, 3), i = ph.i;
+   var b = vbrand(1 + (Math.floor(t*2) % 3));
+   var FMT = [["16:9","Desktop"],["4:3","Surfplatta"],["9:16","Mobil"]];
+   var cell = function(k, x, y, w){
+     var cur = k === i;
+     return vsite(D, 1 + k, x, y, w, FMT[k][0],
+              'outline:'+(cur ? '2px solid '+T.oli : '1px solid '+T.line)+';'
+              +'opacity:'+(cur?1:.5)+';')
+      +'<div style="position:absolute;left:'+x+'cqw;top:'+(y + w*ratOf(FMT[k][0]) + 2).toFixed(2)+'cqw;'
+      +'font-family:Montserrat,sans-serif;font-size:1.8cqw;font-weight:500;letter-spacing:.16em;'
+      +'text-transform:uppercase;color:'+(cur?T.oli:T.mut)+'">'+esc(FMT[k][1]+" · "+FMT[k][0])+'</div>';
    };
-   return mshell(D,
-     '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+SAFE.top+'cqw">'
-     + mswap2(nm(i>0?i-1:0), nm(i), sp) +'</div>'
-     + (i>0 ? msite(D, i-1, 7, 29, 86) : '')
-     + msite(D, i, 7, 29, 86, w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
+   return mshell(D, mkick(D,"Ett bygge, alla ytor")
+     + mrule(D, 30, 6.4, 6.4)
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:33.5cqw">'
+     + mdisp(D, "Samma sida, omsatt", 6.6) +'</div>'
+     /* Höjderna följer förhållandet, så raderna måste räknas: 16:9 på 60
+        blir 33,8 hög, 4:3 på 40 blir 30, 9:16 på 25 blir 44,4. Den sista
+        är den som styr var brödtexten kan börja. */
+     + cell(0, 6.4, 46, 60)
+     + cell(1, 6.4, 88, 40)
+     + cell(2, 52, 88, 25)
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:139cqw">'
+     + mbody(D, "Desktop, surfplatta och mobil är inte tre sidor. Det är en, som sätter om sig.",
+             lerp(.45, 1, eOut(seg(t,.62,.9)))) +'</div>'
      + mfoot(D));
+ },
+ /* 04 STILLHET — sidan får stå för sig själv. Kontoret byts, inget annat. */
+ stillhet:function(D, t){
+   var T = mtone(D), ph = mphN(t, 0, .96, 4), i = ph.i;
+   var w  = i>0 ? eInOut(Math.min(1, ph.local/.26)) : 1;
+   var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
+   var b = vbrand(i), pb = vbrand(i>0?i-1:0);
+   var kick = function(x){
+     return '<div style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:500;'
+      +'letter-spacing:.38em;text-transform:uppercase;color:'+T.oli+'">'+esc(x)+'</div>';
+   };
+   var Y = 58, W = 84, X = 8;
+   return mshell(D,
+     (i>0 ? vsite(D, i-1, X, Y, W, "4:3") : '')
+   + vsite(D, i, X, Y, W, "4:3", w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:126cqw">'
+   + mswap2(kick(pb.name), kick(b.name), sp) +'</div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:131.5cqw">'
+   + mdisp(D, "Er visningssida", 8.4) +'</div>'
+   + mmark(D));
  }
 };
+/* höjd/bredd för ett förhållande, som faktor */
+function ratOf(ar){
+  var q = (typeof AR !== "undefined" && AR[ar]) || [16,9];
+  return q[1]/q[0];
+}
 
-/* ---------- 07 3D VISNING — PLAN, VOLYM, RUNDVANDRING ----------
-   Den förra versionen var ett diagram: en isometrisk streckritning som
-   lyfte sig, med rubrikerna satta i vitt rakt på ljusa fotografier. Två
-   fel. Diagrammet visade inte produkten — 3D-visningen är en riktig
-   yta som kunden klickar i — och den vita texten på ljus bild gick inte
-   att läsa.
-
-   mviewer() ritar den faktiska visningsytan: lägesväljaren Dollhouse /
-   Planvy / Rundvandring, själva vyn, och sidfoten med objektets data.
-   Planritningen är kvar, men nu som ETT AV LÄGENA i produkten i stället
-   för som en illustration av den. */
-/* Planen ritas i en viewBox som beskurits till figuren och vars bas
-   följer lyftet, så att volymen står stilla i mitten i stället för att
-   krympa till en prick i ett tomt fält. */
 function mplan(c, a, lift){
   var k = 1 - lift*.34, base = 25 - 24*k + 21*lift;
   var y = function(v){ return base + (v-50)*k - lift*8 };
@@ -796,116 +898,154 @@ function mplan(c, a, lift){
      +'" opacity="'+(.07*lift).toFixed(3)+'" stroke="'+c+'" stroke-width="1.4"/>' : '')
    +'<circle cx="50" cy="'+(y(74)-13*lift)+'" r="3.2" fill="'+a+'"/></svg>';
 }
-var M3D = [["Dollhouse","threed",     "Hela bostaden som en volym."],
-           ["Planvy",   "",          "Måtten och planlösningen."],
-           ["Rundvandring","matterport","Kunden går igenom rummen själv."]];
 
-/* Visningsytan i miniatyr — egen container, så samma funktion håller
-   på 42 cqw och på 88. mode 0/1/2 följer M3D. lift driver planritningen
-   från platt uppifrån till rest volym. */
-function mviewer(D, mode, x, y, w, lift, extra, vh){
-  var T = mtone(D);
-  vh = vh || 74;   /* vyns höjd i sidans egna cqw; total = 22 + vh */
-  var plate = T.dark ? "#141416" : "#FFFFFF";
-  var line  = T.dark ? "#26262A" : "#E4DEDB";
-  var ink   = T.dark ? "#EFEDE7" : "#1C1C1E";
-  var mut   = T.dark ? "#8C8A84" : "#8A8580";
-  var tabs = M3D.map(function(m, j){
-    var on = j === mode;
-    return '<span style="font-family:Montserrat,sans-serif;font-size:2.7cqw;font-weight:500;letter-spacing:.16em;'
-     +'text-transform:uppercase;color:'+(on?T.oli:mut)+';padding-bottom:1.6cqw;'
-     +'border-bottom:'+(on?'2px solid '+T.oli:'2px solid transparent')+'">'+esc(m[0])+'</span>';
-  }).join("");
-  var view = (mode === 1)
-    ? '<div style="position:absolute;inset:0;background:'+(T.dark?"#0E0E0D":"#F7F5F2")+';padding:4cqw">'
-      + mplan(ink, T.oli, lift) +'</div>'
-    : '<div style="position:absolute;inset:0;'+bg(M3D[mode][1], "m-3d-"+mode)+'"></div>';
-  return '<div style="position:absolute;left:'+x.toFixed(2)+'cqw;top:'+y.toFixed(2)+'cqw;width:'+w.toFixed(2)
-   +'cqw;container-type:inline-size;text-align:left;background:'+plate+';border:1px solid '+line+';'
-   +'overflow:hidden;'+(extra||'')+'">'
-   +'<div style="height:11cqw;display:flex;align-items:flex-end;gap:5cqw;padding:0 5cqw;'
-   +'border-bottom:1px solid '+line+'">'+tabs+'</div>'
-   +'<div style="position:relative;height:'+vh+'cqw;overflow:hidden">'+view+'</div>'
-   +'<div style="height:11cqw;border-top:1px solid '+line+';display:flex;align-items:center;'
-   +'justify-content:space-between;padding:0 5cqw">'
-   +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:5cqw;color:'+ink+'">'
-   + esc(mo("addr")) +'</span>'
-   +'<span style="font-family:Montserrat,sans-serif;font-size:2.5cqw;letter-spacing:.18em;text-transform:uppercase;'
-   +'color:'+mut+'">'+esc(mo("area")+" · "+mo("rooms"))+'</span></div></div>';
+/* ---------- 07 3D VISNING ----------
+   Omritad kring vad produkten faktiskt är värd, inte kring hur den ser ut.
+
+   Den förra versionen ritade en lägesväljare — Dollhouse, Planvy,
+   Rundvandring — som om produkten vore ett gränssnitt. Det är en
+   funktionslista, inte ett säljargument. Ingen mäklare köper en flikrad.
+
+   Vad 3D-visningen faktiskt gör:
+
+     · Bostaden är öppen dygnet runt. Ingen bokad tid, ingen söndag
+       klockan tretton. Spekulanten går in när hen vill.
+     · Fler når objektet. Den som bor i en annan stad, den som arbetar
+       på helgen, den som inte vill anmäla sig innan hen sett något.
+     · De som ändå kommer har redan gått igenom bostaden. Färre besök
+       men bättre, och frågorna handlar om affären i stället för om
+       planlösningen.
+     · Måtten finns i sidan. Får soffan plats? Svaret finns utan
+       måttband.
+     · Länken är kontorets egen sida, inte en tredjepartsvisare. Den
+       delas i annonsen, i mejlet, i SMS:et.
+
+   Klockslagen nedan är hela argumentet i en bild: bostaden är öppen
+   06:40, 14:15 och 23:20. Det är det en fysisk visning aldrig är. */
+var T3D = [["06:40","Före jobbet"],["14:15","Från en annan stad"],["23:20","Efter läggdags"]];
+var T3VAL = [
+  ["Öppen dygnet runt",   "Ingen bokad tid. Spekulanten går in när det passar."],
+  ["Fler når objektet",   "Den som bor långt bort ser bostaden ändå."],
+  ["Bättre visningar",    "De som kommer har redan gått igenom hemmet."],
+  ["Måtten finns i sidan","Får soffan plats? Svaret finns utan måttband."]
+];
+
+/* Klockan som en enkel urtavla — inget gränssnitt, bara en form. */
+function m3clock(col, line, hh, mm){
+  var a = (hh%12)/12*360 + mm/60*30, b = mm/60*360;
+  var pt = function(deg, r){
+    var v = (deg-90)*Math.PI/180;
+    return (50+Math.cos(v)*r).toFixed(1)+' '+(50+Math.sin(v)*r).toFixed(1);
+  };
+  return '<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" aria-hidden="true">'
+   +'<circle cx="50" cy="50" r="42" fill="none" stroke="'+line+'" stroke-width="2"/>'
+   +'<line x1="50" y1="50" x2="'+pt(a,22).split(" ")[0]+'" y2="'+pt(a,22).split(" ")[1]
+   +'" stroke="'+col+'" stroke-width="4" stroke-linecap="round"/>'
+   +'<line x1="50" y1="50" x2="'+pt(b,32).split(" ")[0]+'" y2="'+pt(b,32).split(" ")[1]
+   +'" stroke="'+col+'" stroke-width="2.6" stroke-linecap="round"/>'
+   +'<circle cx="50" cy="50" r="3" fill="'+col+'"/></svg>';
 }
 
 MK.tredim = {
- /* 01 EDITORIAL — planritningen reser sig till volym inne i visningsytan,
-    och lägesväljaren följer med. Det är samma rörelse som förut, men nu
-    sker den i produkten i stället för bredvid den. */
+ /* 01 EDITORIAL — samma bostad, tre klockslag. Sidan står still och bara
+    tiden byts: det är precis vad en digital visning innebär. */
  editorial:function(D, t){
-   var ph = mphN(t, 0, .96, 3), i = ph.i;
+   var T = mtone(D), ph = mphN(t, 0, .96, 3), i = ph.i;
    var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
-   var lift = i===1 ? eInOut(ph.local) : (i>1 ? 1 : 0);
-   /* lägesbytet är en maskerad övergång, inte en korsfade */
    var w  = i>0 ? eInOut(Math.min(1, ph.local/.26)) : 1;
-   var CAP = [["Volymen.","Hela bostaden i en bild, ovanifrån."],
-              ["Planritningen.","Måtten och planlösningen, samma modell."],
-              ["Rundvandringen.","Kunden går igenom rummen själv."]];
-   var prv = CAP[i>0?i-1:0], cur = CAP[i];
+   var prv = T3D[i>0?i-1:0], cur = T3D[i];
+   var klock = function(x){
+     var hh = +x[0].split(":")[0], mm = +x[0].split(":")[1];
+     return '<div style="display:flex;align-items:center;gap:3.4cqw">'
+      +'<span style="width:9cqw;height:9cqw;flex:0 0 9cqw">'+m3clock(T.oli, T.line, hh, mm)+'</span>'
+      +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:9cqw;'
+      +'color:'+T.ink+'">'+esc(x[0])+'</span></div>';
+   };
    return mshell(D, mkick(D,"3D visning · "+mo("addr"))
-     + (i>0 ? mviewer(D, i-1, 7, 36, 86, i-1===1?1:0) : '')
-     + mviewer(D, i, 7, 36, 86, lift,
-               w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
-     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:123cqw">'
-     + mswap2(mdisp(D, prv[0], 8.6), mdisp(D, cur[0], 8.6), sp) +'</div>'
-     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:134.5cqw">'
+     + (i>0 ? vsite(D, 1, 6, 44, 88, "16:9") : '')
+     + vsite(D, 1, 6, 44, 88, "16:9",
+             w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '',
+             {img: i===1 ? "threed" : i===2 ? "living" : "matterport"})
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:104cqw">'
+     + mswap2(klock(prv), klock(cur), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:118cqw">'
      + mswap2(mbody(D, prv[1]), mbody(D, cur[1]), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:127cqw">'
+     + mdisp(D, "Bostaden är alltid öppen.", 7.6) +'</div>'
      + mfoot(D));
  },
- /* 02 SYSTEM — de tre lägena uppe samtidigt. Att det är EN modell läst
-    på tre sätt är hela argumentet, och det syns bara när de står
-    bredvid varandra. */
+ /* 02 SYSTEM — de fyra argumenten, ett i taget tänt. Inte funktioner:
+    effekter. Vad mäklaren faktiskt får ut av att sidan finns. */
  system:function(D, t){
-   var T = mtone(D), now = mphN(t, .06, .94, 3).i;
-   var lift = eInOut(seg(t, .30, .74));
-   var cell = function(k, x, y, w){
-     var cur = k === now;
-     return mviewer(D, k, x, y, w, lift,
-              cur ? 'outline:2px solid '+T.oli+';' : 'opacity:'+(k<now?.66:.4)+';')
-      +'<div style="position:absolute;left:'+x+'cqw;top:'+(y+w*.96+2).toFixed(2)+'cqw;'
-      +'font-family:Montserrat,sans-serif;font-size:1.85cqw;font-weight:500;letter-spacing:.16em;'
-      +'text-transform:uppercase;color:'+(cur?T.oli:T.mut)+'">'+esc(M3D[k][0])+'</div>';
-   };
-   return mshell(D, mkick(D,"Från plan till rum")
+   var T = mtone(D), now = mphN(t, .06, .94, 4).i;
+   var rows = T3VAL.map(function(x, j){
+     var on = j <= now, cur = j === now;
+     /* Fyra rader efter en sida måste rymmas ovanför kolofonen: raden är
+        därför 13 cqw hög, inte 16. Det är skillnaden mellan att gå ihop
+        och att tryckas ur ramen. */
+     return '<div style="display:flex;align-items:flex-start;gap:2.6cqw;padding:2cqw 0;'
+      +'border-bottom:1px solid '+T.line+';opacity:'+(cur?1:on?.8:.36)+'">'
+      +'<span style="width:1.2cqw;height:1.2cqw;border-radius:50%;margin-top:1.4cqw;flex:0 0 1.2cqw;'
+      +'background:'+(on?T.oli:T.line)+'"></span>'
+      +'<span><span style="display:block;font-family:\'Cormorant Garamond\',Georgia,serif;'
+      +'font-weight:300;font-size:4.4cqw;line-height:1.1;color:'+T.ink+'">'+esc(x[0])+'</span>'
+      +'<span style="display:block;font-family:Montserrat,sans-serif;font-size:2.35cqw;'
+      +'line-height:1.55;margin-top:.8cqw;color:'+(T.dark?"#A8A6A0":"#4A4744")+'">'+esc(x[1])+'</span>'
+      +'</span></div>';
+   }).join("");
+   return mshell(D, mkick(D,"Vad en 3D-visning ger")
      + mrule(D, 30, 6.4, 6.4)
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:33.5cqw">'
-     + mdisp(D, "En modell, tre sätt att läsa den", 6.6) +'</div>'
-     + cell(0, 6.4, 46, 42) + cell(1, 51.6, 46, 42)
-     + cell(2, 6.4, 96, 42)
-     +'<div style="position:absolute;left:51.6cqw;right:6.4cqw;top:104cqw">'
-     + mbody(D, "Skannas en gång. Levereras i kontorets varumärke.",
-             lerp(.42, 1, eOut(seg(t,.70,.94)))) +'</div>'
+     + mdisp(D, "Bostaden säljer medan du sover", 6.6) +'</div>'
+     + vsite(D, 1, 6.4, 46, 52, "16:9", '', {img:"threed"})
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:80cqw">'+rows+'</div>'
      + mfoot(D));
  },
- /* 03 OBJECT — ytan i stort sett i full storlek. Ingen text ovanpå
-    fotografiet: rubriken står på pappret, inte i bilden. Det var därför
-    den förra versionen inte gick att läsa. */
+ /* 03 OBJECT — sidan i det närmaste full storlek. Leveransen får tala.
+    Rubriken står på pappret, aldrig i bilden. */
  object:function(D, t){
    var T = mtone(D), ph = mphN(t, 0, .96, 3), i = ph.i;
    var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
-   var lift = i===1 ? eInOut(ph.local) : (i>1 ? 1 : 0);
    var w  = i>0 ? eInOut(Math.min(1, ph.local/.26)) : 1;
-   var nm = function(j){
-     return '<div style="font-family:Montserrat,sans-serif;font-size:2.25cqw;font-weight:500;'
-      +'letter-spacing:.24em;text-transform:uppercase;color:'+T.oli+'">'
-      + esc("3D visning · " + M3D[j][0]) +'</div>';
-   };
-   var bd = function(j){ return mbody(D, M3D[j][2]) };
+   var IM = ["matterport","threed","living"];
+   var CAP = [["Gå in när du vill.","Sidan är öppen dygnet runt, inte söndag klockan tretton."],
+              ["Gå igenom varje rum.","Hela bostaden, i ordning, i egen takt."],
+              ["Mät medan du går.","Måtten finns i sidan. Får soffan plats?"]];
+   var prv = CAP[i>0?i-1:0], cur = CAP[i];
    return mshell(D,
-     '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+SAFE.top+'cqw">'
-     + mswap2(nm(i>0?i-1:0), nm(i), sp) +'</div>'
-     + (i>0 ? mviewer(D, i-1, 4, 29, 92, i-1===1?1:0, '', 92) : '')
-     + mviewer(D, i, 4, 29, 92, lift,
-               w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '', 92)
-     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:137cqw">'
-     + mswap2(bd(i>0?i-1:0), bd(i), sp) +'</div>'
-     + mfoot(D));
+     '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+SAFE.top+'cqw;'
+     +'font-family:Montserrat,sans-serif;font-size:2.25cqw;font-weight:500;letter-spacing:.24em;'
+     +'text-transform:uppercase;color:'+T.oli+'">3D visning</div>'
+   + (i>0 ? vsite(D, 1, 4, 30, 92, "4:3", '', {img:IM[i>0?i-1:0]}) : '')
+   + vsite(D, 1, 4, 30, 92, "4:3", w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '',
+           {img:IM[i]})
+   +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:104cqw">'
+   + mswap2(mdisp(D, prv[0], 8.2), mdisp(D, cur[0], 8.2), sp) +'</div>'
+   +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:116cqw">'
+   + mswap2(mbody(D, prv[1]), mbody(D, cur[1]), sp) +'</div>'
+   + mfoot(D));
+ },
+ /* 04 STILLHET — ett klockslag, en rad. Argumentet utan att argumentera. */
+ stillhet:function(D, t){
+   var T = mtone(D), ph = mphN(t, 0, .96, 3), i = ph.i;
+   var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
+   var w  = i>0 ? eInOut(Math.min(1, ph.local/.26)) : 1;
+   var kick = function(x){
+     return '<div style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:500;'
+      +'letter-spacing:.38em;text-transform:uppercase;color:'+T.oli+'">'+esc(x)+'</div>';
+   };
+   return mshell(D,
+     (i>0 ? vsite(D, 1, 8, 44, 84, "4:3", '', {img:"matterport"}) : '')
+   + vsite(D, 1, 8, 44, 84, "4:3", w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '',
+           {img:"matterport"})
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:120cqw">'
+   + mswap2(kick(T3D[i>0?i-1:0][0]+" · "+T3D[i>0?i-1:0][1]),
+            kick(T3D[i][0]+" · "+T3D[i][1]), sp) +'</div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:126cqw">'
+   + mdisp(D, "Alltid öppen", 8.4) +'</div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:138cqw">'
+   + mbody(D, "Bostaden går att uppleva när som helst.") +'</div>'
+   + mmark(D));
  }
 };
 
@@ -932,12 +1072,10 @@ var MSLOTS = {
      script än det här och finns inte när filen körs igenom */
   kampanj:null,
   format: null,
-  white:  [{s:"m-site-hero", k:"matterport", n:"Sidans hero"},
-           {s:"m-site-0", k:"threed", n:"Ingång 1"},
-           {s:"m-site-1", k:"om3",    n:"Ingång 2"},
-           {s:"m-site-2", k:"drone",  n:"Ingång 3"}],
-  tredim: [{s:"m-3d-0", k:"threed",     n:"Dollhouse"},
-           {s:"m-3d-2", k:"matterport", n:"Rundvandring"}]
+  white:  [{s:"m-site-hero", k:"matterport", n:"Bostaden i sidan"}],
+  /* 3D-visningen ritar numera den faktiska visningssidan, och den har
+     en bild — bostaden. Lägesväljaren är borta. */
+  tredim: [{s:"m-site-hero", k:"matterport", n:"Bostaden i sidan"}]
 };
 function mslotKey(slot, fallback){
   var o = SLOTS[slot];
@@ -1131,7 +1269,7 @@ var MOBJ = {
   addr:"Silvergården 9A", city:"Landskrona", distr:"Kv. Sanden",
   rooms:"4 rum", area:"112 m²", year:"1968", typ:"Bostadsrätt",
   head:"Ljuset som gör skillnad",
-  b1:"Nordvik", b2:"Alvhem"
+  b1:"Nordvik", b2:"Alvhem", b3:"Lagerlings"
 };
 var MTX = {};
 /* PEDITS bär adress och ort på mallarna — läs den innan standardvärdet */
@@ -1156,7 +1294,8 @@ var MOFIELDS = [
   {k:"distr", n:"Stadsdel"},    {k:"typ",   n:"Bostadstyp"},
   {k:"rooms", n:"Antal rum"},   {k:"area",  n:"Boarea"},
   {k:"year",  n:"Byggår"},      {k:"head",  n:"Annonsrubrik"},
-  {k:"b1",    n:"Kontor A"},    {k:"b2",    n:"Kontor B"}
+  {k:"b1",    n:"Kontor A"},    {k:"b2",    n:"Kontor B"},
+  {k:"b3",    n:"Kontor C"}
 ];
 /* vilka fält en kandidat faktiskt visar — panelen ska inte be om mer */
 var MOUSE = {
@@ -1165,8 +1304,9 @@ var MOUSE = {
   estyl:  [],
   kampanj:["addr","city","rooms","area","year"],
   format: ["addr","city","rooms","area","year"],
-  white:  ["addr","city","rooms","area","year","b1","b2"],
-  tredim: ["addr","rooms","area"]
+  /* visningssidan visar adressen och kontoret — inte faktaraden */
+  white:  ["addr","b1","b2","b3"],
+  tredim: ["addr"]
 };
 function mofieldsOf(cand){
   var use = MOUSE[cand] || [];
