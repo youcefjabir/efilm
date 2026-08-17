@@ -116,9 +116,12 @@ tr:last-child td{border-bottom:0}
 .cmplab b{display:block;font-size:13px;font-weight:650}
 .cmplab span{display:block;font-family:var(--mono);font-size:10px;color:var(--acc);margin-top:3px;letter-spacing:.05em}
 .cmplab em{display:block;font-size:11.5px;color:var(--mut);margin-top:8px;font-style:normal;line-height:1.5}
-.cmpcell{padding:0;border:1px solid var(--line);background:none;border-radius:4px;cursor:pointer;overflow:hidden;
-  display:block;max-width:250px;transition:box-shadow .18s,transform .18s}
-.cmpcell:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.cmpcell{max-width:250px}
+.cmpcell .specbtn{padding:0;border:1px solid var(--line);background:none;border-radius:4px;cursor:pointer;
+  overflow:hidden;display:block;width:100%;transition:box-shadow .18s,transform .18s}
+.cmpcell .specbtn:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.cmpcell .dlrow{margin-top:7px}
+.cmpcell .dlb{font-size:10px;padding:4px 8px}
 
 /* ============ 02 KOMPOSITIONER ============ */
 .dirbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -213,6 +216,19 @@ tr:last-child td{border-bottom:0}
 .tplcap{display:flex;justify-content:space-between;align-items:baseline}
 .tplcap b{font-size:13px;font-weight:650}
 .tplcap .mono{font-size:10px;color:var(--acc);letter-spacing:.08em}
+.dlrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dlbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:0 0 22px;padding:12px 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:9px}
+.dlbar .eyebrow{margin-right:2px}
+/* 08 EXPORT */
+.xgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;margin-bottom:26px}
+.xcard{border:1px solid var(--line);border-radius:10px;padding:15px 16px 14px;background:var(--panel);
+  display:flex;flex-direction:column;gap:9px}
+.xcard h4{font-size:13.5px;font-weight:650;letter-spacing:-.01em;margin:0}
+.xcard p{font-size:12px;line-height:1.62;color:var(--mut);margin:0;flex:1}
+.xcard .xn{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
+.xcard .dlrow{margin-top:0}
+.xnote{font-size:12px;line-height:1.68;color:var(--mut);max-width:78ch;margin:0 0 20px}
 .tplrow{display:flex;gap:5px}
 .tplrow .dlb{flex:1;text-align:center;padding:5px 4px;font-family:var(--mono);font-size:10px}
 .boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px}
@@ -227,6 +243,9 @@ tr:last-child td{border-bottom:0}
 
 /* ============ 04 BIBLIOTEK ============ */
 .hlgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
+.hlwrap{display:flex;flex-direction:column}
+.hlwrap .hlcard{flex:1}
+.hlwrap .dlrow{margin-top:8px}
 .hlcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;
   cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0;display:flex;flex-direction:column;
   transition:box-shadow .18s,transform .18s,border-color .18s}

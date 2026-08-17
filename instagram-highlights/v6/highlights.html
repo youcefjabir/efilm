@@ -116,9 +116,12 @@ tr:last-child td{border-bottom:0}
 .cmplab b{display:block;font-size:13px;font-weight:650}
 .cmplab span{display:block;font-family:var(--mono);font-size:10px;color:var(--acc);margin-top:3px;letter-spacing:.05em}
 .cmplab em{display:block;font-size:11.5px;color:var(--mut);margin-top:8px;font-style:normal;line-height:1.5}
-.cmpcell{padding:0;border:1px solid var(--line);background:none;border-radius:4px;cursor:pointer;overflow:hidden;
-  display:block;max-width:250px;transition:box-shadow .18s,transform .18s}
-.cmpcell:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.cmpcell{max-width:250px}
+.cmpcell .specbtn{padding:0;border:1px solid var(--line);background:none;border-radius:4px;cursor:pointer;
+  overflow:hidden;display:block;width:100%;transition:box-shadow .18s,transform .18s}
+.cmpcell .specbtn:hover{box-shadow:var(--shadow);transform:translateY(-2px)}
+.cmpcell .dlrow{margin-top:7px}
+.cmpcell .dlb{font-size:10px;padding:4px 8px}
 
 /* ============ 02 KOMPOSITIONER ============ */
 .dirbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -213,6 +216,19 @@ tr:last-child td{border-bottom:0}
 .tplcap{display:flex;justify-content:space-between;align-items:baseline}
 .tplcap b{font-size:13px;font-weight:650}
 .tplcap .mono{font-size:10px;color:var(--acc);letter-spacing:.08em}
+.dlrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.dlbar{display:flex;flex-wrap:wrap;align-items:center;gap:9px;margin:0 0 22px;padding:12px 14px;
+  background:var(--panel);border:1px solid var(--line);border-radius:9px}
+.dlbar .eyebrow{margin-right:2px}
+/* 08 EXPORT */
+.xgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:14px;margin-bottom:26px}
+.xcard{border:1px solid var(--line);border-radius:10px;padding:15px 16px 14px;background:var(--panel);
+  display:flex;flex-direction:column;gap:9px}
+.xcard h4{font-size:13.5px;font-weight:650;letter-spacing:-.01em;margin:0}
+.xcard p{font-size:12px;line-height:1.62;color:var(--mut);margin:0;flex:1}
+.xcard .xn{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--acc);text-transform:uppercase}
+.xcard .dlrow{margin-top:0}
+.xnote{font-size:12px;line-height:1.68;color:var(--mut);max-width:78ch;margin:0 0 20px}
 .tplrow{display:flex;gap:5px}
 .tplrow .dlb{flex:1;text-align:center;padding:5px 4px;font-family:var(--mono);font-size:10px}
 .boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:18px}
@@ -227,6 +243,9 @@ tr:last-child td{border-bottom:0}
 
 /* ============ 04 BIBLIOTEK ============ */
 .hlgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
+.hlwrap{display:flex;flex-direction:column}
+.hlwrap .hlcard{flex:1}
+.hlwrap .dlrow{margin-top:8px}
 .hlcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;
   cursor:pointer;text-align:left;font:inherit;color:inherit;padding:0;display:flex;flex-direction:column;
   transition:box-shadow .18s,transform .18s,border-color .18s}
@@ -3600,47 +3619,303 @@ async function offer(blob, filename, btn){
   }
 }
 
+/* =====================================================================
+   EXPORT — en kö, allt som syns
+
+   Tidigare fanns nedladdning bara på tre ställen: en bildruta, ett
+   omslag och de fyra kampanjmallarna. Allt annat gick att titta på men
+   inte att få ut — kompositionerna, kontaktkartorna, motionens
+   nyckelbilder, en hel riktning på en gång. Det var fel: kan man se det
+   ska man kunna ladda ner det.
+
+   Ett jobb är {n: filnamn, w, h, bg, f: () => html} eller, för det som
+   inte är en enkel bildruta, {n, b: () => Promise<Blob>}. HTML byggs
+   först när rutan ska rastreras, så en lista på 200 filer kostar
+   ingenting förrän den körs. Samma kö driver en enda fil och hela
+   biblioteket — det finns bara en väg ut.
+   ===================================================================== */
+function pad2(v){ return String(v).padStart(2,"0") }
+function pad3(v){ return String(v).padStart(3,"0") }
+function paperOf(d, light){ return d==="skugga" ? "#0E0E0D" : (light || "#EFECE7") }
+function job(name, htmlFn, w, h, bg){
+  return {n:name, w:w||1080, h:h||1920, bg:bg,
+          f:(typeof htmlFn === "function") ? htmlFn : function(){ return htmlFn }};
+}
+
+var busy = false;
+async function runJobs(jobs, btn){
+  if(busy) return false;
+  busy = true;
+  var lbl = btn.textContent, n = jobs.length, ok = 0, failed = [];
+  btn.disabled = true;
+  var dl = await downloads();
+  if(!dl){
+    btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
+    status(codeText("unavailable"));
+    setTimeout(function(){ btn.textContent = lbl }, 3400);
+    return false;
+  }
+  for(var i = 0; i < n; i++){
+    var j = jobs[i], blob;
+    btn.textContent = n>1 ? ("Renderar " + (i+1) + " / " + n + "…") : "Renderar…";
+    try { blob = j.b ? await j.b() : await framePNG(j.f(), j.w, j.h, j.bg) }
+    catch(e){ failed.push(j.n); continue }
+    if(n>1) btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
+    try {
+      await saveRetry(blob, j.n, (function(ix){ return function(k){
+        btn.textContent = "Väntar " + (ix+1) + " / " + n + "… " + k } })(i));
+      ok++;
+    } catch(e){
+      var code = (e && e.code) || "unknown";
+      if(code === "declined"){            /* medvetet nej — sluta fråga */
+        btn.disabled = false; busy = false;
+        btn.textContent = ok + " av " + n + " sparade";
+        status("Avbrutet. " + ok + " av " + n + " sparade.");
+        setTimeout(function(){ btn.textContent = lbl }, 3800);
+        return false;
+      }
+      failed.push(j.n);
+    }
+    if(i < n-1) await wait(650);          /* låt dialogrutan stängas helt */
+  }
+  btn.disabled = false; busy = false;
+  btn.textContent = n===1 ? (ok ? "Sparad ✓" : codeText(lastCode))
+                          : (ok + " av " + n + " sparade" + (failed.length ? " ✕" : " ✓"));
+  status(failed.length
+    ? (ok + " sparade · misslyckades på " + failed.slice(0,2).join(", ") + (failed.length>2 ? " m.fl." : ""))
+    : (n===1 ? "Sparad: " + jobs[0].n : "Alla " + ok + " filer sparade"));
+  setTimeout(function(){ btn.textContent = lbl }, 3800);
+  return true;
+}
+
+/* ---------- vad som går att bygga ----------
+   Varje byggare tar knappens data-attribut och returnerar en jobblista.
+   Att lägga till en ny exportyta är att lägga till en rad här. */
+var BUILD = {
+  frame: function(a){
+    var h = hlOf(a.hl), i = +a.i, d = a.ddir;
+    return [job("viewly-"+d+"-"+slug(h.name)+"-"+pad2(i+1)+".png",
+      function(){ return story(d, h.st[i], i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "") },
+      1080, 1920, paperOf(d))];
+  },
+  cover: function(a){
+    var h = hlOf(a.hl), d = a.ddir;
+    return [job("viewly-omslag-"+d+"-"+slug(h.name)+".png",
+      function(){ return coverFrame(d, h) }, 1080, 1920, paperOf(d, "#F2EFEF"))];
+  },
+  sheet: function(a){
+    var h = hlOf(a.hl), d = a.ddir;
+    return [{n:"viewly-"+d+"-"+slug(h.name)+"-kontaktkarta.png",
+             b:function(){ return sheetPNG(d, h, 540) }}];
+  },
+  /* ett helt kapitel: bildrutorna plus omslaget sist */
+  chapter: function(a){
+    var h = hlOf(a.hl), d = a.ddir, out = [];
+    h.st.forEach(function(s, i){
+      out.push(job("viewly-"+d+"-"+slug(h.name)+"-"+pad2(i+1)+".png",
+        function(){ return story(d, s, i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "") },
+        1080, 1920, paperOf(d)));
+    });
+    return out.concat(BUILD.cover({hl:h.id, ddir:d}));
+  },
+  covers: function(a){
+    return HL.map(function(h){ return BUILD.cover({hl:h.id, ddir:a.ddir})[0] });
+  },
+  sheets: function(a){
+    return HL.map(function(h){ return BUILD.sheet({hl:h.id, ddir:a.ddir})[0] });
+  },
+  /* hela biblioteket i vald riktning — 90 bildrutor + 14 omslag */
+  library: function(a){
+    var out = [];
+    HL.forEach(function(h){ out = out.concat(BUILD.chapter({hl:h.id, ddir:a.ddir})) });
+    return out;
+  },
+  /* kampanjmallarna. ar satt = ett format, annars alla tre */
+  post: function(a){
+    var d = a.ddir, ar = a.ar, q = AR[ar];
+    var p = POSTS.filter(function(x){ return x.id===a.pid })[0];
+    if(!p) return [];
+    return [job("viewly-"+d+"-"+p.id+"-"+p.phase+"-"+ar.replace(":","x")+".png",
+      function(){ return post(d, p, ar) }, 1080, Math.round(1080*q[1]/q[0]), paperOf(d))];
+  },
+  posts: function(a){
+    var d = a.ddir, ars = a.ar ? [a.ar] : ["4:5","1:1","9:16"], out = [];
+    POSTS.forEach(function(p){ ars.forEach(function(ar){
+      out = out.concat(BUILD.post({pid:p.id, ar:ar, ddir:d})) }) });
+    return out;
+  },
+  /* kompositionerna — ett exempel per primitiv */
+  prim: function(a){
+    var d = a.ddir, sp = SPECS.filter(function(x){ return x.p===a.p })[0];
+    if(!sp) return [];
+    var r = refOf(sp.ref);
+    return [job("viewly-komposition-"+d+"-"+sp.p+".png",
+      function(){ return story(d, r.s, r.i, r.n) }, 1080, 1920, paperOf(d))];
+  },
+  prims: function(a){
+    var out = [];
+    SPECS.forEach(function(sp){ out = out.concat(BUILD.prim({p:sp.p, ddir:a.ddir})) });
+    return out;
+  },
+  /* motion: de tre nyckelbilderna ur en riktning */
+  mkf: function(a){
+    var f = (MK[a.cand]||{})[a.mdir], d = a.ddir;
+    if(!f) return [];
+    return [0,.5,1].map(function(tt, k){
+      return job("viewly-motion-"+a.cand+"-"+a.mdir+"-"+d+"-"+["start","nyckel","slut"][k]+".png",
+        function(){ return f(d, tt) }, 1080, 1920, paperOf(d));
+    });
+  },
+  /* motion: bildsekvens genom hela klippet, för klippning i annat program */
+  mseq: function(a){
+    var f = (MK[a.cand]||{})[a.mdir], d = a.ddir, n = Math.max(2, +(a.n || 16)), out = [];
+    if(!f) return [];
+    for(var k = 0; k < n; k++){
+      out.push((function(tt, ix){
+        return job("viewly-motion-"+a.cand+"-"+a.mdir+"-"+d+"-"+pad3(ix+1)+".png",
+          function(){ return f(d, tt) }, 1080, 1920, paperOf(d));
+      })(k/(n-1), k));
+    }
+    return out;
+  },
+  /* alla nyckelbilder: 7 kandidater × 3 riktningar × 3 lägen */
+  allmkf: function(a){
+    var out = [];
+    MCAND.forEach(function(c){ MDIRS.forEach(function(dd){
+      out = out.concat(BUILD.mkf({cand:c.id, mdir:dd.id, ddir:a.ddir})) }) });
+    return out;
+  }
+};
+
+/* ---------- ZIP ----------
+   En uppsättning på 104 filer betyder 104 spardialoger. Det är inte en
+   nedladdning, det är ett straff. Därför packas allt som är mer än en fil
+   till ett arkiv: en dialog, en fil.
+
+   Inget bibliotek. PNG är redan komprimerat, så posterna lagras utan
+   deflate (metod 0) — då består en ZIP av tre saker: en lokal header per
+   fil, en central katalog och en slutpost. Det enda som kräver riktig kod
+   är CRC-32, och det är en tabell och en loop. */
+var CRCT = (function(){
+  var t = new Uint32Array(256);
+  for(var n = 0; n < 256; n++){
+    var c = n;
+    for(var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+function crc32(u8){
+  var c = 0xFFFFFFFF;
+  for(var i = 0; i < u8.length; i++) c = CRCT[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+async function zipBlob(files){
+  var enc = new TextEncoder(), parts = [], central = [], offset = 0;
+  var now = new Date();
+  var dtime = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF;
+  var ddate = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+  for(var i = 0; i < files.length; i++){
+    var nameB = enc.encode(files[i].name);
+    var data  = new Uint8Array(await files[i].blob.arrayBuffer());
+    var crc   = crc32(data);
+    var lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true);
+    lh.setUint16(4, 20, true);            /* version som behövs */
+    lh.setUint16(6, 0x0800, true);        /* filnamn i UTF-8 — å ä ö överlever */
+    lh.setUint16(8, 0, true);             /* metod 0: lagrad */
+    lh.setUint16(10, dtime, true); lh.setUint16(12, ddate, true);
+    lh.setUint32(14, crc, true);
+    lh.setUint32(18, data.length, true);
+    lh.setUint32(22, data.length, true);
+    lh.setUint16(26, nameB.length, true);
+    parts.push(new Uint8Array(lh.buffer), nameB, data);
+    var ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true);
+    ch.setUint16(4, 20, true); ch.setUint16(6, 20, true);
+    ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true);
+    ch.setUint16(12, dtime, true); ch.setUint16(14, ddate, true);
+    ch.setUint32(16, crc, true);
+    ch.setUint32(20, data.length, true); ch.setUint32(24, data.length, true);
+    ch.setUint16(28, nameB.length, true);
+    ch.setUint32(42, offset, true);
+    central.push(new Uint8Array(ch.buffer), nameB);
+    offset += 30 + nameB.length + data.length;
+  }
+  var cdSize = central.reduce(function(a, x){ return a + x.length }, 0);
+  var eo = new DataView(new ArrayBuffer(22));
+  eo.setUint32(0, 0x06054b50, true);
+  eo.setUint16(8, files.length, true); eo.setUint16(10, files.length, true);
+  eo.setUint32(12, cdSize, true); eo.setUint32(16, offset, true);
+  return new Blob(parts.concat(central, [new Uint8Array(eo.buffer)]), {type:"application/zip"});
+}
+
+/* Samma jobblista som runJobs, men allt hamnar i ett arkiv. */
+async function runZip(jobs, btn, zipname){
+  if(busy) return false;
+  busy = true;
+  var lbl = btn.textContent, n = jobs.length, files = [], failed = [];
+  btn.disabled = true;
+  var dl = await downloads();
+  if(!dl){
+    btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
+    status(codeText("unavailable"));
+    setTimeout(function(){ btn.textContent = lbl }, 3400);
+    return false;
+  }
+  for(var i = 0; i < n; i++){
+    var j = jobs[i];
+    btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
+    try {
+      var blob = j.b ? await j.b() : await framePNG(j.f(), j.w, j.h, j.bg);
+      files.push({name:j.n, blob:blob});
+    } catch(e){ failed.push(j.n) }
+    /* släpp tråden så knapptexten hinner ritas om */
+    if((i & 3) === 3) await new Promise(function(r){ requestAnimationFrame(r) });
+  }
+  if(!files.length){
+    btn.disabled = false; busy = false; btn.textContent = "Rendering misslyckades";
+    setTimeout(function(){ btn.textContent = lbl }, 3000);
+    return false;
+  }
+  btn.textContent = "Packar " + files.length + " filer…";
+  var zip;
+  try { zip = await zipBlob(files) }
+  catch(e){
+    btn.disabled = false; busy = false; btn.textContent = "Kunde inte packa";
+    setTimeout(function(){ btn.textContent = lbl }, 3000);
+    return false;
+  }
+  btn.disabled = false; busy = false;
+  var ok = await offer(zip, zipname, btn);
+  if(ok) status(files.length + " filer i " + zipname + " · " + fmtBytes(zip.size)
+                + (failed.length ? " · " + failed.length + " misslyckades" : ""));
+  return ok;
+}
+
 async function runExport(btn){
   if(P.hl){ P.paused = true; clearTimeout(P.timer) }
-  var kind = btn.dataset.dl, lbl = btn.textContent;
-  btn.textContent = "Renderar…"; btn.disabled = true;
-  try {
-    if(kind === "frame"){
-      var h = hlOf(btn.dataset.hl), i = +btn.dataset.i, d = btn.dataset.ddir;
-      var html = story(d, h.st[i], i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "");
-      var b = await framePNG(html, 1080, 1920, d==="skugga"?"#0E0E0D":"#EFECE7");
-      btn.textContent = lbl; btn.disabled = false;
-      await offer(b, "viewly-"+d+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png", btn);
-    } else if(kind === "sheet"){
-      var h2 = hlOf(btn.dataset.hl), d2 = btn.dataset.ddir;
-      var b2 = await sheetPNG(d2, h2, 540);
-      btn.textContent = lbl; btn.disabled = false;
-      await offer(b2, "viewly-"+d2+"-"+slug(h2.name)+"-kontaktkarta.png", btn);
-    } else if(kind === "cover"){
-      var hc = hlOf(btn.dataset.hl), dc = btn.dataset.ddir;
-      var bc = await framePNG(coverFrame(dc, hc), 1080, 1920, dc==="skugga"?"#0E0E0D":"#F2EFEF");
-      btn.textContent = lbl; btn.disabled = false;
-      await offer(bc, "viewly-omslag-"+dc+"-"+slug(hc.name)+".png", btn);
-    } else if(kind === "covers"){
-      btn.disabled = false; busy = false;
-      await downloadCovers(btn.dataset.ddir, btn);
-    } else if(kind === "post"){
-      var p = POSTS.filter(function(x){return x.id===btn.dataset.pid})[0];
-      var ar = btn.dataset.ar, a = AR[ar], d3 = btn.dataset.ddir;
-      var W = 1080, H = Math.round(1080*a[1]/a[0]);
-      var b3 = await framePNG(post(d3, p, ar), W, H, d3==="skugga"?"#0E0E0D":"#EFECE7");
-      btn.textContent = lbl; btn.disabled = false;
-      await offer(b3, "viewly-"+d3+"-"+p.id+"-"+ar.replace(":","x")+".png", btn);
-    }
-  } catch(e){
-    btn.disabled = false;
-    btn.textContent = "Rendering misslyckades";
-    setTimeout(function(){ btn.textContent = lbl }, 2600);
+  var kind = btn.dataset.dl, mk = BUILD[kind];
+  if(!mk) return;
+  var jobs = [];
+  try { jobs = mk(btn.dataset) || [] } catch(e){ jobs = [] }
+  if(!jobs.length){ status("Inget att exportera"); return }
+  if(btn.dataset.zip && jobs.length > 1){
+    var nm = "viewly-" + (btn.dataset.zipname || kind) + "-" + (btn.dataset.ddir || state.dir) + ".zip";
+    await runZip(jobs, btn, nm);
+  } else {
+    await runJobs(jobs, btn);
   }
 }
-function dlBtn(kind, attrs, label){
-  var a = Object.keys(attrs).map(function(k){return ' data-'+k+'="'+attrs[k]+'"'}).join("");
-  return '<button class="dlb" type="button" data-dl="'+kind+'"'+a+'>'+label+'</button>';
+function dlBtn(kind, attrs, label, cls){
+  var a = Object.keys(attrs).map(function(k){ return ' data-'+k+'="'+attrs[k]+'"' }).join("");
+  return '<button class="dlb'+(cls?" "+cls:"")+'" type="button" data-dl="'+kind+'"'+a+'>'+label+'</button>';
+}
+/* Ett arkiv i stället för en fil i taget. Används för allt som är mer än
+   en handfull filer — annars blir nedladdningen en rad med dialogrutor. */
+function zipBtn(kind, attrs, label, name, cls){
+  var o = Object.assign({}, attrs, {zip:"1", zipname:name || kind});
+  return dlBtn(kind, o, label, cls == null ? "pri" : cls);
 }
 
 /* =====================================================================
@@ -3895,8 +4170,11 @@ function secRiktning(){
       +'<div class="cmplab"><b>'+r.h.name+'</b><span>'+String(r.i+1).padStart(2,"0")+' · '+r.s.p+'</span>'
         +'<em>'+(r.s.h||r.s.k||"—")+'</em></div>'
       +DIRS.map(function(d){
-        return '<button class="cmpcell specbtn" type="button" data-play="'+r.h.id+':'+r.i+':'+d.id+'">'
-          +frame(d.id,r.s,r.i,r.n)+'</button>'}).join("")
+        return '<div class="cmpcell">'
+          +'<button class="specbtn" type="button" data-play="'+r.h.id+':'+r.i+':'+d.id+'">'
+          +frame(d.id,r.s,r.i,r.n)+'</button>'
+          +'<div class="dlrow">'+dlBtn("frame",{hl:r.h.id, i:r.i, ddir:d.id},"PNG · "+d.n)+'</div></div>'
+        }).join("")
       +'</div>';
   }).join("");
 
@@ -3904,6 +4182,11 @@ function secRiktning(){
     "ARKIV och SKUGGA är vidareutvecklade ur de ursprungliga spåren. Båda bygger på samma tolv kompositionsprimitiv och "
    +"samma innehåll — skillnaden ligger i grund, ljus och hur fotografiet används. Ingen riktning är vald.")
    +'<div class="dps">'+panels+'</div>'
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
+   + zipBtn("library",{ddir:"arkiv"},"Hela biblioteket · ARKIV · ZIP","biblioteket")
+   + zipBtn("library",{ddir:"skugga"},"Hela biblioteket · SKUGGA · ZIP","biblioteket")
+   +'<span class="mut" style="font-size:11.5px">'+(totalStories()+HL.length)
+   +' PNG per riktning. Enskilda uppsättningar finns i vy 08.</span></div>'
    +'<h3 class="h3">Samma Story, två riktningar</h3>'
    +toggles(false)
    +'<div class="cmphead"><div></div>'+DIRS.map(function(d){return '<span>'+d.n+'</span>'}).join("")+'</div>'
@@ -3919,7 +4202,8 @@ function secKomp(){
     return '<div class="spec">'
       +'<button class="specbtn" type="button" data-play="'+r.h.id+':'+r.i+':'+state.dir+'">'+frame(state.dir,r.s,r.i,r.n)+'</button>'
       +'<div class="speccap"><span class="t">'+p.n+'</span><span class="p">'+p.id+'</span></div>'
-      +'<p class="specd">'+p.d+'</p></div>';
+      +'<p class="specd">'+p.d+'</p>'
+      +'<div class="dlrow">'+dlBtn("prim",{p:sp.p, ddir:state.dir},"PNG · 1080×1920")+'</div></div>';
   }).join("");
   var counts={}; HL.forEach(function(h){h.st.forEach(function(s){counts[s.p]=(counts[s.p]||0)+1})});
   var total=totalStories();
@@ -3937,6 +4221,9 @@ function secKomp(){
    +"linje, plåt och luft, med bilden i en mask. De tre sista — flow, matrix och phases — ritar hur något fungerar "
    +"i stället för att beskriva det. Fördelningen nedan är den faktiska fördelningen i biblioteket.")
    +dirbar()+toggles(true)
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
+   + zipBtn("prims",{ddir:state.dir},"Alla "+SPECS.length+" kompositioner · ZIP","kompositioner")
+   + dlBtn("prims",{ddir:state.dir},"Separat, en i taget")+'</div>'
    +'<div class="specimens">'+cards+'</div>'
    +'<h3 class="h3">Fördelning över biblioteket</h3><div class="bars">'+bars+'</div>';
 }
@@ -3976,6 +4263,11 @@ function secProfil(){
   return sechead("Profil","Raden är ett eget designproblem",
     cap(nw(HL.length))+" covers, 64 px breda, som en horisontell rad ovanför rutnätet. De ska gå att skilja åt i ögonvrån, i den "
    +"ordning en ny besökare läser dem: vad är det, hur ser det ut, vad kan jag få, funkar det, vilka är ni, hur börjar jag.")
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner omslagen</span>'
+   + zipBtn("covers",{ddir:"arkiv"},"Alla "+HL.length+" · ARKIV · ZIP","omslag")
+   + zipBtn("covers",{ddir:"skugga"},"Alla "+HL.length+" · SKUGGA · ZIP","omslag")
+   + HL.map(function(h){ return dlBtn("cover",{hl:h.id, ddir:state.dir}, h.num) }).join("")
+   +'</div>'
    +'<div class="phones">'+phones+'</div>'
    +'<h3 class="h3">Igenkänning i verklig storlek</h3><div class="minis">'+strip+'</div>'
    +'<h3 class="h3">Ordning och roll</h3><div class="tw"><table><thead><tr>'
@@ -4025,6 +4317,11 @@ function secFormat(){
    +dirbar()+toggles(false)
    +'<div class="objwrap"><span id="flash" class="flash"></span>'+objectPanel()
      +'<button class="dlb pri" type="button" data-act="save">Spara</button></div>'
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
+   + zipBtn("posts",{ddir:d},"Alla 12 artboards · ZIP","kampanjmallar")
+   + dlBtn("posts",{ddir:d, ar:"4:5"},"Bara 4:5")
+   + dlBtn("posts",{ddir:d, ar:"1:1"},"Bara 1:1")
+   + dlBtn("posts",{ddir:d, ar:"9:16"},"Bara 9:16")+'</div>'
    +'<h3 class="h3" style="margin-top:0">Samma inlägg i tre format</h3>'
    +'<div class="fmts">'+one+'</div>'
    +'<h3 class="h3">Kampanjmallarna · 4:5</h3>'
@@ -4360,50 +4657,6 @@ function thumb(k, on, attr){
     +'</span>';
 }
 
-/* ---------- nedladdning av en hel serie ---------- */
-var busy = false;
-async function downloadSeries(hlId, dir, btn){
-  if(busy) return; busy = true;
-  var h = hlOf(hlId), n = h.st.length + 1, lbl = btn.textContent;   /* +1: omslaget sist */
-  btn.disabled = true;
-  var dl = await downloads();
-  if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
-    status(codeText("unavailable")); setTimeout(function(){ btn.textContent = lbl }, 3400); return }
-  var okCount = 0, failed = [];
-  for(var i = 0; i < n; i++){
-    btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
-    var blob;
-    try {
-      var isCov = i === n-1;
-      var html = isCov ? coverFrame(dir, h)
-                       : story(dir, h.st[i], i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "");
-      blob = await framePNG(html, 1080, 1920,
-        dir==="skugga" ? "#0E0E0D" : (isCov ? "#F2EFEF" : "#EFECE7"));
-    } catch(e){ failed.push(i+1); continue }
-    btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
-    try {
-      await saveRetry(blob, "viewly-"+dir+"-"+slug(h.name)+"-"+String(i+1).padStart(2,"0")+".png",
-        function(k){ btn.textContent = "Väntar " + (i+1) + " / " + n + "… " + k });
-      okCount++;
-    } catch(e){
-      var code = (e && e.code) || "unknown";
-      if(code === "declined"){                 /* medvetet nej — sluta fråga */
-        btn.disabled = false; busy = false;
-        btn.textContent = okCount + " av " + n + " sparade";
-        status("Avbrutet vid bildruta " + (i+1) + ". " + okCount + " sparade.");
-        setTimeout(function(){ btn.textContent = lbl }, 3800);
-        return;
-      }
-      failed.push(i+1);
-    }
-    await wait(650);                            /* låt dialogrutan stängas helt */
-  }
-  btn.disabled = false; busy = false;
-  btn.textContent = okCount + " av " + n + " sparade" + (failed.length ? " ✕" : " ✓");
-  status(failed.length ? (okCount+" sparade, misslyckades på "+failed.join(", "))
-                       : ("Alla "+okCount+" bildrutor sparade"));
-  setTimeout(function(){ btn.textContent = lbl }, 3800);
-}
 
 function handleCoverUpload(files, hlId){
   var f = Array.prototype.slice.call(files).filter(function(x){return /^image\//.test(x.type)})[0];
@@ -4413,42 +4666,6 @@ function handleCoverUpload(files, hlId){
     CEDITS[hlId] = Object.assign({}, CEDITS[hlId], {cover:key});
     flash("Omslagsbild bytt"); render();
   });
-}
-async function downloadCovers(dir, btn){
-  if(busy) return; busy = true;
-  var lbl = btn.textContent, n = HL.length, ok = 0, failed = [];
-  btn.disabled = true;
-  var dl = await downloads();
-  if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
-    status(codeText("unavailable")); setTimeout(function(){ btn.textContent = lbl }, 3400); return }
-  for(var i = 0; i < n; i++){
-    var h = HL[i];
-    btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
-    var blob;
-    try {
-      blob = await framePNG(coverFrame(dir, h), 1080, 1920, dir==="skugga"?"#0E0E0D":"#F2EFEF");
-    } catch(e){ failed.push(h.name); continue }
-    btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
-    try {
-      await saveRetry(blob, "viewly-omslag-"+dir+"-"+slug(h.name)+".png",
-        function(k){ btn.textContent = "Väntar " + (i+1) + " / " + n + "… " + k });
-      ok++;
-    } catch(e){
-      if((e && e.code) === "declined"){
-        btn.disabled = false; busy = false;
-        btn.textContent = ok + " av " + n + " sparade";
-        status("Avbrutet. " + ok + " omslag sparade."); setTimeout(function(){ btn.textContent = lbl }, 3800);
-        return;
-      }
-      failed.push(h.name);
-    }
-    await wait(650);
-  }
-  btn.disabled = false; busy = false;
-  btn.textContent = ok + " av " + n + " sparade" + (failed.length ? " ✕" : " ✓");
-  status(failed.length ? (ok+" omslag sparade, misslyckades: "+failed.join(", "))
-                       : ("Alla "+ok+" omslag sparade"));
-  setTimeout(function(){ btn.textContent = lbl }, 3800);
 }
 
 /* Två exporter, för att en enda inte kan vara båda. Den lätta är några kB
@@ -4500,13 +4717,20 @@ function studioIndex(){
     var seq = h.st.map(function(s,j){
       return '<i class="pchip'+(isEdited(s)?' ed':'')+'">'+String(j+1).padStart(2,"0")+' '+s.p+'</i>';
     }).join("");
-    return '<button class="hlcard" type="button" data-edit="'+h.id+'">'
+    return '<div class="hlwrap"><button class="hlcard" type="button" data-edit="'+h.id+'">'
       +'<span class="top"><span class="cvw">'+coverEl(state.dir,h)+'</span>'
         +'<span class="tt"><b>'+h.name+'</b><span>'+h.q+'</span></span>'
         +(edits?'<span class="chip">'+edits+' ändrade</span>':'')+'</span>'
       +'<span class="body"><span class="lead"><span class="frame">'+story(state.dir,h.st[0],0,h.st.length)+'</span></span>'
         +'<span class="seq">'+seq+'</span></span>'
-      +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="open">Öppna →</span></span></button>';
+      +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="open">Öppna →</span></span></button>'
+      /* Nedladdning ligger utanför kortknappen — annars går det inte att
+         nå kapitlets filer utan att först öppna editorn. */
+      +'<div class="dlrow">'
+      + zipBtn("chapter",{hl:h.id, ddir:state.dir},"Alla "+(h.st.length+1)+" · ZIP","kapitel-"+h.id,null)
+      + dlBtn("sheet",{hl:h.id, ddir:state.dir},"Kontaktkarta")
+      + dlBtn("cover",{hl:h.id, ddir:state.dir},"Omslag")
+      +'</div></div>';
   }).join("");
   var alts = 0; HL.forEach(function(h){ h.st.forEach(function(x){ alts += variantCount(x) }) });
   var chosen = Object.keys(PICKS).filter(function(k){ return PICKS[k] }).length;
@@ -4516,6 +4740,11 @@ function studioIndex(){
    +(chosen ? chosen+" bildrutor har ett annat förslag än A valt. " : "")
    +need+" bildrutor är markerade som Behöver material.")
    +dirbar()+toggles(true)
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
+   + zipBtn("library",{ddir:state.dir},"Hela biblioteket · "+(totalStories()+HL.length)+" PNG · ZIP","biblioteket")
+   + zipBtn("covers",{ddir:state.dir},"Alla omslag · ZIP","omslag",null)
+   + zipBtn("sheets",{ddir:state.dir},"Alla kontaktkartor · ZIP","kontaktkartor",null)
+   +'<span class="mut" style="font-size:11.5px">Fler uppsättningar i vy 08 Export.</span></div>'
    +'<div class="hlgrid">'+cards+'</div>'
    +'<h3 class="h3">Alla ändringar</h3>'
    +'<div class="ctl">'
@@ -4635,7 +4864,8 @@ function studioEditor(){
            + (isCover ? dlBtn("cover",{hl:h.id, ddir:state.dir},"Omslaget · 1080×1920")
                        : dlBtn("frame",{hl:h.id, i:i, ddir:state.dir},"Denna bildruta · 1080×1920"))
            + dlBtn("sheet",{hl:h.id, ddir:state.dir},"Hela serien som kontaktkarta")
-           +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+(n+1)+' bildrutor separat</button>'
+           + zipBtn("chapter",{hl:h.id, ddir:state.dir},"Alla "+(n+1)+" bildrutor · ZIP","kapitel-"+h.id)
+           + dlBtn("chapter",{hl:h.id, ddir:state.dir},"Alla "+(n+1)+" separat")
            + (!isCover && MPICK[s.sid]
               ? '<button class="dlb pri" type="button" data-mv="1" data-mvsid="'+s.sid+'" data-mvdir="'
                 +state.dir+'">Rörelsen som video · '+MDUR[MSID[s.sid]].toFixed(1)+' s</button>' : '')
@@ -4746,7 +4976,7 @@ function coverPanel(h){
    + figs
    +'<div class="dlcol" style="margin-top:8px">'
      + dlBtn("cover",{hl:h.id, ddir:d},"Ladda ner omslaget · 1080×1920")
-     + dlBtn("covers",{ddir:d},"Alla "+HL.length+" omslag")
+     + zipBtn("covers",{ddir:d},"Alla "+HL.length+" omslag · ZIP","omslag",null)
    +'</div>'
    +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:7px">Omslaget ligger också sist '
    +'i kapitlets bildruteserie, så det följer med när du laddar ner hela serien.</p>'
@@ -4823,8 +5053,18 @@ function svgImage(svg, w, h){
 }
 async function exportMotion(btn){
   if(busy) return; busy = true;
-  var lbl = btn.textContent, sid = btn.dataset.mvsid, d = btn.dataset.mvdir;
-  var m = motionOf(sid); if(!m){ busy=false; return }
+  var lbl = btn.textContent, d = btn.dataset.mvdir;
+  /* Två vägar in: en Story som har fått en rörelse vald (mvsid), eller en
+     kandidat och riktning direkt (mvcand + mvmdir) — så vy 07 kan spela in
+     ett klipp utan att man först måste välja rörelsen på en Story. */
+  var sid = btn.dataset.mvsid || "";
+  var cnd = btn.dataset.mvcand || "";
+  var m = sid ? motionOf(sid)
+              : ((MK[cnd]||{})[btn.dataset.mvmdir]
+                 ? {cand:cnd, dir:btn.dataset.mvmdir, dur:MDUR[cnd]||6} : null);
+  if(!m){ busy=false; return }
+  var frameAt = sid ? function(tt){ return motionFrame(d, sid, tt) }
+                    : function(tt){ return MK[m.cand][m.dir](d, tt) };
   var FPS = 30, W = 1080, H = 1920, N = Math.round(m.dur*FPS);
   btn.disabled = true;
   var dl = await downloads();
@@ -4844,7 +5084,7 @@ async function exportMotion(btn){
       /* första rutan innan start — annars blir klippet tomt */
       MOTION_T = 0;
       var first = await svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
-        + xhtml(motionFrame(d, sid, 0), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
+        + xhtml(frameAt(0), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
       ctx.drawImage(first, 0, 0, W, H);
       rec.start(250);
       var t0 = performance.now();
@@ -4852,7 +5092,7 @@ async function exportMotion(btn){
         var tt = f/(N-1);
         btn.textContent = "Renderar " + (f+1) + " / " + N + "…";
         var img = await svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
-          + xhtml(motionFrame(d, sid, tt), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
+          + xhtml(frameAt(tt), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
         ctx.drawImage(img, 0, 0, W, H);
         /* håll rutan kvar så inspelaren hinner fånga den */
         var target = t0 + (f+1)*(1000/FPS);
@@ -4870,7 +5110,7 @@ async function exportMotion(btn){
   btn.disabled = false; btn.textContent = lbl; busy = false;
   if(blob){
     var ext = blob.type.indexOf("mp4") >= 0 ? "mp4" : "webm";
-    await offer(blob, "viewly-motion-"+slug(sid)+"-"+m.dir+"-"+d+"."+ext, btn);
+    await offer(blob, "viewly-motion-"+slug(sid||m.cand)+"-"+m.dir+"-"+d+"."+ext, btn);
   } else status("Inspelningen gav ingen giltig fil");
 }
 
@@ -4972,6 +5212,93 @@ function mediaCtl(slot, cur){
    +'<label class="sl">Zoom <em>'+Math.round((o.zoom||1)*100)+'%</em>'
    +'<input type="range" data-sl="'+slot+':zoom" min="100" max="170" value="'+Math.round((o.zoom||1)*100)+'"></label>'
    +'<button class="tbtn" type="button" data-reset="'+slot+'">Återställ slot</button>';
+}
+
+/* =====================================================================
+   08 · EXPORT — ett ställe där allt går att hämta
+
+   Knapparna finns kvar där de hör hemma, ute i sektionerna. Den här vyn
+   är registret: varje uppsättning som går att få ut, hur många filer den
+   är och ungefär hur lång tid den tar. Rastrering av en 1080 × 1920-ruta
+   är uppmätt till 39 ms, och mellan varje fil ligger en paus på 650 ms
+   för att spardialogen ska hinna stängas — det är pausen som avgör
+   tiden, inte renderingen.
+   ===================================================================== */
+/* Uppmätt på den här datan: en 1080 × 1920-ruta tar 86 ms att rastrera och
+   väger 0,54 MB. Ett arkiv packas på 0,4 s för 104 filer. Sparas filerna en
+   och en tillkommer 650 ms per fil för att dialogen ska hinna stängas — det
+   är den pausen, inte renderingen, som gör separat-vägen långsam. */
+function secs(s){ return s < 60 ? "~"+Math.round(s)+" s" : "~"+Math.round(s/60)+" min" }
+function xmeta(n, mb){
+  return n + " fil" + (n===1?"":"er")
+   + (n>1 ? " · " + secs(n*0.086 + 0.5) + " · ~" + (n*mb).toFixed(n*mb<10?1:0) + " MB" : " · " + secs(1));
+}
+function xcard(num, title, desc, n, mb, btns){
+  return '<div class="xcard"><span class="xn">'+num+' · '+xmeta(n, mb)+'</span>'
+   +'<h4>'+esc(title)+'</h4><p>'+desc+'</p><div class="dlrow">'+btns+'</div></div>';
+}
+function secExport(){
+  var d = state.dir, dn = d==="skugga" ? "SKUGGA" : "ARKIV";
+  var nSt = totalStories(), nHl = HL.length;
+  var chapters = HL.map(function(h){
+    return '<div class="xcard"><span class="xn">'+h.num+' · '+xmeta(h.st.length+1, 0.42)
+     +'</span><h4>'+esc(h.name)+'</h4>'
+     +'<p>'+h.st.length+' bildrutor plus omslaget sist.</p>'
+     +'<div class="dlrow">'
+     + zipBtn("chapter",{hl:h.id, ddir:d},"Alla "+(h.st.length+1)+" · ZIP","kapitel-"+h.id,null)
+     + dlBtn("sheet",{hl:h.id, ddir:d},"Kontaktkarta")
+     + dlBtn("cover",{hl:h.id, ddir:d},"Omslag")
+     +'</div></div>';
+  }).join("");
+
+  return sechead("Export", "Allt som syns går att ladda ner",
+     "Allt renderas i webbläsaren, i 1080 px bredd, och sparas via nedladdningsdialogen. Riktningen nedan följer "
+    +"valet i sidhuvudet — just nu " + dn + ". Byter du riktning byter allt på den här sidan riktning med. "
+    +"Redigeringar du gjort i studion, i objektpanelen och på omslagen följer med i exporten; motion och "
+    +"innehållsalternativ likaså, eftersom exporten går genom samma renderare som förhandsvisningen.")
+   + dirbar()
+   +'<p class="xnote"><b>ZIP är standardvägen.</b> Allt renderas i webbläsaren och packas till ett arkiv — '
+   +'en fil, en spardialog. Arkivet lagras utan komprimering eftersom PNG redan är komprimerat, så det väger '
+   +'lika mycket som filerna gör var för sig. Hela biblioteket blir omkring 56 MB; nekar webbläsaren en så stor '
+   +'fil, ta kapitel för kapitel längre ner i stället. <b>Separat</b> sparar en fil i taget och öppnar då en '
+   +'dialog per fil — säger du nej i någon av dem stannar kön där, och knappen berättar hur många som hann sparas. '
+   +'Videor spelas in i realtid och ligger kvar i vy 07, en riktning i taget.</p>'
+   +'<h3 class="h3" style="margin-top:0">Hela biblioteket</h3>'
+   +'<div class="xgrid">'
+   + xcard("Allt", "Biblioteket i "+dn,
+       "Samtliga "+nSt+" bildrutor plus "+nHl+" omslag, kapitel för kapitel, i filnamnsordning.",
+       nSt + nHl, 0.54, zipBtn("library",{ddir:d},"Ladda ner allt · ZIP","biblioteket")
+       + dlBtn("library",{ddir:d},"Separat"))
+   + xcard("Omslag", "Alla omslag",
+       "Ett omslag per highlight i valt omslagssystem, 1080 × 1920.",
+       nHl, 0.07, zipBtn("covers",{ddir:d},"Alla "+nHl+" omslag · ZIP","omslag")
+       + dlBtn("covers",{ddir:d},"Separat"))
+   + xcard("Kartor", "Alla kontaktkartor",
+       "En kontaktkarta per kapitel — hela serien på en bild, numrerad, med omslaget sist. Bra att skicka på granskning.",
+       nHl, 0.18, zipBtn("sheets",{ddir:d},"Alla "+nHl+" kontaktkartor · ZIP","kontaktkartor")
+       + dlBtn("sheets",{ddir:d},"Separat"))
+   + xcard("Komp", "Kompositionerna",
+       "Ett exempel per primitiv, alltså hela formspråket på "+SPECS.length+" bilder.",
+       SPECS.length, 0.55, zipBtn("prims",{ddir:d},"Alla "+SPECS.length+" · ZIP","kompositioner")
+       + dlBtn("prims",{ddir:d},"Separat"))
+   +'</div>'
+   +'<h3 class="h3">Kampanjen och formaten</h3>'
+   +'<div class="xgrid">'
+   + xcard("Mallar", "Kampanjmallarna i alla format",
+       "Kommande, Till salu, Visning och Såld i 4:5, 1:1 och 9:16. Alla med objektets aktuella text ur objektpanelen.",
+       POSTS.length*3, 0.96,
+       zipBtn("posts",{ddir:d},"Alla 12 · ZIP","kampanjmallar")
+       + dlBtn("posts",{ddir:d, ar:"4:5"},"4:5")
+       + dlBtn("posts",{ddir:d, ar:"1:1"},"1:1")
+       + dlBtn("posts",{ddir:d, ar:"9:16"},"9:16"))
+   + xcard("Motion", "Motionens nyckelbilder",
+       "Start, nyckel och slut för samtliga kandidater och riktningar. Bildsekvenser och video finns per riktning i vy 07.",
+       MCAND.length*MDIRS.length*3, 0.38,
+       zipBtn("allmkf",{ddir:d},"Alla "+(MCAND.length*MDIRS.length*3)+" · ZIP","nyckelbilder")
+       + dlBtn("allmkf",{ddir:d},"Separat"))
+   +'</div>'
+   +'<h3 class="h3">Kapitel för kapitel</h3>'
+   +'<div class="xgrid">'+chapters+'</div>';
 }
 
 /* =====================================================================
@@ -5248,9 +5575,21 @@ function secMotion(){
          +'<span class="mkfl">'+["Start","Nyckel","Slut"][st]+'</span></div>';
       }).join("");
       var board = (MSTORY[c.id]||{})[d.id] || [];
+      var dur = (MDUR[c.id]||6).toFixed(1).replace(".",",");
+      /* Allt som går att se ska gå att få ut: de tre nyckelbilderna, hela
+         klippet som bildsekvens för klippning i annat program, och samma
+         klipp inspelat som video. Tidigare fanns ingenting av det här —
+         man var tvungen att gå in i studion och välja rörelsen på en Story
+         först, vilket inte var uppenbart för någon. */
       return '<div class="mdir">'
        +'<div class="mdirh"><b>'+esc(d.n)+'</b><span>'+esc(d.d)+'</span></div>'
        +'<div class="mkfs">'+frames+'</div>'
+       + (f ? '<div class="dlrow">'
+           + zipBtn("mkf",{cand:c.id, mdir:d.id, ddir:state.dir},"3 nyckelbilder · ZIP","kf-"+c.id+"-"+d.id,null)
+           + zipBtn("mseq",{cand:c.id, mdir:d.id, ddir:state.dir, n:24},"Bildsekvens · 24 PNG · ZIP","seq-"+c.id+"-"+d.id,null)
+           + '<button class="dlb pri" type="button" data-mv="1" data-mvcand="'+c.id
+             +'" data-mvmdir="'+d.id+'" data-mvdir="'+state.dir+'">Video · '+dur+' s</button>'
+           +'</div>' : '')
        +'<ol class="mboard">'+board.map(function(b){
           return '<li><span class="t">'+esc(b[0])+'</span><span class="w">'+b[1]+'</span></li>' }).join("")+'</ol>'
        +'</div>';
@@ -5278,6 +5617,10 @@ function secMotion(){
    +'<div class="tw"><table><thead><tr><th>Template</th><th>Klass</th><th>Syfte</th><th>Varför</th>'
    +'<th>Vad rör sig</th><th>Vad står still</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
    +'<h3 class="h3">Kandidater och riktningar</h3>'
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
+   + zipBtn("allmkf",{ddir:state.dir},"Alla "+(MCAND.length*MDIRS.length*3)+" nyckelbilder · ZIP","nyckelbilder")
+   +'<span class="mut" style="font-size:11.5px">'+MCAND.length+' kandidater × '+MDIRS.length
+   +' riktningar × 3 lägen. Video och bildsekvens finns per riktning nedan.</span></div>'
    + cands;
 }
 
@@ -5289,7 +5632,8 @@ var SECTIONS=[
  {id:"format",   n:"Format",       num:"04", f:secFormat},
  {id:"studio",   n:"Studio",       num:"05", f:secStudio},
  {id:"lager",    n:"Lager & media",num:"06", f:secLager},
- {id:"motion",   n:"Motion",       num:"07", f:secMotion}
+ {id:"motion",   n:"Motion",       num:"07", f:secMotion},
+ {id:"export",   n:"Export",       num:"08", f:secExport}
 ];
 
 /* =====================================================================
@@ -5423,8 +5767,6 @@ document.addEventListener("click",function(e){
     state.edit.i=(j+h.st.length+1)%(h.st.length+1); render(); return }
   var mv=e.target.closest("[data-mv]"); if(mv){ exportMotion(mv); return }
   var vx=e.target.closest("[data-vhl]"); if(vx){ exportVideo(vx); return }
-  var sr=e.target.closest("[data-series]");
-  if(sr){ downloadSeries(sr.dataset.series, state.dir, sr); return }
   var ac=e.target.closest("[data-act]");
   if(ac){
     var a=ac.dataset.act;
@@ -5559,9 +5901,23 @@ var s=document.createElement("style"); s.textContent=CSS; document.head.appendCh
    att skripta och att testa utan att klicka sig igenom gränssnittet */
 /* Lagringen går att köra utifrån, så att kvotbeteendet kan testas på riktigt
    i stället för att klickas fram. */
+/* Exportkön går att köra utifrån med en stubbad spardialog, så att
+   avbrottsbeteendet testas på riktigt i stället för att klickas fram.
+   declineAt = index där stubben säger nej; -1 = aldrig. */
+var STUB_N = 0;
+function stubDownloads(declineAt){
+  STUB_N = 0; dlTried = true;
+  DL = {save:function(){
+    var i = STUB_N++;
+    if(declineAt >= 0 && i === declineAt){ STUB_N--; return Promise.reject({code:"declined"}) }
+    return Promise.resolve(true);
+  }};
+}
 window.__vstudio = {
   framePNG:framePNG, motionFrame:function(d,s,tt){ return motionFrame(d,s,tt) },
-  exportMotion:exportMotion,
+  exportMotion:exportMotion, BUILD:BUILD, runJobs:runJobs,
+  stubDownloads:stubDownloads, stubCount:function(){ return STUB_N },
+  zipBlob:zipBlob, runZip:runZip,
   UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
   saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
   dropUpload:dropUpload, dropAllUploads:dropAllUploads,

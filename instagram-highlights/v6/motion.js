@@ -266,9 +266,21 @@ function secMotion(){
          +'<span class="mkfl">'+["Start","Nyckel","Slut"][st]+'</span></div>';
       }).join("");
       var board = (MSTORY[c.id]||{})[d.id] || [];
+      var dur = (MDUR[c.id]||6).toFixed(1).replace(".",",");
+      /* Allt som går att se ska gå att få ut: de tre nyckelbilderna, hela
+         klippet som bildsekvens för klippning i annat program, och samma
+         klipp inspelat som video. Tidigare fanns ingenting av det här —
+         man var tvungen att gå in i studion och välja rörelsen på en Story
+         först, vilket inte var uppenbart för någon. */
       return '<div class="mdir">'
        +'<div class="mdirh"><b>'+esc(d.n)+'</b><span>'+esc(d.d)+'</span></div>'
        +'<div class="mkfs">'+frames+'</div>'
+       + (f ? '<div class="dlrow">'
+           + zipBtn("mkf",{cand:c.id, mdir:d.id, ddir:state.dir},"3 nyckelbilder · ZIP","kf-"+c.id+"-"+d.id,null)
+           + zipBtn("mseq",{cand:c.id, mdir:d.id, ddir:state.dir, n:24},"Bildsekvens · 24 PNG · ZIP","seq-"+c.id+"-"+d.id,null)
+           + '<button class="dlb pri" type="button" data-mv="1" data-mvcand="'+c.id
+             +'" data-mvmdir="'+d.id+'" data-mvdir="'+state.dir+'">Video · '+dur+' s</button>'
+           +'</div>' : '')
        +'<ol class="mboard">'+board.map(function(b){
           return '<li><span class="t">'+esc(b[0])+'</span><span class="w">'+b[1]+'</span></li>' }).join("")+'</ol>'
        +'</div>';
@@ -296,5 +308,9 @@ function secMotion(){
    +'<div class="tw"><table><thead><tr><th>Template</th><th>Klass</th><th>Syfte</th><th>Varför</th>'
    +'<th>Vad rör sig</th><th>Vad står still</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
    +'<h3 class="h3">Kandidater och riktningar</h3>'
+   +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
+   + zipBtn("allmkf",{ddir:state.dir},"Alla "+(MCAND.length*MDIRS.length*3)+" nyckelbilder · ZIP","nyckelbilder")
+   +'<span class="mut" style="font-size:11.5px">'+MCAND.length+' kandidater × '+MDIRS.length
+   +' riktningar × 3 lägen. Video och bildsekvens finns per riktning nedan.</span></div>'
    + cands;
 }
