@@ -24,7 +24,7 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | 02 | Kompositioner | De tretton primitiven renderade i vald riktning, plus den faktiska fördelningen över biblioteket |
 | 03 | Profil | Fjorton omslag i verklig Instagram-skala, båda riktningarna, samt igenkänningstest vid 56 px |
 | 04 | Format | Fyra kampanjmallar och tre artboards: 9:16, 4:5, 1:1 — plus profilrutnätet |
-| 05 | Studio | Redigera: öppna ett kapitel, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
+| 05 | Studio | Redigera: välj bland tre förslag per bildruta, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 
 I Studio öppnar du ett kapitel och får filmremsa, live-scen och inspektör. `▶ Spela
@@ -220,6 +220,90 @@ cirkeln.
 
 ---
 
+## Tre förslag per bildruta
+
+Varje Story finns i **tre utföranden**. 90 bildrutor blir 270. Förslag A är
+originalet; B och C ligger som patchar ovanpå det och byter både komposition
+och formulering.
+
+| | Grepp |
+|---|---|
+| **A** | Originalet |
+| **B** | Samma budskap, annan komposition — vill man ha samma sak sagd men med en annan bildyta |
+| **C** | Annan ingång till samma sak. Oftast kortare och mer konkret, ibland en faktaram i stället för en känsla |
+
+Ett exempel, 03 · 3D visning, bildruta 02:
+
+| | Primitiv | Rubrik |
+|---|---|---|
+| A | `quiet` | *Låt spekulanten kliva in. När som helst.* |
+| B | `editorial` | *Låt spekulanten kliva in* — med bilden som stöd |
+| C | `system` | *Fyra siffror:* 99 % · 90 % · 32 % snabbare · 9 % högre slutpris |
+
+I studion ligger de tre som **live-renderade bildrutor** överst i inspektören,
+inte som beskrivningar — man väljer med ögat. Filmremsan märker upp vilka
+bildrutor som har ett annat förslag än A.
+
+Ordningen vid rendering är **original → valt förslag → egna ändringar**. En
+omskriven rubrik ligger alltså kvar när man byter förslag, och `Återställ
+bildrutan` går tillbaka hela vägen till A.
+
+Byter en patch primitiv bär den med sig det primitivet ritar: `split` behöver
+två bilder och två etiketter, `system` poster, `matrix` format. All copy är
+hämtad ur eller förenlig med respektive sida på viewly.se.
+
+Svepet renderar alla 270 utförandena i båda riktningarna — 540 renderingar,
+noll text i Instagrams kritiska zoner.
+
+---
+
+## Bildbanken
+
+Egna bilder och klipp laddas upp per bildruta och hamnar i en gemensam bank som
+alla bildrutor och omslag delar. Varje egen bild har ett **kryss** för
+borttagning; de 24 som följer med underlaget kan inte tas bort — de är
+underlaget, inte användarens material.
+
+En borttagen bild får inte lämna en trasig referens efter sig, så varje
+media-slot, omslag och kampanjmall som pekade på den återgår till sitt original
+i samma operation. `Töm bildbanken` gör samma sak för allt på en gång.
+
+En mätare under bildväljaren visar hur många egna bilder som finns, hur mycket
+de väger och var de faktiskt ligger.
+
+### Varför sparandet slutade fungera
+
+Den förra versionen la **allt** i localStorage, uppladdade bilder inkluderade.
+En bild på 1400 px som base64 väger 200–500 kB, och localStorage tar omkring
+5 MB totalt. Mätt i webbläsaren: `QuotaExceededError` vid **13 bilder / 5,2 MB**
+— därefter gick ingenting att spara, inte ens en ändrad rubrik.
+
+Lagringen är därför delad i två:
+
+| | Innehåll | Var | Storlek i praktiken |
+|---|---|---|---|
+| **Lätt** | texter, valda förslag, slot-inställningar, objektet, omslagsval | `localStorage` | ~400 B |
+| **Tung** | bildbanken | `IndexedDB` | hundratals MB |
+
+Den lätta delen sparas **alltid först**, så att ett fullt bildutrymme aldrig
+kan ta texten med sig. Saknas IndexedDB faller bilderna tillbaka till
+localStorage, och om inte heller det räcker sägs det rakt ut i stället för att
+sparandet tystnar.
+
+Verifierat med 25 bilder på 9,8 MB: allt sparat, texten och de valda förslagen
+oskadda, bildbanken korrekt inläst efter omladdning.
+
+Exporten är också delad, av samma skäl:
+
+- **Exportera text som JSON** — några kB, går alltid igenom. Flyttar texter och
+  val mellan webbläsare eller personer.
+- **Exportera allt inkl. bilder** — tar med bildbanken och blir stor.
+
+Import läser båda, och en trasig fil ger ett besked i stället för att tyst göra
+ingenting.
+
+---
+
 ## Studio — redigera och ladda ner
 
 Vy 05 är en editor, inte en katalog. Öppna ett kapitel och du får tre kolumner:
@@ -235,7 +319,8 @@ filmremsa med alla bildrutor, live-scen i mitten, inspektör till höger.
 | Stegetiketter, AI-signaler, tonlägen, annonsrubrik, annonsingress | `flow` |
 | Formatnamn, en per rad | `matrix` |
 | Objektet: adress, ort, fakta, etikett, tid, not | `phases` och vy 04 Format |
-| Bild i slot | Hela biblioteket **plus egna uppladdade bilder** |
+| Utförande | Tre förslag per bildruta — A, B eller C |
+| Bild i slot | Hela biblioteket **plus egna uppladdade bilder**, med borttagning |
 | Fokalpunkt Y och zoom | 0–100 % respektive 100–200 % |
 | Omslag: märke, bild, fokalpunkt | Per kapitel |
 
@@ -267,15 +352,15 @@ klara MP4 men skriver en tom eller avhuggen fil, och då körs exporten om med
 nästa format. Ljudet från klippet följer med när webbläsaren
 tillåter det. Max 20 sekunder.
 
-**Spara.** `Spara` lägger redigeringar, slot-inställningar och uppladdade bilder i
-webbläsarens `localStorage` under `viewly.highlights.v1` — de överlever omladdning.
-`Exportera JSON` / `Importera JSON` flyttar allt mellan webbläsare eller personer.
-`Återställ allt` nollar tillbaka till originalet.
+**Spara.** `Spara` lägger texter, valda förslag och slot-inställningar i
+`localStorage` och bildbanken i `IndexedDB` — se **Bildbanken** ovan för varför de
+är åtskilda. `Återställ allt` nollar tillbaka till originalet.
 
-Redigeringarna ligger aldrig i innehållsmodellen: de lagras i `EDITS` (Stories),
-`SLOTS` (media) och `PEDITS` (objektet) och läggs på vid rendering, så originalet
-finns alltid kvar. `Återställ bildrutan`, `Återställ objektet` och `Återställ allt`
-går tillbaka olika långt.
+Redigeringarna ligger aldrig i innehållsmodellen: de lagras i `PICKS` (valt
+förslag), `EDITS` (Stories), `SLOTS` (media), `CEDITS` (omslag) och `PEDITS`
+(objektet), och läggs på vid rendering i ordningen original → förslag →
+ändringar. Originalet finns alltid kvar. `Återställ bildrutan`, `Återställ
+objektet` och `Återställ allt` går tillbaka olika långt.
 
 ### Export
 

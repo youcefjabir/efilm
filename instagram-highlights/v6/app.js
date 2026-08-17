@@ -613,37 +613,177 @@ function secFormat(){
    ladda ner. Redigeringarna ligger i EDITS/SLOTS ovanpå originaldatan —
    originalet går alltid att återställa till, per fält eller per bildruta.
    ===================================================================== */
+/* ---------------------------------------------------------------------
+   LAGRING
+   Den förra versionen la ALLT i localStorage, uppladdade bilder inkluderade.
+   En bild på 1400 px som base64 väger 200-500 kB och localStorage tar
+   omkring 5 MB totalt — efter ett tiotal uppladdningar kastade setItem
+   QuotaExceededError och då gick ingenting att spara längre, inte ens en
+   ändrad rubrik. Det var felet.
+
+   Lagringen är därför delad i två:
+
+     lätt   texter, slot-inställningar, objektet, omslagsval — några få kB.
+            Ligger i localStorage och sparas ALLTID först, så att ett fullt
+            bildutrymme aldrig kan ta texten med sig.
+     tung   själva bilderna. Ligger i IndexedDB, som mäter i hundratals MB.
+
+   Saknas IndexedDB faller bilderna tillbaka till localStorage och användaren
+   får veta det rakt ut i stället för att upptäcka det när sparandet tystnar.
+   --------------------------------------------------------------------- */
 var STORE = "viewly.highlights.v1";
+var IDB_DB = "viewly.highlights", IDB_ST = "blobs", IDB_KEY = "uploads";
+
+function idbOpen(){
+  return new Promise(function(res){
+    try{
+      if(!window.indexedDB) return res(null);
+      var rq = indexedDB.open(IDB_DB, 1);
+      rq.onupgradeneeded = function(){ rq.result.createObjectStore(IDB_ST) };
+      rq.onsuccess = function(){ res(rq.result) };
+      rq.onerror   = function(){ res(null) };
+      rq.onblocked = function(){ res(null) };
+    }catch(e){ res(null) }
+  });
+}
+function idbPut(val){
+  return idbOpen().then(function(db){
+    if(!db) return false;
+    return new Promise(function(res){
+      try{
+        var tx = db.transaction(IDB_ST, "readwrite");
+        tx.objectStore(IDB_ST).put(val, IDB_KEY);
+        tx.oncomplete = function(){ res(true) };
+        tx.onerror = tx.onabort = function(){ res(false) };
+      }catch(e){ res(false) }
+    });
+  });
+}
+function idbGet(){
+  return idbOpen().then(function(db){
+    if(!db) return null;
+    return new Promise(function(res){
+      try{
+        var rq = db.transaction(IDB_ST, "readonly").objectStore(IDB_ST).get(IDB_KEY);
+        rq.onsuccess = function(){ res(rq.result || null) };
+        rq.onerror   = function(){ res(null) };
+      }catch(e){ res(null) }
+    });
+  });
+}
+function idbClear(){ return idbPut({}) }
+
+function lightState(){
+  return {v:2, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS};
+}
+function bankBytes(){
+  var n = 0; for(var k in UPLOADS) n += UPLOADS[k].length; return n;
+}
+function fmtBytes(n){
+  return n > 1048576 ? (n/1048576).toFixed(1).replace(".",",")+" MB"
+       : n > 1024    ? Math.round(n/1024)+" kB" : n+" B";
+}
+var bankMode = "idb";      /* idb | local | none — vad som faktiskt bar bilderna */
 
 function saveAll(msg){
-  try {
-    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS,
-                                                posts:PEDITS, covers:CEDITS}));
-    flash(msg || "Sparat");
-  } catch(e){
-    flash(UPLOADS && Object.keys(UPLOADS).length
-      ? "Fullt utrymme — exportera JSON istället" : "Kunde inte spara", true);
+  /* Texten först och för sig. Går bilderna inte att spara ska det inte
+     kunna radera en enda ändrad rubrik. */
+  var lightOK = true;
+  try { localStorage.setItem(STORE, JSON.stringify(lightState())) }
+  catch(e){ lightOK = false }
+
+  var count = Object.keys(UPLOADS).length;
+  if(!count){
+    bankMode = "idb";
+    idbClear();
+    flash(lightOK ? (msg || "Sparat") : "Kunde inte spara", !lightOK);
+    return;
   }
+  idbPut(UPLOADS).then(function(ok){
+    if(ok){
+      bankMode = "idb";
+      flash(lightOK ? (msg || "Sparat") + " · " + count + " bilder ("+fmtBytes(bankBytes())+")"
+                    : "Bilder sparade, men inte texten", !lightOK);
+    } else {
+      /* Ingen IndexedDB — försök localStorage och var ärlig om utfallet. */
+      try {
+        localStorage.setItem(STORE+".bank", JSON.stringify(UPLOADS));
+        bankMode = "local";
+        flash((msg || "Sparat") + " · bildbanken i localStorage");
+      } catch(e2){
+        bankMode = "none";
+        flash("Texten är sparad. Bildbanken ("+fmtBytes(bankBytes())
+             +") får inte plats — exportera allt som JSON", true);
+      }
+    }
+    if(state.edit) refreshBankMeter();
+  });
 }
 function loadAll(){
+  var any = false;
   try {
-    var raw = localStorage.getItem(STORE); if(!raw) return false;
-    var d = JSON.parse(raw);
-    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
-    Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
-    Object.assign(CEDITS, d.covers||{});
-    return true;
-  } catch(e){ return false }
+    var raw = localStorage.getItem(STORE);
+    if(raw){
+      var d = JSON.parse(raw);
+      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
+      Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
+      Object.assign(PICKS, d.picks||{});
+      /* v1 la bilderna i samma post — flytta över dem tyst. */
+      if(d.uploads) Object.assign(UPLOADS, d.uploads);
+      any = true;
+    }
+    var bk = localStorage.getItem(STORE+".bank");
+    if(bk){ Object.assign(UPLOADS, JSON.parse(bk)); bankMode = "local"; any = true }
+  } catch(e){}
+  return any;
+}
+function loadBank(){
+  return idbGet().then(function(u){
+    if(u && Object.keys(u).length){ Object.assign(UPLOADS, u); return true }
+    return false;
+  });
 }
 function clearAll(){
-  Object.keys(EDITS).forEach(function(k){delete EDITS[k]});
-  Object.keys(SLOTS).forEach(function(k){delete SLOTS[k]});
-  Object.keys(UPLOADS).forEach(function(k){delete UPLOADS[k]});
-  Object.keys(PEDITS).forEach(function(k){delete PEDITS[k]});
-  Object.keys(CEDITS).forEach(function(k){delete CEDITS[k]});
+  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS].forEach(function(o){
+    Object.keys(o).forEach(function(k){ delete o[k] }) });
+  Object.keys(VIDEOS).forEach(function(k){ delete VIDEOS[k] });
   seedSlots();
-  try{ localStorage.removeItem(STORE) }catch(e){}
+  try{ localStorage.removeItem(STORE); localStorage.removeItem(STORE+".bank") }catch(e){}
+  idbClear();
 }
+
+/* ---------- bildbanken: ta bort ----------
+   En borttagen bild får inte lämna en trasig referens efter sig. Varje
+   slot och varje omslag som pekade på den återgår till sitt original. */
+function dropUpload(key){
+  if(!UPLOADS[key]) return false;
+  delete UPLOADS[key];
+  delete VIDEOS[key];
+  Object.keys(SLOTS).forEach(function(sid){
+    if(SLOTS[sid] && SLOTS[sid].img === key) delete SLOTS[sid].img;
+  });
+  Object.keys(CEDITS).forEach(function(hid){
+    if(CEDITS[hid] && CEDITS[hid].cover === key) delete CEDITS[hid].cover;
+  });
+  Object.keys(PEDITS).forEach(function(pid){
+    if(PEDITS[pid] && PEDITS[pid].m === key) delete PEDITS[pid].m;
+  });
+  return true;
+}
+function dropAllUploads(){
+  Object.keys(UPLOADS).forEach(dropUpload);
+}
+function refreshBankMeter(){
+  var el = $("#bankmeter"); if(el) el.innerHTML = bankMeterHTML();
+}
+function bankMeterHTML(){
+  var n = Object.keys(UPLOADS).length;
+  if(!n) return '<span class="mut">Bildbanken är tom. '+MEDIAKEYS.length+' bilder följer med underlaget.</span>';
+  var where = bankMode==="local" ? "localStorage" : bankMode==="none" ? "inte sparad" : "IndexedDB";
+  return '<span class="mut">'+n+' egna '+(n===1?"bild":"bilder")+' · '+fmtBytes(bankBytes())
+   +' · '+where+'</span> <button class="lnkb" type="button" data-act="bank-clear">Töm bildbanken</button>';
+}
+
 var flashT;
 function flash(txt, warn){
   var el = $("#flash"); if(!el) return;
@@ -681,11 +821,13 @@ var FIELDLAB = {
   mx_names:["Formatnamn — en per rad","list"]
 };
 function fieldsFor(s){
-  return (RENDERED[s.p] || ["k","h","s"]).map(function(k){
+  return (RENDERED[picked(s).p] || ["k","h","s"]).map(function(k){
     return [k, FIELDLAB[k][0], FIELDLAB[k][1]];
   });
 }
 function val(s, key){
+  /* Fälten speglar det VALDA förslaget, inte alltid original A. */
+  s = picked(s);
   var e = EDITS[s.sid] || {};
   if(key==="items")      return (e.items || s.items || []).join("\n");
   if(key==="flow_items") return ((e.mid||s.mid).items || []).join("\n");
@@ -699,7 +841,8 @@ function val(s, key){
   return e[key] != null ? e[key] : (s[key] || "");
 }
 function setVal(s, key, v){
-  var e = EDITS[s.sid] || (EDITS[s.sid] = {});
+  var sid = s.sid; s = picked(s);
+  var e = EDITS[sid] || (EDITS[sid] = {});
   var lines = function(x){ return x.split("\n").filter(function(l){return l.trim()}) };
   if(key==="items")           e.items = lines(v);
   else if(key==="flow_items") e.mid   = Object.assign({}, e.mid||s.mid, {items:lines(v)});
@@ -717,6 +860,7 @@ function setVal(s, key, v){
 }
 function isEdited(s){
   var e = EDITS[s.sid];
+  if(PICKS[s.sid]) return true;
   var slotted = SLOTS[s.sid] && !slotIsDefault(s, s.sid);
   return !!(e && Object.keys(e).length) || !!slotted;
 }
@@ -726,7 +870,7 @@ function slotIsDefault(s, key){
       && (o.zoom===s.zoom || (o.zoom==null && s.zoom==null));
 }
 function resetStory(s){
-  delete EDITS[s.sid]; delete SLOTS[s.sid]; delete SLOTS[s.sid+"-b"];
+  delete EDITS[s.sid]; delete SLOTS[s.sid]; delete SLOTS[s.sid+"-b"]; delete PICKS[s.sid];
   if(s.fy!=null || s.zoom!=null) SLOTS[s.sid] = {fy:s.fy, zoom:s.zoom};
 }
 
@@ -773,6 +917,18 @@ function handleUpload(files, slot){
   });
 }
 function allKeys(){ return Object.keys(UPLOADS).concat(MEDIAKEYS) }
+/* Egna bilder får ett kryss. De inbyggda kan inte tas bort — de är
+   underlaget, inte användarens material. Krysset ligger utanpå knappen så
+   att ett klick på det aldrig råkar välja bilden i stället. */
+function thumb(k, on, attr){
+  return '<span class="mislot'+(on?" on":"")+'">'
+    +'<button class="mi'+(on?" on":"")+(isVideo(k)?" vid":"")+'" type="button" '+attr
+    +' title="'+k+'"><img src="'+(mediaURL(k)||"")+'" alt="">'
+    +(isVideo(k)?'<i class="vbadge">▶</i>':'')+'</button>'
+    +(UPLOADS[k] ? '<button class="midel" type="button" data-midel="'+k
+       +'" title="Ta bort ur bildbanken" aria-label="Ta bort bilden">×</button>' : '')
+    +'</span>';
+}
 
 /* ---------- nedladdning av en hel serie ---------- */
 var busy = false;
@@ -863,24 +1019,37 @@ async function downloadCovers(dir, btn){
   setTimeout(function(){ btn.textContent = lbl }, 3800);
 }
 
-async function exportJSON(btn){
+/* Två exporter, för att en enda inte kan vara båda. Den lätta är några kB
+   och går alltid igenom — den flyttar texten mellan webbläsare och personer.
+   Den fullständiga bär bildbanken och kan bli tiotals MB. */
+async function exportJSON(btn, withBank){
   var lbl = btn.textContent;
-  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS,
-                             posts:PEDITS, covers:CEDITS}, null, 1);
-  await offer(new Blob([data]), "viewly-highlights-redigeringar.json", btn);
+  var body = lightState();
+  if(withBank) body.uploads = UPLOADS;
+  var data;
+  try { data = JSON.stringify(body) }
+  catch(e){ status("Kunde inte serialisera — för mycket data"); btn.textContent = lbl; return }
+  await offer(new Blob([data], {type:"application/json"}),
+    withBank ? "viewly-highlights-allt.json" : "viewly-highlights-text.json", btn);
   btn.textContent = lbl;
 }
 function importJSON(file){
   var fr = new FileReader();
   fr.onload = function(){
-    try {
-      var d = JSON.parse(fr.result);
-      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
-      Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
-      Object.assign(CEDITS, d.covers||{});
-      flash("Importerat"); renderEditor();
-    } catch(e){ flash("Kunde inte läsa filen", true) }
+    var d;
+    try { d = JSON.parse(fr.result) }
+    catch(e){ flash("Filen är inte giltig JSON", true); return }
+    if(!d || typeof d !== "object"){ flash("Filen innehåller inga redigeringar", true); return }
+    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
+    Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
+    Object.assign(PICKS, d.picks||{});
+    var n = 0;
+    if(d.uploads){ Object.assign(UPLOADS, d.uploads); n = Object.keys(d.uploads).length }
+    flash("Importerat" + (n ? " · "+n+" bilder" : " · text"));
+    saveAll("Importerat och sparat");
+    renderEditor();
   };
+  fr.onerror = function(){ flash("Kunde inte läsa filen", true) };
   fr.readAsText(file);
 }
 
@@ -907,29 +1076,68 @@ function studioIndex(){
         +'<span class="seq">'+seq+'</span></span>'
       +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="open">Öppna →</span></span></button>';
   }).join("");
+  var alts = 0; HL.forEach(function(h){ h.st.forEach(function(x){ alts += variantCount(x) }) });
+  var chosen = Object.keys(PICKS).filter(function(k){ return PICKS[k] }).length;
   return sechead("Studio", cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
-    "Öppna ett kapitel för att gå igenom bildrutorna: byt bild, ladda upp egna, justera utsnitt, skriv om texten. "
-   +"Spara i webbläsaren eller exportera allt som JSON. "+need+" bildrutor är markerade som Behöver material.")
+    "Varje bildruta finns i tre utföranden — "+alts+" totalt. Öppna ett kapitel, välj det förslag som "
+   +"passar, byt bild, ladda upp egna och skriv om texten. "
+   +(chosen ? chosen+" bildrutor har ett annat förslag än A valt. " : "")
+   +need+" bildrutor är markerade som Behöver material.")
    +dirbar()+toggles(true)
    +'<div class="hlgrid">'+cards+'</div>'
    +'<h3 class="h3">Alla ändringar</h3>'
    +'<div class="ctl">'
-     +'<button class="dlb" type="button" data-act="save">Spara i webbläsaren</button>'
-     +'<button class="dlb" type="button" data-act="exportjson">Exportera JSON</button>'
+     +'<button class="dlb pri" type="button" data-act="save">Spara i webbläsaren</button>'
+     +'<button class="dlb" type="button" data-act="exportjson">Exportera text som JSON</button>'
+     +'<button class="dlb" type="button" data-act="exportall">Exportera allt inkl. bilder</button>'
      +'<label class="dlb" style="cursor:pointer">Importera JSON<input type="file" accept="application/json,.json" id="impjson" hidden></label>'
      +'<button class="dlb" type="button" data-act="reset-all">Återställ allt</button>'
-   +'</div>';
+   +'</div>'
+   +'<div id="bankmeter" class="bankm">'+bankMeterHTML()+'</div>'
+   +'<p class="mut" style="font-size:11.5px;line-height:1.6;max-width:62ch;margin-top:8px">'
+   +'Texten ligger i localStorage och är någon kB. Bildbanken ligger i IndexedDB och '
+   +'kan bära hundratals MB — därför sparas de var för sig, så att ett fullt bildutrymme '
+   +'aldrig kan ta texten med sig. <b>Exportera text</b> går alltid igenom; '
+   +'<b>exportera allt</b> tar med bilderna och blir stor.</p>';
+}
+
+/* ---------------------------------------------------------------------
+   FÖRSLAGSVÄLJAREN
+   Tre utföranden av samma bildruta, renderade i verklig komposition — inte
+   beskrivna i text. Man väljer med ögat. Egna ändringar ligger kvar ovanpå
+   det valda förslaget, så ett byte kastar aldrig en omskriven rubrik.
+   --------------------------------------------------------------------- */
+var ALTLAB = ["A","B","C","D"];
+function variantPanel(s, i, n){
+  var a = altsOf(s);
+  if(!a) return '<div class="edsec"><div class="eyebrow">Förslag</div>'
+    +'<p class="mut" style="font-size:11.5px;line-height:1.55">Den här bildrutan har '
+    +'bara ett utförande.</p></div>';
+  var cur = PICKS[s.sid]|0;
+  var cards = [s].concat(a.map(function(pt){ return Object.assign({}, s, pt) }))
+    .map(function(v, j){
+      var vs = Object.assign({}, v, EDITS[s.sid]||{});
+      return '<button class="vcard'+(j===cur?" on":"")+'" type="button" data-alt="'+s.sid+':'+j+'" '
+        +'title="Förslag '+ALTLAB[j]+' — '+v.p+'">'
+        +'<span class="vfr">'+story(state.dir, vs, i, n)+'</span>'
+        +'<span class="vcap"><b>'+ALTLAB[j]+'</b><i>'+v.p+'</i></span></button>';
+    }).join("");
+  return '<div class="edsec"><div class="eyebrow">Förslag <em class="cnt">'+(a.length+1)+'</em></div>'
+    +'<div class="vgrid">'+cards+'</div>'
+    +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:2px">'
+    +'Byter komposition och formulering. Egna ändringar följer med.</p></div>';
 }
 
 function studioEditor(){
   var h = hlOf(state.edit.hl), n = h.st.length, i = Math.min(state.edit.i, n-1), s = h.st[i];
-  var eff = Object.assign({}, s, EDITS[s.sid]||{});
+  var eff = Object.assign({}, picked(s), EDITS[s.sid]||{});
 
   var strip = h.st.map(function(x,j){
     return '<button class="filmb'+(j===i?" on":"")+'" type="button" data-pick="'+j+'">'
       +'<span class="filmn">'+String(j+1).padStart(2,"0")+(isEdited(x)?' <i class="dot"></i>':'')+'</span>'
       +'<span class="filmf">'+story(state.dir,x,j,n)+'</span>'
-      +'<span class="filmp">'+x.p+'</span></button>';
+      +'<span class="filmp">'+picked(x).p
+        +(PICKS[x.sid]?' <b class="vtag">'+ALTLAB[PICKS[x.sid]]+'</b>':'')+'</span></button>';
   }).join("");
 
   var fields = fieldsFor(s).map(function(f){
@@ -971,6 +1179,7 @@ function studioEditor(){
          +'<button class="tbtn" type="button" data-step="1">→</button></span></div>'
      +'</div>'
      +'<div class="edside">'
+       + variantPanel(s, i, n)
        +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
          +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
        + coverPanel(h)
@@ -1075,8 +1284,7 @@ function coverPanel(h){
      ? '<div class="mplab" style="margin-top:6px">Bild bakom märket <code class="mono">'+img+'</code></div>'
        +'<label class="upl"><input type="file" accept="image/*" data-upc="'+h.id+'" hidden>Ladda upp egen bild</label>'
        +'<div class="mrow">'+allKeys().map(function(k){
-          return '<button class="mi'+(img===k?" on":"")+'" type="button" data-ci="'+h.id+':'+k+'" title="'+k+'">'
-            +'<img src="'+(mediaURL(k)||"")+'" alt=""></button>'}).join("")+'</div>'
+          return thumb(k, img===k, 'data-ci="'+h.id+':'+k+'"') }).join("")+'</div>'
        +'<label class="sl">Fokalpunkt Y <em>'+Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'%</em>'
        +'<input type="range" data-sl="cover-'+h.id+':fy" min="0" max="100" value="'
        +Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'"></label>'
@@ -1097,9 +1305,8 @@ function mediaPanel(slot, cur, label){
    +'<label class="upl">Ladda upp bild eller video'
      +'<input type="file" accept="image/*,video/*" multiple data-up="'+slot+'" hidden></label>'
    +'<div class="mrow">'+allKeys().map(function(k){
-      return '<button class="mi'+(active===k?" on":"")+(isVideo(k)?" vid":"")+'" type="button" '
-        +'data-mi="'+slot+':'+k+'" title="'+k+'">'
-        +'<img src="'+(mediaURL(k)||"")+'" alt="">'+(isVideo(k)?'<i class="vbadge">▶</i>':'')+'</button>'}).join("")+'</div>'
+      return thumb(k, active===k, 'data-mi="'+slot+':'+k+'"') }).join("")+'</div>'
+   +'<div class="bankm sm">'+bankMeterHTML()+'</div>'
    +'<label class="sl">Fokalpunkt Y <em>'+Math.round((o.fy!=null?o.fy:.5)*100)+'%</em>'
      +'<input type="range" data-sl="'+slot+':fy" min="0" max="100" value="'+Math.round((o.fy!=null?o.fy:.5)*100)+'"></label>'
    +'<label class="sl">Zoom <em>'+Math.round((o.zoom||1)*100)+'%</em>'
@@ -1285,7 +1492,12 @@ document.addEventListener("click",function(e){
     var a=ac.dataset.act;
     if(a==="back"){ state.edit=null; render() }
     else if(a==="save"){ saveAll() }
-    else if(a==="exportjson"){ exportJSON(ac) }
+    else if(a==="exportjson"){ exportJSON(ac, false) }
+    else if(a==="exportall"){ exportJSON(ac, true) }
+    else if(a==="bank-clear"){
+      var bn=Object.keys(UPLOADS).length;
+      if(bn && confirm("Ta bort alla "+bn+" egna bilder ur bildbanken? Bildrutor som använder dem går tillbaka till originalbilden.")){
+        dropAllUploads(); saveAll("Bildbanken tömd"); render() } }
     else if(a==="play"){ play(state.edit.hl, state.edit.i, state.dir) }
     else if(a==="reset-story"){
       var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
@@ -1305,6 +1517,19 @@ document.addEventListener("click",function(e){
   var ci=e.target.closest("[data-ci]");
   if(ci){ var q2=ci.dataset.ci.split(":");
     CEDITS[q2[0]] = Object.assign({}, CEDITS[q2[0]], {cover:q2[1]}); render(); return }
+  var al=e.target.closest("[data-alt]");
+  if(al){
+    var qa=al.dataset.alt.split(":"), pv=+qa[1];
+    if(pv) PICKS[qa[0]] = pv; else delete PICKS[qa[0]];
+    saveAll("Förslag "+ALTLAB[pv]+" valt"); render(); return;
+  }
+  var md=e.target.closest("[data-midel]");
+  if(md){
+    e.preventDefault(); e.stopPropagation();
+    var dk=md.dataset.midel;
+    if(dropUpload(dk)){ saveAll("Bilden borttagen"); render() }
+    return;
+  }
   var mi=e.target.closest("[data-mi]");
   if(mi){var a=mi.dataset.mi.split(":");
     SLOTS[a[0]]=Object.assign({},SLOTS[a[0]],{img:a[1]}); afterSlot(a[0]); return}
@@ -1368,11 +1593,23 @@ function seedSlots(){
   });
 }
 loadAll();
+/* Bildbanken ligger i IndexedDB och läses asynkront. Vyn ritas om när den
+   är inne — utan det visas gamla nycklar utan bild efter en omladdning. */
+loadBank().then(function(got){ if(got) render() });
 
 var s=document.createElement("style"); s.textContent=CSS; document.head.appendChild(s);
 
 /* liten publik export-API — samma väg som knapparna använder, så den går
    att skripta och att testa utan att klicka sig igenom gränssnittet */
+/* Lagringen går att köra utifrån, så att kvotbeteendet kan testas på riktigt
+   i stället för att klickas fram. */
+window.__vstudio = {
+  UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
+  saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
+  dropUpload:dropUpload, dropAllUploads:dropAllUploads,
+  bankBytes:bankBytes, fmtBytes:fmtBytes,
+  get bankMode(){ return bankMode }
+};
 window.viewlyExport = {
   frame:function(hlId, i, dir){ var h=hlOf(hlId);
     return framePNG(story(dir,h.st[i],i,h.st.length), 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7") },

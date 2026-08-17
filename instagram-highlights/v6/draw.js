@@ -428,9 +428,37 @@ var RENDER = {arkiv:A, skugga:B};
    Nyckeln är slot-id:t, så ändringen följer sin plats i biblioteket och
    originalet finns alltid kvar att återställa till. */
 var EDITS = {};
-function story(dirId, s, i, n){
+
+/* ---------------------------------------------------------------------
+   TRE FÖRSLAG PER BILDRUTA
+   Varje Story finns i tre utföranden. Förslag A är originalet; B och C är
+   PATCHAR ovanpå det — de byter komposition och omformulerar budskapet,
+   men de ändrar aldrig originaldatan. Valet ligger i PICKS[sid] och läggs
+   på före EDITS, så att en egen text alltid vinner över förslaget.
+
+   Ordningen är därför: original → valt förslag → egna ändringar.
+   --------------------------------------------------------------------- */
+var PICKS = {};
+var ALTS  = {};                      /* sid -> [patchB, patchC] */
+function altsOf(s){
+  var a = s.sid && ALTS[s.sid];
+  return a && a.length ? a : null;
+}
+function variantCount(s){ var a = altsOf(s); return a ? a.length + 1 : 1 }
+/* Bara förslaget, utan egna ändringar. Editorn behöver det som "original"
+   att jämföra mot och att återställa till. */
+function picked(s){
+  var v = s.sid ? (PICKS[s.sid]|0) : 0, a = altsOf(s);
+  return (v && a && a[v-1]) ? Object.assign({}, s, a[v-1]) : s;
+}
+function effective(s){
+  s = picked(s);
   var e = s.sid && EDITS[s.sid];
   if(e) s = Object.assign({}, s, e);
+  return s;
+}
+function story(dirId, s, i, n){
+  s = effective(s);
   var r = RENDER[dirId] || A;
   var f = r[s.p] || r.fullbleed;
   return f(s, i, n);

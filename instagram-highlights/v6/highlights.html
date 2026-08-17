@@ -354,6 +354,38 @@ tr:last-child td{border-bottom:0}
 .mi{position:relative}
 .vbadge{position:absolute;right:2px;bottom:2px;font-style:normal;font-size:7px;line-height:1;
   background:rgba(0,0,0,.66);color:#fff;border-radius:2px;padding:2px 3px}
+/* Egna bilder bär ett kryss. Krysset ligger utanpå knappen så att ett klick
+   på det aldrig råkar välja bilden i stället för att ta bort den. */
+.mislot{position:relative;display:inline-flex;line-height:0}
+/* Alltid synligt, inte bara vid hover: borttagning var efterfrågad, och
+   en funktion man måste hitta med musen är inte hittad. */
+.midel{position:absolute;top:-6px;right:-6px;width:17px;height:17px;border-radius:50%;
+  border:1px solid var(--line);background:var(--card);color:var(--ink2);font-size:13px;
+  font-weight:600;line-height:1;padding:0 0 1px;cursor:pointer;display:grid;place-items:center;
+  opacity:.75;transition:opacity .12s,background .12s,color .12s}
+.mislot:hover .midel,.midel:focus-visible{opacity:1}
+.midel:hover{background:#B4453B;border-color:#B4453B;color:#fff}
+/* Förslagsväljaren: tre riktiga bildrutor sida vid sida, inte tre etiketter. */
+.vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0 6px}
+.vcard{padding:0;border:2px solid var(--line);border-radius:6px;background:var(--card);
+  cursor:pointer;overflow:hidden;display:block;text-align:left;transition:border-color .12s}
+.vcard:hover{border-color:var(--mut)}
+.vcard.on{border-color:var(--acc)}
+.vfr{display:block;position:relative;width:100%;aspect-ratio:9/16;container-type:inline-size;overflow:hidden}
+.vcap{display:flex;justify-content:space-between;align-items:baseline;gap:4px;padding:4px 5px;
+  border-top:1px solid var(--line);font-size:9.5px}
+.vcap b{font-family:var(--mono);font-weight:600}
+.vcap i{font-style:normal;font-family:var(--mono);color:var(--mut);font-size:8.5px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vcard.on .vcap{background:var(--acc);color:#fff}
+.vcard.on .vcap i{color:rgba(255,255,255,.8)}
+.eyebrow .cnt{font-style:normal;font-family:var(--mono);color:var(--mut);margin-left:5px}
+.vtag{font-family:var(--mono);color:var(--acc);font-weight:700}
+.bankm{margin-top:10px;font-size:11.5px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.bankm.sm{margin:-6px 0 12px}
+.lnkb{background:none;border:0;padding:0;font:inherit;color:var(--mut);
+  text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.lnkb:hover{color:#B4453B}
 .sl{display:block;font-size:11px;color:var(--mut);margin-bottom:12px}
 .sl em{font-style:normal;font-family:var(--mono);color:var(--ink2);float:right}
 .sl input{width:100%;margin-top:5px;accent-color:var(--acc)}
@@ -867,9 +899,37 @@ var RENDER = {arkiv:A, skugga:B};
    Nyckeln är slot-id:t, så ändringen följer sin plats i biblioteket och
    originalet finns alltid kvar att återställa till. */
 var EDITS = {};
-function story(dirId, s, i, n){
+
+/* ---------------------------------------------------------------------
+   TRE FÖRSLAG PER BILDRUTA
+   Varje Story finns i tre utföranden. Förslag A är originalet; B och C är
+   PATCHAR ovanpå det — de byter komposition och omformulerar budskapet,
+   men de ändrar aldrig originaldatan. Valet ligger i PICKS[sid] och läggs
+   på före EDITS, så att en egen text alltid vinner över förslaget.
+
+   Ordningen är därför: original → valt förslag → egna ändringar.
+   --------------------------------------------------------------------- */
+var PICKS = {};
+var ALTS  = {};                      /* sid -> [patchB, patchC] */
+function altsOf(s){
+  var a = s.sid && ALTS[s.sid];
+  return a && a.length ? a : null;
+}
+function variantCount(s){ var a = altsOf(s); return a ? a.length + 1 : 1 }
+/* Bara förslaget, utan egna ändringar. Editorn behöver det som "original"
+   att jämföra mot och att återställa till. */
+function picked(s){
+  var v = s.sid ? (PICKS[s.sid]|0) : 0, a = altsOf(s);
+  return (v && a && a[v-1]) ? Object.assign({}, s, a[v-1]) : s;
+}
+function effective(s){
+  s = picked(s);
   var e = s.sid && EDITS[s.sid];
   if(e) s = Object.assign({}, s, e);
+  return s;
+}
+function story(dirId, s, i, n){
+  s = effective(s);
   var r = RENDER[dirId] || A;
   var f = r[s.p] || r.fullbleed;
   return f(s, i, n);
@@ -1795,6 +1855,462 @@ var HL = [
   ]}
 ];
 
+/* =====================================================================
+   FÖRSLAG B OCH C
+
+   Varje bildruta finns i tre utföranden. A är originalet nedan i HL; B och
+   C ligger här som PATCHAR ovanpå det. En patch byter komposition (`p`) och
+   omformulerar budskapet — den ändrar aldrig originaldatan, och egna
+   redigeringar läggs alltid ovanpå det valda förslaget.
+
+   Principen bakom paren:
+
+     B  samma budskap, annan komposition. Vill man ha samma sak sagd men
+        med en annan bildyta väljer man B.
+     C  annan ingång till samma sak — oftast kortare och mer konkret, ibland
+        en faktaram i stället för en känsla.
+
+   Byter en patch primitiv måste den bära med sig det primitivet ritar:
+   `split` behöver två bilder och två etiketter, `system` behöver poster,
+   `matrix` format. Därför ser vissa patchar längre ut än andra.
+
+   All copy är hämtad ur eller förenlig med respektive sida på viewly.se.
+   Förslag och riktning, inte låsta krav.
+   ===================================================================== */
+/* ALTS deklareras i draw.js; här fylls den. */
+ALTS = {
+
+/* ---------- 01 VIEWLY ---------- */
+"viewly-0":[
+ {p:"fullbleed", m:"hero", k:"Viewly", h:"Bostadspresentation"},
+ {p:"quiet", k:"01 — Viewly", h:"Vi levererar inte bilder.", em:"Vi levererar presentationen.",
+  s:"Foto, rum, rörelse och annonsmaterial i en och samma produktion."}],
+"viewly-1":[
+ {p:"editorial", m:"hero", k:"Utgångspunkten", h:"Ett objekt är inte en fotografering.",
+  s:"Det är en presentation — och den avgör hur bostaden möts på Hemnet."},
+ {p:"mark", m:"living", k:"VIEWLY", h:"En presentation", s:"inte en mapp med filer."}],
+"viewly-2":[
+ {p:"quiet", k:"Tjänsterna", h:"Sju delar. Ett flöde.", em:"Var och en står för sig.",
+  s:"Fotografering · 3D visning · E-styling · Atmosphere · Drönarfotografering · Områdeskarta · Motion"},
+ {p:"system", k:"Vad ingår", h:"Välj det bostaden behöver.", s:"Inget är obligatoriskt. Delarna fungerar var för sig och tillsammans.",
+  items:["Fotografering","3D visning","E-styling","Atmosphere","Drönarfotografering","Områdeskarta","Motion"]}],
+"viewly-3":[
+ {p:"quiet", k:"01 — Viewly", h:"Foto är grunden.", em:"Resten bygger på den.",
+  s:"3D, e-styling och atmosfär är det som får annonsen att sticka ut."},
+ {p:"split", m:["kitchen","esLivAft"], la:"Bara foto", lb:"Foto och tillägg", k:"Grunden", h:"Skillnaden"}],
+"viewly-4":[
+ {p:"editorial", m:"living", k:"Hantverket", h:"Varje rum fotograferas för sitt bästa läge.",
+  s:"Inte för att bocka av en lista."},
+ {p:"fullbleed", m:"dining", k:"", h:""}],
+"viewly-5":[
+ {p:"editorial", m:"portal", k:"Portalen", h:"Allt om bostaden på ett ställe.",
+  s:"Boka, följ produktionen, hämta materialet — utan mejltrådar."},
+ {p:"system", k:"Portalen", h:"Fyra steg.", s:"Från bokning till publicerad kampanj.",
+  items:["Boka","Produktion","Leverans","Publicera"]}],
+"viewly-6":[
+ {p:"cta", k:"01 — Viewly", h:"Se vad bostaden kan bli", s:"viewly.se"},
+ {p:"mark", m:"hero", k:"VIEWLY", h:"viewly.se", s:"Bostadspresentation, samlad."}],
+
+/* ---------- 02 FOTOGRAFERING ---------- */
+"foto-0":[
+ {p:"mark", m:"hero", k:"FOTOGRAFERING", h:"Bostadsfotografering", s:"Genomtänkta fotopaket, anpassade efter bostaden."},
+ {p:"editorial", m:"hero", k:"02 — Fotografering", h:"Foto är grunden.",
+  s:"Allt annat vi gör bygger på bilderna från den här dagen."}],
+"foto-1":[
+ {p:"editorial", m:"kitchen", k:"Ljuset", h:"Vi väntar in det.", s:"Vi lägger inte till det. Rätt timme gör mer för ett rum än någon efterbearbetning."},
+ {p:"split", m:["kitchen","hero"], la:"Fel timme", lb:"Rätt timme", k:"Ljuset", h:"Timing"}],
+"foto-2":[
+ {p:"editorial", m:"kitchen", k:"Rymd", h:"Ett rum ska kännas.", s:"Inte mätas. Perspektivet ska visa hur bostaden används, inte hur stor den är på pappret."},
+ {p:"quiet", k:"02 — Fotografering", h:"Rymd.", em:"Ett rum ska kännas.", s:"Inte mätas."}],
+"foto-3":[
+ {p:"fullbleed", m:"boucle", k:"Detalj", h:"Det som gör ett hus till ett hem"},
+ {p:"split", m:["boucle","eames"], la:"Textur", lb:"Form", k:"Detalj", h:"Närbilderna"}],
+"foto-4":[
+ {p:"quiet", k:"Omfattning", h:"Inget fast antal.", em:"Alla bilder som tillför värde.",
+  s:"Lägenhet 15–35 bilder, villa 25–50. Leverans 1–3 dagar. Från 1 800 kr exkl. moms."},
+ {p:"system", k:"Vad du får", h:"Fyra löften.", s:"Samma för varje objekt, oavsett storlek.",
+  items:["Alla bilder som tillför värde","Leverans 1–3 arbetsdagar","Bilder klara för Hemnet","Från 1 800 kr exkl. moms"]}],
+"foto-5":[
+ {p:"editorial", m:"drone", k:"Exteriör", h:"Bostaden i sitt sammanhang.", s:"Fasad, tomt och läge — fotograferat när ljuset gör dem rättvisa."},
+ {p:"case", m:"drone", k:"Exteriör", h:"Fasaden", s:"Blue hour"}],
+"foto-6":[
+ {p:"cta", k:"02 — Fotografering", h:"Boka fotografering", s:"Från 1 800 kr exkl. moms"},
+ {p:"quiet", k:"02 — Fotografering", h:"Fotograferingen är början.", em:"Inte leveransen.",
+  s:"Se hela ekosystemet på viewly.se"}],
+
+/* ---------- 03 3D VISNING ---------- */
+"visning-0":[
+ {p:"fullbleed", m:"matterport", k:"03 — 3D visning", h:"Visning dygnet runt"},
+ {p:"quiet", k:"3D VISNING", h:"Annonsen stänger.", em:"Visningen gör det inte.",
+  s:"En upplevelse som stannar kvar efter att annonsen är borta."}],
+"visning-1":[
+ {p:"editorial", m:"matterport", k:"Tillgänglighet", h:"Låt spekulanten kliva in.",
+  s:"När som helst, var som helst, hur många gånger som helst."},
+ {p:"system", k:"Vad det ger", h:"Fyra siffror.", s:"Från våra egna visningssidor.",
+  items:["99 % vill ha 3D i annonsen","90 % väljer bostad med 3D först","32 % snabbare försäljning","9 % högre slutpris"]}],
+"visning-2":[
+ {p:"editorial", m:"threed", k:"I visningen", h:"Dollhouse och planritning.",
+  s:"Inbyggt mätverktyg och guidade rundturspunkter leder blicken genom bostaden."},
+ {p:"system", k:"Inbyggt", h:"Fyra verktyg.", s:"Ingen app, ingen inloggning.",
+  items:["Dollhouse-vy","Planritning","Mätverktyg","Guidade rundturspunkter"]}],
+"visning-3":[
+ {p:"whitelabel", m:"matterport", k:"White label", h:"Er logga. Era färger.",
+  s:"Kontoret sätter uttrycket en gång. Varje ny visningssida byggs automatiskt i det.",
+  brands:[["Nordvik","#1F3A2E","Se bostaden"],["Alvhem","#7A3B2E","Boka visning"]]},
+ {p:"whitelabel", m:"threedcam", k:"Levereras i ert varumärke", h:"Aldrig i vårt.",
+  s:"Logotyp, färger, typografi och knappstil är kontorets. Viewly syns inte på sidan.",
+  brands:[["Kontor A","#8A5A1A","Starta visning"],["Kontor B","#3D5A7A","Visa bostaden"]]}],
+"visning-4":[
+ {p:"quiet", k:"Så går det till", h:"Skanning på plats.", em:"Länk inom 1–3 dagar.",
+  s:"Boka skanning · Matterport-produktion · Länk klar att publicera"},
+ {p:"product", m:"threedcam", k:"Så går det till", h:"Vi skannar. Ni publicerar.",
+  s:"1–3 arbetsdagar från skanning till färdig länk."}],
+"visning-5":[
+ {p:"system", k:"Räckvidd", h:"Fungerar där annonsen finns.", s:"En länk, alla kanaler.",
+  items:["Hemnet","Booli","Hitta Hem","Mäklarsystem och egen hemsida"]},
+ {p:"quiet", k:"03 — 3D visning", h:"En länk.", em:"Alla kanaler.",
+  s:"Hemnet, Booli, Hitta Hem, mäklarsystem och egna hemsidor."}],
+"visning-6":[
+ {p:"cta", k:"03 — 3D visning", h:"Boka skanning", s:"Länk klar inom 1–3 dagar"},
+ {p:"mark", m:"matterport", k:"3D VISNING", h:"Öppet dygnet runt", s:"viewly.se/3d-visning"}],
+
+/* ---------- 04 E-STYLING ---------- */
+"estyling-0":[
+ {p:"mark", m:"esLivAft", k:"E-STYLING", h:"Starkare presentation", s:"Tydligare bostad."},
+ {p:"split", m:["esLivBef","esLivAft"], la:"Tomt", lb:"Möblerat", k:"04 — E-styling", h:"Digital inredning"}],
+"estyling-1":[
+ {p:"editorial", m:"esBedAft", k:"Poängen", h:"Vi skapar liv i tomma rum.",
+  s:"Ett tomt rum är svårt att läsa. Möblerat blir det en bostad att föreställa sig i."},
+ {p:"system", k:"Vad det ger", h:"Fyra siffror.", s:"Från e-stylade objekt.",
+  items:["83 % lättare att föreställa sig hemmet","60 % fler visningsbokningar","48 % kortare tid till affär","20 % höjde buden"]}],
+"estyling-2":[
+ {p:"split", m:["esLivBef","esLivAft"], la:"Original", lb:"E-stylat", k:"Vardagsrum", h:"Samma rum"},
+ {p:"fullbleed", m:"esLivAft", k:"Vardagsrum", h:"E-stylat"}],
+"estyling-3":[
+ {p:"split", m:["esBedBef","esBedAft"], la:"Original", lb:"E-stylat", k:"Sovrum", h:"Samma rum"},
+ {p:"editorial", m:"esBedAft", k:"Sovrum", h:"Möblerat för svensk marknad.",
+  s:"Stilen väljs efter bostaden och köparen — inte efter en katalog."}],
+"estyling-4":[
+ {p:"quiet", k:"Så går det till", h:"Ladda upp bilderna.", em:"Annonsklart på 1–3 dagar.",
+  s:"Välj stil och paket. Vi gör resten."},
+ {p:"product", m:"esLivAft", k:"Så går det till", h:"Tre steg.", s:"Ladda upp · välj stil och paket · annonsklart på 1–3 dagar."}],
+"estyling-5":[
+ {p:"quiet", k:"Transparens", h:"Både original och e-stylat.", em:"Alltid båda.",
+  s:"Alla e-stylade bilder är tydligt märkta, så att marknadsföringen följer kraven på transparens."},
+ {p:"system", k:"Villkoren", h:"Tre löften.", s:"Så att ingen behöver fråga.",
+  items:["Du får både original och e-stylat","Alla e-stylade bilder är märkta","Omgjort inom 24 timmar utan kostnad"]}],
+"estyling-6":[
+ {p:"cta", k:"04 — E-styling", h:"Ladda upp bilderna", s:"Annonsklart på 1–3 dagar"},
+ {p:"quiet", k:"04 — E-styling", h:"Bostadens fulla potential.", em:"Alltid ärligt mot rummet.",
+  s:"Vi möblerar. Vi flyttar inga väggar."}],
+
+/* ---------- 05 ATMOSPHERE ---------- */
+"atmosphere-0":[
+ {p:"fullbleed", m:"skyAft", k:"05 — Atmosphere", h:"Ge annonsen wow-faktorn"},
+ {p:"quiet", k:"ATMOSPHERE", h:"Vädret bestämde.", em:"Nu gör det inte det.",
+  s:"Ljus, väder och årstid — justerat efter hur bostaden faktiskt ser ut när den är som bäst."}],
+"atmosphere-1":[
+ {p:"editorial", m:"vadBef", k:"Problemet", h:"Grå himmel. Skarpa skuggor.",
+  s:"Många bostäder fotograferas när förutsättningarna är som sämst — och annonsen ligger uppe i månader."},
+ {p:"split", m:["vadBef","vadAft"], la:"Som det var", lb:"Som det kan vara", k:"05 — Atmosphere", h:"Samma dag"}],
+"atmosphere-2":[
+ {p:"split", m:["skyBef","skyAft"], la:"Eftermiddag", lb:"Skymning", k:"Effekt 01", h:"Skymning"},
+ {p:"fullbleed", m:"skyAft", k:"Effekt 01 — Skymning", h:""}],
+"atmosphere-3":[
+ {p:"split", m:["vadBef","vadAft"], la:"Mulet", lb:"Klart", k:"Effekt 02", h:"Blå himmel"},
+ {p:"editorial", m:"vadAft", k:"Effekt 02", h:"Blå himmel.", s:"Himlen byts, inte huset. Fasad, tomt och skuggor följer med i rätt riktning."}],
+"atmosphere-4":[
+ {p:"quiet", k:"Effekt 03", h:"Sommar.", em:"Trädgården som ännu inte blommat fram.",
+  s:"Grön, i juni — även när bilderna togs i mars.",
+  need:"Före/efter-par för sommareffekten saknas. Behövs: samma tomt grå respektive grönskande."},
+ {p:"system", k:"Effekterna", h:"Tre lägen.", s:"Väljs per bild, inte per objekt.",
+  items:["Skymning","Blå himmel","Sommar"]}],
+"atmosphere-5":[
+ {p:"editorial", m:"skyAft", k:"Gränsen", h:"Inga möbler flyttas.",
+  s:"Vi ändrar ljus, väder och årstid. Ingenting annat. Annonsklara bilder inom 1–3 arbetsdagar."},
+ {p:"system", k:"Gränsen", h:"Vad vi rör.", s:"Och vad vi aldrig rör.",
+  items:["Ljus — ja","Väder — ja","Årstid — ja","Möbler och objekt — aldrig"]}],
+"atmosphere-6":[
+ {p:"cta", k:"05 — Atmosphere", h:"Rätt förutsättningar", s:"Annonsklart inom 1–3 dagar"},
+ {p:"mark", m:"skyAft", k:"ATMOSPHERE", h:"Wow-faktorn", s:"viewly.se/atmosphere"}],
+
+/* ---------- 06 DRÖNARE ---------- */
+"dronare-0":[
+ {p:"mark", m:"drone", k:"DRÖNARFOTOGRAFERING", h:"Upplev från luften", s:"Perspektivet som visar mer än bostaden."},
+ {p:"editorial", m:"drone", k:"06 — Drönare", h:"Läget syns inte från marken.",
+  s:"Luftbilder visar tomt, omgivning och avstånd på ett sätt en fasadbild aldrig kan."}],
+"dronare-1":[
+ {p:"editorial", m:"drone", k:"Perspektivet", h:"Marken visar bostaden. Luften visar läget.",
+  s:"Tomtens storlek, grannskapet, vattnet bakom huset — sådant som avgör men sällan syns."},
+ {p:"case", m:"drone", k:"Från luften", h:"Läget", s:"Tomt, omgivning, helhet"}],
+"dronare-2":[
+ {p:"fullbleed", m:"drone", k:"Vad bilderna visar", h:"Läge, tomt och omgivning"},
+ {p:"quiet", k:"06 — Drönare", h:"Ett perspektiv marken inte kan ge.", em:"Läget, tomten, helheten.",
+  s:"Efterbearbetade flygbilder och korta klipp."}],
+"dronare-3":[
+ {p:"quiet", k:"Leverans", h:"Bilder och klipp.", em:"Klara att publicera.",
+  s:"Flygbilder för Hemnet och prospekt, korta klipp för sociala medier. Flygning enligt gällande regler. 1–3 dagar."},
+ {p:"system", k:"Leverans", h:"Vad du får.", s:"Efterbearbetat och publiceringsklart.",
+  items:["Flygbilder — Hemnet och prospekt","Korta klipp — sociala medier","Flygning enligt gällande regler","Leverans 1–3 dagar"]}],
+"dronare-4":[
+ {p:"editorial", m:"hero", k:"Helheten", h:"Bostaden i sitt kvarter.",
+  s:"En bild som placerar objektet — inte bara visar det.",
+  need:"Flygbild i blue hour — helheten med bostaden i sitt kvarter."},
+ {p:"split", m:["hero","drone"], la:"Från marken", lb:"Från luften", k:"Helheten", h:"Två perspektiv",
+  need:"Flygbild i blue hour som B-sida."}],
+"dronare-5":[
+ {p:"cta", k:"06 — Drönare", h:"Lägg till flygning", s:"Bokas med fotograferingen"},
+ {p:"quiet", k:"06 — Drönare", h:"Boka flygning.", em:"Läget säljer.",
+  s:"viewly.se/dronarfotografering"}],
+
+/* ---------- 07 OMRÅDESKARTA ---------- */
+"omradeskarta-0":[
+ {p:"fullbleed", m:"drone", k:"07 — Områdeskarta", h:"Läget, servicen, sammanhanget",
+  need:"Ingen områdeskarta finns i biblioteket. Behövs: renderad karta 9:16."},
+ {p:"quiet", k:"OMRÅDESKARTA", h:"En stiliserad karta.", em:"Bostaden i sitt sammanhang.",
+  s:"Kommunikationer, skolor, service och natur — samlat i en bild.",
+  need:"Ingen områdeskarta finns i biblioteket."}],
+"omradeskarta-1":[
+ {p:"editorial", m:"drone", k:"Varför", h:"Köparen väljer inte bara bostad.",
+  s:"Hen väljer läge. Kartan svarar på den frågan innan någon hinner ställa den.",
+  need:"Produktbild: faktisk områdeskarta."},
+ {p:"mark", m:"drone", k:"OMRÅDESKARTA", h:"Läget", s:"Köparen väljer inte bara bostad — hen väljer läge.",
+  need:"Produktbild: faktisk områdeskarta."}],
+"omradeskarta-2":[
+ {p:"system", k:"På kartan", h:"Fyra lager.", s:"Markerade runt bostaden, i kontorets uttryck.",
+  items:["Kommunikationer","Skolor","Service","Natur"], need:"Produktbild: faktisk områdeskarta i 9:16."},
+ {p:"editorial", m:"drone", k:"Kartan", h:"Ett elegant komplement till annonsen.",
+  s:"Inte en skärmdump från Google — en ritad karta i kontorets grafiska profil.",
+  need:"Produktbild: faktisk områdeskarta i 9:16."}],
+"omradeskarta-3":[
+ {p:"whitelabel", m:"drone", k:"White label", h:"Ert formspråk. Varje objekt.",
+  s:"Samma uttryck på varje karta gör kontorets annonser igenkännbara i flödet.",
+  brands:[["Nordvik","#1F3A2E","Se området"],["Alvhem","#7A3B2E","Se området"]],
+  need:"Korten ska visa två faktiska kartor, en i vardera kontors färger."},
+ {p:"whitelabel", m:"drone", k:"Levereras i ert varumärke", h:"Inte i vårt.",
+  s:"Färger, typsnitt och format anpassas efter kontorets grafiska profil.",
+  brands:[["Kontor A","#8A5A1A","Se området"],["Kontor B","#3D5A7A","Se området"]],
+  need:"Korten ska visa två faktiska kartor."}],
+"omradeskarta-4":[
+ {p:"quiet", k:"Leverans", h:"Högupplöst PNG.", em:"Inom 1–2 arbetsdagar.",
+  s:"Klar för prospekt, Hemnet och sociala medier.",
+  need:"Kartan i användning — i prospekt eller Hemnet-annons."},
+ {p:"system", k:"Leverans", h:"Tre saker.", s:"Inget mer behöver beställas.",
+  items:["Högupplöst PNG","Kontorets grafiska profil","Inom 1–2 arbetsdagar"],
+  need:"Kartan i användning."}],
+"omradeskarta-5":[
+ {p:"cta", k:"07 — Områdeskarta", h:"Beställ områdeskarta", s:"Klar inom 1–2 arbetsdagar"},
+ {p:"mark", m:"drone", k:"OMRÅDESKARTA", h:"Läget", s:"viewly.se/omradeskarta",
+  need:"Renderad karta 9:16."}],
+
+/* ---------- 08 MOTION ---------- */
+"motion-0":[
+ {p:"fullbleed", m:"dining", k:"08 — Motion", h:"Bostadsfilm", need:"Nyckelbildruta ur faktisk Motion-film."},
+ {p:"quiet", k:"MOTION", h:"Bostadsfilm.", em:"Utan en separat filmning.",
+  s:"Motion bygger filmen av fotograferingen som redan är gjord."}],
+"motion-1":[
+ {p:"editorial", m:"dining", k:"Idén", h:"Bilderna finns redan.",
+  s:"Motion skapar en sammanhängande film av dem — kamerarörelser, klippning och musik.",
+  need:"Nyckelbildruta ur faktisk Motion-film."},
+ {p:"mark", m:"living", k:"MOTION", h:"Nästa steg", s:"Filmen byggs av fotograferingen."}],
+"motion-2":[
+ {p:"editorial", m:"dining2", k:"Rörelsen", h:"Naturliga kamerarörelser.",
+  s:"Ingen zoom, ingen effekt — en långsam rörelse som låter rummet tala.",
+  need:"Motion-frame med synlig rörelseoskärpa."},
+ {p:"fullbleed", m:"dining2", k:"Rörelse", h:"", need:"Motion-frame med synlig rörelseoskärpa."}],
+"motion-3":[
+ {p:"quiet", k:"Så byggs filmen", h:"Fyra steg.", em:"Bilderna, rörelsen, redigeringen, filmen.",
+  s:"Genomtänkt klippning och musik som lyfter helheten."},
+ {p:"product", m:"dining", k:"Så byggs filmen", h:"Bilderna blir en berättelse.",
+  s:"Rörelse, klippning och musik — i den ordningen."}],
+"motion-4":[
+ {p:"system", k:"Format", h:"En film, tre format.", s:"Samma klipp genom hela kanalen.",
+  items:["9:16 — Story och Reel","1:1 — Kvadrat i flödet","4:5 — Inlägg"]},
+ {p:"matrix", m:"living", k:"Format", h:"Ett klipp, alla ytor.",
+  fmts:[["9:16","Reel",9,16],["4:5","Inlägg",4,5],["1:1","Kvadrat",1,1]],
+  s:"Instagram, Facebook och LinkedIn ur samma film."}],
+"motion-5":[
+ {p:"system", k:"Varför", h:"Tre skäl.", s:"Utan en extra produktionsdag.",
+  items:["Syns i flödet","Ger bostaden sammanhang","Kostar ingen extra fotografering"]},
+ {p:"editorial", m:"dining", k:"Varför", h:"Kostar ingen extra fotografering.",
+  s:"Rörligt syns i flödet där stillbilden scrollas förbi — och bostaden får sammanhang."}],
+"motion-6":[
+ {p:"cta", k:"08 — Motion", h:"Beställ Motion", s:"Byggs av fotograferingen"},
+ {p:"quiet", k:"08 — Motion", h:"Låt bostaden ta plats.", em:"I rörelse.", s:"viewly.se/motion"}],
+
+/* ---------- 09 ANNONSEN ---------- */
+"annonsen-0":[
+ {p:"fullbleed", m:"kitchen", k:"09 — Annonsskrivaren", h:"Annonsen på trettio sekunder"},
+ {p:"quiet", k:"ANNONSSKRIVAREN", h:"Objektbeskrivningen.", em:"Inte längre en flaskhals.",
+  s:"Fyll i bostaden, ladda upp bilderna, få ett färdigt utkast."}],
+"annonsen-1":[
+ {p:"editorial", m:"kitchen", k:"Så snabbt", h:"Färdig bostadsannons på 30 sekunder.",
+  s:"Fyll i bostaden. Ladda upp bilderna. Läs igenom och justera."},
+ {p:"product", m:"portal", k:"Så snabbt", h:"30 sekunder.", s:"Från uppladdade bilder till läsbart utkast.",
+  need:"Produktbild Annonsskrivaren 9:16."}],
+"annonsen-2":[
+ {p:"system", k:"Vad AI:n läser", h:"Sex signaler.", s:"Ur bilderna du laddar upp — inte ur en mall.",
+  items:["Ljusinsläpp","Takhöjd och volym","Material och ytskikt","Planlösning","Utsikt och läge","Områdets karaktär"]},
+ {p:"editorial", m:"living", k:"Underlaget", h:"Texten skrivs ur bilderna.",
+  s:"Ljus, takhöjd, material, planlösning, utsikt och områdets karaktär — läst ur det du laddat upp."}],
+"annonsen-3":[
+ {p:"quiet", k:"Tonläge", h:"Tre röster.", em:"Samma bostad, olika tilltal.",
+  s:"Saklig, varm eller exklusiv. Två omskrivningar ingår."},
+ {p:"split", m:["kitchen","boucle"], la:"Saklig", lb:"Exklusiv", k:"Tonläge", h:"Samma bostad"}],
+"annonsen-4":[
+ {p:"quiet", k:"Din text", h:"Utkastet är ditt att ändra.", em:"Ingenting publiceras automatiskt.",
+  s:"Du redigerar, kortar och godkänner.", need:"Produktbild Annonsskrivaren 9:16: redigeringsvyn."},
+ {p:"system", k:"Kontrollen", h:"Tre saker som gäller.", s:"Verktyget skriver. Du bestämmer.",
+  items:["Ingenting publiceras automatiskt","Två omskrivningar ingår","Texten är din att ändra"]}],
+"annonsen-5":[
+ {p:"cta", k:"09 — Annonsen", h:"Testa Annonsskrivaren", s:"viewly.se/annonsskrivaren"},
+ {p:"mark", m:"kitchen", k:"ANNONSSKRIVAREN", h:"Trettio sekunder", s:"till ett färdigt utkast."}],
+
+/* ---------- 10 KAMPANJEN ---------- */
+"kampanjen-0":[
+ {p:"fullbleed", m:"hero", k:"10 — Social / Ads Studio", h:"Ett objekt, en kampanj"},
+ {p:"quiet", k:"SOCIAL / ADS STUDIO", h:"Ett objekt.", em:"En komplett kampanj.",
+  s:"Mallarna är satta. Innehållet fylls i åt dig."}],
+"kampanjen-1":[
+ {p:"quiet", k:"Mallbiblioteket", h:"Kontorets egna mallar.", em:"Obegränsat antal.",
+  s:"I valfritt format. Designen är satt — innehållet fylls i åt dig.",
+  need:"Skärmbild ur Social / Ads Studio: mallbiblioteket."},
+ {p:"system", k:"Mallbiblioteket", h:"Tre saker som är satta.", s:"En gång, sedan aldrig igen.",
+  items:["Kontorets design","Obegränsat antal mallar","Valfritt format"],
+  need:"Skärmbild ur Social / Ads Studio."}],
+"kampanjen-2":[
+ {p:"matrix", m:"living", k:"Format", h:"Samma mall, alla ytor.",
+  fmts:[["9:16","Story",9,16],["4:5","Inlägg",4,5],["1:1","Kvadrat",1,1]],
+  s:"Instagram, Facebook och LinkedIn ur en och samma export."},
+ {p:"system", k:"Format", h:"Tre ytor.", s:"Exporteras samtidigt ur samma mall.",
+  items:["4:5 — Inlägg, störst yta i flödet","1:1 — Kvadrat i profilrutnätet","9:16 — Story och Reel"]}],
+"kampanjen-3":[
+ {p:"phases", k:"Kampanjen", h:"Fyra lägen. Ett objekt.", now:2,
+  items:["p1","p2","p3","p4"],
+  s:"Mallen byts när kampanjen går vidare — bilden, adressen och fakta står kvar."},
+ {p:"phases", k:"Status styr allt", h:"Inte en etikett i hörnet.", now:3,
+  items:["p1","p2","p3","p4"],
+  s:"Kommande håller tillbaka. Till salu är tätast. Visning säger en sak. Såld låter ordet ta över."}],
+"kampanjen-4":[
+ {p:"system", k:"Export", h:"Fyra vägar ut.", s:"När mallarna är satta tar det under en minut.",
+  items:["JPG","PNG","PDF","Hela serien som zip"]},
+ {p:"editorial", m:"portal", k:"Export", h:"Under en minut.", s:"Ladda ner som JPG, PNG eller PDF — eller hela serien som zip.",
+  need:"Skärmbild: exportvyn."}],
+"kampanjen-5":[
+ {p:"cta", k:"10 — Kampanjen", h:"Öppna Social / Ads Studio", s:"viewly.se/some-studio"},
+ {p:"mark", m:"hero", k:"SOCIAL / ADS STUDIO", h:"Ett objekt", s:"Hela kampanjen."}],
+
+/* ---------- 11 SYSTEMET ---------- */
+"systemet-0":[
+ {p:"mark", m:"portal", k:"SYSTEMET", h:"Mäklarportalen", s:"Mer tid för affären."},
+ {p:"editorial", m:"hero", k:"11 — Systemet", h:"Mindre tid i mappar.",
+  s:"Beställning, produktion, material och fakturering på samma ställe."}],
+"systemet-1":[
+ {p:"editorial", m:"portal", k:"Mäklarportalen", h:"Ett ställe för hela bostaden.",
+  s:"Boka, följ produktionen, hämta materialet, publicera.",
+  need:"Vertikala portalskärmar 9:16."},
+ {p:"quiet", k:"Mäklarportalen", h:"Ett ställe.", em:"Hela bostaden.",
+  s:"Boka, följ, hämta, publicera — utan en enda mejltråd."}],
+"systemet-2":[
+ {p:"quiet", k:"Flödet", h:"Fyra steg.", em:"Från bokning till publicerad kampanj.",
+  s:"Boka · Produktion · Leverans · Publicera"},
+ {p:"product", m:"portal", k:"Flödet", h:"Du ser var objektet står.", s:"Hela vägen, i realtid.",
+  need:"Vertikal portalvy: produktionsstatus."}],
+"systemet-3":[
+ {p:"quiet", k:"Skillnaden", h:"Inte en mapp med filer.", em:"En färdig presentation.",
+  s:"Redo att publiceras, i rätt format, med rätt text."},
+ {p:"split", m:["hero","portal"], la:"Filer", lb:"Presentation", k:"Skillnaden", h:"Vad du får"}],
+"systemet-4":[
+ {p:"system", k:"Samlat", h:"Fyra saker på ett ställe.", s:"En faktura. Ett konto.",
+  items:["Beställning","Mallar","Material","Fakturering"]},
+ {p:"editorial", m:"portal", k:"Samlat", h:"En faktura. Ett konto.",
+  s:"Beställning, mallar, material och fakturering på samma ställe.",
+  need:"Vertikal portalvy: faktureringsöversikt."}],
+"systemet-5":[
+ {p:"cta", k:"11 — Systemet", h:"Skapa konto", s:"viewly.se"},
+ {p:"mark", m:"portal", k:"SYSTEMET", h:"Ett ställe", s:"Hela produktionen."}],
+
+/* ---------- 12 OBJEKT ---------- */
+"objekt-0":[
+ {p:"mark", m:"drone", k:"OBJEKT 01", h:"Silvergården 9A", s:"Landskrona",
+  need:"Verklig exteriör för caset."},
+ {p:"fullbleed", m:"drone", k:"Objekt 01 — Landskrona", h:"Silvergården 9A",
+  need:"Verklig exteriör för caset."}],
+"objekt-1":[
+ {p:"editorial", m:"living", k:"Interiör", h:"Samma dag, samma ljus.",
+  s:"Alla bilder i kapitlet kommer från ett och samma objekt.", need:"Interiör från samma objekt."},
+ {p:"case", m:"living", k:"Objekt 01", h:"Interiören", s:"Silvergården 9A", need:"Interiör från samma objekt."}],
+"objekt-2":[
+ {p:"fullbleed", m:"eames", k:"Detalj", h:"", need:"Detalj från samma objekt."},
+ {p:"split", m:["eames","boucle"], la:"Detalj", lb:"Material", k:"Objekt 01", h:"Närbilderna",
+  need:"Två detaljer från samma objekt."}],
+"objekt-3":[
+ {p:"editorial", m:"threed", k:"3D", h:"Planlösningen.", s:"Samma bostad, nu att gå igenom.",
+  need:"3D-vy från samma objekt."},
+ {p:"fullbleed", m:"threed", k:"3D-visning", h:"", need:"3D-vy från samma objekt."}],
+"objekt-4":[
+ {p:"editorial", m:"dining2", k:"Rörelse", h:"Och som film.", s:"Motion byggd av samma fotografering.",
+  need:"Motion-frame från samma objekt."},
+ {p:"case", m:"dining2", k:"Objekt 01", h:"Filmen", s:"Motion", need:"Motion-frame från samma objekt."}],
+"objekt-5":[
+ {p:"system", k:"Ett objekt", h:"Fem leveranser.", s:"Silvergården 9A, från en enda bokning.",
+  items:["Fotografering","3D visning","Motion","Annonstext","Kampanjmallar"]},
+ {p:"cta", k:"12 — Objekt", h:"Se fler objekt", s:"viewly.se"}],
+
+/* ---------- 13 INIFRÅN ---------- */
+"inifran-0":[
+ {p:"fullbleed", m:"om1", k:"13 — Inifrån", h:"Människorna bakom"},
+ {p:"editorial", m:"om1", k:"INIFRÅN", h:"Vilka vi är.", s:"Fotografer, redigerare och utvecklare i samma organisation."}],
+"inifran-1":[
+ {p:"editorial", m:"om3", k:"Hållningen", h:"Vi bygger inte för igår.",
+  s:"Bostäder marknadsförs på skärm nu. Presentationen borde vara byggd för det."},
+ {p:"mark", m:"om3", k:"INIFRÅN", h:"Byggt för idag", s:"inte för hur det såg ut igår."}],
+"inifran-2":[
+ {p:"quiet", k:"Så arbetar vi", h:"Hantverk och teknik.", em:"Ingen av delarna räcker ensam.",
+  s:"Fotografen ser rummet. Systemet ser till att det kommer fram."},
+ {p:"system", k:"Så arbetar vi", h:"Fyra roller.", s:"Samma organisation, samma leverans.",
+  items:["Fotograf på plats","Redigering","Produktion","Support"]}],
+"inifran-3":[
+ {p:"editorial", m:"om4", k:"Platsen", h:"Vi är där bostaden är.", s:"Fotograferna arbetar lokalt, systemet är detsamma överallt."},
+ {p:"fullbleed", m:"om4", k:"", h:""}],
+"inifran-4":[
+ {p:"quiet", k:"Fotograferna", h:"Fotografen är inte en underleverantör.", em:"Fotografen är Viewly.",
+  s:"Samma hantverk, samma standard, samma leverans.", need:"Reportagebild: fotograf i arbete på plats."},
+ {p:"case", m:"kontakt", k:"Fotograferna", h:"Fotografen är Viewly", s:"Inte en underleverantör",
+  need:"Reportagebild: fotograf i arbete på plats."}],
+"inifran-5":[
+ {p:"editorial", m:"om1", k:"Att arbeta med oss", h:"Din blick. Ditt hantverk.",
+  s:"Vår organisation, våra kunder, vårt system. Du fotograferar."},
+ {p:"system", k:"Att arbeta med oss", h:"Fyra saker vi står för.", s:"Du tar med dig blicken.",
+  items:["Uppdrag i ditt område","Fast ersättning","Redigering ingår","Utrustningsstöd"]}],
+"inifran-6":[
+ {p:"cta", k:"13 — Inifrån", h:"Fotografera med Viewly", s:"viewly.se/fotografer"},
+ {p:"mark", m:"kontakt", k:"INIFRÅN", h:"Bli fotograf", s:"viewly.se/fotografer"}],
+
+/* ---------- 14 DITT HEM ---------- */
+"ditthem-0":[
+ {p:"mark", m:"dining", k:"DITT HEM", h:"Din bostad", s:"säljs en gång."},
+ {p:"editorial", m:"dining", k:"14 — Ditt hem", h:"Presentationen betyder något.",
+  s:"De flesta möter bostaden på en skärm, långt innan de går på visning."}],
+"ditthem-1":[
+ {p:"editorial", m:"living", k:"Varför", h:"Ditt hem säljs en gång.",
+  s:"Det första intrycket sker på Hemnet, i en scroll, på några sekunder."},
+ {p:"fullbleed", m:"living", k:"14 — Ditt hem", h:"En gång"}],
+"ditthem-2":[
+ {p:"editorial", m:"living", k:"Vad som ingår", h:"Foto, rum och rörelse.",
+  s:"Din mäklare beställer. Vi producerar. Du ser resultatet i annonsen."},
+ {p:"quiet", k:"14 — Ditt hem", h:"Din mäklare beställer.", em:"Vi producerar.",
+  s:"Foto, 3D, e-styling och film — i en och samma presentation."}],
+"ditthem-3":[
+ {p:"system", k:"Vad Viewly tillför", h:"Fyra delar.", s:"Beställs av mäklaren, syns i annonsen.",
+  items:["Fotografering","3D visning","E-styling","Motion"]},
+ {p:"split", m:["esLivBef","esLivAft"], la:"Utan", lb:"Med Viewly", k:"Vad Viewly tillför", h:"Skillnaden"}],
+"ditthem-4":[
+ {p:"cta", k:"14 — Ditt hem", h:"Fråga din mäklare om Viewly", s:"viewly.se"},
+ {p:"quiet", k:"14 — Ditt hem", h:"Arbetar din mäklare med Viewly?", em:"Fråga innan ni bestämmer.",
+  s:"viewly.se"}]
+};
+
 
 /* Varje media-slot får ett stabilt id så bildval, fokalpunkt och zoom kan
    sparas per plats i biblioteket. En Story kan ange fy/zoom som utgångsläge —
@@ -2534,37 +3050,177 @@ function secFormat(){
    ladda ner. Redigeringarna ligger i EDITS/SLOTS ovanpå originaldatan —
    originalet går alltid att återställa till, per fält eller per bildruta.
    ===================================================================== */
+/* ---------------------------------------------------------------------
+   LAGRING
+   Den förra versionen la ALLT i localStorage, uppladdade bilder inkluderade.
+   En bild på 1400 px som base64 väger 200-500 kB och localStorage tar
+   omkring 5 MB totalt — efter ett tiotal uppladdningar kastade setItem
+   QuotaExceededError och då gick ingenting att spara längre, inte ens en
+   ändrad rubrik. Det var felet.
+
+   Lagringen är därför delad i två:
+
+     lätt   texter, slot-inställningar, objektet, omslagsval — några få kB.
+            Ligger i localStorage och sparas ALLTID först, så att ett fullt
+            bildutrymme aldrig kan ta texten med sig.
+     tung   själva bilderna. Ligger i IndexedDB, som mäter i hundratals MB.
+
+   Saknas IndexedDB faller bilderna tillbaka till localStorage och användaren
+   får veta det rakt ut i stället för att upptäcka det när sparandet tystnar.
+   --------------------------------------------------------------------- */
 var STORE = "viewly.highlights.v1";
+var IDB_DB = "viewly.highlights", IDB_ST = "blobs", IDB_KEY = "uploads";
+
+function idbOpen(){
+  return new Promise(function(res){
+    try{
+      if(!window.indexedDB) return res(null);
+      var rq = indexedDB.open(IDB_DB, 1);
+      rq.onupgradeneeded = function(){ rq.result.createObjectStore(IDB_ST) };
+      rq.onsuccess = function(){ res(rq.result) };
+      rq.onerror   = function(){ res(null) };
+      rq.onblocked = function(){ res(null) };
+    }catch(e){ res(null) }
+  });
+}
+function idbPut(val){
+  return idbOpen().then(function(db){
+    if(!db) return false;
+    return new Promise(function(res){
+      try{
+        var tx = db.transaction(IDB_ST, "readwrite");
+        tx.objectStore(IDB_ST).put(val, IDB_KEY);
+        tx.oncomplete = function(){ res(true) };
+        tx.onerror = tx.onabort = function(){ res(false) };
+      }catch(e){ res(false) }
+    });
+  });
+}
+function idbGet(){
+  return idbOpen().then(function(db){
+    if(!db) return null;
+    return new Promise(function(res){
+      try{
+        var rq = db.transaction(IDB_ST, "readonly").objectStore(IDB_ST).get(IDB_KEY);
+        rq.onsuccess = function(){ res(rq.result || null) };
+        rq.onerror   = function(){ res(null) };
+      }catch(e){ res(null) }
+    });
+  });
+}
+function idbClear(){ return idbPut({}) }
+
+function lightState(){
+  return {v:2, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS};
+}
+function bankBytes(){
+  var n = 0; for(var k in UPLOADS) n += UPLOADS[k].length; return n;
+}
+function fmtBytes(n){
+  return n > 1048576 ? (n/1048576).toFixed(1).replace(".",",")+" MB"
+       : n > 1024    ? Math.round(n/1024)+" kB" : n+" B";
+}
+var bankMode = "idb";      /* idb | local | none — vad som faktiskt bar bilderna */
 
 function saveAll(msg){
-  try {
-    localStorage.setItem(STORE, JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS,
-                                                posts:PEDITS, covers:CEDITS}));
-    flash(msg || "Sparat");
-  } catch(e){
-    flash(UPLOADS && Object.keys(UPLOADS).length
-      ? "Fullt utrymme — exportera JSON istället" : "Kunde inte spara", true);
+  /* Texten först och för sig. Går bilderna inte att spara ska det inte
+     kunna radera en enda ändrad rubrik. */
+  var lightOK = true;
+  try { localStorage.setItem(STORE, JSON.stringify(lightState())) }
+  catch(e){ lightOK = false }
+
+  var count = Object.keys(UPLOADS).length;
+  if(!count){
+    bankMode = "idb";
+    idbClear();
+    flash(lightOK ? (msg || "Sparat") : "Kunde inte spara", !lightOK);
+    return;
   }
+  idbPut(UPLOADS).then(function(ok){
+    if(ok){
+      bankMode = "idb";
+      flash(lightOK ? (msg || "Sparat") + " · " + count + " bilder ("+fmtBytes(bankBytes())+")"
+                    : "Bilder sparade, men inte texten", !lightOK);
+    } else {
+      /* Ingen IndexedDB — försök localStorage och var ärlig om utfallet. */
+      try {
+        localStorage.setItem(STORE+".bank", JSON.stringify(UPLOADS));
+        bankMode = "local";
+        flash((msg || "Sparat") + " · bildbanken i localStorage");
+      } catch(e2){
+        bankMode = "none";
+        flash("Texten är sparad. Bildbanken ("+fmtBytes(bankBytes())
+             +") får inte plats — exportera allt som JSON", true);
+      }
+    }
+    if(state.edit) refreshBankMeter();
+  });
 }
 function loadAll(){
+  var any = false;
   try {
-    var raw = localStorage.getItem(STORE); if(!raw) return false;
-    var d = JSON.parse(raw);
-    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
-    Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
-    Object.assign(CEDITS, d.covers||{});
-    return true;
-  } catch(e){ return false }
+    var raw = localStorage.getItem(STORE);
+    if(raw){
+      var d = JSON.parse(raw);
+      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
+      Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
+      Object.assign(PICKS, d.picks||{});
+      /* v1 la bilderna i samma post — flytta över dem tyst. */
+      if(d.uploads) Object.assign(UPLOADS, d.uploads);
+      any = true;
+    }
+    var bk = localStorage.getItem(STORE+".bank");
+    if(bk){ Object.assign(UPLOADS, JSON.parse(bk)); bankMode = "local"; any = true }
+  } catch(e){}
+  return any;
+}
+function loadBank(){
+  return idbGet().then(function(u){
+    if(u && Object.keys(u).length){ Object.assign(UPLOADS, u); return true }
+    return false;
+  });
 }
 function clearAll(){
-  Object.keys(EDITS).forEach(function(k){delete EDITS[k]});
-  Object.keys(SLOTS).forEach(function(k){delete SLOTS[k]});
-  Object.keys(UPLOADS).forEach(function(k){delete UPLOADS[k]});
-  Object.keys(PEDITS).forEach(function(k){delete PEDITS[k]});
-  Object.keys(CEDITS).forEach(function(k){delete CEDITS[k]});
+  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS].forEach(function(o){
+    Object.keys(o).forEach(function(k){ delete o[k] }) });
+  Object.keys(VIDEOS).forEach(function(k){ delete VIDEOS[k] });
   seedSlots();
-  try{ localStorage.removeItem(STORE) }catch(e){}
+  try{ localStorage.removeItem(STORE); localStorage.removeItem(STORE+".bank") }catch(e){}
+  idbClear();
 }
+
+/* ---------- bildbanken: ta bort ----------
+   En borttagen bild får inte lämna en trasig referens efter sig. Varje
+   slot och varje omslag som pekade på den återgår till sitt original. */
+function dropUpload(key){
+  if(!UPLOADS[key]) return false;
+  delete UPLOADS[key];
+  delete VIDEOS[key];
+  Object.keys(SLOTS).forEach(function(sid){
+    if(SLOTS[sid] && SLOTS[sid].img === key) delete SLOTS[sid].img;
+  });
+  Object.keys(CEDITS).forEach(function(hid){
+    if(CEDITS[hid] && CEDITS[hid].cover === key) delete CEDITS[hid].cover;
+  });
+  Object.keys(PEDITS).forEach(function(pid){
+    if(PEDITS[pid] && PEDITS[pid].m === key) delete PEDITS[pid].m;
+  });
+  return true;
+}
+function dropAllUploads(){
+  Object.keys(UPLOADS).forEach(dropUpload);
+}
+function refreshBankMeter(){
+  var el = $("#bankmeter"); if(el) el.innerHTML = bankMeterHTML();
+}
+function bankMeterHTML(){
+  var n = Object.keys(UPLOADS).length;
+  if(!n) return '<span class="mut">Bildbanken är tom. '+MEDIAKEYS.length+' bilder följer med underlaget.</span>';
+  var where = bankMode==="local" ? "localStorage" : bankMode==="none" ? "inte sparad" : "IndexedDB";
+  return '<span class="mut">'+n+' egna '+(n===1?"bild":"bilder")+' · '+fmtBytes(bankBytes())
+   +' · '+where+'</span> <button class="lnkb" type="button" data-act="bank-clear">Töm bildbanken</button>';
+}
+
 var flashT;
 function flash(txt, warn){
   var el = $("#flash"); if(!el) return;
@@ -2602,11 +3258,13 @@ var FIELDLAB = {
   mx_names:["Formatnamn — en per rad","list"]
 };
 function fieldsFor(s){
-  return (RENDERED[s.p] || ["k","h","s"]).map(function(k){
+  return (RENDERED[picked(s).p] || ["k","h","s"]).map(function(k){
     return [k, FIELDLAB[k][0], FIELDLAB[k][1]];
   });
 }
 function val(s, key){
+  /* Fälten speglar det VALDA förslaget, inte alltid original A. */
+  s = picked(s);
   var e = EDITS[s.sid] || {};
   if(key==="items")      return (e.items || s.items || []).join("\n");
   if(key==="flow_items") return ((e.mid||s.mid).items || []).join("\n");
@@ -2620,7 +3278,8 @@ function val(s, key){
   return e[key] != null ? e[key] : (s[key] || "");
 }
 function setVal(s, key, v){
-  var e = EDITS[s.sid] || (EDITS[s.sid] = {});
+  var sid = s.sid; s = picked(s);
+  var e = EDITS[sid] || (EDITS[sid] = {});
   var lines = function(x){ return x.split("\n").filter(function(l){return l.trim()}) };
   if(key==="items")           e.items = lines(v);
   else if(key==="flow_items") e.mid   = Object.assign({}, e.mid||s.mid, {items:lines(v)});
@@ -2638,6 +3297,7 @@ function setVal(s, key, v){
 }
 function isEdited(s){
   var e = EDITS[s.sid];
+  if(PICKS[s.sid]) return true;
   var slotted = SLOTS[s.sid] && !slotIsDefault(s, s.sid);
   return !!(e && Object.keys(e).length) || !!slotted;
 }
@@ -2647,7 +3307,7 @@ function slotIsDefault(s, key){
       && (o.zoom===s.zoom || (o.zoom==null && s.zoom==null));
 }
 function resetStory(s){
-  delete EDITS[s.sid]; delete SLOTS[s.sid]; delete SLOTS[s.sid+"-b"];
+  delete EDITS[s.sid]; delete SLOTS[s.sid]; delete SLOTS[s.sid+"-b"]; delete PICKS[s.sid];
   if(s.fy!=null || s.zoom!=null) SLOTS[s.sid] = {fy:s.fy, zoom:s.zoom};
 }
 
@@ -2694,6 +3354,18 @@ function handleUpload(files, slot){
   });
 }
 function allKeys(){ return Object.keys(UPLOADS).concat(MEDIAKEYS) }
+/* Egna bilder får ett kryss. De inbyggda kan inte tas bort — de är
+   underlaget, inte användarens material. Krysset ligger utanpå knappen så
+   att ett klick på det aldrig råkar välja bilden i stället. */
+function thumb(k, on, attr){
+  return '<span class="mislot'+(on?" on":"")+'">'
+    +'<button class="mi'+(on?" on":"")+(isVideo(k)?" vid":"")+'" type="button" '+attr
+    +' title="'+k+'"><img src="'+(mediaURL(k)||"")+'" alt="">'
+    +(isVideo(k)?'<i class="vbadge">▶</i>':'')+'</button>'
+    +(UPLOADS[k] ? '<button class="midel" type="button" data-midel="'+k
+       +'" title="Ta bort ur bildbanken" aria-label="Ta bort bilden">×</button>' : '')
+    +'</span>';
+}
 
 /* ---------- nedladdning av en hel serie ---------- */
 var busy = false;
@@ -2784,24 +3456,37 @@ async function downloadCovers(dir, btn){
   setTimeout(function(){ btn.textContent = lbl }, 3800);
 }
 
-async function exportJSON(btn){
+/* Två exporter, för att en enda inte kan vara båda. Den lätta är några kB
+   och går alltid igenom — den flyttar texten mellan webbläsare och personer.
+   Den fullständiga bär bildbanken och kan bli tiotals MB. */
+async function exportJSON(btn, withBank){
   var lbl = btn.textContent;
-  var data = JSON.stringify({v:1, edits:EDITS, slots:SLOTS, uploads:UPLOADS,
-                             posts:PEDITS, covers:CEDITS}, null, 1);
-  await offer(new Blob([data]), "viewly-highlights-redigeringar.json", btn);
+  var body = lightState();
+  if(withBank) body.uploads = UPLOADS;
+  var data;
+  try { data = JSON.stringify(body) }
+  catch(e){ status("Kunde inte serialisera — för mycket data"); btn.textContent = lbl; return }
+  await offer(new Blob([data], {type:"application/json"}),
+    withBank ? "viewly-highlights-allt.json" : "viewly-highlights-text.json", btn);
   btn.textContent = lbl;
 }
 function importJSON(file){
   var fr = new FileReader();
   fr.onload = function(){
-    try {
-      var d = JSON.parse(fr.result);
-      Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
-      Object.assign(UPLOADS, d.uploads||{}); Object.assign(PEDITS, d.posts||{});
-      Object.assign(CEDITS, d.covers||{});
-      flash("Importerat"); renderEditor();
-    } catch(e){ flash("Kunde inte läsa filen", true) }
+    var d;
+    try { d = JSON.parse(fr.result) }
+    catch(e){ flash("Filen är inte giltig JSON", true); return }
+    if(!d || typeof d !== "object"){ flash("Filen innehåller inga redigeringar", true); return }
+    Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
+    Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
+    Object.assign(PICKS, d.picks||{});
+    var n = 0;
+    if(d.uploads){ Object.assign(UPLOADS, d.uploads); n = Object.keys(d.uploads).length }
+    flash("Importerat" + (n ? " · "+n+" bilder" : " · text"));
+    saveAll("Importerat och sparat");
+    renderEditor();
   };
+  fr.onerror = function(){ flash("Kunde inte läsa filen", true) };
   fr.readAsText(file);
 }
 
@@ -2828,29 +3513,68 @@ function studioIndex(){
         +'<span class="seq">'+seq+'</span></span>'
       +'<span class="foot"><span>'+h.st.length+' Stories</span><span class="open">Öppna →</span></span></button>';
   }).join("");
+  var alts = 0; HL.forEach(function(h){ h.st.forEach(function(x){ alts += variantCount(x) }) });
+  var chosen = Object.keys(PICKS).filter(function(k){ return PICKS[k] }).length;
   return sechead("Studio", cap(nw(HL.length))+" kapitel, "+totalStories()+" Stories",
-    "Öppna ett kapitel för att gå igenom bildrutorna: byt bild, ladda upp egna, justera utsnitt, skriv om texten. "
-   +"Spara i webbläsaren eller exportera allt som JSON. "+need+" bildrutor är markerade som Behöver material.")
+    "Varje bildruta finns i tre utföranden — "+alts+" totalt. Öppna ett kapitel, välj det förslag som "
+   +"passar, byt bild, ladda upp egna och skriv om texten. "
+   +(chosen ? chosen+" bildrutor har ett annat förslag än A valt. " : "")
+   +need+" bildrutor är markerade som Behöver material.")
    +dirbar()+toggles(true)
    +'<div class="hlgrid">'+cards+'</div>'
    +'<h3 class="h3">Alla ändringar</h3>'
    +'<div class="ctl">'
-     +'<button class="dlb" type="button" data-act="save">Spara i webbläsaren</button>'
-     +'<button class="dlb" type="button" data-act="exportjson">Exportera JSON</button>'
+     +'<button class="dlb pri" type="button" data-act="save">Spara i webbläsaren</button>'
+     +'<button class="dlb" type="button" data-act="exportjson">Exportera text som JSON</button>'
+     +'<button class="dlb" type="button" data-act="exportall">Exportera allt inkl. bilder</button>'
      +'<label class="dlb" style="cursor:pointer">Importera JSON<input type="file" accept="application/json,.json" id="impjson" hidden></label>'
      +'<button class="dlb" type="button" data-act="reset-all">Återställ allt</button>'
-   +'</div>';
+   +'</div>'
+   +'<div id="bankmeter" class="bankm">'+bankMeterHTML()+'</div>'
+   +'<p class="mut" style="font-size:11.5px;line-height:1.6;max-width:62ch;margin-top:8px">'
+   +'Texten ligger i localStorage och är någon kB. Bildbanken ligger i IndexedDB och '
+   +'kan bära hundratals MB — därför sparas de var för sig, så att ett fullt bildutrymme '
+   +'aldrig kan ta texten med sig. <b>Exportera text</b> går alltid igenom; '
+   +'<b>exportera allt</b> tar med bilderna och blir stor.</p>';
+}
+
+/* ---------------------------------------------------------------------
+   FÖRSLAGSVÄLJAREN
+   Tre utföranden av samma bildruta, renderade i verklig komposition — inte
+   beskrivna i text. Man väljer med ögat. Egna ändringar ligger kvar ovanpå
+   det valda förslaget, så ett byte kastar aldrig en omskriven rubrik.
+   --------------------------------------------------------------------- */
+var ALTLAB = ["A","B","C","D"];
+function variantPanel(s, i, n){
+  var a = altsOf(s);
+  if(!a) return '<div class="edsec"><div class="eyebrow">Förslag</div>'
+    +'<p class="mut" style="font-size:11.5px;line-height:1.55">Den här bildrutan har '
+    +'bara ett utförande.</p></div>';
+  var cur = PICKS[s.sid]|0;
+  var cards = [s].concat(a.map(function(pt){ return Object.assign({}, s, pt) }))
+    .map(function(v, j){
+      var vs = Object.assign({}, v, EDITS[s.sid]||{});
+      return '<button class="vcard'+(j===cur?" on":"")+'" type="button" data-alt="'+s.sid+':'+j+'" '
+        +'title="Förslag '+ALTLAB[j]+' — '+v.p+'">'
+        +'<span class="vfr">'+story(state.dir, vs, i, n)+'</span>'
+        +'<span class="vcap"><b>'+ALTLAB[j]+'</b><i>'+v.p+'</i></span></button>';
+    }).join("");
+  return '<div class="edsec"><div class="eyebrow">Förslag <em class="cnt">'+(a.length+1)+'</em></div>'
+    +'<div class="vgrid">'+cards+'</div>'
+    +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:2px">'
+    +'Byter komposition och formulering. Egna ändringar följer med.</p></div>';
 }
 
 function studioEditor(){
   var h = hlOf(state.edit.hl), n = h.st.length, i = Math.min(state.edit.i, n-1), s = h.st[i];
-  var eff = Object.assign({}, s, EDITS[s.sid]||{});
+  var eff = Object.assign({}, picked(s), EDITS[s.sid]||{});
 
   var strip = h.st.map(function(x,j){
     return '<button class="filmb'+(j===i?" on":"")+'" type="button" data-pick="'+j+'">'
       +'<span class="filmn">'+String(j+1).padStart(2,"0")+(isEdited(x)?' <i class="dot"></i>':'')+'</span>'
       +'<span class="filmf">'+story(state.dir,x,j,n)+'</span>'
-      +'<span class="filmp">'+x.p+'</span></button>';
+      +'<span class="filmp">'+picked(x).p
+        +(PICKS[x.sid]?' <b class="vtag">'+ALTLAB[PICKS[x.sid]]+'</b>':'')+'</span></button>';
   }).join("");
 
   var fields = fieldsFor(s).map(function(f){
@@ -2892,6 +3616,7 @@ function studioEditor(){
          +'<button class="tbtn" type="button" data-step="1">→</button></span></div>'
      +'</div>'
      +'<div class="edside">'
+       + variantPanel(s, i, n)
        +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
          +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
        + coverPanel(h)
@@ -2996,8 +3721,7 @@ function coverPanel(h){
      ? '<div class="mplab" style="margin-top:6px">Bild bakom märket <code class="mono">'+img+'</code></div>'
        +'<label class="upl"><input type="file" accept="image/*" data-upc="'+h.id+'" hidden>Ladda upp egen bild</label>'
        +'<div class="mrow">'+allKeys().map(function(k){
-          return '<button class="mi'+(img===k?" on":"")+'" type="button" data-ci="'+h.id+':'+k+'" title="'+k+'">'
-            +'<img src="'+(mediaURL(k)||"")+'" alt=""></button>'}).join("")+'</div>'
+          return thumb(k, img===k, 'data-ci="'+h.id+':'+k+'"') }).join("")+'</div>'
        +'<label class="sl">Fokalpunkt Y <em>'+Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'%</em>'
        +'<input type="range" data-sl="cover-'+h.id+':fy" min="0" max="100" value="'
        +Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'"></label>'
@@ -3018,9 +3742,8 @@ function mediaPanel(slot, cur, label){
    +'<label class="upl">Ladda upp bild eller video'
      +'<input type="file" accept="image/*,video/*" multiple data-up="'+slot+'" hidden></label>'
    +'<div class="mrow">'+allKeys().map(function(k){
-      return '<button class="mi'+(active===k?" on":"")+(isVideo(k)?" vid":"")+'" type="button" '
-        +'data-mi="'+slot+':'+k+'" title="'+k+'">'
-        +'<img src="'+(mediaURL(k)||"")+'" alt="">'+(isVideo(k)?'<i class="vbadge">▶</i>':'')+'</button>'}).join("")+'</div>'
+      return thumb(k, active===k, 'data-mi="'+slot+':'+k+'"') }).join("")+'</div>'
+   +'<div class="bankm sm">'+bankMeterHTML()+'</div>'
    +'<label class="sl">Fokalpunkt Y <em>'+Math.round((o.fy!=null?o.fy:.5)*100)+'%</em>'
      +'<input type="range" data-sl="'+slot+':fy" min="0" max="100" value="'+Math.round((o.fy!=null?o.fy:.5)*100)+'"></label>'
    +'<label class="sl">Zoom <em>'+Math.round((o.zoom||1)*100)+'%</em>'
@@ -3206,7 +3929,12 @@ document.addEventListener("click",function(e){
     var a=ac.dataset.act;
     if(a==="back"){ state.edit=null; render() }
     else if(a==="save"){ saveAll() }
-    else if(a==="exportjson"){ exportJSON(ac) }
+    else if(a==="exportjson"){ exportJSON(ac, false) }
+    else if(a==="exportall"){ exportJSON(ac, true) }
+    else if(a==="bank-clear"){
+      var bn=Object.keys(UPLOADS).length;
+      if(bn && confirm("Ta bort alla "+bn+" egna bilder ur bildbanken? Bildrutor som använder dem går tillbaka till originalbilden.")){
+        dropAllUploads(); saveAll("Bildbanken tömd"); render() } }
     else if(a==="play"){ play(state.edit.hl, state.edit.i, state.dir) }
     else if(a==="reset-story"){
       var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
@@ -3226,6 +3954,19 @@ document.addEventListener("click",function(e){
   var ci=e.target.closest("[data-ci]");
   if(ci){ var q2=ci.dataset.ci.split(":");
     CEDITS[q2[0]] = Object.assign({}, CEDITS[q2[0]], {cover:q2[1]}); render(); return }
+  var al=e.target.closest("[data-alt]");
+  if(al){
+    var qa=al.dataset.alt.split(":"), pv=+qa[1];
+    if(pv) PICKS[qa[0]] = pv; else delete PICKS[qa[0]];
+    saveAll("Förslag "+ALTLAB[pv]+" valt"); render(); return;
+  }
+  var md=e.target.closest("[data-midel]");
+  if(md){
+    e.preventDefault(); e.stopPropagation();
+    var dk=md.dataset.midel;
+    if(dropUpload(dk)){ saveAll("Bilden borttagen"); render() }
+    return;
+  }
   var mi=e.target.closest("[data-mi]");
   if(mi){var a=mi.dataset.mi.split(":");
     SLOTS[a[0]]=Object.assign({},SLOTS[a[0]],{img:a[1]}); afterSlot(a[0]); return}
@@ -3289,11 +4030,23 @@ function seedSlots(){
   });
 }
 loadAll();
+/* Bildbanken ligger i IndexedDB och läses asynkront. Vyn ritas om när den
+   är inne — utan det visas gamla nycklar utan bild efter en omladdning. */
+loadBank().then(function(got){ if(got) render() });
 
 var s=document.createElement("style"); s.textContent=CSS; document.head.appendChild(s);
 
 /* liten publik export-API — samma väg som knapparna använder, så den går
    att skripta och att testa utan att klicka sig igenom gränssnittet */
+/* Lagringen går att köra utifrån, så att kvotbeteendet kan testas på riktigt
+   i stället för att klickas fram. */
+window.__vstudio = {
+  UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
+  saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
+  dropUpload:dropUpload, dropAllUploads:dropAllUploads,
+  bankBytes:bankBytes, fmtBytes:fmtBytes,
+  get bankMode(){ return bankMode }
+};
 window.viewlyExport = {
   frame:function(hlId, i, dir){ var h=hlOf(hlId);
     return framePNG(story(dir,h.st[i],i,h.st.length), 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7") },
