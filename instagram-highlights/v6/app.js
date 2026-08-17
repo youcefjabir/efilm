@@ -1287,24 +1287,18 @@ function coverPanel(h){
       +'<span class="csetn"><b>'+cs.n+'</b></span></button>';
   }).join("");
 
-  var figs = set===2 ? '<div class="mplab">Figur <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
+  /* Motivväljaren gäller alla tre systemen — det är samma fjorton motiv,
+     olika utföranden. Knapparna ritas i det system som är valt. */
+  var GP = covPal(d, set);
+  var figs = '<div class="mplab">'+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).n
+    +' — '+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).d
+    +' <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
     +'<div class="grow">'+GLYPH_IDS.map(function(g){
+      var f = (set===1 ? LINE : PICTO)[g];
       return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
-        +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw">'
-        +'<svg viewBox="0 0 100 100">'+FIG[g]("currentColor", "#6E7266")+'</svg></span></button>';
-    }).join("")+'</div>' : '';
-
-  var e = CEDITS[h.id] || {};
-  var img = e.cover || h.cover;
-  var pic = set===1
-    ? '<div class="mplab" style="margin-top:8px">Fotografi <code class="mono">'+img+'</code></div>'
-      +'<label class="upl"><input type="file" accept="image/*" data-upc="'+h.id+'" hidden>Ladda upp egen bild</label>'
-      +'<div class="mrow">'+allKeys().map(function(k){
-         return thumb(k, img===k, 'data-ci="'+h.id+':'+k+'"') }).join("")+'</div>'
-      +'<label class="sl">Fokalpunkt Y <em>'+Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'%</em>'
-      +'<input type="range" data-sl="cover-'+h.id+':fy" min="0" max="100" value="'
-      +Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'"></label>'
-    : '';
+        +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw" style="background:'+GP.bg+'">'
+        +'<svg viewBox="0 0 100 100">'+f(GP)+'</svg></span></button>';
+    }).join("")+'</div>';
 
   return '<div class="edsec"><div class="eyebrow">Omslag <em class="cnt">3 system</em></div>'
    +'<div class="csets">'+sets+'</div>'
@@ -1314,7 +1308,7 @@ function coverPanel(h){
      +'<span class="cvsm">'+coverEl(d,h)+'</span>'
      +'<span class="mut" style="font-size:10.5px;line-height:1.5">'+COVSETS[set].d
      +'<br>64 px och 56 px — så stort det faktiskt visas.</span></div>'
-   + figs + pic
+   + figs
    +'<div class="dlcol" style="margin-top:8px">'
      + dlBtn("cover",{hl:h.id, ddir:d},"Ladda ner omslaget · 1080×1920")
      + dlBtn("covers",{ddir:d},"Alla "+HL.length+" omslag")

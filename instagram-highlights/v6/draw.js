@@ -474,99 +474,217 @@ function story(dirId, s, i, n){
 var GW = 100;                                       /* glyfernas viewBox */
 
 /* ---------------------------------------------------------------------
-   OMSLAGEN — tre system
+   OMSLAGEN — pictogram
 
-   Sju omgångar av ikoner ligger bakom det här, och felet var hela tiden
-   samma: ett omslag ritades som en IKON. Ikoner hör hemma i gränssnitt.
-   Viewly är ett produktionsbolag med redaktionell profil — Cormorant,
-   hårlinjer, papper, generösa marginaler — och den profilen har ingen
-   ikonuppsättning i sig. Den har typografi, material och reduktion.
+   Utvärdering av den förra ikonomgången, märke för märke. Sju av fjorton
+   var informativa; resten var geometri som råkade se ut som något:
 
-   Därför tre system i stället för ett, precis som bildrutorna har tre
-   utföranden. De är avsiktligt olika register, inte tre varianter av
-   samma idé:
+     Kortet          ett kort med block i — läste som ett profilkort
+     Rummet möblerat en bänk, inte ett möblerat rum
+     Höjden          en lampa, inte en drönare
+     Kvarteret       en propeller
+     Formaten        block, men proportionerna gick inte att läsa
+     Portalen        block
+     Kontaktkartan   block
 
-     MONOGRAMMET  kapitelinitialen satt i Cormorant. Bokens anfang.
-     MATERIALET   ett fotografi ur biblioteket, tonat till en gemensam
-                  valör. Byråns eget arbete som omslag.
-     FIGUREN      en enda reducerad figur i hårlinje, med stort andrum.
+   Och över hela uppsättningen tre fel som gjorde den billig snarare än
+   fel: formerna gick nästan ut i kant (ingen luft), valörerna låg för
+   nära varandra (grå gröt), och varje märke hade sin egen skala.
 
-   Alla tre använder samma platta, samma marginal och samma olivpunkt, så
-   raden hänger ihop även om man blandar. Ingen fyllnadsfärg, inga
-   rundade hörn, inga scener.
+   Rättningen är inte fler detaljer utan färre, satta i ett system:
+
+     OPTISK RUTA  varje motiv ryms i 56 × 56 av 100. Marginalen är inte
+                  tom yta, den är det som gör en form dyr.
+     FYRA TONER   platta, ljus, form, accent. Inga mellanlägen, ingen
+                  opacitet — valörerna ska gå att räkna.
+     EN ACCENT    exakt en yta i accentfärg per märke, och den ligger på
+                  det som betyder något.
+     MINST 6 BRED ingen form tunnare än 6 enheter. Hårlinjer hör till
+                  systemet Linjen, inte hit.
+     ETT BUDSKAP  märket ska gå att namnge på en halv sekund. Kan det
+                  inte det är motivet fel, inte utförandet.
    --------------------------------------------------------------------- */
-var COVPAL = {
-  arkiv:  {bg:"#EFECE6", ink:"#1C1C1E", olive:"#6E7266", line:"#D3CCC4", soft:"#A9A29A"},
-  skugga: {bg:"#0E0E0D", ink:"#EFEDE7", olive:"#98A088", line:"#33332F", soft:"#6E6C66"}
-};
-
-/* Monogrammet: två tecken, versal och gemen, som i en boks kapitelanfang.
-   Viewly bär märket självt i stället — det är den enda logotypen. */
-var MONO = {
-  viewly:"", foto:"Fo", visning:"3D", estyling:"Es", atmosphere:"At", dronare:"Dr",
-  omradeskarta:"Om", motion:"Mo", annonsen:"An", kampanjen:"Ka", systemet:"Sy",
-  objekt:"Ob", inifran:"In", ditthem:"Hem"
-};
-
-/* Figuren: en form per kapitel, ritad i hårlinje och stor. Hårlinjen är
-   1,8 i 100-rutan, vilket vid 56 px blir drygt en pixel — synligt, och
-   det enda som håller uppsättningen samman. */
-var FIG = {
-  vmark:   function(c,a){ return '<g transform="translate(20 27) scale(.0698)">'
-             +'<path d="'+GEO.limb+'" fill="'+c+'"/>'
-             +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+a+'"/></g>' },
-  aperture:function(c,a){ return '<rect x="22" y="26" width="56" height="42" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="66" cy="38" r="5.5" fill="'+a+'"/>'
-             +'<path d="M22 60 L38 48 L52 60 L62 54 L78 64" fill="none" stroke="'+c+'" stroke-width="1.8"/>' },
-  cube:    function(c,a){ return '<path d="M50 20 L80 37 V63 L50 80 L20 63 V37 Z" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<path d="M20 37 L50 54 L80 37 M50 54 V80" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="50" cy="54" r="4.6" fill="'+a+'"/>' },
-  halves:  function(c,a){ return '<circle cx="50" cy="50" r="27" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<path d="M50 23 A27 27 0 0 1 50 77 Z" fill="'+a+'"/>' },
-  sun:     function(c,a){ return '<path d="M30 58 A20 20 0 0 1 70 58 Z" fill="'+a+'"/>'
-             +'<path d="M16 58 H84" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<path d="M50 24 V32 M27 33 L32 38 M73 33 L68 38" stroke="'+c+'" stroke-width="1.8"/>' },
-  drone:   function(c,a){ return '<path d="M50 26 L74 70 H26 Z" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="50" cy="26" r="5.5" fill="'+a+'"/>'
-             +'<path d="M18 78 H82" stroke="'+c+'" stroke-width="1.8"/>' },
-  map:     function(c,a){ return '<path d="M16 42 H84 M16 66 H84 M38 18 V82 M66 18 V82" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="52" cy="54" r="6" fill="'+a+'"/>' },
-  motion:  function(c,a){ return '<path d="M30 68 V44 M42 68 V34 M54 68 V38 M66 68 V28" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<path d="M22 76 H78" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="66" cy="22" r="4.6" fill="'+a+'"/>' },
-  lines:   function(c,a){ return '<path d="M22 40 H78 M22 52 H78 M22 64 H60" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="70" cy="64" r="4.6" fill="'+a+'"/>' },
-  formats: function(c,a){ return '<rect x="20" y="22" width="34" height="56" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<rect x="34" y="34" width="34" height="34" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<rect x="48" y="28" width="32" height="40" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="80" cy="72" r="4.6" fill="'+a+'"/>' },
-  spine:   function(c,a){ return '<path d="M50 26 V74" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="50" cy="26" r="5.5" fill="'+a+'"/>'
-             +'<circle cx="50" cy="44" r="3.4" fill="'+c+'"/><circle cx="50" cy="60" r="3.4" fill="'+c+'"/>'
-             +'<circle cx="50" cy="74" r="3.4" fill="'+c+'"/>' },
-  gable:   function(c,a){ return '<path d="M22 68 L50 30 L78 68" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<path d="M22 68 H78" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="50" cy="58" r="4.6" fill="'+a+'"/>' },
-  people:  function(c,a){ var id=gid();
-             return '<defs><clipPath id="'+id+'"><circle cx="39" cy="50" r="20"/></clipPath></defs>'
-             +'<g clip-path="url(#'+id+')"><circle cx="61" cy="50" r="20" fill="'+a+'"/></g>'
-             +'<circle cx="39" cy="50" r="20" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="61" cy="50" r="20" fill="none" stroke="'+c+'" stroke-width="1.8"/>' },
-  door:    function(c,a){ return '<path d="M30 76 V48 A20 20 0 0 1 70 48 V76" fill="none" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<path d="M20 76 H80" stroke="'+c+'" stroke-width="1.8"/>'
-             +'<circle cx="62" cy="60" r="4.6" fill="'+a+'"/>' }
-};
 function gid(){ return "g"+Math.random().toString(36).slice(2,8) }
 
-/* Behålls som namn/beskrivning till väljaren och till dokumentationen. */
+/* Fyra roller. `t3` är accenten och används en gång per märke. */
+var COVPAL = {
+  arkiv:  {pictogram:{bg:"#EFECE6", t1:"#C8CCBF", t2:"#6E7266", t3:"#1C1C1E"},
+           negativ:  {bg:"#6E7266", t1:"#98A088", t2:"#F2F0EA", t3:"#1C1C1E"},
+           line:     {bg:"#EFECE6", t1:"#C8CCBF", t2:"#1C1C1E", t3:"#6E7266"}},
+  skugga: {pictogram:{bg:"#0E0E0D", t1:"#3A4034", t2:"#98A088", t3:"#EFEDE7"},
+           negativ:  {bg:"#2C322A", t1:"#5A6350", t2:"#EFEDE7", t3:"#98A088"},
+           line:     {bg:"#0E0E0D", t1:"#33332F", t2:"#EFEDE7", t3:"#98A088"}}
+};
+
+/* ---------------------------------------------------------------------
+   PICTOGRAM
+   Fjorton motiv, alla i den optiska rutan 22–78. Formen är fylld, dess
+   detaljer är URSKURNA i plattans färg — aldrig pålagda linjer.
+   --------------------------------------------------------------------- */
+var PICTO = {
+  /* Logotypen. Enda märket som får bryta rutan, för den ÄR märket. */
+  vmark:   function(P){ return '<g transform="translate(24 31) scale(.0605)">'
+             +'<path d="'+GEO.limb+'" fill="'+P.t2+'"/>'
+             +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+P.t3+'"/></g>' },
+
+  /* Fotografering: ett kort med ett landskap i. Solen är accenten. */
+  aperture:function(P){ return '<rect x="22" y="28" width="56" height="44" fill="'+P.t2+'"/>'
+             +'<rect x="28" y="34" width="44" height="32" fill="'+P.bg+'"/>'
+             +'<path d="M28 66 L43 50 L53 60 L61 53 L72 66 Z" fill="'+P.t1+'"/>'
+             +'<circle cx="62" cy="42" r="5.5" fill="'+P.t3+'"/>' },
+
+  /* 3D: kuben. Tre ytor, tre toner — det är hela poängen med volym. */
+  cube:    function(P){ return '<path d="M50 22 L78 38 L50 54 L22 38 Z" fill="'+P.t1+'"/>'
+             +'<path d="M22 38 L50 54 V78 L22 62 Z" fill="'+P.t2+'"/>'
+             +'<path d="M78 38 L50 54 V78 L78 62 Z" fill="'+P.t3+'"/>' },
+
+  /* E-styling: fåtöljen. En möbel säger möblerat snabbare än ett rum. */
+  halves:  function(P){ return '<rect x="30" y="22" width="40" height="30" fill="'+P.t2+'"/>'
+             +'<rect x="22" y="40" width="9" height="24" fill="'+P.t2+'"/>'
+             +'<rect x="69" y="40" width="9" height="24" fill="'+P.t2+'"/>'
+             +'<rect x="30" y="50" width="40" height="14" fill="'+P.t2+'"/>'
+             +'<rect x="27" y="64" width="7" height="12" fill="'+P.t1+'"/>'
+             +'<rect x="66" y="64" width="7" height="12" fill="'+P.t1+'"/>'
+             +'<rect x="37" y="28" width="17" height="13" fill="'+P.t3+'"/>' },
+
+  /* Atmosphere: solen över horisonten. */
+  sun:     function(P){ return '<path d="M30 58 A20 20 0 0 1 70 58 Z" fill="'+P.t2+'"/>'
+             +'<rect x="20" y="58" width="60" height="6" fill="'+P.t3+'"/>'
+             +'<rect x="26" y="68" width="48" height="5" fill="'+P.t1+'"/>'
+             +'<rect x="34" y="77" width="32" height="4" fill="'+P.t1+'"/>' },
+
+  /* Drönare: kvadkoptern. Fyra rotorer, en lins. */
+  drone:   function(P){ return '<path d="M31 31 L69 69 M69 31 L31 69" stroke="'+P.t1+'" stroke-width="7"/>'
+             +'<circle cx="28" cy="28" r="11" fill="'+P.t2+'"/><circle cx="72" cy="28" r="11" fill="'+P.t2+'"/>'
+             +'<circle cx="28" cy="72" r="11" fill="'+P.t2+'"/><circle cx="72" cy="72" r="11" fill="'+P.t2+'"/>'
+             +'<rect x="38" y="40" width="24" height="20" fill="'+P.t2+'"/>'
+             +'<circle cx="50" cy="50" r="6" fill="'+P.t3+'"/>' },
+
+  /* Områdeskarta: nålen. Den universella kartsymbolen, ritad smalare och
+     rakare än standardnålen så att den inte läser som en app-ikon. */
+  map:     function(P){ return '<ellipse cx="50" cy="74" rx="14" ry="4.5" fill="'+P.t1+'"/>'
+             +'<path d="M50 22 A16 16 0 0 0 34 38 C34 50 50 70 50 70 S66 50 66 38 A16 16 0 0 0 50 22 Z" fill="'+P.t2+'"/>'
+             +'<circle cx="50" cy="38" r="6.5" fill="'+P.t3+'"/>' },
+
+  /* Motion: bildrutan med spelknappen. */
+  motion:  function(P){ return '<rect x="22" y="28" width="56" height="38" fill="'+P.t2+'"/>'
+             +'<path d="M44 39 L60 47 L44 55 Z" fill="'+P.bg+'"/>'
+             +'<rect x="22" y="70" width="34" height="6" fill="'+P.t3+'"/>'
+             +'<rect x="60" y="70" width="18" height="6" fill="'+P.t1+'"/>' },
+
+  /* Annonsen: dokumentet. Rubriken är accenten. */
+  lines:   function(P){ return '<rect x="27" y="22" width="46" height="56" fill="'+P.t2+'"/>'
+             +'<rect x="33" y="30" width="26" height="7" fill="'+P.t3+'"/>'
+             +'<g fill="'+P.bg+'">'
+             +'<rect x="33" y="43" width="34" height="5"/><rect x="33" y="52" width="34" height="5"/>'
+             +'<rect x="33" y="61" width="20" height="5"/></g>' },
+
+  /* Kampanjen: tre format i sanna proportioner — 9:16, 4:5, 1:1. */
+  formats: function(P){ return '<rect x="22" y="22" width="16" height="52" fill="'+P.t1+'"/>'
+             +'<rect x="42" y="32" width="18" height="42" fill="'+P.t2+'"/>'
+             +'<rect x="64" y="52" width="22" height="22" fill="'+P.t3+'"/>'
+             +'<rect x="22" y="78" width="64" height="4" fill="'+P.t1+'"/>' },
+
+  /* Systemet: portalen som fyra ytor, en tänd. */
+  spine:   function(P){ return '<rect x="20" y="26" width="60" height="48" fill="'+P.t2+'"/>'
+             +'<rect x="20" y="26" width="60" height="10" fill="'+P.t3+'"/>'
+             +'<rect x="26" y="42" width="22" height="12" fill="'+P.bg+'"/>'
+             +'<rect x="52" y="42" width="22" height="12" fill="'+P.bg+'"/>'
+             +'<rect x="26" y="59" width="48" height="9" fill="'+P.t1+'"/>' },
+
+  /* Objekt: plåtarna på varandra. Ett objekt, flera leveranser. */
+  gable:   function(P){ return '<rect x="22" y="22" width="40" height="30" fill="'+P.t1+'"/>'
+             +'<rect x="30" y="32" width="40" height="30" fill="'+P.bg+'"/>'
+             +'<rect x="32" y="34" width="36" height="26" fill="'+P.t2+'"/>'
+             +'<rect x="38" y="44" width="40" height="30" fill="'+P.bg+'"/>'
+             +'<rect x="40" y="46" width="36" height="26" fill="'+P.t3+'"/>' },
+
+  /* Inifrån: fotografen. Kameran är accenten. */
+  people:  function(P){ return '<circle cx="50" cy="34" r="11" fill="'+P.t2+'"/>'
+             +'<path d="M50 48 A22 22 0 0 1 72 70 V78 H28 V70 A22 22 0 0 1 50 48 Z" fill="'+P.t2+'"/>'
+             +'<rect x="39" y="56" width="22" height="14" fill="'+P.t3+'"/>'
+             +'<circle cx="50" cy="63" r="4.4" fill="'+P.bg+'"/>' },
+
+  /* Ditt hem: huset med tänt fönster. */
+  door:    function(P){ return '<path d="M22 48 L50 24 L78 48 Z" fill="'+P.t2+'"/>'
+             +'<rect x="30" y="48" width="40" height="30" fill="'+P.t1+'"/>'
+             +'<rect x="44" y="60" width="12" height="18" fill="'+P.t2+'"/>'
+             +'<rect x="34" y="54" width="8" height="8" fill="'+P.t3+'"/>' }
+};
+
+/* ---------------------------------------------------------------------
+   LINJEN
+   Samma fjorton motiv i hårlinje. Ritas i samma optiska ruta, men får
+   vara större eftersom en linje väger mindre än en fylld yta.
+   --------------------------------------------------------------------- */
+function ln2(d, c, w){ return '<path d="'+d+'" fill="none" stroke="'+c+'" stroke-width="'+(w||2)
+  +'" stroke-linecap="square" stroke-linejoin="miter"/>' }
+var LINE = {
+  vmark:   function(P){ return '<g transform="translate(22 29) scale(.0653)">'
+             +'<path d="'+GEO.limb+'" fill="'+P.t2+'"/>'
+             +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+P.t3+'"/></g>' },
+  aperture:function(P){ return ln2("M20 28 H80 V72 H20 Z", P.t2)
+             +ln2("M20 64 L38 46 L50 58 L60 50 L80 66", P.t2)
+             +'<circle cx="64" cy="40" r="6" fill="'+P.t3+'"/>' },
+  cube:    function(P){ return ln2("M50 18 L82 36 V64 L50 82 L18 64 V36 Z", P.t2)
+             +ln2("M18 36 L50 54 L82 36 M50 54 V82", P.t2)
+             +'<circle cx="50" cy="54" r="5" fill="'+P.t3+'"/>' },
+  halves:  function(P){ return ln2("M28 20 H72 V50 H28 Z", P.t2)
+             +ln2("M18 38 H28 V64 H18 Z M72 38 H82 V64 H72 Z", P.t2)
+             +ln2("M28 50 H72 V64 H28 Z", P.t2)
+             +ln2("M26 64 V78 M74 64 V78", P.t2)
+             +'<rect x="38" y="27" width="16" height="12" fill="'+P.t3+'"/>' },
+  sun:     function(P){ return '<path d="M30 58 A20 20 0 0 1 70 58 Z" fill="'+P.t3+'"/>'
+             +ln2("M14 58 H86", P.t2)+ln2("M24 70 H76", P.t2)+ln2("M34 80 H66", P.t2)
+             +ln2("M50 22 V30 M28 30 L34 36 M72 30 L66 36", P.t2) },
+  drone:   function(P){ return ln2("M32 32 L68 68 M68 32 L32 68", P.t2)
+             +'<circle cx="26" cy="26" r="11" fill="none" stroke="'+P.t2+'" stroke-width="2"/>'
+             +'<circle cx="74" cy="26" r="11" fill="none" stroke="'+P.t2+'" stroke-width="2"/>'
+             +'<circle cx="26" cy="74" r="11" fill="none" stroke="'+P.t2+'" stroke-width="2"/>'
+             +'<circle cx="74" cy="74" r="11" fill="none" stroke="'+P.t2+'" stroke-width="2"/>'
+             +ln2("M38 40 H62 V60 H38 Z", P.t2)
+             +'<circle cx="50" cy="50" r="6" fill="'+P.t3+'"/>' },
+  map:     function(P){ return ln2("M50 20 A17 17 0 0 0 33 37 C33 50 50 72 50 72 S67 50 67 37 A17 17 0 0 0 50 20 Z", P.t2)
+             +'<circle cx="50" cy="37" r="6.5" fill="'+P.t3+'"/>'
+             +ln2("M32 78 H68", P.t2) },
+  motion:  function(P){ return ln2("M18 28 H82 V66 H18 Z", P.t2)
+             +'<path d="M43 38 L61 47 L43 56 Z" fill="'+P.t3+'"/>'
+             +ln2("M18 74 H50", P.t2) },
+  lines:   function(P){ return ln2("M26 18 H74 V82 H26 Z", P.t2)
+             +'<rect x="34" y="30" width="26" height="7" fill="'+P.t3+'"/>'
+             +ln2("M34 46 H66 M34 56 H66 M34 66 H54", P.t2) },
+  formats: function(P){ return ln2("M16 18 H36 V74 H16 Z", P.t2)
+             +ln2("M42 30 H64 V74 H42 Z", P.t2)
+             +ln2("M70 52 H92 V74 H70 Z", P.t2)
+             +'<rect x="16" y="80" width="76" height="3" fill="'+P.t3+'"/>' },
+  spine:   function(P){ return ln2("M16 24 H84 V76 H16 Z", P.t2)
+             +ln2("M16 38 H84", P.t2)
+             +ln2("M24 48 H48 V62 H24 Z", P.t2)
+             +'<rect x="54" y="48" width="24" height="14" fill="'+P.t3+'"/>' },
+  gable:   function(P){ return ln2("M16 20 H58 V50 H16 Z", P.t2)
+             +'<rect x="26" y="30" width="44" height="32" fill="'+P.bg+'"/>'
+             +ln2("M26 30 H70 V62 H26 Z", P.t2)
+             +'<rect x="36" y="42" width="46" height="34" fill="'+P.bg+'"/>'
+             +ln2("M36 42 H82 V76 H36 Z", P.t2)
+             +'<circle cx="70" cy="64" r="6" fill="'+P.t3+'"/>' },
+  people:  function(P){ return ln2("M50 24 A11 11 0 1 1 49.9 24 Z", P.t2)
+             +ln2("M26 80 V72 A24 24 0 0 1 74 72 V80", P.t2)
+             +'<rect x="40" y="56" width="20" height="13" fill="'+P.t3+'"/>' },
+  door:    function(P){ return ln2("M18 50 L50 22 L82 50", P.t2)
+             +ln2("M28 50 V80 H72 V50", P.t2)
+             +ln2("M44 80 V62 H56 V80", P.t2)
+             +'<rect x="33" y="56" width="9" height="9" fill="'+P.t3+'"/>' }
+};
+
+/* Namn och beskrivning till väljaren och dokumentationen. */
 var GLYPHS = {
-  vmark:{n:"V-märket", d:"Logotypen"},      aperture:{n:"Plåten", d:"Bild och horisont"},
-  cube:{n:"Volymen", d:"Rummet i axonometri"}, halves:{n:"Halvan", d:"Cirkel till hälften fylld"},
-  sun:{n:"Solen", d:"Halv sol över horisonten"}, drone:{n:"Höjden", d:"Blickfältet uppifrån"},
-  map:{n:"Korsningen", d:"Gator och en punkt"}, motion:{n:"Rörelsen", d:"Staplar i olika höjd"},
-  lines:{n:"Texten", d:"Tre rader"},          formats:{n:"Formaten", d:"Tre ramar"},
-  spine:{n:"Ryggraden", d:"Axel med noder"},  gable:{n:"Gaveln", d:"Takfallet"},
-  people:{n:"Snittet", d:"Två cirklar"},      door:{n:"Dörren", d:"Valvet"}
+  vmark:{n:"V-märket", d:"Logotypen"},        aperture:{n:"Kortet", d:"Ett foto med landskap"},
+  cube:{n:"Kuben", d:"Volym i tre ytor"},     halves:{n:"Fåtöljen", d:"Möblerat rum"},
+  sun:{n:"Solen", d:"Sol över horisont"},     drone:{n:"Drönaren", d:"Kvadkopter med lins"},
+  map:{n:"Nålen", d:"Platsen på kartan"},     motion:{n:"Spelknappen", d:"Bildruta med play"},
+  lines:{n:"Dokumentet", d:"Text med rubrik"},formats:{n:"Formaten", d:"9:16, 4:5, 1:1"},
+  spine:{n:"Portalen", d:"Fyra ytor, en tänd"},gable:{n:"Plåtarna", d:"Tre kort på varandra"},
+  people:{n:"Fotografen", d:"Person med kamera"}, door:{n:"Huset", d:"Hem med tänt fönster"}
 };
 var GLYPH_IDS = Object.keys(GLYPHS);
 
@@ -578,90 +696,52 @@ function cov(h, key){
 }
 
 /* ---------------------------------------------------------------------
-   TRE SYSTEM
-   Valet ligger i CPICKS[kapitel-id] och sparas som allt annat. Alla tre
-   delar plattan, marginalen och olivpunkten, så raden håller ihop även
-   om man blandar — men den ser bäst ut satt genomgående.
+   TRE SYSTEM — alla tre är ikoner
+   Samma fjorton motiv, tre utföranden. Valet ligger i CPICKS[kapitel-id].
    --------------------------------------------------------------------- */
 var CPICKS = {};
 var COVSETS = [
-  {id:"monogram", n:"Monogrammet", d:"Kapitelinitialen satt i Cormorant, hårlinje under."},
-  {id:"materialet", n:"Materialet", d:"Ett fotografi ur biblioteket, tonat till gemensam valör."},
-  {id:"figuren", n:"Figuren", d:"En reducerad figur i hårlinje, med stort andrum."}
+  {id:"pictogram", k:"pictogram", n:"Pictogram", d:"Fylld form, utskurna detaljer. Rak och tyst."},
+  {id:"linjen",    k:"line",      n:"Linjen",    d:"Samma motiv i hårlinje, med stort andrum."},
+  {id:"negativ",   k:"negativ",   n:"Negativ",   d:"Formen urskuren ur en fylld olivplatta."}
 ];
 function covSetIx(h){ var v = CPICKS[h.id]; return (v===1||v===2) ? v : 0 }
-
-function covMono(h, P){
-  var m = MONO[h.id];
-  if(!m) return '<div style="width:34cqw">'+vmark(P.ink, P.olive,
-    'style="width:100%;height:auto;display:block"')+'</div>';
-  return '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;'
-    +'font-size:'+(m.length>2?30:38)+'cqw;line-height:.86;letter-spacing:-.02em;color:'+P.ink+'">'
-    + esc(m) +'</div>';
+function covPal(dirId, ix){
+  var d = COVPAL[dirId] || COVPAL.arkiv;
+  return d[COVSETS[ix].k];
 }
-function covArt(dirId, h, P){
-  var set = covSetIx(h);
-  if(set === 1){
-    /* Materialet: fotografiet avfärgas och tonas ned till en gemensam
-       valör, annars blir varje omslag sin egen gråton och raden faller
-       isär. Punkten ligger kvar som signatur. */
-    /* Första tonningen la en tung pappersslöja över bilden och allt blev
-       grå gröt. Duotonen görs i stället med kontrast plus en tunn olivton:
-       fotografiet ska synas, bara stämmas till en gemensam valör. */
-    var k = cov(h,"cover") || "hero";
-    return '<div style="position:absolute;inset:0;'+bg(k,"cover-"+h.id)
-      +';filter:grayscale(1) contrast('+(dirId==="skugga"?"1.10":"1.22")+') brightness('
-      +(dirId==="skugga"?".72":"1.04")+')"></div>'
-      +'<div style="position:absolute;inset:0;background:'+P.olive+';opacity:'
-      +(dirId==="skugga"?".16":".20")+'"></div>'
-      +'<div style="position:absolute;inset:0;background:'
-      +(dirId==="skugga"
-        ? 'radial-gradient(78% 78% at 50% 38%,rgba(14,14,13,.10),rgba(14,14,13,.72))'
-        : 'radial-gradient(80% 80% at 50% 36%,rgba(239,236,230,0),rgba(239,236,230,.42))')+'"></div>'
-      /* punkten får en egen ring, annars försvinner den mot ett ljust motiv */
-      +'<div style="position:absolute;left:50%;bottom:12cqw;transform:translateX(-50%);'
-      +'width:7.6cqw;height:7.6cqw;border-radius:50%;display:grid;place-items:center;background:'
-      +(dirId==="skugga"?"rgba(14,14,13,.55)":"rgba(239,236,230,.72)")+'">'
-      +'<i style="width:4.4cqw;height:4.4cqw;border-radius:50%;background:'+P.olive+';display:block"></i></div>';
-  }
-  if(set === 2){
-    var f = FIG[cov(h,"glyph")] || FIG.vmark;
-    return '<div style="position:absolute;inset:0;display:grid;place-items:center">'
-      +'<svg viewBox="0 0 100 100" style="width:62cqw;height:62cqw;display:block" aria-hidden="true">'
-      + f(P.ink, P.olive) +'</svg></div>';
-  }
-  return '<div style="position:absolute;inset:0;display:flex;flex-direction:column;'
-    +'align-items:center;justify-content:center;gap:7.5cqw">'
-    + covMono(h, P)
-    +'<div style="width:16cqw;height:1px;background:'+P.olive+'"></div></div>';
+function covArt(dirId, h, ix){
+  var P = covPal(dirId, ix);
+  var key = cov(h,"glyph");
+  var f = (ix===1 ? LINE : PICTO)[key] || (ix===1 ? LINE : PICTO).vmark;
+  return '<div style="position:absolute;inset:0;display:grid;place-items:center">'
+    +'<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" aria-hidden="true">'
+    + f(P) +'</svg></div>';
 }
 
 /* ar: "1:1" i profilraden, "9:16" vid export */
 function cover(dirId, h, ar){
-  var sq = ar !== "9:16";
-  var P = COVPAL[dirId] || COVPAL.arkiv;
+  var sq = ar !== "9:16", ix = covSetIx(h), P = covPal(dirId, ix);
   var plate = sq ? 'inset:0' : 'left:8cqw;right:8cqw;top:50%;transform:translateY(-50%);aspect-ratio:1';
   return '<div style="position:absolute;'+plate+';border-radius:50%;overflow:hidden;background:'+P.bg+'">'
-    + covArt(dirId, h, P) +'</div>';
+    + covArt(dirId, h, ix) +'</div>';
 }
 
-/* Omslaget som bildruta: sista bilden i varje Highlight, och det som
-   exporteras. Cirkeln ritas i 1080 × 1920 så att Instagram kan beskära
-   den själv, med kapitlets namn satt under. */
+/* Omslaget som bildruta: sist i varje Highlight och det som exporteras. */
 function coverFrame(dirId, h){
-  var P = COVPAL[dirId] || COVPAL.arkiv;
-  return '<div class="'+(dirId==="skugga"?"b":"a")+'" style="background:'
-    +(dirId==="skugga"?"#0E0E0D":"#F2EFEF")+'">'
+  var ix = covSetIx(h), P = covPal(dirId, ix);
+  var pap = dirId==="skugga" ? "#0E0E0D" : "#F2EFEF";
+  var ink = dirId==="skugga" ? "#EFEDE7" : "#1C1C1E";
+  var oli = dirId==="skugga" ? "#98A088" : "#6E7266";
+  return '<div class="'+(dirId==="skugga"?"b":"a")+'" style="background:'+pap+'">'
     +'<div style="position:absolute;left:0;right:0;top:'+SAFE.top+'cqw;bottom:'+SAFE.bot+'cqw;'
     +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7cqw">'
-    +'<div style="position:relative;width:62cqw;aspect-ratio:1;border-radius:50%;overflow:hidden;'
-    +'container-type:inline-size;box-shadow:0 0 0 1px '+P.line+'">'+cover(dirId,h,"1:1")+'</div>'
-    +'<div style="display:flex;flex-direction:column;align-items:center;gap:2.6cqw">'
-    +'<div style="font-family:Montserrat,sans-serif;font-size:2.6cqw;letter-spacing:.3em;'
-    +'text-transform:uppercase;color:'+(dirId==="skugga"?"#98A088":"#6E7266")+'">Omslag</div>'
-    +'<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:7.4cqw;'
-    +'color:'+(dirId==="skugga"?"#EFEDE7":"#1C1C1E")+'">'+esc(h.label||h.name)+'</div></div></div>'
-    +'</div>';
+    +'<div style="position:relative;width:60cqw;aspect-ratio:1;border-radius:50%;overflow:hidden;'
+    +'container-type:inline-size">'+cover(dirId,h,"1:1")+'</div>'
+    +'<div style="display:flex;flex-direction:column;align-items:center;gap:2.8cqw">'
+    +'<div style="width:7cqw;height:1px;background:'+oli+'"></div>'
+    +'<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:7.6cqw;'
+    +'color:'+ink+'">'+esc(h.label||h.name)+'</div></div></div></div>';
 }
 
 /* =====================================================================

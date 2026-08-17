@@ -150,52 +150,83 @@ men har egen vertikal rytm per mall och per format.
 
 ---
 
-## Omslagen — tre system
+## Omslagen — tre ikonsystem
 
-Ett nummer på omslaget låser ordningen, så varje kapitel har i stället ett eget
-märke. Ordningen är fri.
+Ett nummer på omslaget låser ordningen, så varje kapitel har ett eget märke.
+Ordningen är fri.
 
-Sju omgångar av ikoner ligger bakom det som står nu, och felet var hela tiden
-detsamma: omslaget ritades som en **ikon**. Ikoner hör hemma i gränssnitt.
-Viewly är ett produktionsbolag med redaktionell profil — Cormorant, hårlinjer,
-papper, generösa marginaler — och den profilen har ingen ikonuppsättning i sig.
-Den har typografi, material och reduktion.
+### Utvärdering av den förra ikonomgången
 
-| Omgång | Grepp | Varför den föll |
-|---|---|---|
-| 1 | Hårlinjer, små symboler | Generiska |
-| 2 | Fyllda UI-figurer | Läste som ett ikonbibliotek |
-| 3 | Beskurna fragment i full svärta | Bauhaus-affischer |
-| 4 | Ljusa tvättar | Så abstrakta att motivet försvann |
-| 5 | Graverade kapitelmärken | Eleganta, men skulle studeras |
-| 6 | Platt 2D-illustration | Rätt register — men branschens vokabulär |
-| 7 | Samma, i Viewlys palett | Närmare, men fortfarande ikon |
+Sju av fjorton var informativa. Resten var geometri som råkade se ut som något:
 
-Därför **tre system** i stället för ett, precis som bildrutorna har tre
-utföranden. De är avsiktligt olika register, inte tre varianter av samma idé:
+| Märke | Läste som |
+|---|---|
+| Kortet | ett profilkort |
+| Rummet möblerat | en bänk |
+| Höjden | en lampa |
+| Kvarteret | en propeller |
+| Formaten, Portalen, Kontaktkartan | block |
+
+Över hela uppsättningen tre fel som gjorde den *billig* snarare än bara fel:
+formerna gick nästan ut i kant, valörerna låg för nära varandra, och varje märke
+hade sin egen skala.
+
+En mellanomgång svarade med att ta bort ikonerna helt — monogram i Cormorant och
+tonade fotografier. Det var fel svar: ett omslag ska vara **informativt**, och
+varken en bokstav eller en suddig bild säger vilken tjänst kapitlet handlar om.
+
+### Rättningen: färre detaljer, satta i ett system
+
+| Regel | |
+|---|---|
+| **Optisk ruta** | varje motiv ryms i 56 × 56 av 100. Marginalen är det som gör en form dyr |
+| **Fyra toner** | platta, ljus, form, accent. Inga mellanlägen, ingen opacitet |
+| **En accent** | exakt en yta per märke, och den ligger på det som betyder något |
+| **Minst 6 brett** | ingen fylld form tunnare än 6 enheter |
+| **Ett budskap** | märket ska gå att namnge på en halv sekund |
+
+### Tre system, alla ikoner
+
+Samma fjorton motiv, tre utföranden — precis som bildrutorna har tre förslag:
 
 | System | Grepp |
 |---|---|
-| **Monogrammet** | Kapitelinitialen satt i Cormorant Garamond, med olivhårlinje under. Bokens anfang. Viewly bär logotypen självt |
-| **Materialet** | Ett fotografi ur biblioteket, avfärgat och stämt till en gemensam olivton. Byråns eget arbete som omslag |
-| **Figuren** | En enda reducerad figur i hårlinje, med stort andrum. Fjorton figurer att välja bland |
+| **Pictogram** | Fylld form med utskurna detaljer. Rak och tyst |
+| **Linjen** | Samma motiv i hårlinje, med stort andrum |
+| **Negativ** | Formen urskuren ur en fylld olivplatta — en tyngre rad |
 
-Alla tre delar plattan, marginalen och olivpunkten, så raden håller ihop även om
-man blandar — men den ser bäst ut satt genomgående, och en länk i panelen sätter
-valt system för alla fjorton kapitel på en gång.
+En länk i panelen sätter valt system för alla fjorton kapitel; motivet kan bytas
+per kapitel bland de fjorton.
 
-Ingen fyllnadsfärg, inga rundade hörn, inga scener. Paletten är brevpapperets:
-`#EFECE6` respektive `#0E0E0D`, bläck `#1C1C1E`, oliv `#6E7266`.
+| Kapitel | Motiv |
+|---|---|
+| Viewly | logotypen |
+| Fotografering | ett foto med landskap |
+| 3D visning | kuben, volym i tre ytor |
+| E-styling | fåtöljen — en möbel säger möblerat snabbare än ett rum |
+| Atmosphere | solen över horisonten |
+| Drönare | kvadkoptern med lins |
+| Områdeskarta | nålen |
+| Motion | bildrutan med spelknappen |
+| Annonsen | dokumentet med rubrik |
+| Kampanjen | tre format på gemensam baslinje |
+| Systemet | portalen som fönster med lister |
+| Objekt | tre plåtar på varandra |
+| Inifrån | fotografen med kamera |
+| Ditt hem | huset med tänt fönster |
+
+Paletten är brevpapperets: `#EFECE6` respektive `#0E0E0D`, oliv `#6E7266`,
+bläck `#1C1C1E`. Inga främmande färger, inga rundade hörn, inga scener.
 
 ### Omslaget är sista bildrutan
 
-Omslaget ligger nu **sist i varje kapitels bildruteserie** — i filmremsan, i
+Omslaget ligger **sist i varje kapitels bildruteserie** — i filmremsan, i
 kontaktkartan och i serienedladdningen. Ett kapitel med sju Stories laddar ner
 åtta filer. Exportbilden är 1080 × 1920 med cirkeln centrerad och kapitlets namn
-satt under; Instagram beskär själv till cirkeln.
+satt i Cormorant under; Instagram beskär själv till cirkeln.
 
-Det gick tidigare bara att ladda ner omslaget från en knapp i inspektören, vilket
-var lätt att missa. Knappen finns kvar, plus `Alla 14 omslag`.
+Klickar man sista kortet i remsan öppnas omslagsvyn med sin egen
+nedladdningsknapp. Textfälten göms — det är ingen bildruta man skriver i.
 
 ## Tre förslag per bildruta
 
