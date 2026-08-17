@@ -1418,7 +1418,7 @@ function studioEditor(){
            + dlBtn("chapter",{hl:h.id, ddir:state.dir},"Alla "+(n+1)+" separat")
            + (!isCover && MPICK[s.sid]
               ? '<button class="dlb pri" type="button" data-mv="1" data-mvsid="'+s.sid+'" data-mvdir="'
-                +state.dir+'">Rörelsen som video · '+MDUR[MSID[s.sid]].toFixed(1)+' s</button>' : '')
+                +state.dir+'">Rörelsen som video · '+durOf(MSID[s.sid], MPICK[s.sid]).toFixed(1)+' s</button>' : '')
            + (!isCover && videoRects(story(state.dir,s,i,n), 1080, 1920).length
               ? '<button class="dlb pri" type="button" data-vhl="'+h.id+'" data-vi="'+i+'" data-vdir="'+state.dir+'">'
                 +'Denna bildruta som video</button>' : '')
@@ -1575,15 +1575,30 @@ function motionPanel(s, i, n){
      +'title="'+esc(o.d)+'"><span class="vfr">'+html+'</span>'
      +'<span class="vcap"><b>'+esc(o.n)+'</b></span></button>';
   }).join("");
-  return '<div class="edsec"><div class="eyebrow">Rörelse <em class="cnt">'+MDUR[cand].toFixed(1)+' s</em></div>'
+  return '<div class="edsec"><div class="eyebrow">Rörelse'
+   + (cur ? ' <em class="cnt">'+durOf(cand,cur).toFixed(1)+' s</em>' : '') +'</div>'
    +'<div class="vgrid vgrid4">'+cards+'</div>'
    + (cur ? '<div class="mplay"><button class="dlb pri" type="button" data-act="mplay">&#9654; Spela</button>'
       +'<input type="range" id="mscrub" min="0" max="1000" value="'+Math.round(MOTION_T*1000)+'">'
-      +'<span class="mtime mono" id="mtime">'+(MOTION_T*MDUR[cand]).toFixed(1)+' s</span></div>' : '')
+      +'<span class="mtime mono" id="mtime">'+(MOTION_T*durOf(cand,cur)).toFixed(1)+' s</span></div>' : '')
    +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:4px">'
    + (cur ? 'Dra i reglaget för att granska bildruta för bildruta. Exporten renderar samma funktion.'
           : 'Statisk är default. Rörelse läggs på som alternativ — originalet ligger kvar under.')
-   +'</p></div>';
+   +'</p></div>'
+   /* Rörelsens egna bildplatser. Utan den här listan fanns det inget sätt
+      att byta bilderna i ett rörligt alternativ — nycklarna satt i koden. */
+   + (cur ? motionMedia(cand) : '');
+}
+function motionMedia(cand){
+  var slots = mslotsOf(cand);
+  if(!slots.length) return '';
+  return '<div class="edsec"><div class="eyebrow">Rörelsens bilder '
+   +'<em class="cnt">'+slots.length+'</em></div>'
+   +'<p class="mut" style="font-size:11px;line-height:1.55;margin:0 0 10px">'
+   +'Samma bildbank som Storyn. Byter du här slår det igenom i förhandsvisningen, '
+   +'i nyckelbilderna och i videon — det är samma renderare.</p>'
+   + slots.map(function(x){ return mediaPanel(x.s, x.k, x.n) }).join("")
+   +'</div>';
 }
 
 /* ---------------------------------------------------------------------
@@ -1611,7 +1626,7 @@ async function exportMotion(btn){
   var cnd = btn.dataset.mvcand || "";
   var m = sid ? motionOf(sid)
               : ((MK[cnd]||{})[btn.dataset.mvmdir]
-                 ? {cand:cnd, dir:btn.dataset.mvmdir, dur:MDUR[cnd]||6} : null);
+                 ? {cand:cnd, dir:btn.dataset.mvmdir, dur:durOf(cnd, btn.dataset.mvmdir)} : null);
   if(!m){ busy=false; return }
   var frameAt = sid ? function(tt){ return motionFrame(d, sid, tt) }
                     : function(tt){ return MK[m.cand][m.dir](d, tt) };

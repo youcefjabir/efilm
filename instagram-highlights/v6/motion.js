@@ -123,18 +123,25 @@ var MCAND = [
    Tre riktningar, tre bilder var. Riktningarna är samma tre genom hela
    uppsättningen så att kandidaterna går att jämföra mot varandra.
    ===================================================================== */
+/* Stillhet står först eftersom den ligger närmast hur svenska mäklare
+   faktiskt postar — inte för att den är vald. Ingen riktning är vald. */
 var MDIRS = [
- {id:"editorial", n:"01 · Editorial reveal",
+ {id:"stillhet", n:"01 · Stillhet",
+  d:"Den lätta. Ett fotografi i passepartout, ett spärrat ord, en rad. En enda långsam inzoomning på 5,5 %, texten står helt still. Referensen är svenska mäklares egna flöden."},
+ {id:"editorial", n:"02 · Editorial reveal",
   d:"Mycket luft. Stor typografi. Innehållet avslöjas genom masker och beskärningar. Magasinets kampanjuppslag."},
- {id:"system", n:"02 · System / process",
+ {id:"system", n:"03 · System / process",
   d:"Visar hur Viewly arbetar. Tunna linjer, rutnät, rena geometriska element. Ingen HUD, inga sken."},
- {id:"object", n:"03 · Object / material",
+ {id:"object", n:"04 · Object / material",
   d:"Materialet är huvudpersonen. Fotografi, plan eller text byggs upp framför tittaren. Gränssnitt bara där det förklarar."}
 ];
 
 /* ---------- storyboards ---------- */
 var MSTORY = {
  annons:{
+  stillhet:[["0,0 s","Ett fotografi i passepartout, 84 × 100 cqw. Under det ANNONSEN spärrat och rubriken verktyget skrev: <i>Ljuset som gör skillnad</i>. Märket uppe till vänster. Ingenting mer."],
+   ["0,0–8,0 s","Bilden zoomar in 5,5 % linjärt över hela klippet. Ingen ease — ease läses som webbanimation. Texten står helt still hela vägen."],
+   ["8,0 s","Slutbild. Rubriken är resultatet av verktyget, inte en beskrivning av det."]],
   editorial:[["0,0 s","Uppslaget ligger färdigt men tomt: fyra faktarader med sina rubriker, sex tomma bildplatser och textytans radlinjer. Rutnätet syns från första bildrutan — det är därför plåten aldrig känns halvfärdig."],
    ["0,3 s","Adress, ort och stadsdel, storlek och bostadstyp skrivs in rad för rad med clip-mask, 200 ms isär. Det är de 30 sekunder mäklaren faktiskt lägger."],
    ["2,3 s","Bilderna faller in i sina platser, 85 ms isär. Platserna flyttar sig inte — de fylls."],
@@ -153,6 +160,9 @@ var MSTORY = {
    ["5,4 s","Omskrivningen: markeringen flyttar till Varm och rubrik och ingress SKRIVS OM till en annan formulering. Det är den delen av produkten som är lättast att missa i en stillbild."],
    ["6,9 s","Andra omskrivningen till Exklusiv. Fotnot: två omskrivningar ingår."]]},
  motion:{
+  stillhet:[["0,0 s","Fotografiet i ram, RÖRLIG BILD och adressen. Inget spelknappsymbol, ingen förklaring."],
+   ["0,0–8,0 s","Inzoomning 9 % — här får den vara tydligare, eftersom rörelsen ÄR produkten. Fortfarande linjärt."],
+   ["8,0 s","Slutbild."]],
   editorial:[["0,0 s","Stillbilden i sitt fönster. Rubrik: <i>Stillbilden.</i>"],
    ["1,5 s","Bilden börjar en push-in på 6 % — linjärt, inte ease. Rubriken byts maskerat till <i>Rörelsen.</i>"],
    ["4,5 s","Push-in fortsätter till 13 %. Ingenting annat händer. Det är hela poängen."],
@@ -168,6 +178,10 @@ var MSTORY = {
    ["5,2 s","Andra bildbytet. Rubrik: <i>Filmen är klar.</i>"],
    ["6,6 s","Slutbild hålls."]]},
  estyl:{
+  stillhet:[["0,0 s","Det tomma rummet i ram. E-STYLING och ordet <i>Tomt</i>."],
+   ["2,1 s","Det möblerade rummet avslöjas underifrån med en mask genom samma ram. Ingen korsfade, ingen glödande kant."],
+   ["3,8 s","Ordet byts maskerat till <i>Möblerat</i>."],
+   ["8,0 s","Slutbild. Två bilder, ett ord, ingen text som förklarar vad e-styling är."]],
   editorial:[["0,0 s","Originalbilden i sin ram. Rubrik: <i>Tomt.</i>"],
    ["1,4 s","Wipe-kanten startar från vänster. Ren clip-inset, ingen suddighet, ingen linje som glöder."],
    ["3,2 s","Halvvägs. En 1 px ljus linje markerar kanten — det enda grafiska tillägget."],
@@ -183,6 +197,11 @@ var MSTORY = {
    ["5,0 s","Wipen klar."],
    ["5,4 s","Rubriken byts maskerat till <i>Ny känsla.</i> Slutbild hålls 1,6 s."]]},
  kampanj:{
+  stillhet:[["0,0 s","Bilden i ram. KOMMANDE spärrat, adressen under. Det här är hela formatet — det svenska mäklare faktiskt lägger upp."],
+   ["2,4 s","TILL SALU. Bilden byts med en mask underifrån, ordet byts maskerat, adressen står still."],
+   ["4,8 s","VISNING."],
+   ["7,2 s","SÅLD."],
+   ["9,6 s","Slutbild. Fyra faser utan en enda faktarad."]],
   editorial:[["0,0 s","Den färdiga KOMMANDE-artboarden ligger på uppslaget — samma mall som exporteras i vy 05, nedskalad till 70 cqw. Under den: fasnamnet i Cormorant, en rad om vad mallen gör, och fyra förloppsstreck med det första i oliv."],
    ["2,1 s","TILL SALU sätts över den föregående med en maskerad övergång från vänster, som ett tryckark. Faktaraden — 4 rum, 112 kvadratmeter, 1968 — kommer med i mallen, inte som påhäng."],
    ["4,2 s","VISNING. Mallen tömmer sig själv: en enda uppgift satt stort. Adressen i kicklinjen överst har inte rört sig en enda bildruta — det är beviset för att underlaget är detsamma."],
@@ -199,6 +218,10 @@ var MSTORY = {
    ["6,3 s","Såld. Förloppsstrecken fylls sist."],
    ["8,4 s","Slutbild hålls: fyra tryckfärdiga inlägg ur samma underlag."]]},
  format:{
+  stillhet:[["0,0 s","Bilden i en 9:16-ram, formatet spärrat under, adressen som rad. Höjden är låst."],
+   ["2,2 s","Ramen morfar till 4:5 — bilden står still, det är ytan som rör sig. Ordet byts maskerat."],
+   ["4,4 s","1:1."],
+   ["6,6 s","Slutbild."]],
   editorial:[["0,0 s","Till salu-mallen satt i 9:16, i full storlek på uppslaget. Under den: formatets namn i Cormorant och dess mått. Det är en riktig artboard ur vy 05, inte en beskuren bild."],
    ["2,2 s","Formatbytet sker under en vandrande kant: den gamla ytan tas bort uppifrån samtidigt som 4:5 sätts av samma kant. Höjden är låst, så det är BREDDEN som växer — och mallen sätter om sig själv i den."],
    ["4,4 s","1:1. Faktaraden får mer luft, bandhöjden räknas om, kolofonen står kvar. Samma mall, tredje ytan."],
@@ -212,6 +235,10 @@ var MSTORY = {
    ["4,4 s","Samma sak till 1:1."],
    ["6,6 s","Slutbild: <i>Kvadrat.</i>"]]},
  white:{
+  stillhet:[["0,0 s","Bilden i ram. Kontorets namn spärrat under, adressen som rad."],
+   ["2,7 s","Namnet byts maskerat till nästa kontor. Bild, ram och adress rör sig inte."],
+   ["5,4 s","Tredje kontoret."],
+   ["8,0 s","Slutbild. Att sidan levereras i kontorets varumärke sägs med ett ord, inte med en sida."]],
   editorial:[["0,0 s","Den faktiska visningssidan, satt men utan varumärke: list, hero, status, adress, faktarad, tre ingångar och knapp. Allt utom loggan och accentfärgen är på plats."],
    ["2,2 s","Nordvik. Accentfärgen sveper över sidan från vänster som en maskerad övergång — logotypruta, statusrad, knapp och domän färgas i samma svep. Bild, adress och faktarad rör sig inte en pixel."],
    ["4,4 s","Alvhem. Samma svep, en annan färg."],
@@ -225,6 +252,9 @@ var MSTORY = {
    ["4,4 s","Alvhem."],
    ["6,6 s","Slutbild."]]},
  tredim:{
+  stillhet:[["0,0 s","Rummet i ram, 3D VISNING spärrat, <i>Gå igenom bostaden</i> som rad."],
+   ["0,0–8,0 s","Inzoomning 7 %, linjärt. Ingen geometri ovanpå bilden, inget gränssnitt."],
+   ["8,0 s","Slutbild."]],
   editorial:[["0,0 s","Visningsytan som kunden faktiskt klickar i: lägesväljaren Dollhouse / Planvy / Rundvandring, vyn, och sidfoten med adress och boarea. Dollhouse aktivt."],
    ["2,2 s","Planvy sätts genom en maskerad övergång, och planritningen reser sig från platt till volym inne i vyn — en enda kamerarörelse, ease-in-out, ingen rotation."],
    ["4,4 s","Rundvandring. Samma modell, tredje läget."],
@@ -266,7 +296,7 @@ function secMotion(){
          +'<span class="mkfl">'+["Start","Nyckel","Slut"][st]+'</span></div>';
       }).join("");
       var board = (MSTORY[c.id]||{})[d.id] || [];
-      var dur = (MDUR[c.id]||6).toFixed(1).replace(".",",");
+      var dur = durOf(c.id, d.id).toFixed(1).replace(".",",");
       /* Allt som går att se ska gå att få ut: de tre nyckelbilderna, hela
          klippet som bildsekvens för klippning i annat program, och samma
          klipp inspelat som video. Tidigare fanns ingenting av det här —

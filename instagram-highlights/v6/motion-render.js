@@ -284,12 +284,10 @@ MK.annons = {
 /* ---------- 02 MOTION ---------- */
 MK.motion = {
  editorial:function(D, t){
-   var z = lerp(1, 1.13, t), fy = lerp(.5, .42, t);
+   var z = lerp(1, 1.13, t), fy = lerp(mfy("m-mo2"), mfy("m-mo2")-.08, t);
    var lab = t<.25 ? ["Stillbilden.", null, 0] : t<.75 ? ["Rörelsen.", null, seg(t,.22,.30)] : ["Filmen.", null, seg(t,.72,.80)];
    return mshell(D,
-     '<div style="position:absolute;left:0;right:0;top:26cqw;height:96cqw;overflow:hidden">'
-     +'<div style="position:absolute;inset:0;background-image:url('+(mediaURL("dining")||"")+');background-size:'
-     +(z*100).toFixed(2)+'% auto;background-position:50% '+(fy*100).toFixed(1)+'%"></div></div>'
+     mzoom("m-mo2", "dining", 0, 26, 100, 96, z, fy)
      + mkick(D,"Motion")
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:132cqw">'
      + mreveal(mdisp(D, lab[0], 10.6), lab[2]===0?1:lab[2]) +'</div>'
@@ -299,7 +297,7 @@ MK.motion = {
    var T=mtone(D), steps=["Bilderna","Rörelsen","Redigeringen","Filmen"];
    var p = eInOut(seg(t,.10,.86));
    return mshell(D, mkick(D,"Så byggs filmen")
-     + mimg("dining", 6.4, 30, 87.2, 49)
+     + mzoom("m-mo2", "dining", 6.4, 30, 87.2, 49, 1)
      +'<div style="position:absolute;left:'+(6.4+(87.2-40)*p).toFixed(2)+'cqw;top:34cqw;width:40cqw;height:41cqw;'
      +'border:1px solid '+T.oli+'"></div>'
      + mrule(D,88,6.4,6.4)
@@ -316,13 +314,13 @@ MK.motion = {
  },
  object:function(D, t){
    var a = seg(t,.24,.34), b = seg(t,.44,.54), c = seg(t,.74,.84);
-   var k = c>.5 ? "dining2" : b>.5 ? "dining" : "living";
+   var sl = c>.5 ? ["m-mo3","dining2"] : b>.5 ? ["m-mo2","dining"] : ["m-mo1","living"];
    var btnP = eOut(seg(t,.18,.30)), btnFade = 1 - .82*seg(t,.42,.52);
    var head = c>.5 ? ["Filmen är klar.", seg(t,.76,.86)]
             : b>.5 ? ["Rörelsen läggs på.", seg(t,.46,.56)]
                    : ["Bilderna finns redan.", 1];
    return mshell(D,
-     mimg(k, 0, 0, 100, 177.8)
+     mzoom(sl[0], sl[1], 0, 0, 100, 177.8, 1)
      +'<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,14,13,.34),rgba(14,14,13,0) 34%,rgba(14,14,13,.62))"></div>'
      +'<div style="position:absolute;left:6.4cqw;top:'+SAFE.top+'cqw;font-family:Montserrat,sans-serif;'
      +'font-size:2.25cqw;letter-spacing:.24em;text-transform:uppercase;color:#98A088">Motion</div>'
@@ -902,6 +900,207 @@ MK.tredim = {
 };
 
 /* ---------------------------------------------------------------------
+   BILDPLATSER I RÖRELSE
+
+   Rörelsens bilder gick inte att byta. Nycklarna låg inbakade i
+   renderarna, och en av dem — push-in-bilden i Motion — gick rakt på
+   mediaURL() förbi hela slotsystemet. Editorn hade därför ingenting att
+   erbjuda, och den som ville byta bild kunde inte.
+
+   Nu har varje kandidat en namngiven uppsättning platser. msrc() slår
+   upp platsen i SLOTS först och faller tillbaka på originalnyckeln, så
+   allt ser likadant ut tills någon byter — precis som Storyns bildplats.
+   --------------------------------------------------------------------- */
+var MSLOTS = {
+  annons: ANIM6.map(function(k, j){ return {s:"m-"+k, k:k, n:"Underlag "+(j+1)} }),
+  motion: [{s:"m-mo1", k:"living",  n:"Första bilden"},
+           {s:"m-mo2", k:"dining",  n:"Push-in / andra"},
+           {s:"m-mo3", k:"dining2", n:"Slutbilden"}],
+  estyl:  [{s:"m-w1",  k:"esLivBef", n:"Före"},
+           {s:"m-w2",  k:"esLivAft", n:"Efter"}],
+  /* kampanj och format fylls i vid uppslag — POSTS lastas i ett senare
+     script än det här och finns inte när filen körs igenom */
+  kampanj:null,
+  format: null,
+  white:  [{s:"m-site-hero", k:"matterport", n:"Sidans hero"},
+           {s:"m-site-0", k:"threed", n:"Ingång 1"},
+           {s:"m-site-1", k:"om3",    n:"Ingång 2"},
+           {s:"m-site-2", k:"drone",  n:"Ingång 3"}],
+  tredim: [{s:"m-3d-0", k:"threed",     n:"Dollhouse"},
+           {s:"m-3d-2", k:"matterport", n:"Rundvandring"}]
+};
+function mslotKey(slot, fallback){
+  var o = SLOTS[slot];
+  return (o && o.img) || fallback;
+}
+function msrc(slot, fallback){ return mediaURL(mslotKey(slot, fallback)) || "" }
+function mfy(slot, def){ var o = SLOTS[slot] || {}; return o.fy != null ? o.fy : (def == null ? .5 : def) }
+/* En bild med egen skala — används av push-in och av Stillhet. Går genom
+   samma plats som allt annat, så bytet slår igenom här också. */
+function mzoom(slot, k, x, y, w, h, zoom, fyOver, extra){
+  var u = msrc(slot, k), fy = (fyOver == null ? mfy(slot) : fyOver) * 100;
+  var inner = u
+    ? 'background-image:url('+u+');background-size:'+(zoom*100).toFixed(2)+'% auto;'
+      +'background-position:50% '+fy.toFixed(1)+'%;'
+    : 'background:repeating-linear-gradient(135deg,#DAD6D0 0 8px,#D2CDC6 8px 16px);';
+  return '<div style="position:absolute;left:'+x+'cqw;top:'+y+'cqw;width:'+w+'cqw;height:'+h
+   +'cqw;overflow:hidden;'+(extra||'')+'"><div style="position:absolute;inset:0;'+inner+'"></div></div>';
+}
+/* Vilken plats hör en viss kandidat till? Editorn frågar den här. */
+function mslotsOf(cand){
+  if(cand === "kampanj"){
+    return POSTS.map(function(p){ return {s:"post-"+p.id, k:p.m, n:"Mall · "+p.phase} });
+  }
+  if(cand === "format"){
+    var p2 = POSTS.filter(function(x){ return x.id==="p2" })[0];
+    return p2 ? [{s:"post-p2", k:p2.m, n:"Mallens bild"}] : [];
+  }
+  return MSLOTS[cand] || [];
+}
+
+/* =====================================================================
+   04 · STILLHET — den lätta riktningen
+
+   Referensen är svenska mäklares egna Stories, de som gör det bra.
+   Fantastic Frank, Alvhem, Historiska Hem, Skeppsholmen. Titta på dem
+   och räkna elementen: ett fotografi, en tunn ram, en rad text. Ofta
+   adressen. Ibland ett litet spärrat ord — KOMMANDE, TILL SALU, SÅLD.
+   Det är allt.
+
+   De tre första riktningarna förklarar. De har rubrik, ingress, mätlinje
+   och kolofon, för att de ska bevisa hur en produkt fungerar. Det är
+   rätt för ett säljunderlag och fel för ett flöde. Stillhet är motsatsen:
+   ingenting förklaras, ytan får vara tyst.
+
+   Reglerna, och de gäller alla sju kandidaterna:
+     · ETT fotografi, i passepartout med generös marginal
+     · EN rörelse — en långsam inzoomning på 5,5 %, linjärt över hela
+       klippet. Ingen ease, för ease läses som en webbanimation
+     · EN rad satt typografi, plus ett litet spärrat ord ovanför
+     · texten står HELT STILLA. Bara bilden rör sig
+     · ingen ingress, ingen faktarad, ingen mätlinje, ingen kolofon i
+       två spalter — bara ett litet märke centrerat i underkant
+     · byten sker med mask, aldrig korsfade
+
+   Det som gör den till en riktning och inte sju engångslayouter är att
+   allt går genom mstill(). Kandidaterna byter bara ut bilden, ordet och
+   raden.
+   ===================================================================== */
+var STILL = {
+  X: 8, Y: 30, W: 84, H: 100,       /* passepartout — stående, som ramen på en vägg */
+  KICK: 135.5, LINE: 140.5          /* ordet och raden, båda stilla */
+};
+/* Märket sitter uppe till vänster i litet format, som ett kontor sätter
+   sin logotyp. Nertill hamnade det under Instagrams svarsfält, och utan
+   satt bredd renderades SVG:n i sin naturliga storlek — ett jättemärke
+   tvärs över plåten. */
+function mmark(D){
+  var T = mtone(D);
+  return '<div style="position:absolute;left:8cqw;top:'+SAFE.top+'cqw;width:4.2cqw;opacity:.5">'
+   + vmark(T.ink, T.oli, 'style="width:100%;height:auto;display:block"') +'</div>';
+}
+/* o = {slot, k, kick, line, t, zoom0, zoom1, prevKick, prevLine, swap, wipe} */
+function mstill(D, o){
+  var T = mtone(D), S = STILL;
+  var z = lerp(o.zoom0 == null ? 1 : o.zoom0, o.zoom1 == null ? 1.055 : o.zoom1, mclamp(o.t));
+  var sp = o.swap == null ? 1 : mclamp(o.swap);
+  var kick = function(txt){
+    return '<div style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:500;'
+     +'letter-spacing:.38em;text-transform:uppercase;color:'+T.oli+'">'+esc(txt)+'</div>';
+  };
+  var line = function(txt){
+    return '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;color:'+T.ink+';'
+     + dsize(txt, 8.4, SERIF) +'line-height:1.04">'+esc(txt)+'</div>';
+  };
+  /* bilden: den nya ligger under, den gamla dras bort med en mask */
+  var img = o.wipe != null && o.wipe < 1
+    ? mzoom(o.slot2, o.k2, S.X, S.Y, S.W, S.H, z)
+      + mzoom(o.slot, o.k, S.X, S.Y, S.W, S.H, z,
+              null, 'clip-path:inset(0 0 '+(o.wipe*100).toFixed(1)+'% 0);')
+    : mzoom(o.slot, o.k, S.X, S.Y, S.W, S.H, z);
+  return mshell(D, img
+   +'<div style="position:absolute;left:'+S.X+'cqw;right:'+S.X+'cqw;top:'+S.Y+'cqw;height:'+S.H
+   +'cqw;outline:1px solid '+(T.dark ? "rgba(239,237,231,.16)" : "rgba(28,28,30,.10)")+';pointer-events:none"></div>'
+   +'<div style="position:absolute;left:'+S.X+'cqw;right:'+S.X+'cqw;top:'+S.KICK+'cqw">'
+   + (o.prevKick != null ? mswap2(kick(o.prevKick), kick(o.kick), sp) : kick(o.kick)) +'</div>'
+   +'<div style="position:absolute;left:'+S.X+'cqw;right:'+S.X+'cqw;top:'+S.LINE+'cqw">'
+   + (o.prevLine != null ? mswap2(line(o.prevLine), line(o.line), sp) : line(o.line)) +'</div>'
+   + mmark(D));
+}
+
+/* ---- 01 Annonsskrivaren: den färdiga rubriken, inte verktyget ---- */
+MK.annons.stillhet = function(D, t){
+  return mstill(D, {slot:"m-living", k:"living", t:t,
+    kick:"Annonsen", line:"Ljuset som gör skillnad"});
+};
+/* ---- 02 Motion: en enda långsam inzoomning. Det ÄR produkten ---- */
+MK.motion.stillhet = function(D, t){
+  return mstill(D, {slot:"m-mo2", k:"dining", t:t, zoom1:1.09,
+    kick:"Rörlig bild", line:"Silvergården 9A"});
+};
+/* ---- 03 E-styling: tomt blir möblerat under en mask ---- */
+MK.estyl.stillhet = function(D, t){
+  var w = 1 - eInOut(seg(t, .26, .74));
+  return mstill(D, {slot:"m-w1", k:"esLivBef", slot2:"m-w2", k2:"esLivAft",
+    wipe:w, t:t, swap:seg(t,.62,.84),
+    kick:"E-styling", prevLine:"Tomt", line:"Möblerat"});
+};
+/* ---- 04 Kampanjen: ordet byts, adressen står still ----
+   Det här är precis det svenska mäklare gör: en bild, ett ord, adressen. */
+MK.kampanj.stillhet = function(D, t){
+  var ph = mphN(t, 0, .96, 4), i = ph.i;
+  var pp = mpost(MPH4[i]), pv = mpost(MPH4[i > 0 ? i-1 : 0]);
+  return mstill(D, {
+    slot:"post-"+MPH4[i], k:pp.m,
+    slot2:"post-"+MPH4[i>0?i-1:0], k2:pv.m,
+    wipe: i>0 ? 1 - eInOut(Math.min(1, ph.local/.24)) : 0,
+    t:t, swap: i>0 ? Math.min(1, ph.local/.34) : 1,
+    prevKick: MPCAP[i>0?i-1:0][0], kick: MPCAP[i][0],
+    prevLine: pv.addr, line: pp.addr});
+};
+/* ---- 05 Format: samma bild, ramen byter proportion ----
+   Enda kandidaten där passepartouten själv rör sig, eftersom ytan är
+   ämnet. Bilden står still i stället. */
+MK.format.stillhet = function(D, t){
+  var T = mtone(D), ph = mphN(t, 0, .96, 3), i = ph.i;
+  var f = FMT3[i], pf = FMT3[i>0?i-1:0];
+  var m  = i>0 ? eInOut(Math.min(1, ph.local/.26)) : 1;
+  var sp = i>0 ? Math.min(1, ph.local/.34) : 1;
+  var H = 100, Y = 30;
+  var w = lerp(H*pf[3]/pf[4], H*f[3]/f[4], m), x = (100-w)/2;
+  var kick = function(txt){
+    return '<div style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:500;'
+     +'letter-spacing:.38em;text-transform:uppercase;color:'+T.oli+'">'+esc(txt)+'</div>';
+  };
+  var line = function(txt){
+    return '<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;color:'+T.ink+';'
+     + dsize(txt, 8.4, SERIF) +'line-height:1.04">'+esc(txt)+'</div>';
+  };
+  return mshell(D,
+    mzoom("post-p2", "kitchen", x, Y, w, H, 1.04)
+   +'<div style="position:absolute;left:'+x.toFixed(2)+'cqw;top:'+Y+'cqw;width:'+w.toFixed(2)+'cqw;height:'+H
+   +'cqw;outline:1px solid '+(T.dark?"rgba(239,237,231,.16)":"rgba(28,28,30,.10)")+'"></div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:'+STILL.KICK+'cqw">'
+   + mswap2(kick(pf[1]+" · "+pf[0]), kick(f[1]+" · "+f[0]), sp) +'</div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:'+STILL.LINE+'cqw">'
+   + line("Silvergården 9A") +'</div>'
+   + mmark(D));
+};
+/* ---- 06 White label: kontorets namn byts, bilden är densamma ---- */
+MK.white.stillhet = function(D, t){
+  var ph = mphN(t, 0, .96, 3), i = ph.i;
+  return mstill(D, {slot:"m-site-hero", k:"matterport", t:t,
+    swap: i>0 ? Math.min(1, ph.local/.34) : 1,
+    prevKick: MWB[i>0?i-1:0][2], kick: MWB[i][2],
+    line:"Silvergården 9A"});
+};
+/* ---- 07 3D visning: rummet, långsamt ---- */
+MK.tredim.stillhet = function(D, t){
+  return mstill(D, {slot:"m-3d-2", k:"matterport", t:t, zoom1:1.07,
+    kick:"3D visning", line:"Gå igenom bostaden"});
+};
+
+/* ---------------------------------------------------------------------
    KOPPLINGEN TILL BIBLIOTEKET
    Motion är ett ALTERNATIV, aldrig ett utbyte. MPICK är tomt som default
    och då renderas bildrutan precis som förut. Sätts den renderas
@@ -914,10 +1113,14 @@ var MSID = {
 var MPICK = {};            /* sid -> "editorial" | "system" | "object" */
 var MOTION_T = 0;          /* nuvarande position 0–1, satt av spelaren/exporten */
 var MDUR = {annons:7.8, motion:6.4, estyl:6.2, kampanj:8.4, format:6.6, white:6.6, tredim:6.6};
+/* Stillhet håller samma längd oavsett kandidat — lugnet är poängen, och
+   en inzoomning på 5,5 % behöver tid för att läsas som rörelse alls. */
+var MDURX = {stillhet:8.0, kampanj_stillhet:9.6};
+function durOf(cand, dir){ return MDURX[cand+"_"+dir] || MDURX[dir] || MDUR[cand] || 6 }
 
 function motionOf(sid){
   var c = MSID[sid], d = MPICK[sid];
-  return (c && d && MK[c] && MK[c][d]) ? {cand:c, dir:d, dur:MDUR[c]||6} : null;
+  return (c && d && MK[c] && MK[c][d]) ? {cand:c, dir:d, dur:durOf(c,d)} : null;
 }
 function motionFrame(dirId, sid, t){
   var m = motionOf(sid); if(!m) return null;
