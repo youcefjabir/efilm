@@ -1007,11 +1007,16 @@ var AR = {"9:16":[9,16], "4:5":[4,5], "1:1":[1,1]};
 /* I 9:16 ligger Instagrams svarsfält över de nedersta 26 cqw. Bandet växer
    och får extra bottenpadding där, så faktarad och kolofon aldrig hamnar under. */
 function safeBot(ar){ return ar==="9:16" ? SAFE.bot : 4.6 }
-function paWrap(p, band, bandH, ar){
+/* veil lägger en ljus slöja över fotografiet — SÅLD backar bilden. Den låg
+   tidigare inne som en strängersättning på den färdiga markupen, vilket tappade
+   ett </div> och lämnade artboarden obalanserad. Nu är den en parameter. */
+function paWrap(p, band, bandH, ar, veil){
   var sb = safeBot(ar), H = bandH + (sb - 4.6);
   return '<div class="a" style="overflow:hidden">'
    +'<div style="position:absolute;left:0;right:0;top:0;bottom:'+H+'cqw;overflow:hidden">'
-     +'<div style="position:absolute;inset:0;'+bg(p.m,"post-"+p.id)+'"></div></div>'
+     +'<div style="position:absolute;inset:0;'+bg(p.m,"post-"+p.id)+'"></div>'
+     +(veil ? '<div style="position:absolute;inset:0;background:'+veil+'"></div>' : '')
+   +'</div>'
    +'<div style="position:absolute;left:0;right:0;bottom:0;height:'+H+'cqw;background:#F2EFEF;'
      +'padding:4.2cqw 5.6cqw '+sb+'cqw;display:flex;flex-direction:column">'+band+'</div></div>';
 }
@@ -1068,10 +1073,7 @@ var PA = {
     +'<div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:2.8cqw">'
       +'<span class="a-l" style="font-size:2.5cqw">'+esc(p.addr)+' · '+esc(p.city)+'</span>'
       +'<span class="a-k" style="font-size:1.9cqw">'+esc(p.note)+'</span></div>'
-    + paFoot(p.when), 52, ar)
-    .replace('</div></div><div style="position:absolute;left:0;right:0;bottom:0;height:',
-             '<div style="position:absolute;inset:0;background:rgba(242,239,239,.26)"></div></div>'
-            +'<div style="position:absolute;left:0;right:0;bottom:0;height:');
+    + paFoot(p.when), 52, ar, 'rgba(242,239,239,.26)');
  }
 };
 
