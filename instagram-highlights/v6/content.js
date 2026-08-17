@@ -32,7 +32,11 @@ var PRIMS = [
   {id:"flow",      n:"Flow",            d:"Input → bearbetning → output. Visar processen, med ett faktiskt resultat i slutet."},
   {id:"matrix",    n:"Format matrix",   d:"Samma objekt i sanna formatproportioner. 4:5, 1:1 och 9:16 mätbart mot varandra."},
   {id:"phases",    n:"Phases",          d:"En kampanj som fyra faktiska artboards, med aktuellt läge tänt."},
-  {id:"whitelabel",n:"White label",     d:"Samma leverans i två kontors varumärken, sida vid sida. För 3D-visningssidan och områdeskartan, som inte bär Viewlys uttryck utan kundens."}
+  {id:"whitelabel",n:"White label",     d:"Samma leverans i två kontors varumärken, sida vid sida. För 3D-visningssidan och områdeskartan, som inte bär Viewlys uttryck utan kundens."},
+  /* --- illustration: sambandet mellan delarna, som inte går att fotografera --- */
+  {id:"orbit",     n:"Orbit",          d:"En nod i mitten och n satelliter. Vänd inåt matar delarna objektet, vänd utåt matar objektet delarna."},
+  {id:"chain",     n:"Chain",          d:"Numrerade steg med förbindelser. Ett arbetsflöde där varje steg förenklar nästa."},
+  {id:"portal",    n:"Portal",         d:"Spritt blir samlat. Sex leverantörer till vänster, en yta till höger."}
 ];
 
 /* ett representativt exempel per primitiv, för specimen-rutnätet */
@@ -49,7 +53,10 @@ var SPECS = [
   {p:"flow",       ref:["annonsen",2]},
   {p:"matrix",     ref:["kampanjen",2]},
   {p:"phases",     ref:["kampanjen",3]},
-  {p:"whitelabel", ref:["visning",3]}
+  {p:"whitelabel", ref:["visning",3]},
+  {p:"orbit",      ref:["ekosystem",1]},
+  {p:"chain",      ref:["ekosystem",3]},
+  {p:"portal",     ref:["ekosystem",4]}
 ];
 
 /* --------------------------------------------------------------------

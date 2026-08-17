@@ -1250,31 +1250,145 @@ function cov(h, key){
    TRE SYSTEM — alla tre är ikoner
    Samma fjorton motiv, tre utföranden. Valet ligger i CPICKS[kapitel-id].
    --------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+   TRE SYSTEM TILL — ren design
+
+   De tre första systemen ritar motivet i en cirkel med kapitlets namn
+   under. Det är informativt men det är inte ett omslag — det är en ikon
+   med etikett.
+
+   De tre nya har varken cirkel eller text. Instagram beskär ändå rutan
+   till en cirkel i profilraden, så det är fel att rita en till; ytan ska
+   komponeras för att tåla beskärningen, inte upprepa den. Och namnet står
+   redan under omslaget i Instagrams eget gränssnitt.
+
+   Kvar blir bara designen:
+
+     FÄLT    motivet uppförstorat 1,75 gånger och beskuret av rutan.
+             Två toner, ingen ram. Läses som en form långt innan den
+             läses som en symbol.
+     SNITT   ett enda diagonalt snitt i märkets egen vinkel, 58 grader.
+             Motivet ligger över snittet och byter färg där det korsar.
+     RELIEF  motivet två gånger med förskjutning — oliv bakom, bläck
+             framför. Tryckkänslan, utan att låtsas vara papper.
+
+   Samma fjorton motiv som förut. Det som byts är hur de presenteras.
+   --------------------------------------------------------------------- */
+var COVPAL2 = {
+  arkiv: {
+    falt:   {bg:"#6E7266", t1:"#8A9080", t2:"#F2EFEF", t3:"#1C1C1E"},
+    snitt:  {bg:"#EFECE6", t1:"#C8CCBF", t2:"#1C1C1E", t3:"#6E7266"},
+    relief: {bg:"#EFECE6", t1:"#C8CCBF", t2:"#1C1C1E", t3:"#6E7266"}
+  },
+  skugga: {
+    falt:   {bg:"#2C322A", t1:"#48503E", t2:"#EFEDE7", t3:"#98A088"},
+    snitt:  {bg:"#0E0E0D", t1:"#33332F", t2:"#EFEDE7", t3:"#98A088"},
+    relief: {bg:"#0E0E0D", t1:"#33332F", t2:"#EFEDE7", t3:"#98A088"}
+  }
+};
+/* snittets motsida: grunden och motivet byter plats */
+function covInv(P){
+  return {bg:P.t2, t1:P.t3, t2:P.bg, t3:P.t1};
+}
+/* Märkets vinkel, 58 grader, uttryckt som en linje tvärs över rutan. */
+function covCut(){
+  var t = (typeof GEO !== "undefined" && GEO.tan) ? GEO.tan : 1.6003;
+  /* y = 50 + tan*(x-50), klippt mot rutans kanter */
+  var y0 = 50 - t*50, y1 = 50 + t*50;
+  return {y0:y0, y1:y1};
+}
+function covMotif(key, P){
+  var f = PICTO[key] || PICTO.vmark;
+  return f(P);
+}
+/* ---- de tre nya ytorna, alla i en 0 0 100 100-ruta ---- */
+function covFalt(key, P){
+  /* Uppförstorat kring rutans mitt, inte kring origo — annars hamnar
+     beskärningen där motivet råkar ligga och halva uppsättningen blir
+     oigenkännlig. 1,5 gånger fyller ytan och lämnar silhuetten läsbar;
+     förskjutningen uppåt vänster ger asymmetrin. */
+  var k = 1.5, c = 50 - 50*k;
+  return '<rect width="100" height="100" fill="'+P.bg+'"/>'
+   +'<g transform="translate('+(c-5).toFixed(1)+' '+(c-3).toFixed(1)+') scale('+k+')">'
+   + covMotif(key, P) +'</g>';
+}
+function covSnitt(key, P){
+  var c = covCut(), id = "cut"+Math.abs(hashStr(key))%99999;
+  var I = covInv(P);
+  return '<defs>'
+   +'<clipPath id="'+id+'a"><path d="M 0 '+c.y0+' L 100 '+c.y1+' L 100 -200 L 0 -200 Z"/></clipPath>'
+   +'<clipPath id="'+id+'b"><path d="M 0 '+c.y0+' L 100 '+c.y1+' L 100 300 L 0 300 Z"/></clipPath>'
+   +'</defs>'
+   +'<g clip-path="url(#'+id+'a)"><rect width="100" height="100" fill="'+P.bg+'"/>'
+     + covMotif(key, P) +'</g>'
+   +'<g clip-path="url(#'+id+'b)"><rect width="100" height="100" fill="'+I.bg+'"/>'
+     + covMotif(key, I) +'</g>';
+}
+function covRelief(key, P){
+  /* Förskjutningen måste synas vid 56 px, annars är det bara ett
+     pictogram igen. 6 enheter av 100 syns; 3 gör det inte. Skuggan är
+     helt i oliv och motivet helt i bläck, så paret läses som två lager. */
+  var S = {bg:P.t3, t1:P.t3, t2:P.t3, t3:P.t3};
+  var F = {bg:P.bg, t1:P.t2, t2:P.t2, t3:P.t2};
+  return '<rect width="100" height="100" fill="'+P.bg+'"/>'
+   +'<g transform="translate(6 6)">'+ covMotif(key, S) +'</g>'
+   + covMotif(key, F);
+}
+/* stabil liten hash så clipPath-id:t inte krockar mellan omslag */
+function hashStr(s){
+  var h = 0; s = String(s);
+  for(var i = 0; i < s.length; i++){ h = (h*31 + s.charCodeAt(i)) | 0 }
+  return h;
+}
+
 var CPICKS = {};
 var COVSETS = [
   {id:"pictogram", k:"pictogram", n:"Pictogram", d:"Fylld form, utskurna detaljer. Rak och tyst."},
   {id:"linjen",    k:"line",      n:"Linjen",    d:"Samma motiv i hårlinje, med stort andrum."},
-  {id:"negativ",   k:"negativ",   n:"Negativ",   d:"Formen urskuren ur en fylld olivplatta."}
+  {id:"negativ",   k:"negativ",   n:"Negativ",   d:"Formen urskuren ur en fylld olivplatta."},
+  /* --- utan cirkel, utan text: bara designen --- */
+  {id:"falt",   k:"falt",   n:"Fält",   d:"Motivet uppförstorat och beskuret av rutan. Två toner, ingen ram.", pure:true},
+  {id:"snitt",  k:"snitt",  n:"Snitt",  d:"Ett diagonalt snitt i märkets egen vinkel. Motivet byter färg där det korsar.", pure:true},
+  {id:"relief", k:"relief", n:"Relief", d:"Motivet två gånger med förskjutning — oliv bakom, bläck framför.", pure:true}
 ];
-function covSetIx(h){ var v = CPICKS[h.id]; return (v===1||v===2) ? v : 0 }
+/* Ett rent omslag ritar varken cirkel eller etikett. */
+function covPure(ix){ return !!(COVSETS[ix] && COVSETS[ix].pure) }
+/* Antalet system är inte längre tre — gränsen läses ur COVSETS i stället
+   för att stå i koden, annars hamnar varje nytt system tyst på nummer ett. */
+function covSetIx(h){
+  var v = CPICKS[h.id];
+  return (typeof v === "number" && v > 0 && v < COVSETS.length) ? v : 0;
+}
 function covPal(dirId, ix){
+  var k = COVSETS[ix].k;
   var d = COVPAL[dirId] || COVPAL.arkiv;
-  return d[COVSETS[ix].k];
+  var d2 = COVPAL2[dirId] || COVPAL2.arkiv;
+  return d[k] || d2[k];
 }
 function covArt(dirId, h, ix){
-  var P = covPal(dirId, ix);
-  var key = cov(h,"glyph");
-  var f = (ix===1 ? LINE : PICTO)[key] || (ix===1 ? LINE : PICTO).vmark;
+  var P = covPal(dirId, ix), key = cov(h,"glyph"), body;
+  var k = COVSETS[ix].k;
+  if(k === "falt")        body = covFalt(key, P);
+  else if(k === "snitt")  body = covSnitt(key, P);
+  else if(k === "relief") body = covRelief(key, P);
+  else {
+    var f = (ix===1 ? LINE : PICTO)[key] || (ix===1 ? LINE : PICTO).vmark;
+    body = f(P);
+  }
   return '<div style="position:absolute;inset:0;display:grid;place-items:center">'
     +'<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" aria-hidden="true">'
-    + f(P) +'</svg></div>';
+    + body +'</svg></div>';
 }
 
 /* ar: "1:1" i profilraden, "9:16" vid export */
 function cover(dirId, h, ar){
   var sq = ar !== "9:16", ix = covSetIx(h), P = covPal(dirId, ix);
   var plate = sq ? 'inset:0' : 'left:8cqw;right:8cqw;top:50%;transform:translateY(-50%);aspect-ratio:1';
-  return '<div style="position:absolute;'+plate+';border-radius:50%;overflow:hidden;background:'+P.bg+'">'
+  /* Instagram beskär ändå rutan till en cirkel i profilraden. De rena
+     systemen ritar därför ingen egen — ytan komponeras för beskärningen
+     i stället för att upprepa den. */
+  var rad = covPure(ix) ? '' : 'border-radius:50%;';
+  return '<div style="position:absolute;'+plate+';'+rad+'overflow:hidden;background:'+P.bg+'">'
     + covArt(dirId, h, ix) +'</div>';
 }
 
@@ -1284,6 +1398,14 @@ function coverFrame(dirId, h){
   var pap = dirId==="skugga" ? "#0E0E0D" : "#F2EFEF";
   var ink = dirId==="skugga" ? "#EFEDE7" : "#1C1C1E";
   var oli = dirId==="skugga" ? "#98A088" : "#6E7266";
+  /* Rena system exporteras som just bara designen — ingen cirkel, ingen
+     etikett, ingen mätlinje. Ytan är omslaget. */
+  if(covPure(ix)){
+    return '<div class="'+(dirId==="skugga"?"b":"a")+'" style="background:'+P.bg+'">'
+      +'<div style="position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);'
+      +'aspect-ratio:1;overflow:hidden;container-type:inline-size">'
+      + cover(dirId,h,"1:1") +'</div></div>';
+  }
   return '<div class="'+(dirId==="skugga"?"b":"a")+'" style="background:'+pap+'">'
     +'<div style="position:absolute;left:0;right:0;top:'+SAFE.top+'cqw;bottom:'+SAFE.bot+'cqw;'
     +'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7cqw">'
@@ -1620,6 +1742,214 @@ var PA = {
       +'<span class="a-k" style="font-size:1.9cqw">'+esc(p.note)+'</span></div>'
     + paFoot(p.when), 52, ar, 'rgba(242,239,239,.26)');
  }
+};
+
+/* =====================================================================
+   ILLUSTRATIONSPRIMITIV — ekosystemet ritat, inte fotograferat
+
+   Kapitel 15 handlar om hur delarna hänger ihop. Det går inte att
+   fotografera. Ett foto på ett kök säger ingenting om att samma objekt
+   bär både planritningen, filmen och annonsen — det måste RITAS.
+
+   Därför tre nya primitiv som bara använder geometri, linje och typografi:
+
+     orbit   en nod i mitten och n satelliter runt den. dir:"in" när
+             satelliterna matar mitten (grundmaterialet), dir:"out" när
+             mitten matar satelliterna (förädlingen). Samma figur, vänd.
+     chain   numrerade steg under varandra med förbindelser. Flödet på
+             viewly.se/maklare: intagning, produktion, portal, annons,
+             kampanj.
+     portal  spridda märken till vänster som samlas i en enda yta till
+             höger. Administrationen före och efter.
+
+   Ingen av dem tar en bild. De ritas i SVG med samma två färger som
+   resten av riktningen, så de sitter i samma system som allt annat.
+   ===================================================================== */
+
+/* Nodens position på en cirkel. Startar rakt upp och går medsols. */
+function ekoPos(i, n, r, cx, cy){
+  var a = -Math.PI/2 + i*2*Math.PI/n;
+  return {x:cx + Math.cos(a)*r, y:cy + Math.sin(a)*r};
+}
+/* En pil längs linjen mellan två punkter, en bit in från slutet. */
+function ekoArrow(x1, y1, x2, y2, col, at, sz){
+  var dx = x2-x1, dy = y2-y1, L = Math.sqrt(dx*dx+dy*dy) || 1;
+  var ux = dx/L, uy = dy/L, px = x1+ux*L*at, py = y1+uy*L*at;
+  var nx = -uy, ny = ux;
+  sz = sz || 2.1;
+  return '<path d="M '+(px+ux*sz)+' '+(py+uy*sz)
+   +' L '+(px-ux*sz*.5+nx*sz*.72)+' '+(py-uy*sz*.5+ny*sz*.72)
+   +' L '+(px-ux*sz*.5-nx*sz*.72)+' '+(py-uy*sz*.5-ny*sz*.72)
+   +' Z" fill="'+col+'"/>';
+}
+/* Själva figuren, i en 0 0 100 100-ruta. p är 0–1 och används av motion;
+   statiskt renderas den alltid färdig (p = 1). */
+function ekoOrbit(ink, oli, line, items, out, p){
+  p = (p == null) ? 1 : mclampX(p);
+  var n = items.length, cx = 50, cy = 50, R = 34, rr = 3.1;
+  var s = '<circle cx="50" cy="50" r="'+R+'" fill="none" stroke="'+line+'" stroke-width=".5"/>';
+  for(var i = 0; i < n; i++){
+    var q = ekoPos(i, n, R, cx, cy);
+    var on = p >= (i+1)/(n+1) - .001;
+    /* ekern ritas från mitten ut, eller utifrån in */
+    var a = out ? [cx, cy, q.x, q.y] : [q.x, q.y, cx, cy];
+    var grow = out ? Math.max(0, Math.min(1, (p-(i)/(n+1))*(n+1)))
+                   : Math.max(0, Math.min(1, (p-(i)/(n+1))*(n+1)));
+    var ex = a[0] + (a[2]-a[0])*grow, ey = a[1] + (a[3]-a[1])*grow;
+    s += '<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+ex+'" y2="'+ey+'" stroke="'+oli+'" stroke-width=".9"/>';
+    if(grow > .55) s += ekoArrow(a[0], a[1], a[2], a[3], oli, .62);
+    s += '<circle cx="'+q.x+'" cy="'+q.y+'" r="'+rr+'" fill="'+(on?oli:"none")
+       + '" stroke="'+(on?oli:line)+'" stroke-width=".9"/>';
+  }
+  /* mitten: objektet */
+  s += '<circle cx="50" cy="50" r="8.6" fill="none" stroke="'+ink+'" stroke-width="1.1"/>'
+     + '<circle cx="50" cy="50" r="3.4" fill="'+ink+'"/>';
+  return '<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" aria-hidden="true">'+s+'</svg>';
+}
+function mclampX(v){ return v<0?0:v>1?1:v }
+
+/* ---------------------------------------------------------------- A · ARKIV */
+/* 14 · ORBIT */
+A.orbit = function(s,i,n){
+  var out = s.dir === "out";
+  var labs = s.items.map(function(x,j){
+    var q = ekoPos(j, s.items.length, 44, 50, 50);
+    return '<span style="position:absolute;left:'+q.x.toFixed(2)+'%;top:'+q.y.toFixed(2)+'%;'
+     +'transform:translate(-50%,-50%);font-family:Montserrat,sans-serif;font-size:2.1cqw;'
+     +'font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#4A4744;'
+     +'white-space:nowrap;background:#F2EFEF;padding:0 1cqw">'+esc(x)+'</span>';
+  }).join("");
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:4cqw">'
+   +'<div class="a-d sm" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="position:relative;width:100%;aspect-ratio:1;max-height:74cqw;align-self:center">'
+   + ekoOrbit("#1C1C1E","#6E7266","#D8D2CF", s.items, out) + labs +'</div>'
+   +(s.s?'<div><div class="a-r" style="margin-bottom:2.2cqw"></div>'
+        +'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div></div>':'')+'</div>');
+};
+/* 15 · CHAIN */
+A.chain = function(s,i,n){
+  var steps = s.items.map(function(x,j){
+    var on = s.now == null || j <= s.now;
+    return '<div style="display:flex;align-items:flex-start;gap:3.4cqw;position:relative">'
+     +'<div style="flex:0 0 8cqw;display:flex;flex-direction:column;align-items:center">'
+       +'<span style="width:8cqw;height:8cqw;border-radius:50%;border:1px solid '+(on?"#6E7266":"#D8D2CF")
+       +';background:'+(on?"#6E7266":"transparent")+';display:grid;place-items:center;'
+       +'font-family:Montserrat,sans-serif;font-size:2.1cqw;font-weight:600;letter-spacing:.06em;'
+       +'color:'+(on?"#F2EFEF":"#A9A29E")+'">'+String(j+1).padStart(2,"0")+'</span>'
+       + (j < s.items.length-1
+          ? '<span style="width:1px;flex:1;min-height:5.2cqw;background:'+(on?"#6E7266":"#D8D2CF")+'"></span>' : '')
+     +'</div>'
+     +'<div style="padding-bottom:'+(j<s.items.length-1?4.4:0)+'cqw">'
+       +'<div style="font-family:Montserrat,sans-serif;font-size:2.3cqw;font-weight:600;letter-spacing:.2em;'
+       +'text-transform:uppercase;color:'+(on?"#1C1C1E":"#A9A29E")+'">'+esc(x[0])+'</div>'
+       +'<div class="a-l" style="font-size:2.55cqw;margin-top:.9cqw;color:'+(on?"#4A4744":"#A9A29E")+'">'
+       +esc(x[1])+'</div></div></div>';
+  }).join("");
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:4.2cqw">'
+   +'<div class="a-d sm" style="'+dsize(s.h,8.2,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div>'+steps+'</div>'
+   +(s.s?'<div class="a-l" style="font-size:2.8cqw">'+esc(s.s)+'</div>':'')+'</div>');
+};
+/* 16 · PORTAL — spritt blir samlat */
+A.portal = function(s,i,n){
+  var scat = (s.before||[]).map(function(x,j){
+    var pos = [[4,6],[46,0],[16,30],[54,26],[2,54],[40,54]][j%6];
+    return '<span style="position:absolute;left:'+pos[0]+'%;top:'+pos[1]+'%;border:1px solid #D8D2CF;'
+     +'background:#F2EFEF;padding:1.5cqw 2.2cqw;font-family:Montserrat,sans-serif;font-size:1.95cqw;'
+     +'letter-spacing:.12em;text-transform:uppercase;color:#8A8580;white-space:nowrap">'+esc(x)+'</span>';
+  }).join("");
+  var rows = (s.after||[]).map(function(x){
+    return '<div style="display:flex;align-items:center;gap:2cqw;padding:1.5cqw 0;border-bottom:1px solid #E4DEDB">'
+     +'<span style="width:.85cqw;height:.85cqw;border-radius:50%;background:#6E7266;flex:0 0 .85cqw"></span>'
+     +'<span style="font-family:Montserrat,sans-serif;font-size:2.25cqw;color:#1C1C1E">'+esc(x)+'</span></div>';
+  }).join("");
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3cqw;min-height:0">'
+   +'<div class="a-d sm" style="'+dsize(s.h,7.4,SERIF)+'">'+esc(s.h)+'</div>'
+   +'<div style="position:relative;height:29cqw;opacity:.85;flex:0 0 auto">'+scat+'</div>'
+   +'<div style="display:flex;align-items:center;gap:2.4cqw">'
+     +'<span style="flex:1;height:1px;background:#D8D2CF"></span>'
+     +'<span class="a-c" style="font-size:1.9cqw">Blir</span>'
+     +'<span style="flex:1;height:1px;background:#D8D2CF"></span></div>'
+   +'<div style="border:1px solid #6E7266;padding:2.8cqw 3.4cqw">'
+     +'<div class="a-k" style="font-size:2.1cqw;margin-bottom:1.2cqw">'+esc(s.plate||"Mäklarportalen")+'</div>'
+     + rows +'</div>'
+   +(s.s?'<div class="a-l" style="font-size:2.6cqw">'+esc(s.s)+'</div>':'')+'</div>');
+};
+
+/* ---------------------------------------------------------------- B · SKUGGA */
+B.orbit = function(s,i,n){
+  var out = s.dir === "out";
+  var labs = s.items.map(function(x,j){
+    var q = ekoPos(j, s.items.length, 44, 50, 50);
+    return '<span style="position:absolute;left:'+q.x.toFixed(2)+'%;top:'+q.y.toFixed(2)+'%;'
+     +'transform:translate(-50%,-50%);font-family:Montserrat,sans-serif;font-size:2.1cqw;'
+     +'font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#CFCDC7;'
+     +'white-space:nowrap;background:#0E0E0D;padding:0 1cqw">'+esc(x)+'</span>';
+  }).join("");
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+9)+'cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,8.6,SERIF)+'">'+esc(s.h)+'</div></div>'
+   +'<div class="z" style="left:9cqw;right:9cqw;top:52cqw"><div style="position:relative;width:100%;aspect-ratio:1">'
+   + ekoOrbit("#EFEDE7","#98A088","#2A2A27", s.items, out) + labs +'</div></div>'
+   +(s.s?'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+2)+'cqw">'
+        +'<div class="b-b" style="font-size:2.7cqw">'+esc(s.s)+'</div></div>':'')
+   + B.foot(i,n));
+};
+B.chain = function(s,i,n){
+  var steps = s.items.map(function(x,j){
+    var on = s.now == null || j <= s.now;
+    return '<div style="display:flex;align-items:flex-start;gap:3.4cqw">'
+     +'<div style="flex:0 0 8cqw;display:flex;flex-direction:column;align-items:center">'
+       +'<span style="width:8cqw;height:8cqw;border-radius:50%;border:1px solid '+(on?"#98A088":"#2A2A27")
+       +';background:'+(on?"#98A088":"transparent")+';display:grid;place-items:center;'
+       +'font-family:Montserrat,sans-serif;font-size:2.1cqw;font-weight:600;'
+       +'color:'+(on?"#0E0E0D":"#6E6C66")+'">'+String(j+1).padStart(2,"0")+'</span>'
+       + (j < s.items.length-1
+          ? '<span style="width:1px;flex:1;min-height:5.2cqw;background:'+(on?"#98A088":"#2A2A27")+'"></span>' : '')
+     +'</div>'
+     +'<div style="padding-bottom:'+(j<s.items.length-1?4.4:0)+'cqw">'
+       +'<div style="font-family:Montserrat,sans-serif;font-size:2.3cqw;font-weight:600;letter-spacing:.2em;'
+       +'text-transform:uppercase;color:'+(on?"#EFEDE7":"#6E6C66")+'">'+esc(x[0])+'</div>'
+       +'<div class="b-b" style="font-size:2.55cqw;margin-top:.9cqw;color:'+(on?"#A8A6A0":"#6E6C66")+'">'
+       +esc(x[1])+'</div></div></div>';
+  }).join("");
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+9)+'cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,8.2,SERIF)+'">'+esc(s.h)+'</div></div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:54cqw">'+steps+'</div>'
+   + B.foot(i,n));
+};
+B.portal = function(s,i,n){
+  var scat = (s.before||[]).map(function(x,j){
+    var pos = [[4,6],[46,0],[16,30],[54,26],[2,54],[40,54]][j%6];
+    return '<span style="position:absolute;left:'+pos[0]+'%;top:'+pos[1]+'%;border:1px solid #2A2A27;'
+     +'padding:1.5cqw 2.2cqw;font-family:Montserrat,sans-serif;font-size:1.95cqw;'
+     +'letter-spacing:.12em;text-transform:uppercase;color:#6E6C66;white-space:nowrap">'+esc(x)+'</span>';
+  }).join("");
+  var rows = (s.after||[]).map(function(x){
+    return '<div style="display:flex;align-items:center;gap:2cqw;padding:1.9cqw 0;'
+     +'border-bottom:1px solid rgba(239,237,231,.12)">'
+     +'<span style="width:.85cqw;height:.85cqw;border-radius:50%;background:#98A088;flex:0 0 .85cqw"></span>'
+     +'<span style="font-family:Montserrat,sans-serif;font-size:2.25cqw;color:#EFEDE7">'+esc(x)+'</span></div>';
+  }).join("");
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+9)+'cqw">'
+   +'<div class="b-d" style="'+dsize(s.h,8.2,SERIF)+'">'+esc(s.h)+'</div></div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:52cqw;height:32cqw;opacity:.9">'+scat+'</div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:88cqw;display:flex;align-items:center;gap:2.4cqw">'
+     +'<span style="flex:1;height:1px;background:#2A2A27"></span>'
+     +'<span class="b-k" style="font-size:1.9cqw">Blir</span>'
+     +'<span style="flex:1;height:1px;background:#2A2A27"></span></div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:96cqw;border:1px solid #98A088;padding:3.4cqw 3.8cqw">'
+     +'<div class="b-k" style="font-size:2.1cqw;margin-bottom:1.6cqw">'+esc(s.plate||"Mäklarportalen")+'</div>'
+     + rows +'</div>'
+   + B.foot(i,n));
 };
 
 /* ---------------------------------------------------------------- B · SKUGGA */
@@ -3163,8 +3493,59 @@ var HL = [
    {p:"editorial", m:"hero", k:"Vad Viewly tillför", h:"Foto, rum och rörelse i en presentation.", s:"Din mäklare beställer. Vi producerar."},
    {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"14 — Ditt hem"}
   ]}
-];
+,
 
+ /* 15 — EKOSYSTEMET. Det enda kapitlet utan ett enda fotografi.
+    Sammanhanget mellan delarna går inte att fotografera — en bild på ett
+    kök säger ingenting om att samma objekt bär både planritningen,
+    filmen och annonsen. Det måste ritas. Flödet följer stegen på
+    viewly.se/maklare: intagning, produktion, mäklarportal,
+    annonsskrivaren, Social / Ads Studio. */
+ {glyph:"spine", id:"ekosystem", num:"15", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
+  q:"Hur hänger allt ihop?",
+  why:"Hela affärsidén i ett kapitel. Inte en tjänstelista — sambandet mellan delarna.",
+  st:[
+   {p:"quiet", k:"15 — Ekosystemet", h:"Ett objekt.", em:"Hela bostadsaffären.",
+    s:"Viewly är inte sju tjänster bredvid varandra. Det är en kedja där varje steg gör nästa enklare."},
+
+   {p:"orbit", k:"Grundmaterialet", dir:"in", h:"Allt börjar i bostaden.",
+    items:["Fotografering","3D visning","Drönare","E-styling","Atmosphere"],
+    s:"Fem produktioner, ett besök. Det som spelas in blir underlaget för allt som kommer sedan."},
+
+   {p:"orbit", k:"Förädlingen", dir:"out", h:"Samma objekt, vidare.",
+    items:["Planritning","Motion","Områdeskarta","Annonstext","Social / Ads"],
+    s:"Ingenting produceras om. Materialet återanvänds genom hela plattformen."},
+
+   {p:"chain", k:"Arbetsflödet", h:"Fem steg, en beställning.", now:4,
+    items:[["Intagning","Objektets uppgifter samlas in en gång."],
+           ["Produktion","Foto, 3D, styling och karta i samma besök."],
+           ["Mäklarportalen","Allt material samlas färdigt för publicering."],
+           ["Annonsskrivaren","Objektbeskrivningen skrivs ur underlaget."],
+           ["Social / Ads Studio","Kampanjen distribueras i alla format."]],
+    s:"Varje steg förenklar nästa. Du beställer i steg ett och hämtar i steg fem."},
+
+   {p:"portal", k:"Administrationen", h:"Från sex kontakter till en yta.",
+    before:["Fotograf","Filmare","3D-leverantör","Stylist","Textbyrå","Annonsverktyg"],
+    plate:"Mäklarportalen",
+    after:["En beställning","Ett arbetsflöde","En leverans","En faktura"],
+    s:"Mäklaren slutar koordinera leverantörer och kan lägga tiden på försäljningen."},
+
+   {p:"system", k:"Vad det ger", h:"Fyra effekter.",
+    items:["Vinna fler uppdrag — en starkare presentation redan i intaget",
+           "Starkare varumärke — allt levereras i kontorets uttryck",
+           "Ökade intäkter — fler objekt genom mindre administration",
+           "Starkare affärer — bättre underlag ger bättre budgivning"],
+    s:"Det är inte bättre bostadsbilder som är målet. Det är en mer komplett marknadsföring per objekt."},
+
+   {p:"chain", k:"Kedjan", h:"Produktion, presentation, marknadsföring.",
+    items:[["Produktion","Materialet skapas en gång, på plats."],
+           ["Presentation","Objektet sätts i portalen och på visningssidan."],
+           ["Marknadsföring","Annons, kampanj och sociala medier ur samma underlag."]],
+    s:"Tre led som brukar ligga hos tre leverantörer. Här är de ett."},
+
+   {p:"cta", h:"Ett objekt.", s:"Hela marknadsföringen.", k:"15 — Ekosystemet"}
+  ]}
+];
 /* =====================================================================
    FÖRSLAG B OCH C
 
@@ -3618,7 +3999,90 @@ ALTS = {
 "ditthem-4":[
  {p:"cta", k:"14 — Ditt hem", h:"Fråga din mäklare om Viewly", s:"viewly.se"},
  {p:"quiet", k:"14 — Ditt hem", h:"Arbetar din mäklare med Viewly?", em:"Fråga innan ni bestämmer.",
-  s:"viewly.se"}]
+  s:"viewly.se"}],
+
+/* ---------- 15 EKOSYSTEMET ----------
+   Inga fotografier här heller, i något av förslagen. Kapitlet ska bära
+   sambandet mellan delarna, och det syns bara i geometri och typografi. */
+"ekosystem-0":[
+ {p:"quiet", k:"15 — Ekosystemet", h:"Sju tjänster.", em:"En kedja.",
+  s:"Varje del gör nästa enklare. Det är det som skiljer ett ekosystem från en prislista."},
+ {p:"chain", k:"Ekosystemet", h:"Så hänger det ihop.", now:4,
+  items:[["Ett besök","All produktion sker vid samma tillfälle."],
+         ["Ett underlag","Materialet återanvänds i alla kanaler."],
+         ["En leverans","Portalen samlar allt färdigt att publicera."]],
+  s:"Ett objekt bär hela marknadsföringen."}],
+
+"ekosystem-1":[
+ {p:"system", k:"Grundmaterialet", h:"Fem produktioner, ett besök.",
+  items:["Fotografering — grunden allt annat bygger på",
+         "3D visning — bostaden att gå igenom",
+         "Drönare — läget och omgivningen",
+         "E-styling — tomma rum får möbler",
+         "Atmosphere — känslan och ljuset"],
+  s:"Det som spelas in på plats blir underlaget för allt som kommer sedan."},
+ {p:"quiet", k:"Grundmaterialet", h:"Allt börjar i bostaden.", em:"En gång.",
+  s:"Foto, 3D, drönare, e-styling och Atmosphere i samma produktion."}],
+
+"ekosystem-2":[
+ {p:"system", k:"Förädlingen", h:"Samma objekt, vidare.",
+  items:["Planritning — måtten ur 3D-skanningen",
+         "Motion — bostadsfilmen ur fotograferingen",
+         "Områdeskarta — läget satt i kontorets varumärke",
+         "Annonstext — objektbeskrivningen ur underlaget",
+         "Social / Ads — kampanjen i alla format"],
+  s:"Ingenting produceras om. Materialet arbetar vidare genom hela plattformen."},
+ {p:"chain", k:"Förädlingen", h:"Underlaget arbetar vidare.",
+  items:[["Ur skanningen","Planritning och rundvandring."],
+         ["Ur fotograferingen","Bostadsfilm och stillbilder till annonsen."],
+         ["Ur uppgifterna","Annonstext, kampanj och sociala medier."]],
+  s:"Tre led, ett underlag."}],
+
+"ekosystem-3":[
+ {p:"orbit", k:"Arbetsflödet", dir:"out", h:"Fem steg ur ett intag.",
+  items:["Intagning","Produktion","Portal","Annons","Kampanj"],
+  s:"Du beställer i steg ett och hämtar i steg fem. Däremellan gör vi arbetet."},
+ {p:"quiet", k:"Arbetsflödet", h:"En beställning.", em:"Fem steg.",
+  s:"Intagning, produktion, mäklarportal, annonsskrivaren, Social / Ads Studio."}],
+
+"ekosystem-4":[
+ {p:"system", k:"Administrationen", h:"Vad du slipper.",
+  items:["Boka och samordna fotograf och filmare",
+         "Beställa 3D och vänta på leverans",
+         "Ladda upp samma bilder i tre verktyg",
+         "Skriva objektbeskrivningen från början",
+         "Bygga om kampanjen för varje format"],
+  s:"Allt det ligger i ett flöde i stället för hos fem leverantörer."},
+ {p:"chain", k:"Administrationen", h:"Från sex kontakter till en.",
+  items:[["Förut","Fotograf, filmare, 3D, stylist, textbyrå, annonsverktyg."],
+         ["Nu","En beställning i portalen."],
+         ["Vinsten","Tiden går till försäljningen i stället."]],
+  s:"Mäklaren slutar koordinera leverantörer."}],
+
+"ekosystem-5":[
+ {p:"chain", k:"Vad det ger", h:"Fyra effekter.",
+  items:[["Vinna fler uppdrag","En starkare presentation redan i intaget."],
+         ["Starkare varumärke","Allt levereras i kontorets uttryck."],
+         ["Ökade intäkter","Fler objekt genom mindre administration."],
+         ["Starkare affärer","Bättre underlag ger bättre budgivning."]],
+  s:"Målet är inte bättre bostadsbilder utan en mer komplett marknadsföring."},
+ {p:"quiet", k:"Vad det ger", h:"Fler uppdrag.", em:"Mindre administration.",
+  s:"Starkare varumärke, ökade intäkter och bättre underlag i varje affär."}],
+
+"ekosystem-6":[
+ {p:"orbit", k:"Kedjan", dir:"out", h:"Produktion, presentation, marknadsföring.",
+  items:["Produktion","Presentation","Marknadsföring"],
+  s:"Tre led som brukar ligga hos tre leverantörer. Här är de ett."},
+ {p:"portal", k:"Kedjan", h:"Tre led, en leverantör.",
+  before:["Produktion","Presentation","Marknadsföring"],
+  plate:"Viewly",
+  after:["Materialet skapas en gång","Objektet sätts i portalen","Kampanjen går ut ur samma underlag"],
+  s:"Sambandet är hela produkten."}],
+
+"ekosystem-7":[
+ {p:"quiet", k:"15 — Ekosystemet", h:"Ett objekt.", em:"Hela marknadsföringen.",
+  s:"Se hela flödet på viewly.se"},
+ {p:"cta", h:"Vill du se hur det fungerar?", s:"Ansök om mäklarkonto", k:"15 — Ekosystemet"}]
 };
 
 
@@ -3648,7 +4112,11 @@ var PRIMS = [
   {id:"flow",      n:"Flow",            d:"Input → bearbetning → output. Visar processen, med ett faktiskt resultat i slutet."},
   {id:"matrix",    n:"Format matrix",   d:"Samma objekt i sanna formatproportioner. 4:5, 1:1 och 9:16 mätbart mot varandra."},
   {id:"phases",    n:"Phases",          d:"En kampanj som fyra faktiska artboards, med aktuellt läge tänt."},
-  {id:"whitelabel",n:"White label",     d:"Samma leverans i två kontors varumärken, sida vid sida. För 3D-visningssidan och områdeskartan, som inte bär Viewlys uttryck utan kundens."}
+  {id:"whitelabel",n:"White label",     d:"Samma leverans i två kontors varumärken, sida vid sida. För 3D-visningssidan och områdeskartan, som inte bär Viewlys uttryck utan kundens."},
+  /* --- illustration: sambandet mellan delarna, som inte går att fotografera --- */
+  {id:"orbit",     n:"Orbit",          d:"En nod i mitten och n satelliter. Vänd inåt matar delarna objektet, vänd utåt matar objektet delarna."},
+  {id:"chain",     n:"Chain",          d:"Numrerade steg med förbindelser. Ett arbetsflöde där varje steg förenklar nästa."},
+  {id:"portal",    n:"Portal",         d:"Spritt blir samlat. Sex leverantörer till vänster, en yta till höger."}
 ];
 
 /* ett representativt exempel per primitiv, för specimen-rutnätet */
@@ -3665,7 +4133,10 @@ var SPECS = [
   {p:"flow",       ref:["annonsen",2]},
   {p:"matrix",     ref:["kampanjen",2]},
   {p:"phases",     ref:["kampanjen",3]},
-  {p:"whitelabel", ref:["visning",3]}
+  {p:"whitelabel", ref:["visning",3]},
+  {p:"orbit",      ref:["ekosystem",1]},
+  {p:"chain",      ref:["ekosystem",3]},
+  {p:"portal",     ref:["ekosystem",4]}
 ];
 
 /* --------------------------------------------------------------------
