@@ -409,6 +409,11 @@ tr:last-child td{border-bottom:0}
 
 /* Förslagsväljaren: tre riktiga bildrutor sida vid sida, inte tre etiketter. */
 .vgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:9px 0 6px}
+.vgrid4{grid-template-columns:repeat(4,1fr);gap:6px}
+.mplay{display:flex;align-items:center;gap:9px;margin:8px 0 2px}
+.mplay .dlb{flex:0 0 auto;margin:0}
+.mplay input[type=range]{flex:1;accent-color:var(--acc)}
+.mtime{font-size:11px;color:var(--mut);flex:0 0 44px;text-align:right}
 .vcard{padding:0;border:2px solid var(--line);border-radius:6px;background:var(--card);
   cursor:pointer;overflow:hidden;display:block;text-align:left;transition:border-color .12s}
 .vcard:hover{border-color:var(--mut)}

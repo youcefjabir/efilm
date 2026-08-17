@@ -673,7 +673,7 @@ function idbGet(){
 function idbClear(){ return idbPut({}) }
 
 function lightState(){
-  return {v:3, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS, csets:CPICKS};
+  return {v:4, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS, csets:CPICKS, motion:MPICK};
 }
 function bankBytes(){
   var n = 0; for(var k in UPLOADS) n += UPLOADS[k].length; return n;
@@ -726,7 +726,7 @@ function loadAll(){
       var d = JSON.parse(raw);
       Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
       Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
-      Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{});
+      Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{}); Object.assign(MPICK, d.motion||{});
       /* v1 la bilderna i samma post — flytta över dem tyst. */
       if(d.uploads) Object.assign(UPLOADS, d.uploads);
       any = true;
@@ -743,7 +743,7 @@ function loadBank(){
   });
 }
 function clearAll(){
-  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS, CPICKS].forEach(function(o){
+  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS, CPICKS, MPICK].forEach(function(o){
     Object.keys(o).forEach(function(k){ delete o[k] }) });
   Object.keys(VIDEOS).forEach(function(k){ delete VIDEOS[k] });
   seedSlots();
@@ -1043,7 +1043,7 @@ function importJSON(file){
     if(!d || typeof d !== "object"){ flash("Filen innehåller inga redigeringar", true); return }
     Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
     Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
-    Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{});
+    Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{}); Object.assign(MPICK, d.motion||{});
     var n = 0;
     if(d.uploads){ Object.assign(UPLOADS, d.uploads); n = Object.keys(d.uploads).length }
     flash("Importerat" + (n ? " · "+n+" bilder" : " · text"));
@@ -1190,6 +1190,7 @@ function studioEditor(){
          +'<button class="tbtn" type="button" data-step="1">→</button></span></div>'
      +'</div>'
      +'<div class="edside">'
+       + (isCover ? '' : motionPanel(s, i, n))
        + (isCover ? '' : variantPanel(s, i, n))
        + (isCover ? '' :
           '<div class="edsec"><div class="eyebrow">Text</div>'+fields
@@ -1204,6 +1205,9 @@ function studioEditor(){
                        : dlBtn("frame",{hl:h.id, i:i, ddir:state.dir},"Denna bildruta · 1080×1920"))
            + dlBtn("sheet",{hl:h.id, ddir:state.dir},"Hela serien som kontaktkarta")
            +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+(n+1)+' bildrutor separat</button>'
+           + (!isCover && MPICK[s.sid]
+              ? '<button class="dlb pri" type="button" data-mv="1" data-mvsid="'+s.sid+'" data-mvdir="'
+                +state.dir+'">Rörelsen som video · '+MDUR[MSID[s.sid]].toFixed(1)+' s</button>' : '')
            + (!isCover && videoRects(story(state.dir,s,i,n), 1080, 1920).length
               ? '<button class="dlb pri" type="button" data-vhl="'+h.id+'" data-vi="'+i+'" data-vdir="'+state.dir+'">'
                 +'Denna bildruta som video</button>' : '')
@@ -1337,6 +1341,142 @@ function mediaPanel(slot, cur, label){
        +VIDEOS[active].dur.toFixed(1)+' s. Videon ligger kvar under sessionen — '
        +'Spara behåller stillbilden ur klippet, inte filmen. Ladda upp igen efter omladdning.</p>' : '')
    +'</div>';
+}
+
+/* ---------------------------------------------------------------------
+   RÖRELSE
+   Bara sju bildrutor i biblioteket har en motion-variant, och den ligger
+   ovanpå A/B/C som ett fjärde alternativ. "Ingen" är default och betyder
+   att bildrutan renderas exakt som förut.
+   --------------------------------------------------------------------- */
+function motionPanel(s, i, n){
+  var cand = MSID[s.sid];
+  if(!cand) return '';
+  var cur = MPICK[s.sid] || "";
+  var opts = [{id:"", n:"Ingen", d:"Statisk"}].concat(MDIRS.map(function(d){
+    return {id:d.id, n:d.n.replace(/^[0-9]+ . /,""), d:d.d.split(".")[0]} }));
+  var keep = MPICK[s.sid];
+  var cards = opts.map(function(o){
+    var html;
+    if(o.id){ html = MK[cand][o.id](state.dir, .5) }
+    else { delete MPICK[s.sid]; html = story(state.dir, s, i, n); if(keep) MPICK[s.sid]=keep }
+    return '<button class="vcard'+(o.id===cur?" on":"")+'" type="button" data-mo="'+s.sid+':'+o.id+'" '
+     +'title="'+esc(o.d)+'"><span class="vfr">'+html+'</span>'
+     +'<span class="vcap"><b>'+esc(o.n)+'</b></span></button>';
+  }).join("");
+  return '<div class="edsec"><div class="eyebrow">Rörelse <em class="cnt">'+MDUR[cand].toFixed(1)+' s</em></div>'
+   +'<div class="vgrid vgrid4">'+cards+'</div>'
+   + (cur ? '<div class="mplay"><button class="dlb pri" type="button" data-act="mplay">&#9654; Spela</button>'
+      +'<input type="range" id="mscrub" min="0" max="1000" value="'+Math.round(MOTION_T*1000)+'">'
+      +'<span class="mtime mono" id="mtime">'+(MOTION_T*MDUR[cand]).toFixed(1)+' s</span></div>' : '')
+   +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:4px">'
+   + (cur ? 'Dra i reglaget för att granska bildruta för bildruta. Exporten renderar samma funktion.'
+          : 'Statisk är default. Rörelse läggs på som alternativ — originalet ligger kvar under.')
+   +'</p></div>';
+}
+
+/* ---------------------------------------------------------------------
+   MOTION SOM VIDEO
+   Ingen tidslinje att synka mot: rutan renderas ur samma tidsfunktion som
+   förhandsvisningen, rastreras, ritas i canvasen och spelas in. Mätt kostar
+   en 1080 × 1920-rastrering 39 ms, så ett sexsekundersklipp i 30 fps tar
+   omkring sju sekunder att producera.
+   --------------------------------------------------------------------- */
+function svgImage(svg, w, h){
+  return new Promise(function(res, rej){
+    var img = new Image();
+    img.onload = function(){ res(img) };
+    img.onerror = function(){ rej(new Error("img")) };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  });
+}
+async function exportMotion(btn){
+  if(busy) return; busy = true;
+  var lbl = btn.textContent, sid = btn.dataset.mvsid, d = btn.dataset.mvdir;
+  var m = motionOf(sid); if(!m){ busy=false; return }
+  var FPS = 30, W = 1080, H = 1920, N = Math.round(m.dur*FPS);
+  btn.disabled = true;
+  var dl = await downloads();
+  if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled=false; busy=false;
+    status(codeText("unavailable")); setTimeout(function(){btn.textContent=lbl},3400); return }
+  var keepT = MOTION_T, skip = [], blob = null, tries = 0;
+  try{
+    while(tries < MIMES.length){
+      var mime = pickMime(skip);
+      if(!mime){ status("Webbläsaren stöder ingen videoinspelning"); break }
+      var c = document.createElement("canvas"); c.width = W; c.height = H;
+      var ctx = c.getContext("2d");
+      var rec = new MediaRecorder(c.captureStream(FPS), {mimeType:mime, videoBitsPerSecond:9000000});
+      var chunks = [];
+      rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) chunks.push(ev.data) };
+      var stopped = new Promise(function(r){ rec.onstop = r });
+      /* första rutan innan start — annars blir klippet tomt */
+      MOTION_T = 0;
+      var first = await svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
+        + xhtml(motionFrame(d, sid, 0), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
+      ctx.drawImage(first, 0, 0, W, H);
+      rec.start(250);
+      var t0 = performance.now();
+      for(var f = 0; f < N; f++){
+        var tt = f/(N-1);
+        btn.textContent = "Renderar " + (f+1) + " / " + N + "…";
+        var img = await svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
+          + xhtml(motionFrame(d, sid, tt), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
+        ctx.drawImage(img, 0, 0, W, H);
+        /* håll rutan kvar så inspelaren hinner fånga den */
+        var target = t0 + (f+1)*(1000/FPS);
+        var wait = target - performance.now();
+        if(wait > 0) await new Promise(function(r){ setTimeout(r, wait) });
+      }
+      rec.requestData(); await new Promise(function(r){ setTimeout(r, 320) });
+      rec.stop(); await stopped;
+      blob = new Blob(chunks, {type:mime});
+      if(await verifyClip(blob, m.dur)) break;
+      skip.push(mime); tries++; blob = null;
+    }
+  } catch(e){ status("Kunde inte spela in: " + (e && e.message || e)) }
+  MOTION_T = keepT;
+  btn.disabled = false; btn.textContent = lbl; busy = false;
+  if(blob){
+    var ext = blob.type.indexOf("mp4") >= 0 ? "mp4" : "webm";
+    await offer(blob, "viewly-motion-"+slug(sid)+"-"+m.dir+"-"+d+"."+ext, btn);
+  } else status("Inspelningen gav ingen giltig fil");
+}
+
+/* ---------- granskningsspelare ----------
+   Ingen animationsmotor: en rAF-loop som sätter MOTION_T och ritar om
+   bildrutan. Samma funktion som exporten anropar, så det man ser är det
+   man får. */
+var mplayRAF = null, mplayT0 = 0;
+function stopMPlay(){ if(mplayRAF){ cancelAnimationFrame(mplayRAF); mplayRAF = null } }
+function currentMotion(){
+  if(!state.edit) return null;
+  var h = hlOf(state.edit.hl), n = h.st.length;
+  if(state.edit.i >= n) return null;
+  return motionOf(h.st[state.edit.i].sid);
+}
+function drawMotionFrame(){
+  var st = $("#edframe"); if(!st || !state.edit) return;
+  var h = hlOf(state.edit.hl), i = state.edit.i, n = h.st.length;
+  if(i >= n) return;
+  st.innerHTML = story(state.dir, h.st[i], i, n) + (state.ig ? igOverlay(n,i) : "");
+  var m = currentMotion(), lab = $("#mtime"), sc = $("#mscrub");
+  if(m && lab) lab.textContent = (MOTION_T*m.dur).toFixed(1) + " s";
+  if(sc && document.activeElement !== sc) sc.value = Math.round(MOTION_T*1000);
+}
+function toggleMPlay(btn){
+  var m = currentMotion(); if(!m) return;
+  if(mplayRAF){ stopMPlay(); btn.innerHTML = "&#9654; Spela"; return }
+  btn.innerHTML = "&#10073;&#10073; Pausa";
+  if(MOTION_T >= .999) MOTION_T = 0;
+  mplayT0 = performance.now() - MOTION_T*m.dur*1000;
+  (function loop(){
+    var el = (performance.now() - mplayT0) / (m.dur*1000);
+    if(el >= 1){ MOTION_T = 1; drawMotionFrame(); stopMPlay();
+      var b = document.querySelector('[data-act="mplay"]'); if(b) b.innerHTML = "&#9654; Spela"; return }
+    MOTION_T = el; drawMotionFrame();
+    mplayRAF = requestAnimationFrame(loop);
+  })();
 }
 
 /* Bara scenen och remsan ritas om vid tangenttryck — annars tappar fältet fokus. */
@@ -1480,14 +1620,49 @@ function step(d){
 /* =====================================================================
    RENDER
    ===================================================================== */
-function render(){
-  var s=SECTIONS.filter(function(x){return x.id===state.sec})[0];
-  $("#canvas").innerHTML='<div class="sec" data-on>'+s.f()+'</div>';
+/* ---------------------------------------------------------------------
+   OMRITNING UTAN ATT TAPPA PLATSEN
+   render() scrollade alltid till toppen. Varje klick som ändrade något —
+   välja förslag, byta omslagssystem, byta bild — byggde om hela sektionen
+   och kastade tillbaka användaren till sidans början. Det var buggen.
+
+   Nu scrollas det bara när man faktiskt byter vy: annan sektion, in i
+   editorn eller ut ur den. Allt annat behåller scrollposition, och
+   fokuset läggs tillbaka på det element som klickades.
+   --------------------------------------------------------------------- */
+var lastView = null;
+function viewKey(){ return state.sec + "|" + (state.edit ? state.edit.hl : "") }
+function render(opts){
+  opts = opts || {};
+  var s = SECTIONS.filter(function(x){return x.id===state.sec})[0];
+  var key = viewKey(), sameView = (key === lastView);
+  var y = window.scrollY;
+  /* vilket element hade fokus, uttryckt som en väljare vi kan hitta igen */
+  var ae = document.activeElement, sel = null;
+  if(ae && ae !== document.body){
+    for(var i=0;i<FOCUS_ATTRS.length;i++){
+      var a = FOCUS_ATTRS[i], v = ae.getAttribute && ae.getAttribute(a);
+      if(v != null){ sel = '['+a+'="'+v.replace(/"/g,'\\"')+'"]'; break }
+    }
+  }
+  $("#canvas").innerHTML = '<div class="sec" data-on>'+s.f()+'</div>';
   mountVideos($("#canvas"));
   document.querySelectorAll(".navb").forEach(function(b){
     b.setAttribute("aria-current", String(b.dataset.s===state.sec))});
-  window.scrollTo(0,0);
+
+  if(opts.top || !sameView){ window.scrollTo(0,0) }
+  else {
+    /* två steg: direkt, och efter layout — bilder kan ändra höjden */
+    window.scrollTo(0,y);
+    requestAnimationFrame(function(){ if(Math.abs(window.scrollY-y)>2) window.scrollTo(0,y) });
+  }
+  if(sel && sameView){
+    var el = $(sel);
+    if(el && el.focus) try{ el.focus({preventScroll:true}) }catch(e){ el.focus() }
+  }
+  lastView = key;
 }
+var FOCUS_ATTRS = ["data-alt","data-cset","data-gl","data-mi","data-ci","data-ed","data-sl","data-pick","data-mo"];
 $("#nav").innerHTML=SECTIONS.map(function(s){
   return '<button class="navb" type="button" data-s="'+s.id+'" aria-current="'+(s.id===state.sec)+'">'
    +'<span class="n">'+s.num+'</span><span class="lbl">'+s.n+'</span></button>'}).join("");
@@ -1495,11 +1670,12 @@ $("#railmark").innerHTML=vmark("#1C1C1E","#6E7266")+'<span class="brandname">VIE
 
 document.addEventListener("click",function(e){
   /* Studio i skenan går alltid till kapitellistan — annars sitter man fast i editorn. */
-  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; state.edit=null; render(); return}
+  var n=e.target.closest(".navb"); if(n){state.sec=n.dataset.s; state.edit=null; render({top:true}); return}
   /* Bara riktningsknapparna — nedladdningsknapparna bär också ett riktnings-
      attribut, och matchade tidigare här först: klicket bytte riktning och
      scrollade upp i stället för att exportera. */
   var d=e.target.closest(".dirb[data-dir]"); if(d){state.dir=d.dataset.dir;render();return}
+  /* Bildrutan i filmremsan: byt utan att sidan hoppar. */
   var p=e.target.closest("[data-play]");
   if(p){var q=p.dataset.play.split(":");play(q[0],+q[1],q[2]);return}
   if(e.target.closest("#pclose")){closeP();return}
@@ -1508,22 +1684,24 @@ document.addEventListener("click",function(e){
   var pd=e.target.closest("[data-pd]"); if(pd){P.dir=pd.dataset.pd;drawPlayer();return}
   var dl=e.target.closest("[data-dl]"); if(dl){ runExport(dl); return }
   var ed=e.target.closest("[data-edit]");
-  if(ed){ state.edit={hl:ed.dataset.edit, i:0}; render(); return }
+  if(ed){ state.edit={hl:ed.dataset.edit, i:0}; render({top:true}); return }
   var pk=e.target.closest("[data-pick]");
   if(pk){ state.edit.i=+pk.dataset.pick; render(); return }
   var sp=e.target.closest("[data-step]");
   if(sp){ var h=hlOf(state.edit.hl), j=state.edit.i+ +sp.dataset.step;
     state.edit.i=(j+h.st.length+1)%(h.st.length+1); render(); return }
+  var mv=e.target.closest("[data-mv]"); if(mv){ exportMotion(mv); return }
   var vx=e.target.closest("[data-vhl]"); if(vx){ exportVideo(vx); return }
   var sr=e.target.closest("[data-series]");
   if(sr){ downloadSeries(sr.dataset.series, state.dir, sr); return }
   var ac=e.target.closest("[data-act]");
   if(ac){
     var a=ac.dataset.act;
-    if(a==="back"){ state.edit=null; render() }
+    if(a==="back"){ state.edit=null; render({top:true}) }
     else if(a==="save"){ saveAll() }
     else if(a==="exportjson"){ exportJSON(ac, false) }
     else if(a==="exportall"){ exportJSON(ac, true) }
+    else if(a==="mplay"){ toggleMPlay(ac) }
     else if(a==="cset-all"){
       var v = state.edit ? covSetIx(hlOf(state.edit.hl)) : 0;
       HL.forEach(function(x){ CPICKS[x.id] = v });
@@ -1555,6 +1733,13 @@ document.addEventListener("click",function(e){
   var cs=e.target.closest("[data-cset]");
   if(cs){ var qc=cs.dataset.cset.split(":"); CPICKS[qc[0]] = +qc[1];
     saveAll(COVSETS[+qc[1]].n+" valt"); render(); return }
+  var mo=e.target.closest("[data-mo]");
+  if(mo){
+    var qm=mo.dataset.mo.split(":");
+    if(qm[1]) MPICK[qm[0]]=qm[1]; else delete MPICK[qm[0]];
+    MOTION_T = 0; stopMPlay();
+    saveAll(qm[1] ? "Rörelse vald" : "Statisk"); render(); return;
+  }
   var al=e.target.closest("[data-alt]");
   if(al){
     var qa=al.dataset.alt.split(":"), pv=+qa[1];
@@ -1575,6 +1760,8 @@ document.addEventListener("click",function(e){
   if(rs){delete SLOTS[rs.dataset.reset]; afterSlot(rs.dataset.reset); return}
 });
 document.addEventListener("input",function(e){
+  if(e.target.id === "mscrub"){ stopMPlay(); MOTION_T = (+e.target.value)/1000; drawMotionFrame();
+    var mb=document.querySelector('[data-act="mplay"]'); if(mb) mb.innerHTML="&#9654; Spela"; return }
   var ps=e.target.dataset&&e.target.dataset.ps;
   if(ps){ setShared(ps, e.target.value); refreshPosts(); return }
   var po=e.target.dataset&&e.target.dataset.po;
@@ -1642,6 +1829,8 @@ var s=document.createElement("style"); s.textContent=CSS; document.head.appendCh
 /* Lagringen går att köra utifrån, så att kvotbeteendet kan testas på riktigt
    i stället för att klickas fram. */
 window.__vstudio = {
+  framePNG:framePNG, motionFrame:function(d,s,tt){ return motionFrame(d,s,tt) },
+  exportMotion:exportMotion,
   UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
   saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
   dropUpload:dropUpload, dropAllUploads:dropAllUploads,

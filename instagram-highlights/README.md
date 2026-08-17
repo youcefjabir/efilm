@@ -228,6 +228,95 @@ satt i Cormorant under; Instagram beskär själv till cirkeln.
 Klickar man sista kortet i remsan öppnas omslagsvyn med sin egen
 nedladdningsknapp. Textfälten göms — det är ingen bildruta man skriver i.
 
+## Motion — som alternativ, aldrig som ersättning
+
+Sju bildrutor i biblioteket har en rörelsevariant. Den ligger **ovanpå** A/B/C
+som ett fjärde alternativ, och `Ingen` är default: rör man ingenting renderas
+allt exakt som förut.
+
+| # | Bildruta | Primitiv | Längd |
+|---|---|---|---|
+| 01 | Annonsskrivaren | `flow` | 6,8 s |
+| 02 | Motion | `split` | 6,4 s |
+| 03 | E-styling | `split` | 6,2 s |
+| 04 | Kampanjfaserna | `phases` | 6,6 s |
+| 05 | Tre format | `matrix` | 6,2 s |
+| 06 | White label | `whitelabel` | 6,4 s |
+| 07 | 3D — plan till volym | `product` | 6,4 s |
+
+Varje kandidat finns i tre riktningar — **Editorial reveal**, **System / process**
+och **Object / material** — så det finns 21 rörelser att välja bland. Auditen som
+ligger bakom urvalet, med A/B/C-klassificering av alla femton templates, står i
+vy 07.
+
+### Ingen animationsmotor
+
+Rörelsen är en **ren funktion av tiden**:
+
+```js
+mframe(kandidat, riktning, dirId, t)   // t går 0 → 1 över klippets längd
+```
+
+Ingen tidslinje, inga animationsobjekt, inget bibliotek. Sekvensering görs med en
+enda hjälpfunktion, `seg(t, a, b)`, som klipper ut ett tidsfönster och normaliserar
+det till 0–1.
+
+Det bygger på en mätning: att bygga en bildrutas HTML ur datan tar **0,19 ms**.
+Att rita om hela ramen per bildruta är alltså gratis, och då behövs ingen motor
+som muterar DOM-egenskaper över tid.
+
+Konsekvenserna är hela poängen:
+
+- **En källa till sanning.** Granskningsspelaren och exporten anropar samma
+  funktion. De kan inte glida isär.
+- **Deterministiskt.** Ruta *n* ser likadan ut varje gång. Inget att synka mot.
+- **Noll beroenden.** Fungerar under artefaktens CSP, behåller enfilsleveransen.
+- **Skrubbningsbart.** Reglaget i panelen sätter `t` direkt — man kan granska
+  bildruta för bildruta.
+
+### Export
+
+`Rörelsen som video` renderar varje ruta ur samma funktion, rastrerar den och
+spelar in canvasen med `MediaRecorder` — samma pipeline som redan fanns för
+uppladdade klipp.
+
+| Mätt | |
+|---|---|
+| Rastrering, typisk ram | 39 ms |
+| Rastrering, ram med två helbilder och wipe | 78 ms |
+| 6,2 s i 30 fps = 186 rutor | ≈ 15 s |
+
+MP4 där webbläsaren klarar det, annars WebM. Filen kontrolleras efteråt med
+samma `verifyClip` som resten av videoexporten.
+
+### Varför inte Remotion, GSAP eller Framer Motion
+
+Projektet har inget `package.json`, inget byggsteg och inget ramverk, och
+levereras som en fristående HTML-fil under en CSP som blockerar externa värdar.
+GSAP och Motion One kräver bundler eller CDN; Framer Motion kräver React;
+Remotion kräver Node, React, byggsteg och ffmpeg. Remotion är rätt verktyg den
+dag renderingen flyttar till en Node-tjänst med H.264 i skala — det är en annan
+leveransmodell och bör tas som ett eget beslut.
+
+---
+
+## Stabilitet i gränssnittet
+
+`render()` scrollade alltid till toppen. Varje klick som ändrade något — välja
+förslag, byta omslagssystem, byta bild — byggde om hela sektionen och kastade
+tillbaka användaren till sidans början.
+
+Nu scrollas det bara när vyn faktiskt byts: annan sektion, in i editorn eller ut
+ur den. Allt annat behåller scrollpositionen, i två steg — direkt och efter
+layout, eftersom bilder kan ändra sidhöjden. Fokus läggs tillbaka på det element
+som klickades, så tangentbordsnavigering inte tappar sin plats.
+
+Verifierat med ett skript som scrollar ner 900 px och sedan klickar sig igenom
+förslagsbyte, omslagssystem, figurbyte, bildrutebyte och riktningsbyte: alla fem
+behåller positionen.
+
+---
+
 ## Tre förslag per bildruta
 
 Varje Story finns i **tre utföranden**. 90 bildrutor blir 270. Förslag A är

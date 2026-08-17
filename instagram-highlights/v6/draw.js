@@ -458,6 +458,12 @@ function effective(s){
   return s;
 }
 function story(dirId, s, i, n){
+  /* Motion är ett fjärde alternativ ovanpå A/B/C, inte en ersättning.
+     Är inget valt går allt exakt som förut. */
+  if(s.sid && typeof motionFrame === "function"){
+    var mf = motionFrame(dirId, s.sid, MOTION_T);
+    if(mf) return mf;
+  }
   s = effective(s);
   var r = RENDER[dirId] || A;
   var f = r[s.p] || r.fullbleed;
