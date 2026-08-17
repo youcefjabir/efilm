@@ -951,7 +951,8 @@ function idbGet(){
 function idbClear(){ return idbPut({}) }
 
 function lightState(){
-  return {v:4, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS, csets:CPICKS, motion:MPICK};
+  return {v:5, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS,
+          csets:CPICKS, motion:MPICK, mtext:MTX};
 }
 function bankBytes(){
   var n = 0; for(var k in UPLOADS) n += UPLOADS[k].length; return n;
@@ -1004,7 +1005,7 @@ function loadAll(){
       var d = JSON.parse(raw);
       Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
       Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
-      Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{}); Object.assign(MPICK, d.motion||{});
+      Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{}); Object.assign(MPICK, d.motion||{}); Object.assign(MTX, d.mtext||{});
       /* v1 la bilderna i samma post — flytta över dem tyst. */
       if(d.uploads) Object.assign(UPLOADS, d.uploads);
       any = true;
@@ -1021,7 +1022,7 @@ function loadBank(){
   });
 }
 function clearAll(){
-  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS, CPICKS, MPICK].forEach(function(o){
+  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS, CPICKS, MPICK, MTX].forEach(function(o){
     Object.keys(o).forEach(function(k){ delete o[k] }) });
   Object.keys(VIDEOS).forEach(function(k){ delete VIDEOS[k] });
   seedSlots();
@@ -1241,7 +1242,7 @@ function importJSON(file){
     if(!d || typeof d !== "object"){ flash("Filen innehåller inga redigeringar", true); return }
     Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
     Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
-    Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{}); Object.assign(MPICK, d.motion||{});
+    Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{}); Object.assign(MPICK, d.motion||{}); Object.assign(MTX, d.mtext||{});
     var n = 0;
     if(d.uploads){ Object.assign(UPLOADS, d.uploads); n = Object.keys(d.uploads).length }
     flash("Importerat" + (n ? " · "+n+" bilder" : " · text"));
@@ -1587,7 +1588,27 @@ function motionPanel(s, i, n){
    +'</p></div>'
    /* Rörelsens egna bildplatser. Utan den här listan fanns det inget sätt
       att byta bilderna i ett rörligt alternativ — nycklarna satt i koden. */
-   + (cur ? motionMedia(cand) : '');
+   + (cur ? motionText(cand) + motionMedia(cand) : '');
+}
+/* Rörelsens uppgifter — adress, ort, yta, rubrik, kontorsnamn. Samma
+   lagermodell som Storyns text: originalet ligger kvar, ändringen läggs
+   på vid rendering och går att nolla per fält. */
+function motionText(cand){
+  var fs = mofieldsOf(cand);
+  if(!fs.length) return '';
+  return '<div class="edsec"><div class="eyebrow">Objektet i rörelse '
+   +'<em class="cnt">'+fs.length+'</em></div>'
+   +'<p class="mut" style="font-size:11px;line-height:1.55;margin:0 0 10px">'
+   +'Adressen i vy 04 följer med hit automatiskt. Skriver du något här gäller det '
+   +'bara rörelsen. Tomt fält = bibliotekets standardvärde.</p>'
+   + fs.map(function(f){
+      var raw = MTX[f.k] || "";
+      return '<label class="fld"><span>'+esc(f.n)
+       + (raw ? ' <button class="rst" type="button" data-mtxrst="'+f.k+'">återställ</button>' : '')
+       +'</span><input type="text" data-mtx="'+f.k+'" value="'+esc(raw)
+       +'" placeholder="'+esc(mo(f.k))+'"></label>';
+     }).join("")
+   +'</div>';
 }
 function motionMedia(cand){
   var slots = mslotsOf(cand);
@@ -1954,7 +1975,7 @@ function step(d){
    editorn eller ut ur den. Allt annat behåller scrollposition, och
    fokuset läggs tillbaka på det element som klickades.
    --------------------------------------------------------------------- */
-var lastView = null;
+var lastView = null, MTXT = null;
 function viewKey(){ return state.sec + "|" + (state.edit ? state.edit.hl : "") }
 function render(opts){
   opts = opts || {};
@@ -1986,7 +2007,7 @@ function render(opts){
   }
   lastView = key;
 }
-var FOCUS_ATTRS = ["data-alt","data-cset","data-gl","data-mi","data-ci","data-ed","data-sl","data-pick","data-mo"];
+var FOCUS_ATTRS = ["data-alt","data-cset","data-gl","data-mi","data-ci","data-ed","data-sl","data-pick","data-mo","data-mtx"];
 $("#nav").innerHTML=SECTIONS.map(function(s){
   return '<button class="navb" type="button" data-s="'+s.id+'" aria-current="'+(s.id===state.sec)+'">'
    +'<span class="n">'+s.num+'</span><span class="lbl">'+s.n+'</span></button>'}).join("");
@@ -2007,6 +2028,11 @@ document.addEventListener("click",function(e){
   if(e.target.closest("#pprev")){step(-1);return}
   var pd=e.target.closest("[data-pd]"); if(pd){P.dir=pd.dataset.pd;drawPlayer();return}
   var dl=e.target.closest("[data-dl]"); if(dl){ runExport(dl); return }
+  var mrs=e.target.closest("[data-mtxrst]");
+  if(mrs){ delete MTX[mrs.dataset.mtxrst]; render(); return }
+  if(e.target.closest("[data-mtxall]")){
+    Object.keys(MTX).forEach(function(k){ delete MTX[k] }); render(); return;
+  }
   var ed=e.target.closest("[data-edit]");
   if(ed){ state.edit={hl:ed.dataset.edit, i:0}; render({top:true}); return }
   var pk=e.target.closest("[data-pick]");
@@ -2088,6 +2114,14 @@ document.addEventListener("input",function(e){
   if(ps){ setShared(ps, e.target.value); refreshPosts(); return }
   var po=e.target.dataset&&e.target.dataset.po;
   if(po){ var q=po.split(":"); setPost(q[0], q[1], e.target.value); refreshPosts(); return }
+  var mx=e.target.dataset&&e.target.dataset.mtx;
+  if(mx){
+    var val=e.target.value;
+    if(val==="") delete MTX[mx]; else MTX[mx]=val;
+    if(state.edit){ refreshStage() }
+    else { clearTimeout(MTXT); MTXT = setTimeout(render, 260) }   /* vy 07: 84 rutor, vänta ut skrivandet */
+    return;
+  }
   var ed=e.target.dataset&&e.target.dataset.ed;
   if(ed && state.edit){
     var h=hlOf(state.edit.hl);
@@ -2165,7 +2199,7 @@ function stubDownloads(declineAt){
 window.__vstudio = {
   framePNG:framePNG, motionFrame:function(d,s,tt){ return motionFrame(d,s,tt) },
   exportMotion:exportMotion, BUILD:BUILD, runJobs:runJobs,
-  stubDownloads:stubDownloads, stubCount:function(){ return STUB_N },
+  stubDownloads:stubDownloads, stubCount:function(){ return STUB_N }, MTX:MTX,
   zipBlob:zipBlob, runZip:runZip,
   UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
   saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,

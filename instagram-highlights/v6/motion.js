@@ -139,7 +139,7 @@ var MDIRS = [
 /* ---------- storyboards ---------- */
 var MSTORY = {
  annons:{
-  stillhet:[["0,0 s","Ett fotografi i passepartout, 84 × 100 cqw. Under det ANNONSEN spärrat och rubriken verktyget skrev: <i>Ljuset som gör skillnad</i>. Märket uppe till vänster. Ingenting mer."],
+  stillhet:[["0,0 s","Ett fotografi i passepartout, 84 × 100 cqw. Under det ANNONSEN spärrat och rubriken verktyget skrev — den hämtas ur objektet, inte ur koden. Märket uppe till vänster. Ingenting mer."],
    ["0,0–8,0 s","Bilden zoomar in 5,5 % linjärt över hela klippet. Ingen ease — ease läses som webbanimation. Texten står helt still hela vägen."],
    ["8,0 s","Slutbild. Rubriken är resultatet av verktyget, inte en beskrivning av det."]],
   editorial:[["0,0 s","Uppslaget ligger färdigt men tomt: fyra faktarader med sina rubriker, sex tomma bildplatser och textytans radlinjer. Rutnätet syns från första bildrutan — det är därför plåten aldrig känns halvfärdig."],
@@ -338,6 +338,16 @@ function secMotion(){
    +'<div class="tw"><table><thead><tr><th>Template</th><th>Klass</th><th>Syfte</th><th>Varför</th>'
    +'<th>Vad rör sig</th><th>Vad står still</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
    +'<h3 class="h3">Kandidater och riktningar</h3>'
+   /* Objektet sätts en gång här och slår igenom i samtliga bildrutor
+      nedan. Utan den här raden går det inte att visa en riktig bostad
+      i vyn där riktningarna faktiskt jämförs. */
+   +'<div class="dlbar objbar"><span class="eyebrow">Objektet</span>'
+   + MOFIELDS.map(function(f){
+      return '<label class="ofld"><span>'+esc(f.n)+'</span>'
+       +'<input type="text" data-mtx="'+f.k+'" value="'+esc(MTX[f.k]||"")
+       +'" placeholder="'+esc(mo(f.k))+'"></label>';
+     }).join("")
+   +'<button class="dlb" type="button" data-mtxall="1">Återställ objektet</button></div>'
    +'<div class="dlbar"><span class="eyebrow">Ladda ner</span>'
    + zipBtn("allmkf",{ddir:state.dir},"Alla "+(MCAND.length*MDIRS.length*3)+" nyckelbilder · ZIP","nyckelbilder")
    +'<span class="mut" style="font-size:11.5px">'+MCAND.length+' kandidater × '+MDIRS.length

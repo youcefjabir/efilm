@@ -108,8 +108,14 @@ var MK = {};
    la allt i underkant. Nu delas höjden i tre band som byter innehåll —
    uppgifter, avläsning, färdig text — så att ingen del av plåten står
    oanvänd. */
-var ANF = [["Adress","Silvergården 9A"],["Ort","Landskrona · Kv. Sanden"],
-           ["Storlek","4 rum · 112 m²"],["Typ","Bostadsrätt"]];
+/* Faktaraderna byggs vid rendering ur rörelsens objekt — de låg som
+   fasta strängar och gick därför inte att ändra. */
+function anf(){
+  return [["Adress", mo("addr")],
+          ["Ort",    mo("city") + (mo("distr") ? " · " + mo("distr") : "")],
+          ["Storlek", mo("rooms") + " · " + mo("area")],
+          ["Typ",    mo("typ")]];
+}
 var ANIM6 = ["hero","kitchen","living","dining","boucle","eames"];
 var ANSIG = ["Ljusinsläpp","Takhöjd","Material","Planlösning"];
 var ANP = ["Fyra rum med genomgående planlösning och eftermiddagssol rakt in i vardagsrummet.",
@@ -147,7 +153,7 @@ MK.annons = {
    var T = mtone(D);
    var fP = seg(t,.04,.30), iP = seg(t,.28,.52), hP = seg(t,.52,.68), pP = seg(t,.64,.94);
 
-   var rows = ANF.map(function(f,j){
+   var rows = anf().map(function(f,j){
      return anrow(T, f[0], f[1], seg(fP, j*.2, j*.2+.34), 34 + j*9.4);
    }).join("");
 
@@ -160,7 +166,7 @@ MK.annons = {
       +'</div>';
    }).join("");
 
-   var words = "Ljuset som gör skillnad".split(" ");
+   var words = mo("head").split(" ");
    var head = '<div style="display:flex;flex-wrap:wrap;gap:0 2.2cqw;min-height:10cqw">'
      + words.map(function(w,j){ return mreveal(mdisp(D,w,7.4), seg(hP, j*.17, j*.17+.34)) }).join("")
      +'</div>';
@@ -227,7 +233,7 @@ MK.annons = {
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:110cqw">'
      +'<div style="font-family:Montserrat,sans-serif;font-size:1.85cqw;letter-spacing:.22em;'
      +'text-transform:uppercase;color:'+T.mut+';margin-bottom:1.8cqw">Ut · rubrik och tre stycken</div>'
-     + mreveal(mdisp(D,"Ljuset som gör skillnad", 6.2), seg(outP,0,.26))
+     + mreveal(mdisp(D, mo("head"), 6.2), seg(outP,0,.26))
      +'<div style="height:2.4cqw"></div>'+ lines +'</div>'
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;bottom:'+(SAFE.bot+6)+'cqw;'
      +'font-family:Montserrat,sans-serif;font-size:1.9cqw;letter-spacing:.16em;text-transform:uppercase;'
@@ -243,7 +249,7 @@ MK.annons = {
    var toneP = seg(t,.62,1);
    var tone = toneP<=0 ? 0 : toneP<.42 ? 0 : toneP<.74 ? 1 : 2;
    var local = toneP<.42 ? 1 : toneP<.74 ? seg(toneP,.42,.52) : seg(toneP,.74,.84);
-   var heads = ["Ljuset som gör skillnad","Hemmet där eftermiddagen dröjer","Ett kvarter från hamnen"];
+   var heads = [mo("head"),"Hemmet där eftermiddagen dröjer","Ett kvarter från hamnen"];
    var leads = [ANP[0],
                 "Eftermiddagssolen når hela vägen in i vardagsrummet, och rummen hänger ihop utan en enda tröskel.",
                 "Fyra rum i Kvarteret Sanden, med 3,1 meter i takhöjd och hamnen som närmaste granne."];
@@ -262,7 +268,7 @@ MK.annons = {
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:76cqw;clip-path:inset(0 '
      +((1-mclamp(factP))*100).toFixed(1)+'% 0 0);font-family:Montserrat,sans-serif;font-size:2cqw;'
      +'letter-spacing:.18em;text-transform:uppercase;color:'+T.mut+'">'
-     +'Silvergården 9A · 4 rum · 112 m² · Bostadsrätt</div>'
+     + esc(mo("addr")+" · "+mo("rooms")+" · "+mo("area")+" · "+mo("typ")) +'</div>'
      + mrule(D,83,6.4,6.4,.7)
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:90cqw">'
      +'<div style="min-height:19cqw">'
@@ -416,7 +422,8 @@ var MPCAP = [["Kommande",  "Bilden dominerar. Adressen som löfte."],
              ["Visning",   "En enda uppgift, satt stort."],
              ["Såld",      "Ordet tar över, bilden backar."]];
 
-function mpost(id){ for(var j=0;j<POSTS.length;j++){ if(POSTS[j].id===id) return POSTS[j] } return null }
+/* mpost() bor nu i objektavsnittet längst ned — den slår ihop mallen
+   med PEDITS och rörelsens objekt. */
 
 /* En riktig artboard, absolut placerad. w anges i ramens cqw; höjden
    följer formatet. Ingen stand-in — post() är samma renderare som
@@ -462,7 +469,7 @@ MK.kampanj = {
    var seam = (i>0 && w>.001 && w<.999)
      ? '<div style="position:absolute;left:'+(X+W*w).toFixed(2)+'cqw;top:'+Y+'cqw;width:1.5px;height:'
        +(W*1.25).toFixed(2)+'cqw;background:'+T.oli+'"></div>' : '';
-   return mshell(D, mkick(D,"Kampanjen · Silvergården 9A")
+   return mshell(D, mkick(D,"Kampanjen · "+mo("addr"))
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:29cqw">'
      + mswap2(mdisp(D, prv[0], 8.2), mdisp(D, cur[0], 8.2), sp) +'</div>'
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:39.5cqw">'
@@ -531,7 +538,7 @@ MK.kampanj = {
      + stack
      + mrail(D, 123, i, 4)
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:127.5cqw">'
-     + mdisp(D, "Silvergården 9A", 8.6) +'</div>'
+     + mdisp(D, mo("addr"), 8.6) +'</div>'
      +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:139cqw">'
      + mbody(D, "Fyra tryckfärdiga inlägg ur samma underlag.") +'</div>'
      + mfoot(D));
@@ -645,14 +652,17 @@ MK.format = {
    hero, status, adress, faktarad, tre ingångar och en handlingsknapp.
    Allt utom loggan och accentfärgen är identiskt mellan kontoren — det
    är hela poängen, och den syns bara när sidan är satt. */
-var MWB = [["", "", "Utan varumärke"],
-           ["Nordvik", "#1F3A2E", "Nordvik"],
-           ["Alvhem",  "#7A3B2E", "Alvhem"]];
+/* Kontorsnamnen är objektsdata de också — de byggs vid rendering. */
+function mwb(){
+  return [["", "", "Utan varumärke"],
+          [mo("b1"), "#1F3A2E", mo("b1")],
+          [mo("b2"), "#7A3B2E", mo("b2")]];
+}
 
 /* Visningssidan i miniatyr. Egen container: allt inuti räknas mot
    sidans bredd, så samma funktion fungerar på 41 cqw och på 86. */
 function msite(D, bi, x, y, w, extra){
-  var T = mtone(D), b = MWB[bi], c = b[1] || T.mut, on = !!b[1];
+  var T = mtone(D), b = mwb()[bi], c = b[1] || T.mut, on = !!b[1];
   var plate = T.dark ? "#141416" : "#FFFFFF";
   var line  = T.dark ? "#26262A" : "#E4DEDB";
   var ink   = T.dark ? "#EFEDE7" : "#1C1C1E";
@@ -680,9 +690,9 @@ function msite(D, bi, x, y, w, extra){
    +'<div style="font-family:Montserrat,sans-serif;font-size:2.9cqw;font-weight:500;letter-spacing:.3em;'
    +'text-transform:uppercase;color:'+c+'">Till salu</div>'
    +'<div style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:9.4cqw;'
-   +'line-height:1.04;color:'+ink+';margin-top:1.6cqw">Silvergården 9A</div>'
+   +'line-height:1.04;color:'+ink+';margin-top:1.6cqw">'+esc(mo("addr"))+'</div>'
    +'<div style="font-family:Montserrat,sans-serif;font-size:3cqw;color:'+mut+';margin-top:1.6cqw">'
-   +'Landskrona · 4 rum · 112 m² · 1968</div>'
+   + esc(mo("city")+" · "+mo("rooms")+" · "+mo("area")+" · "+mo("year")) +'</div>'
    +'<div style="height:1px;background:'+line+';margin:4.4cqw 0"></div>'
    +'<div style="display:flex;gap:2.4cqw">'+thumbs+'</div>'
    +'<div style="margin-top:5cqw;display:inline-block;padding:2.6cqw 5.4cqw;background:'+(on?c:line)+';'
@@ -706,8 +716,8 @@ MK.white = {
    /* accentfärgen sveper över sidan — maskerat byte, ingen korsfade */
    var w  = i>0 ? eInOut(Math.min(1, ph.local/.28)) : 1;
    var CAP = [["Strukturen.","En sida, samma varje gång."],
-              ["Nordvik.",   "Logga och accentfärg satta av kontoret."],
-              ["Alvhem.",    "Samma sida, ett annat varumärke."]];
+              [mo("b1")+".", "Logga och accentfärg satta av kontoret."],
+              [mo("b2")+".", "Samma sida, ett annat varumärke."]];
    var prv = CAP[i>0?i-1:0], cur = CAP[i];
    return mshell(D, mkick(D,"White label")
      + (i>0 ? msite(D, i-1, 15, 30, 70) : '')
@@ -726,7 +736,7 @@ MK.white = {
      var cur = now === k;
      return '<div style="position:absolute;left:'+x+'cqw;top:122cqw;font-family:Montserrat,sans-serif;'
       +'font-size:1.9cqw;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:'
-      +(cur?T.oli:T.mut)+'">'+esc(MWB[k][2])+'</div>';
+      +(cur?T.oli:T.mut)+'">'+esc(mwb()[k][2])+'</div>';
    };
    return mshell(D, mkick(D,"Ett uttryck, satt en gång")
      + mrule(D, 30, 6.4, 6.4)
@@ -749,7 +759,7 @@ MK.white = {
    var nm = function(j){
      return '<div style="font-family:Montserrat,sans-serif;font-size:2.25cqw;font-weight:500;'
       +'letter-spacing:.24em;text-transform:uppercase;color:'+T.oli+'">'
-      + esc("White label · " + MWB[j][2]) +'</div>';
+      + esc("White label · " + mwb()[j][2]) +'</div>';
    };
    return mshell(D,
      '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+SAFE.top+'cqw">'
@@ -819,9 +829,9 @@ function mviewer(D, mode, x, y, w, lift, extra, vh){
    +'<div style="height:11cqw;border-top:1px solid '+line+';display:flex;align-items:center;'
    +'justify-content:space-between;padding:0 5cqw">'
    +'<span style="font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;font-size:5cqw;color:'+ink+'">'
-   +'Silvergården 9A</span>'
+   + esc(mo("addr")) +'</span>'
    +'<span style="font-family:Montserrat,sans-serif;font-size:2.5cqw;letter-spacing:.18em;text-transform:uppercase;'
-   +'color:'+mut+'">112 m² · 4 rum</span></div></div>';
+   +'color:'+mut+'">'+esc(mo("area")+" · "+mo("rooms"))+'</span></div></div>';
 }
 
 MK.tredim = {
@@ -838,7 +848,7 @@ MK.tredim = {
               ["Planritningen.","Måtten och planlösningen, samma modell."],
               ["Rundvandringen.","Kunden går igenom rummen själv."]];
    var prv = CAP[i>0?i-1:0], cur = CAP[i];
-   return mshell(D, mkick(D,"3D visning · Silvergården 9A")
+   return mshell(D, mkick(D,"3D visning · "+mo("addr"))
      + (i>0 ? mviewer(D, i-1, 7, 36, 86, i-1===1?1:0) : '')
      + mviewer(D, i, 7, 36, 86, lift,
                w<1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
@@ -1031,12 +1041,12 @@ function mstill(D, o){
 /* ---- 01 Annonsskrivaren: den färdiga rubriken, inte verktyget ---- */
 MK.annons.stillhet = function(D, t){
   return mstill(D, {slot:"m-living", k:"living", t:t,
-    kick:"Annonsen", line:"Ljuset som gör skillnad"});
+    kick:"Annonsen", line:mo("head")});
 };
 /* ---- 02 Motion: en enda långsam inzoomning. Det ÄR produkten ---- */
 MK.motion.stillhet = function(D, t){
   return mstill(D, {slot:"m-mo2", k:"dining", t:t, zoom1:1.09,
-    kick:"Rörlig bild", line:"Silvergården 9A"});
+    kick:"Rörlig bild", line:mo("addr")});
 };
 /* ---- 03 E-styling: tomt blir möblerat under en mask ---- */
 MK.estyl.stillhet = function(D, t){
@@ -1083,7 +1093,7 @@ MK.format.stillhet = function(D, t){
    +'<div style="position:absolute;left:8cqw;right:8cqw;top:'+STILL.KICK+'cqw">'
    + mswap2(kick(pf[1]+" · "+pf[0]), kick(f[1]+" · "+f[0]), sp) +'</div>'
    +'<div style="position:absolute;left:8cqw;right:8cqw;top:'+STILL.LINE+'cqw">'
-   + line("Silvergården 9A") +'</div>'
+   + line(mo("addr")) +'</div>'
    + mmark(D));
 };
 /* ---- 06 White label: kontorets namn byts, bilden är densamma ---- */
@@ -1091,14 +1101,90 @@ MK.white.stillhet = function(D, t){
   var ph = mphN(t, 0, .96, 3), i = ph.i;
   return mstill(D, {slot:"m-site-hero", k:"matterport", t:t,
     swap: i>0 ? Math.min(1, ph.local/.34) : 1,
-    prevKick: MWB[i>0?i-1:0][2], kick: MWB[i][2],
-    line:"Silvergården 9A"});
+    prevKick: mwb()[i>0?i-1:0][2], kick: mwb()[i][2],
+    line:mo("addr")});
 };
 /* ---- 07 3D visning: rummet, långsamt ---- */
 MK.tredim.stillhet = function(D, t){
   return mstill(D, {slot:"m-3d-2", k:"matterport", t:t, zoom1:1.07,
     kick:"3D visning", line:"Gå igenom bostaden"});
 };
+
+/* ---------------------------------------------------------------------
+   OBJEKTET I RÖRELSE
+
+   Adressen, orten, ytan, rubriken och kontorsnamnen låg som strängar
+   rakt i renderarna. Bilderna gick att byta, texten gick inte. Man kunde
+   alltså inte visa en demo för en riktig bostad.
+
+   Nu läser varje rörelse sina uppgifter härifrån. Upplösningen sker i
+   tre steg, så att det finns ETT värde och inte tre:
+
+     1  MTX     — skrivet i studions panel Objektet i rörelse
+     2  PEDITS  — objektpanelen i vy 04, om fältet finns där
+     3  MOBJ    — bibliotekets standardobjekt
+
+   Skriver du adressen i vy 04 följer rörelsen med automatiskt. Skriver
+   du den i rörelsepanelen vinner den, och bara för rörelsen.
+   --------------------------------------------------------------------- */
+var MOBJ = {
+  addr:"Silvergården 9A", city:"Landskrona", distr:"Kv. Sanden",
+  rooms:"4 rum", area:"112 m²", year:"1968", typ:"Bostadsrätt",
+  head:"Ljuset som gör skillnad",
+  b1:"Nordvik", b2:"Alvhem"
+};
+var MTX = {};
+/* PEDITS bär adress och ort på mallarna — läs den innan standardvärdet */
+function mpedit(k){
+  if(typeof PEDITS === "undefined") return null;
+  for(var i = 0; i < POSTS.length; i++){
+    var e = PEDITS[POSTS[i].id];
+    if(e && e[k]) return e[k];
+  }
+  return null;
+}
+function mo(k){
+  var v = MTX[k];
+  if(v != null && v !== "") return v;
+  if(k === "addr" || k === "city"){ var p = mpedit(k); if(p) return p }
+  return MOBJ[k];
+}
+/* siffran ur ett fält: "4 rum" -> "4", "112 m²" -> "112" */
+function monum(k){ var m = String(mo(k)).match(/\d+([.,]\d+)?/); return m ? m[0] : mo(k) }
+var MOFIELDS = [
+  {k:"addr",  n:"Adress"},      {k:"city",  n:"Ort"},
+  {k:"distr", n:"Stadsdel"},    {k:"typ",   n:"Bostadstyp"},
+  {k:"rooms", n:"Antal rum"},   {k:"area",  n:"Boarea"},
+  {k:"year",  n:"Byggår"},      {k:"head",  n:"Annonsrubrik"},
+  {k:"b1",    n:"Kontor A"},    {k:"b2",    n:"Kontor B"}
+];
+/* vilka fält en kandidat faktiskt visar — panelen ska inte be om mer */
+var MOUSE = {
+  annons: ["addr","city","distr","typ","rooms","area","head"],
+  motion: ["addr"],
+  estyl:  [],
+  kampanj:["addr","city","rooms","area","year"],
+  format: ["addr","city","rooms","area","year"],
+  white:  ["addr","city","rooms","area","year","b1","b2"],
+  tredim: ["addr","rooms","area"]
+};
+function mofieldsOf(cand){
+  var use = MOUSE[cand] || [];
+  return MOFIELDS.filter(function(f){ return use.indexOf(f.k) >= 0 });
+}
+/* Kampanjmallarna i rörelse: PEDITS först, rörelsens objekt sist, så att
+   adressen bara behöver skrivas på ett ställe. */
+function mpost(id){
+  var p = null;
+  for(var j = 0; j < POSTS.length; j++){ if(POSTS[j].id === id) p = POSTS[j] }
+  if(!p) return null;
+  var q = Object.assign({}, p, (typeof PEDITS !== "undefined" && PEDITS[p.id]) || {});
+  q.addr = mo("addr"); q.city = mo("city");
+  if(q.facts) q.facts = [[monum("rooms"),"rum och kök"],
+                         [monum("area"),"kvadratmeter"],
+                         [mo("year"),"byggår"]];
+  return q;
+}
 
 /* ---------------------------------------------------------------------
    KOPPLINGEN TILL BIBLIOTEKET
