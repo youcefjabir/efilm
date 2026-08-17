@@ -150,97 +150,52 @@ men har egen vertikal rytm per mall och per format.
 
 ---
 
-## Omslagen
+## Omslagen — tre system
 
-Ett nummer på omslaget låser ordningen: lägger man till ett kapitel, eller
-flyttar ett, måste alla omslag ritas om och laddas upp igen. Därför har varje
-kapitel i stället **ett eget märke**. Ordningen är fri.
+Ett nummer på omslaget låser ordningen, så varje kapitel har i stället ett eget
+märke. Ordningen är fri.
 
-Uppsättningen är omritad fem gånger, och varje omgång lärde ut något:
+Sju omgångar av ikoner ligger bakom det som står nu, och felet var hela tiden
+detsamma: omslaget ritades som en **ikon**. Ikoner hör hemma i gränssnitt.
+Viewly är ett produktionsbolag med redaktionell profil — Cormorant, hårlinjer,
+papper, generösa marginaler — och den profilen har ingen ikonuppsättning i sig.
+Den har typografi, material och reduktion.
 
 | Omgång | Grepp | Varför den föll |
 |---|---|---|
-| 1 | Hårlinjer, små symboler | Generiska. En bländare är en kamera, inte ett bostadsfotografi |
-| 2 | Fyllda UI-figurer | Massa nog för 56 px, men läste som ett ikonbibliotek |
-| 3 | Beskurna fragment i full svärta | Grafiskt starka — men Bauhaus-affischer |
-| 4 | Ljusa tvättar | Lugna, men så abstrakta att motivet försvann |
-| 5 | Graverade kapitelmärken | Eleganta, men fel register — ett omslag ska läsas på en halv sekund, inte studeras |
+| 1 | Hårlinjer, små symboler | Generiska |
+| 2 | Fyllda UI-figurer | Läste som ett ikonbibliotek |
+| 3 | Beskurna fragment i full svärta | Bauhaus-affischer |
+| 4 | Ljusa tvättar | Så abstrakta att motivet försvann |
+| 5 | Graverade kapitelmärken | Eleganta, men skulle studeras |
+| 6 | Platt 2D-illustration | Rätt register — men branschens vokabulär |
+| 7 | Samma, i Viewlys palett | Närmare, men fortfarande ikon |
 
-Det avgörande var registret, inte finishen. Ett omslag i profilraden är ett
-**objekt** — en fylld färgplatta med en liten scen i — inte ett papper med en
-symbol på. Det är därför branschen ritar dem så, och det är därför de fyra
-första omgångarna kändes fel oavsett hur väl de var tecknade.
+Därför **tre system** i stället för ett, precis som bildrutorna har tre
+utföranden. De är avsiktligt olika register, inte tre varianter av samma idé:
 
-### Platt illustration i Viewlys palett
+| System | Grepp |
+|---|---|
+| **Monogrammet** | Kapitelinitialen satt i Cormorant Garamond, med olivhårlinje under. Bokens anfang. Viewly bär logotypen självt |
+| **Materialet** | Ett fotografi ur biblioteket, avfärgat och stämt till en gemensam olivton. Byråns eget arbete som omslag |
+| **Figuren** | En enda reducerad figur i hårlinje, med stort andrum. Fjorton figurer att välja bland |
 
-Registret från omgång 6 behålls — omslaget är ett objekt, en fylld platta —
-men vokabulären är utbytt. Omgång 6 lånade branschens: mintgrön grund, vänliga
-vinjetter med moln, krukväxter och små ansikten. Läsbart, men inte vårt.
+Alla tre delar plattan, marginalen och olivpunkten, så raden håller ihop även om
+man blandar — men den ser bäst ut satt genomgående, och en länk i panelen sätter
+valt system för alla fjorton kapitel på en gång.
 
-| | Diakrit | Viewly |
-|---|---|---|
-| Platta | mättad mint | varmt papper `#EAE6DC` |
-| Former | vita | oliv `#6E7266` — teckningsfärgen, inte ett fält |
-| Hörn | rundade | skarpa |
-| Accent | — | bläck `#242821`, en per märke |
-| Extra färger | — | inga |
+Ingen fyllnadsfärg, inga rundade hörn, inga scener. Paletten är brevpapperets:
+`#EFECE6` respektive `#0E0E0D`, bläck `#1C1C1E`, oliv `#6E7266`.
 
-En mellanomgång la hela plattan i oliv. Den föll: `#6E7266` som ett helt fält
-blir drabbigt. Oliven är en **teckningsfärg** i det här systemet, inte ett
-fält — plattan är därför papper, precis som ARKIV i övrigt, och SKUGGA kör
-samma teckning med rampen inverterad.
+### Omslaget är sista bildrutan
 
-Fyra namngivna valörer per riktning, inga opacitetssteg: valörtrappan ska vara
-beslutad, inte uträknad. Det starkaste tonvärdet ligger alltid på det som är
-själva leveransen — solen, soffan, spelknappen, rubriken.
+Omslaget ligger nu **sist i varje kapitels bildruteserie** — i filmremsan, i
+kontaktkartan och i serienedladdningen. Ett kapitel med sju Stories laddar ner
+åtta filer. Exportbilden är 1080 × 1920 med cirkeln centrerad och kapitlets namn
+satt under; Instagram beskär själv till cirkeln.
 
-| Kapitel | Märke | Scen |
-|---|---|---|
-| Viewly | V-märket | logotypen — enda kapitlet som bär den bokstavligt |
-| Fotografering | Kortet | ett rum tryckt med marginal |
-| 3D visning | Volymen | tre ytor och ett tänt fönster |
-| E-styling | Rummet möblerat | soffa och tavla i ett tomt rum |
-| Atmosphere | Skymningen | sol lågt över två lager landskap |
-| Drönare | Höjden | farkosten och blickfältet ned över tomten |
-| Områdeskarta | Kvarteret | kvarter, gator som mellanrum, en punkt |
-| Motion | Svepet | tre bildrutor, klippet i den främsta |
-| Annonsen | Spalten | rubrik i oliv, brödtext under |
-| Kampanjen | Formaten | 9:16, 4:5 och 1:1 i sann proportion |
-| Systemet | Portalen | en yta, allt samlat, en ruta tänd |
-| Objekt | Kontaktkartan | sex plåtar ur samma bostad |
-| Inifrån | Fotografen | porträtt i samma plåt som bostaden |
-| Ditt hem | Hemmet | taket, dörren och ett tänt fönster |
-
-**Status per märke.** Systemet — palett, register, valörtrappa — är satt. Åtta
-märken håller: V-märket, Volymen, Skymningen, Svepet, Spalten, Formaten,
-Fotografen och Hemmet. Fyra behöver mer teckningsarbete innan de är klara:
-Kortet, Rummet möblerat, Höjden och Kvarteret läser fortfarande mer som
-geometri än som scen.
-
-### Mätt, inte bedömt
-
-Omslaget syns bara i en storlek — 56 px i profilraden — så det är den storleken
-som mäts. Alla fjorton renderas i 56 px och kontrolleras för två saker:
-
-| Mått | Krav | ARKIV | SKUGGA |
-|---|---|---|---|
-| Mörkaste mot ljusaste inne i plattan | ≥ 3:1 | 3,1:1 | 3,9:1 |
-| Närmaste par, silhuett vid 56 px | inga dubbletter | 0,67 | 0,33 |
-
-Två märken låg under 3:1 internt och fick var sitt mörkt ankare: spelknappen i
-Motion och det bakre kortet i Kampanjen.
-
-Plattan själv ligger på 1,8:1 mot vitt, och det är avsiktligt: **Instagram ritar
-sin egen grå ring runt varje omslag**, så gränsen mot profilbakgrunden är
-plattformens, inte vår. Den tidigare uppsättningen behövde en egen nyckellinje
-just för att den saknade fylld grund — det behovet försvann med registret.
-
-I studion sitter panelen **Omslag** överst i inspektören: förhandsvisning i 64
-och 56 px, alla fjorton märken som runda plattor i rätt palett, bild bakom
-märket i SKUGGA, och nedladdning — `Ladda ner omslaget` eller `Alla 14 omslag`.
-Exporten är 1080 × 1920 PNG; Instagram beskär själv till cirkeln.
-
----
+Det gick tidigare bara att ladda ner omslaget från en knapp i inspektören, vilket
+var lätt att missa. Knappen finns kvar, plus `Alla 14 omslag`.
 
 ## Tre förslag per bildruta
 

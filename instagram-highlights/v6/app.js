@@ -101,11 +101,11 @@ function sheetPNG(dirId, hl, cw){
   hl.st.forEach(function(s,i){
     var x = pad + i*(cw+gap);
     body += '<foreignObject x="'+x+'" y="'+pad+'" width="'+cw+'" height="'+ch+'">'
-          + xhtml(story(dirId,s,i,n), cw, ch, bgc) + '</foreignObject>'
+          + xhtml(s.html, cw, ch, bgc) + '</foreignObject>'
           + '<text x="'+x+'" y="'+(pad+ch+Math.round(cw*.075))+'" font-family="Montserrat,sans-serif" '
           + 'font-size="'+Math.round(cw*.042)+'" letter-spacing="'+(cw*.006).toFixed(1)+'" '
           + 'fill="'+(dirId==="skugga"?"#8C8A84":"#63676A")+'">'
-          + String(i+1).padStart(2,"0") + '  ' + esc(s.p).toUpperCase() + '</text>';
+          + String(i+1).padStart(2,"0") + '  ' + esc(s.lab).toUpperCase() + '</text>';
   });
   return rasterize(svgDoc(W, H, body), W, H);
 }
@@ -187,8 +187,7 @@ async function runExport(btn){
       await offer(b2, "viewly-"+d2+"-"+slug(h2.name)+"-kontaktkarta.png", btn);
     } else if(kind === "cover"){
       var hc = hlOf(btn.dataset.hl), dc = btn.dataset.ddir;
-      var bc = await framePNG('<div style="position:absolute;inset:0">'+cover(dc,hc,"9:16")+'</div>',
-                              1080, 1920, dc==="skugga"?"#0E0E0D":"#F2EFEF");
+      var bc = await framePNG(coverFrame(dc, hc), 1080, 1920, dc==="skugga"?"#0E0E0D":"#F2EFEF");
       btn.textContent = lbl; btn.disabled = false;
       await offer(bc, "viewly-omslag-"+dc+"-"+slug(hc.name)+".png", btn);
     } else if(kind === "covers"){
@@ -674,7 +673,7 @@ function idbGet(){
 function idbClear(){ return idbPut({}) }
 
 function lightState(){
-  return {v:2, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS};
+  return {v:3, edits:EDITS, slots:SLOTS, posts:PEDITS, covers:CEDITS, picks:PICKS, csets:CPICKS};
 }
 function bankBytes(){
   var n = 0; for(var k in UPLOADS) n += UPLOADS[k].length; return n;
@@ -727,7 +726,7 @@ function loadAll(){
       var d = JSON.parse(raw);
       Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
       Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
-      Object.assign(PICKS, d.picks||{});
+      Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{});
       /* v1 la bilderna i samma post — flytta över dem tyst. */
       if(d.uploads) Object.assign(UPLOADS, d.uploads);
       any = true;
@@ -744,7 +743,7 @@ function loadBank(){
   });
 }
 function clearAll(){
-  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS].forEach(function(o){
+  [EDITS, SLOTS, UPLOADS, PEDITS, CEDITS, PICKS, CPICKS].forEach(function(o){
     Object.keys(o).forEach(function(k){ delete o[k] }) });
   Object.keys(VIDEOS).forEach(function(k){ delete VIDEOS[k] });
   seedSlots();
@@ -934,7 +933,7 @@ function thumb(k, on, attr){
 var busy = false;
 async function downloadSeries(hlId, dir, btn){
   if(busy) return; busy = true;
-  var h = hlOf(hlId), n = h.st.length, lbl = btn.textContent;
+  var h = hlOf(hlId), n = h.st.length + 1, lbl = btn.textContent;   /* +1: omslaget sist */
   btn.disabled = true;
   var dl = await downloads();
   if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled = false; busy = false;
@@ -944,8 +943,11 @@ async function downloadSeries(hlId, dir, btn){
     btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
     var blob;
     try {
-      var html = story(dir, h.st[i], i, n) + (state.ig ? igOverlay(n, i) : "");
-      blob = await framePNG(html, 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7");
+      var isCov = i === n-1;
+      var html = isCov ? coverFrame(dir, h)
+                       : story(dir, h.st[i], i, h.st.length) + (state.ig ? igOverlay(h.st.length, i) : "");
+      blob = await framePNG(html, 1080, 1920,
+        dir==="skugga" ? "#0E0E0D" : (isCov ? "#F2EFEF" : "#EFECE7"));
     } catch(e){ failed.push(i+1); continue }
     btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
     try {
@@ -993,8 +995,7 @@ async function downloadCovers(dir, btn){
     btn.textContent = "Renderar " + (i+1) + " / " + n + "…";
     var blob;
     try {
-      blob = await framePNG('<div style="position:absolute;inset:0">'+cover(dir,h,"9:16")+'</div>',
-                            1080, 1920, dir==="skugga"?"#0E0E0D":"#F2EFEF");
+      blob = await framePNG(coverFrame(dir, h), 1080, 1920, dir==="skugga"?"#0E0E0D":"#F2EFEF");
     } catch(e){ failed.push(h.name); continue }
     btn.textContent = "Sparar " + (i+1) + " / " + n + "…";
     try {
@@ -1042,7 +1043,7 @@ function importJSON(file){
     if(!d || typeof d !== "object"){ flash("Filen innehåller inga redigeringar", true); return }
     Object.assign(EDITS, d.edits||{}); Object.assign(SLOTS, d.slots||{});
     Object.assign(PEDITS, d.posts||{}); Object.assign(CEDITS, d.covers||{});
-    Object.assign(PICKS, d.picks||{});
+    Object.assign(PICKS, d.picks||{}); Object.assign(CPICKS, d.csets||{});
     var n = 0;
     if(d.uploads){ Object.assign(UPLOADS, d.uploads); n = Object.keys(d.uploads).length }
     flash("Importerat" + (n ? " · "+n+" bilder" : " · text"));
@@ -1129,16 +1130,25 @@ function variantPanel(s, i, n){
 }
 
 function studioEditor(){
-  var h = hlOf(state.edit.hl), n = h.st.length, i = Math.min(state.edit.i, n-1), s = h.st[i];
+  var h = hlOf(state.edit.hl), n = h.st.length;
+  var isCover = state.edit.i >= n;                 /* sista kortet är omslaget */
+  var i = isCover ? n : Math.min(state.edit.i, n-1);
+  var s = h.st[isCover ? n-1 : i];
   var eff = Object.assign({}, picked(s), EDITS[s.sid]||{});
 
   var strip = h.st.map(function(x,j){
-    return '<button class="filmb'+(j===i?" on":"")+'" type="button" data-pick="'+j+'">'
+    return '<button class="filmb'+(!isCover && j===i?" on":"")+'" type="button" data-pick="'+j+'">'
       +'<span class="filmn">'+String(j+1).padStart(2,"0")+(isEdited(x)?' <i class="dot"></i>':'')+'</span>'
       +'<span class="filmf">'+story(state.dir,x,j,n)+'</span>'
       +'<span class="filmp">'+picked(x).p
         +(PICKS[x.sid]?' <b class="vtag">'+ALTLAB[PICKS[x.sid]]+'</b>':'')+'</span></button>';
-  }).join("");
+  }).join("")
+  /* Omslaget ligger sist i remsan därför att det ligger sist i serien. Det
+     är ingen bildruta man skriver text i — det redigeras i omslagspanelen. */
+  + '<button class="filmb cov'+(isCover?" on":"")+'" type="button" data-pick="'+n+'">'
+      +'<span class="filmn">'+String(n+1).padStart(2,"0")+'</span>'
+      +'<span class="filmf">'+coverFrame(state.dir,h)+'</span>'
+      +'<span class="filmp">omslag</span></button>';
 
   var fields = fieldsFor(s).map(function(f){
     var v = val(s, f[0]);
@@ -1172,26 +1182,29 @@ function studioEditor(){
    +'<div class="edgrid">'
      +'<div class="film">'+strip+'</div>'
      +'<div class="edstage">'
-       +'<div class="frame" id="edframe">'+story(state.dir,s,i,n)+(state.ig?igOverlay(n,i):'')+'</div>'
-       +'<div class="edunder"><span class="mono">'+String(i+1).padStart(2,"0")+' / '+String(n).padStart(2,"0")
-         +' · '+s.p+'</span>'
+       +'<div class="frame" id="edframe">'
+         +(isCover ? coverFrame(state.dir,h) : story(state.dir,s,i,n)+(state.ig?igOverlay(n,i):''))+'</div>'
+       +'<div class="edunder"><span class="mono">'+String(i+1).padStart(2,"0")+' / '+String(n+1).padStart(2,"0")
+         +' · '+(isCover?"omslag":picked(s).p)+'</span>'
          +'<span class="edstep"><button class="tbtn" type="button" data-step="-1">←</button>'
          +'<button class="tbtn" type="button" data-step="1">→</button></span></div>'
      +'</div>'
      +'<div class="edside">'
-       + variantPanel(s, i, n)
-       +'<div class="edsec"><div class="eyebrow">Text</div>'+fields
-         +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>'
+       + (isCover ? '' : variantPanel(s, i, n))
+       + (isCover ? '' :
+          '<div class="edsec"><div class="eyebrow">Text</div>'+fields
+          +'<button class="dlb" type="button" data-act="reset-story">Återställ bildrutan</button></div>')
        + coverPanel(h)
-       +'<div class="edsec"><div class="eyebrow">Media</div>'+media+'</div>'
-       +(s.p==="phases" ? objectPanel() : '')
-       +(s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
+       + (isCover ? '' : '<div class="edsec"><div class="eyebrow">Media</div>'+media+'</div>')
+       +(!isCover && s.p==="phases" ? objectPanel() : '')
+       +(!isCover && s.need?'<div class="edneed"><b>Behöver material</b>'+esc(s.need)+'</div>':'')
        +'<div class="edsec"><div class="eyebrow">Ladda ner</div>'
          +'<div class="dlcol">'
-           + dlBtn("frame",{hl:h.id, i:i, ddir:state.dir},"Denna bildruta · 1080×1920")
+           + (isCover ? dlBtn("cover",{hl:h.id, ddir:state.dir},"Omslaget · 1080×1920")
+                       : dlBtn("frame",{hl:h.id, i:i, ddir:state.dir},"Denna bildruta · 1080×1920"))
            + dlBtn("sheet",{hl:h.id, ddir:state.dir},"Hela serien som kontaktkarta")
-           +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+n+' bildrutor separat</button>'
-           + (videoRects(story(state.dir,s,i,n), 1080, 1920).length
+           +'<button class="dlb" type="button" data-series="'+h.id+'">Alla '+(n+1)+' bildrutor separat</button>'
+           + (!isCover && videoRects(story(state.dir,s,i,n), 1080, 1920).length
               ? '<button class="dlb pri" type="button" data-vhl="'+h.id+'" data-vi="'+i+'" data-vdir="'+state.dir+'">'
                 +'Denna bildruta som video</button>' : '')
          +'</div>'
@@ -1261,40 +1274,53 @@ function refreshPosts(){
    beskär själv till cirkeln.
    --------------------------------------------------------------------- */
 function coverPanel(h){
-  var d = state.dir;
-  /* Väljaren visar märket precis som det ser ut på plåten — samma palett,
-     samma fyllda grund. Ett märke på panelens bakgrund ser inte ut som ett
-     omslag och går inte att välja mellan. */
-  var GP = COVPAL[d] || COVPAL.arkiv;
-  var glyphs = GLYPH_IDS.map(function(g){
-    return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
-      +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw" style="background:'+GP.bg+'">'
-      +'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">'+GLYPHS[g].svg(GP)+'</svg></span></button>';
+  var d = state.dir, set = covSetIx(h);
+  /* Tre system, renderade i verklig storlek. Man väljer med ögat, som med
+     bildrutornas förslag — och kan sätta samma system för hela raden,
+     vilket är hur den ser bäst ut. */
+  var sets = COVSETS.map(function(cs, j){
+    var prev = CPICKS[h.id]; CPICKS[h.id] = j;
+    var art = coverEl(d, h);
+    if(prev==null) delete CPICKS[h.id]; else CPICKS[h.id] = prev;
+    return '<button class="cset'+(j===set?" on":"")+'" type="button" data-cset="'+h.id+':'+j+'" '
+      +'title="'+cs.d+'"><span class="csetc">'+art+'</span>'
+      +'<span class="csetn"><b>'+cs.n+'</b></span></button>';
   }).join("");
+
+  var figs = set===2 ? '<div class="mplab">Figur <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
+    +'<div class="grow">'+GLYPH_IDS.map(function(g){
+      return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
+        +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw">'
+        +'<svg viewBox="0 0 100 100">'+FIG[g]("currentColor", "#6E7266")+'</svg></span></button>';
+    }).join("")+'</div>' : '';
+
   var e = CEDITS[h.id] || {};
   var img = e.cover || h.cover;
-  return '<div class="edsec"><div class="eyebrow">Omslag</div>'
+  var pic = set===1
+    ? '<div class="mplab" style="margin-top:8px">Fotografi <code class="mono">'+img+'</code></div>'
+      +'<label class="upl"><input type="file" accept="image/*" data-upc="'+h.id+'" hidden>Ladda upp egen bild</label>'
+      +'<div class="mrow">'+allKeys().map(function(k){
+         return thumb(k, img===k, 'data-ci="'+h.id+':'+k+'"') }).join("")+'</div>'
+      +'<label class="sl">Fokalpunkt Y <em>'+Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'%</em>'
+      +'<input type="range" data-sl="cover-'+h.id+':fy" min="0" max="100" value="'
+      +Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'"></label>'
+    : '';
+
+  return '<div class="edsec"><div class="eyebrow">Omslag <em class="cnt">3 system</em></div>'
+   +'<div class="csets">'+sets+'</div>'
+   +'<button class="lnkb" type="button" data-act="cset-all" style="margin:2px 0 10px">'
+   +'Sätt '+COVSETS[set].n.toLowerCase()+' för alla '+HL.length+' kapitel</button>'
    +'<div class="covprev"><span class="cvbig">'+coverEl(d,h)+'</span>'
      +'<span class="cvsm">'+coverEl(d,h)+'</span>'
-     +'<span class="mut" style="font-size:10.5px;line-height:1.5">Så ser det ut i profilraden,<br>64 px och 56 px.</span></div>'
-   +'<div class="mplab">'+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).n
-     +' — '+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).d
-     +' <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
-   +'<div class="grow">'+glyphs+'</div>'
-   +(d==="skugga"
-     ? '<div class="mplab" style="margin-top:6px">Bild bakom märket <code class="mono">'+img+'</code></div>'
-       +'<label class="upl"><input type="file" accept="image/*" data-upc="'+h.id+'" hidden>Ladda upp egen bild</label>'
-       +'<div class="mrow">'+allKeys().map(function(k){
-          return thumb(k, img===k, 'data-ci="'+h.id+':'+k+'"') }).join("")+'</div>'
-       +'<label class="sl">Fokalpunkt Y <em>'+Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'%</em>'
-       +'<input type="range" data-sl="cover-'+h.id+':fy" min="0" max="100" value="'
-       +Math.round(((SLOTS["cover-"+h.id]||{}).fy!=null?SLOTS["cover-"+h.id].fy:.5)*100)+'"></label>'
-     : '<p class="mut" style="font-size:10.5px;line-height:1.5">ARKIV använder inget foto i omslaget — '
-       +'märket står på papper.</p>')
-   +'<div class="dlcol" style="margin-top:6px">'
+     +'<span class="mut" style="font-size:10.5px;line-height:1.5">'+COVSETS[set].d
+     +'<br>64 px och 56 px — så stort det faktiskt visas.</span></div>'
+   + figs + pic
+   +'<div class="dlcol" style="margin-top:8px">'
      + dlBtn("cover",{hl:h.id, ddir:d},"Ladda ner omslaget · 1080×1920")
      + dlBtn("covers",{ddir:d},"Alla "+HL.length+" omslag")
    +'</div>'
+   +'<p class="mut" style="font-size:11px;line-height:1.5;margin-top:7px">Omslaget ligger också sist '
+   +'i kapitlets bildruteserie, så det följer med när du laddar ner hela serien.</p>'
    +'<button class="dlb" type="button" data-act="reset-cover">Återställ omslaget</button></div>';
 }
 
@@ -1322,10 +1348,16 @@ function mediaPanel(slot, cur, label){
 /* Bara scenen och remsan ritas om vid tangenttryck — annars tappar fältet fokus. */
 function refreshStage(){
   if(!state.edit) return;
-  var h = hlOf(state.edit.hl), n = h.st.length, i = state.edit.i, s = h.st[i];
-  var f = $("#edframe");
+  var h = hlOf(state.edit.hl), n = h.st.length, i = state.edit.i;
+  var f = $("#edframe"), t = document.querySelectorAll(".filmb")[i];
+  if(i >= n){                                  /* omslagskortet */
+    var cf = coverFrame(state.dir, h);
+    if(f) f.innerHTML = cf;
+    if(t){ var cfr = t.querySelector(".filmf"); if(cfr) cfr.innerHTML = cf }
+    return;
+  }
+  var s = h.st[i];
   if(f){ f.innerHTML = story(state.dir,s,i,n) + (state.ig?igOverlay(n,i):''); mountVideos(f) }
-  var t = document.querySelectorAll(".filmb")[i];
   if(t){ var fr = t.querySelector(".filmf"); if(fr) fr.innerHTML = story(state.dir,s,i,n) }
 }
 function renderEditor(){ render() }
@@ -1484,7 +1516,7 @@ document.addEventListener("click",function(e){
   if(pk){ state.edit.i=+pk.dataset.pick; render(); return }
   var sp=e.target.closest("[data-step]");
   if(sp){ var h=hlOf(state.edit.hl), j=state.edit.i+ +sp.dataset.step;
-    state.edit.i=(j+h.st.length)%h.st.length; render(); return }
+    state.edit.i=(j+h.st.length+1)%(h.st.length+1); render(); return }
   var vx=e.target.closest("[data-vhl]"); if(vx){ exportVideo(vx); return }
   var sr=e.target.closest("[data-series]");
   if(sr){ downloadSeries(sr.dataset.series, state.dir, sr); return }
@@ -1495,6 +1527,10 @@ document.addEventListener("click",function(e){
     else if(a==="save"){ saveAll() }
     else if(a==="exportjson"){ exportJSON(ac, false) }
     else if(a==="exportall"){ exportJSON(ac, true) }
+    else if(a==="cset-all"){
+      var v = state.edit ? covSetIx(hlOf(state.edit.hl)) : 0;
+      HL.forEach(function(x){ CPICKS[x.id] = v });
+      saveAll(COVSETS[v].n+" satt för alla kapitel"); render() }
     else if(a==="bank-clear"){
       var bn=Object.keys(UPLOADS).length;
       if(bn && confirm("Ta bort alla "+bn+" egna bilder ur bildbanken? Bildrutor som använder dem går tillbaka till originalbilden.")){
@@ -1503,7 +1539,8 @@ document.addEventListener("click",function(e){
     else if(a==="reset-story"){
       var hh=hlOf(state.edit.hl); resetStory(hh.st[state.edit.i]); saveAll("Bildrutan återställd"); render() }
     else if(a==="reset-cover"){
-      if(state.edit){ delete CEDITS[state.edit.hl]; delete SLOTS["cover-"+state.edit.hl];
+      if(state.edit){ delete CEDITS[state.edit.hl]; delete CPICKS[state.edit.hl];
+        delete SLOTS["cover-"+state.edit.hl];
         var hh0=hlOf(state.edit.hl); if(hh0.coverFy!=null) SLOTS["cover-"+hh0.id]={fy:hh0.coverFy};
         saveAll("Omslaget återställt"); render() } }
     else if(a==="reset-object"){
@@ -1518,6 +1555,9 @@ document.addEventListener("click",function(e){
   var ci=e.target.closest("[data-ci]");
   if(ci){ var q2=ci.dataset.ci.split(":");
     CEDITS[q2[0]] = Object.assign({}, CEDITS[q2[0]], {cover:q2[1]}); render(); return }
+  var cs=e.target.closest("[data-cset]");
+  if(cs){ var qc=cs.dataset.cset.split(":"); CPICKS[qc[0]] = +qc[1];
+    saveAll(COVSETS[+qc[1]].n+" valt"); render(); return }
   var al=e.target.closest("[data-alt]");
   if(al){
     var qa=al.dataset.alt.split(":"), pv=+qa[1];
@@ -1615,6 +1655,8 @@ window.viewlyExport = {
   frame:function(hlId, i, dir){ var h=hlOf(hlId);
     return framePNG(story(dir,h.st[i],i,h.st.length), 1080, 1920, dir==="skugga"?"#0E0E0D":"#EFECE7") },
   sheet:function(hlId, dir, cw){ return sheetPNG(dir, hlOf(hlId), cw||540) },
+  cover:function(hlId, dir){ return framePNG(coverFrame(dir, hlOf(hlId)), 1080, 1920,
+    dir==="skugga"?"#0E0E0D":"#F2EFEF") },
   post:function(pid, ar, dir){ var p=POSTS.filter(function(x){return x.id===pid})[0], a=AR[ar];
     return framePNG(post(dir,p,ar), 1080, Math.round(1080*a[1]/a[0]), dir==="skugga"?"#0E0E0D":"#EFECE7") },
   video:function(hlId, i, dir, onProgress){
