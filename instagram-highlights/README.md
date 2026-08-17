@@ -171,38 +171,51 @@ Det avgörande var registret, inte finishen. Ett omslag i profilraden är ett
 symbol på. Det är därför branschen ritar dem så, och det är därför de fyra
 första omgångarna kändes fel oavsett hur väl de var tecknade.
 
-### Platt 2D-illustration
+### Platt illustration i Viewlys palett
 
-Varje omslag är nu en fylld platta med en scen i tre till fem toner, utan
-konturlinjer:
+Registret från omgång 6 behålls — omslaget är ett objekt, en fylld platta —
+men vokabulären är utbytt. Omgång 6 lånade branschens: mintgrön grund, vänliga
+vinjetter med moln, krukväxter och små ansikten. Läsbart, men inte vårt.
 
-- **grunden är alltid fylld.** Salvia `#B7C3A6` i ARKIV, nästan svart
-  `#151813` i SKUGGA. Salvian ligger i logotypens olivfamilj men är mättad
-  nog att bära hela cirkeln — första försöket hade en ljus ton som knappt
-  syntes som ett objekt.
-- **inga konturer.** Bara former mot varandra.
-- **fem roller:** grund, plåt, bläck, oliv, oliv ljus, mellanton — plus en
-  varm ton.
-- **den varma tonen används bara till ljus:** sol, tänt fönster, kameralins.
-  Aldrig som dekoration.
-- **motivet är en scen ur leveransen,** inte en symbol för den.
+| | Diakrit | Viewly |
+|---|---|---|
+| Platta | mättad mint | varmt papper `#EAE6DC` |
+| Former | vita | oliv `#6E7266` — teckningsfärgen, inte ett fält |
+| Hörn | rundade | skarpa |
+| Accent | — | bläck `#242821`, en per märke |
+| Extra färger | — | inga |
+
+En mellanomgång la hela plattan i oliv. Den föll: `#6E7266` som ett helt fält
+blir drabbigt. Oliven är en **teckningsfärg** i det här systemet, inte ett
+fält — plattan är därför papper, precis som ARKIV i övrigt, och SKUGGA kör
+samma teckning med rampen inverterad.
+
+Fyra namngivna valörer per riktning, inga opacitetssteg: valörtrappan ska vara
+beslutad, inte uträknad. Det starkaste tonvärdet ligger alltid på det som är
+själva leveransen — solen, soffan, spelknappen, rubriken.
 
 | Kapitel | Märke | Scen |
 |---|---|---|
-| Viewly | V-märket | logotypen på plattan — enda kapitlet som bär den bokstavligt |
-| Fotografering | Kortet | ett färdigt foto av ett rum, lätt vridet |
-| 3D visning | Volymen | bostaden i tre dimensioner, med ett tänt fönster |
-| E-styling | Rummet möblerat | soffa, tavla och växt i ett tomt rum |
-| Atmosphere | Skymningen | sol lågt över lager av landskap |
-| Drönare | Drönaren | farkosten över tomten |
-| Områdeskarta | Kvarteret | kvarter, gator och punkten där bostaden ligger |
-| Motion | Spelknappen | kortet från 02, satt i rörelse |
-| Annonsen | Texten | ett färdigt annonsutkast med gnistan |
-| Kampanjen | Formaten | samma objekt i tre format |
-| Systemet | Portalen | ett fönster med allt samlat |
+| Viewly | V-märket | logotypen — enda kapitlet som bär den bokstavligt |
+| Fotografering | Kortet | ett rum tryckt med marginal |
+| 3D visning | Volymen | tre ytor och ett tänt fönster |
+| E-styling | Rummet möblerat | soffa och tavla i ett tomt rum |
+| Atmosphere | Skymningen | sol lågt över två lager landskap |
+| Drönare | Höjden | farkosten och blickfältet ned över tomten |
+| Områdeskarta | Kvarteret | kvarter, gator som mellanrum, en punkt |
+| Motion | Svepet | tre bildrutor, klippet i den främsta |
+| Annonsen | Spalten | rubrik i oliv, brödtext under |
+| Kampanjen | Formaten | 9:16, 4:5 och 1:1 i sann proportion |
+| Systemet | Portalen | en yta, allt samlat, en ruta tänd |
 | Objekt | Kontaktkartan | sex plåtar ur samma bostad |
-| Inifrån | Fotografen | porträtt i samma plåt som bostaden fotograferas i |
-| Ditt hem | Hemmet | huset med tänt fönster |
+| Inifrån | Fotografen | porträtt i samma plåt som bostaden |
+| Ditt hem | Hemmet | taket, dörren och ett tänt fönster |
+
+**Status per märke.** Systemet — palett, register, valörtrappa — är satt. Åtta
+märken håller: V-märket, Volymen, Skymningen, Svepet, Spalten, Formaten,
+Fotografen och Hemmet. Fyra behöver mer teckningsarbete innan de är klara:
+Kortet, Rummet möblerat, Höjden och Kvarteret läser fortfarande mer som
+geometri än som scen.
 
 ### Mätt, inte bedömt
 
