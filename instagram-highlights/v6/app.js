@@ -1262,13 +1262,14 @@ function refreshPosts(){
    --------------------------------------------------------------------- */
 function coverPanel(h){
   var d = state.dir;
-  /* Väljaren ritar på panelens egen bakgrund, så urkarvningen får den
-     färgen — annars blir carve-ytorna svarta hål i väljaren. */
-  var gsel = d==="skugga" ? ["#EFEDE7","#A9B394","#17171A"] : ["currentColor","#7E8A6B","#FBFAF9"];
+  /* Väljaren visar märket precis som det ser ut på plåten — samma palett,
+     samma fyllda grund. Ett märke på panelens bakgrund ser inte ut som ett
+     omslag och går inte att välja mellan. */
+  var GP = COVPAL[d] || COVPAL.arkiv;
   var glyphs = GLYPH_IDS.map(function(g){
     return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
-      +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw">'
-      +'<svg viewBox="0 0 100 100">'+GLYPHS[g].svg(gsel[0],gsel[1],gsel[2])+'</svg></span></button>';
+      +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw" style="background:'+GP.bg+'">'
+      +'<svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">'+GLYPHS[g].svg(GP)+'</svg></span></button>';
   }).join("");
   var e = CEDITS[h.id] || {};
   var img = e.cover || h.cover;

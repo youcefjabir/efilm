@@ -156,67 +156,76 @@ Ett nummer på omslaget låser ordningen: lägger man till ett kapitel, eller
 flyttar ett, måste alla omslag ritas om och laddas upp igen. Därför har varje
 kapitel i stället **ett eget märke**. Ordningen är fri.
 
-Uppsättningen är omritad fyra gånger, och varje omgång lärde ut något:
+Uppsättningen är omritad fem gånger, och varje omgång lärde ut något:
 
 | Omgång | Grepp | Varför den föll |
 |---|---|---|
 | 1 | Hårlinjer, små symboler | Generiska. En bländare är en kamera, inte ett bostadsfotografi |
 | 2 | Fyllda UI-figurer | Massa nog för 56 px, men läste som ett ikonbibliotek |
-| 3 | Beskurna fragment i full svärta | Grafiskt starka — men Bauhaus-affischer, inte ett elegant varumärke |
+| 3 | Beskurna fragment i full svärta | Grafiskt starka — men Bauhaus-affischer |
 | 4 | Ljusa tvättar | Lugna, men så abstrakta att motivet försvann |
+| 5 | Graverade kapitelmärken | Eleganta, men fel register — ett omslag ska läsas på en halv sekund, inte studeras |
 
-Slutsatsen var att linjen var rätt språk hela tiden; skalan och specificiteten
-var fel. Märkena är nu **graverade kapitelmärken**: en enda linjevikt genom hela
-uppsättningen, ritade stort så att de fyller plåten, och varje motiv är den
-faktiska leveransen — inte en metafor för den.
+Det avgörande var registret, inte finishen. Ett omslag i profilraden är ett
+**objekt** — en fylld färgplatta med en liten scen i — inte ett papper med en
+symbol på. Det är därför branschen ritar dem så, och det är därför de fyra
+första omgångarna kändes fel oavsett hur väl de var tecknade.
 
-- en linjevikt (3,2 i 100-rutan), inga blandade tjocklekar
-- fyllning bara som svag tvätt, aldrig som huvudform
-- exakt ett olivelement per märke, och det är alltid det som betyder något:
-  solen, ståpunkten, lampan, bostaden
-- logotypen är enda undantaget och får vara helt i bläck
+### Platt 2D-illustration
 
-| Kapitel | Märke | Motiv |
+Varje omslag är nu en fylld platta med en scen i tre till fem toner, utan
+konturlinjer:
+
+- **grunden är alltid fylld.** Salvia `#B7C3A6` i ARKIV, nästan svart
+  `#151813` i SKUGGA. Salvian ligger i logotypens olivfamilj men är mättad
+  nog att bära hela cirkeln — första försöket hade en ljus ton som knappt
+  syntes som ett objekt.
+- **inga konturer.** Bara former mot varandra.
+- **fem roller:** grund, plåt, bläck, oliv, oliv ljus, mellanton — plus en
+  varm ton.
+- **den varma tonen används bara till ljus:** sol, tänt fönster, kameralins.
+  Aldrig som dekoration.
+- **motivet är en scen ur leveransen,** inte en symbol för den.
+
+| Kapitel | Märke | Scen |
 |---|---|---|
-| Viewly | V-märket | logotypen, spårad geometri — enda kapitlet som bär den bokstavligt |
-| Fotografering | Ljuset | fönstret, solen och ljuset som landar på golvet |
-| 3D visning | Volymen | rummet i axonometri, med ståpunkten inuti |
-| E-styling | Halvan | samma rum, tomt till vänster och inrett till höger |
-| Atmosphere | Himlen | halv sol över en låg horisont |
-| Drönare | Höjden | blickfältet som öppnar sig ned över tomten |
-| Områdeskarta | Kvarteret | gator som korsar plåten, bostaden som punkt |
-| Motion | Svepet | tre bildrutor, klippet i den främsta |
-| Annonsen | Spalten | rubrik i oliv, brödtext under |
-| Kampanjen | Formaten | 9:16, 4:5 och 1:1 nästlade i sanna proportioner |
-| Systemet | Ryggraden | en axel genom plåten, noderna på den |
-| Objekt | Kontaktkartan | sex plåtar ur samma bostad, en av dem tänd |
-| Inifrån | Snittet | två cirklar och det de delar |
-| Ditt hem | Dörren | valvet, överljuset och handtaget |
+| Viewly | V-märket | logotypen på plattan — enda kapitlet som bär den bokstavligt |
+| Fotografering | Kortet | ett färdigt foto av ett rum, lätt vridet |
+| 3D visning | Volymen | bostaden i tre dimensioner, med ett tänt fönster |
+| E-styling | Rummet möblerat | soffa, tavla och växt i ett tomt rum |
+| Atmosphere | Skymningen | sol lågt över lager av landskap |
+| Drönare | Drönaren | farkosten över tomten |
+| Områdeskarta | Kvarteret | kvarter, gator och punkten där bostaden ligger |
+| Motion | Spelknappen | kortet från 02, satt i rörelse |
+| Annonsen | Texten | ett färdigt annonsutkast med gnistan |
+| Kampanjen | Formaten | samma objekt i tre format |
+| Systemet | Portalen | ett fönster med allt samlat |
+| Objekt | Kontaktkartan | sex plåtar ur samma bostad |
+| Inifrån | Fotografen | porträtt i samma plåt som bostaden fotograferas i |
+| Ditt hem | Hemmet | huset med tänt fönster |
 
 ### Mätt, inte bedömt
 
-Omslaget syns bara i en enda storlek — 56 px i profilraden — så det är den
-storleken som mäts. Alla fjorton renderas i 56 px mot vitt och kontrolleras för
-tre saker:
+Omslaget syns bara i en storlek — 56 px i profilraden — så det är den storleken
+som mäts. Alla fjorton renderas i 56 px och kontrolleras för två saker:
 
 | Mått | Krav | ARKIV | SKUGGA |
 |---|---|---|---|
-| Konturen mot Instagrams vita profil | ≥ 3:1 | 3,1:1 | 19,1:1 |
-| Mörkaste mot ljusaste inne i plåten | ≥ 3:1 | 3,9:1 | 9,2:1 |
-| Närmaste par, silhuett vid 56 px | inga dubbletter | 0,87 | 0,36 |
+| Mörkaste mot ljusaste inne i plattan | ≥ 3:1 | 3,1:1 | 3,9:1 |
+| Närmaste par, silhuett vid 56 px | inga dubbletter | 0,67 | 0,33 |
 
-Två fel kom bara fram genom mätningen. Papperet `#F2EFEF` mot Instagrams vita
-profilbakgrund ger kontrast 1,1:1 — plåten hade **ingen ytterkontur alls** i
-ljust läge. Nyckellinjen anges därför i `cqw` i stället för px, så att den skalar
-med visningsstorleken: omslaget ses bara litet, och linjen är dimensionerad för
-det. Och två märken låg för nära varandra i silhuett; kvarteret vreds mer och
-fick en huvudgata i full vikt, höjdens siktlinjer smalnades av.
+Två märken låg under 3:1 internt och fick var sitt mörkt ankare: spelknappen i
+Motion och det bakre kortet i Kampanjen.
+
+Plattan själv ligger på 1,8:1 mot vitt, och det är avsiktligt: **Instagram ritar
+sin egen grå ring runt varje omslag**, så gränsen mot profilbakgrunden är
+plattformens, inte vår. Den tidigare uppsättningen behövde en egen nyckellinje
+just för att den saknade fylld grund — det behovet försvann med registret.
 
 I studion sitter panelen **Omslag** överst i inspektören: förhandsvisning i 64
-och 56 px, alla fjorton märken som väljare med namn och motiv, bild bakom märket
-i SKUGGA, och nedladdning — `Ladda ner omslaget` eller `Alla 14 omslag`.
-Exporten är 1080 × 1920 PNG med märket centrerat; Instagram beskär själv till
-cirkeln.
+och 56 px, alla fjorton märken som runda plattor i rätt palett, bild bakom
+märket i SKUGGA, och nedladdning — `Ladda ner omslaget` eller `Alla 14 omslag`.
+Exporten är 1080 × 1920 PNG; Instagram beskär själv till cirkeln.
 
 ---
 
@@ -521,7 +530,7 @@ De kritiska luckorna, i ordning:
 v6/highlights.html      fristående underlag — öppna denna
 v6/shell.html           skalet: tokens, komponenter, layout
 v6/draw.js              geometri, media-slots, riktningsstilar, tretton primitiv × två riktningar,
-                        fjorton kapitelmärken, fyra kampanjmallar × tre format × två riktningar
+                        fjorton illustrerade omslag, fyra kampanjmallar × tre format × två riktningar
 v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
 v6/app.js               vyerna, editorn, exporten och spelaren
 v6/brand-geometry.json  spårad logotyp + safe-area-spec
