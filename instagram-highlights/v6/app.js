@@ -1053,10 +1053,13 @@ function refreshPosts(){
    --------------------------------------------------------------------- */
 function coverPanel(h){
   var d = state.dir;
+  /* Väljaren ritar på panelens egen bakgrund, så urkarvningen får den
+     färgen — annars blir carve-ytorna svarta hål i väljaren. */
+  var gsel = d==="skugga" ? ["#EFEDE7","#A9B394","#17171A"] : ["currentColor","#7E8A6B","#FBFAF9"];
   var glyphs = GLYPH_IDS.map(function(g){
     return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
-      +'title="'+GLYPHS[g].n+'"><span class="giw">'
-      +'<svg viewBox="0 0 100 100">'+GLYPHS[g].svg("currentColor","#6E7266")+'</svg></span></button>';
+      +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw">'
+      +'<svg viewBox="0 0 100 100">'+GLYPHS[g].svg(gsel[0],gsel[1],gsel[2])+'</svg></span></button>';
   }).join("");
   var e = CEDITS[h.id] || {};
   var img = e.cover || h.cover;
@@ -1064,7 +1067,9 @@ function coverPanel(h){
    +'<div class="covprev"><span class="cvbig">'+coverEl(d,h)+'</span>'
      +'<span class="cvsm">'+coverEl(d,h)+'</span>'
      +'<span class="mut" style="font-size:10.5px;line-height:1.5">Så ser det ut i profilraden,<br>64 px och 56 px.</span></div>'
-   +'<div class="mplab">Märke <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
+   +'<div class="mplab">'+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).n
+     +' — '+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).d
+     +' <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
    +'<div class="grow">'+glyphs+'</div>'
    +(d==="skugga"
      ? '<div class="mplab" style="margin-top:6px">Bild bakom märket <code class="mono">'+img+'</code></div>'

@@ -150,38 +150,73 @@ men har egen vertikal rytm per mall och per format.
 
 ---
 
-## Omslagen är märken, inte nummer
+## Omslagen
 
 Ett nummer på omslaget låser ordningen: lägger man till ett kapitel, eller
 flyttar ett, måste alla omslag ritas om och laddas upp igen. Därför har varje
-kapitel i stället **ett eget märke**, tecknat med två till fyra streck i samma
-hårlinje som resten av systemet. Ordningen är fri.
+kapitel i stället **ett eget märke**. Ordningen är fri.
 
-| Kapitel | Märke | Grepp |
+Uppsättningen är omritad fyra gånger, och varje omgång lärde ut något:
+
+| Omgång | Grepp | Varför den föll |
 |---|---|---|
-| Viewly | V-märket | logotypen själv, det enda kapitlet som får använda den bokstavligt |
-| Fotografering | Bländare | cirkel med ljusstreck och olivpunkt |
-| 3D visning | Kub | wireframe-volym med olivnod i mitten |
-| E-styling | Förvandling | cirkel till hälften fylld |
-| Atmosphere | Sol | horisontlinje, båge och olivstrålar |
-| Drönare | Drönare | fyra rotorer i kors med olivnav |
-| Områdeskarta | Karta | vikt karta med olivnål |
-| Motion | Rörelse | tre staplar i olika höjd |
-| Annonsen | Text | tre rader, den sista kortare |
-| Kampanjen | Format | tre rutor i olika proportion |
-| Systemet | Ryggrad | linje med fyra noder |
-| Objekt | Objekt | gavel i logotypens vinkel |
-| Inifrån | Människor | två överlappande cirklar |
-| Ditt hem | Hem | dörr med handtag |
+| 1 | Hårlinjer, små symboler | Generiska. En bländare är en kamera, inte ett bostadsfotografi |
+| 2 | Fyllda UI-figurer | Massa nog för 56 px, men läste som ett ikonbibliotek |
+| 3 | Beskurna fragment i full svärta | Grafiskt starka — men Bauhaus-affischer, inte ett elegant varumärke |
+| 4 | Ljusa tvättar | Lugna, men så abstrakta att motivet försvann |
 
-Två märken är omritade efter test i verklig storlek: drönarens fyra tunna ringar
-försvann vid 56 px och är nu fyllda rotorer, och ryggradens stam och noder är
-kraftigare av samma skäl.
+Slutsatsen var att linjen var rätt språk hela tiden; skalan och specificiteten
+var fel. Märkena är nu **graverade kapitelmärken**: en enda linjevikt genom hela
+uppsättningen, ritade stort så att de fyller plåten, och varje motiv är den
+faktiska leveransen — inte en metafor för den.
+
+- en linjevikt (3,2 i 100-rutan), inga blandade tjocklekar
+- fyllning bara som svag tvätt, aldrig som huvudform
+- exakt ett olivelement per märke, och det är alltid det som betyder något:
+  solen, ståpunkten, lampan, bostaden
+- logotypen är enda undantaget och får vara helt i bläck
+
+| Kapitel | Märke | Motiv |
+|---|---|---|
+| Viewly | V-märket | logotypen, spårad geometri — enda kapitlet som bär den bokstavligt |
+| Fotografering | Ljuset | fönstret, solen och ljuset som landar på golvet |
+| 3D visning | Volymen | rummet i axonometri, med ståpunkten inuti |
+| E-styling | Halvan | samma rum, tomt till vänster och inrett till höger |
+| Atmosphere | Himlen | halv sol över en låg horisont |
+| Drönare | Höjden | blickfältet som öppnar sig ned över tomten |
+| Områdeskarta | Kvarteret | gator som korsar plåten, bostaden som punkt |
+| Motion | Svepet | tre bildrutor, klippet i den främsta |
+| Annonsen | Spalten | rubrik i oliv, brödtext under |
+| Kampanjen | Formaten | 9:16, 4:5 och 1:1 nästlade i sanna proportioner |
+| Systemet | Ryggraden | en axel genom plåten, noderna på den |
+| Objekt | Kontaktkartan | sex plåtar ur samma bostad, en av dem tänd |
+| Inifrån | Snittet | två cirklar och det de delar |
+| Ditt hem | Dörren | valvet, överljuset och handtaget |
+
+### Mätt, inte bedömt
+
+Omslaget syns bara i en enda storlek — 56 px i profilraden — så det är den
+storleken som mäts. Alla fjorton renderas i 56 px mot vitt och kontrolleras för
+tre saker:
+
+| Mått | Krav | ARKIV | SKUGGA |
+|---|---|---|---|
+| Konturen mot Instagrams vita profil | ≥ 3:1 | 3,1:1 | 19,1:1 |
+| Mörkaste mot ljusaste inne i plåten | ≥ 3:1 | 3,9:1 | 9,2:1 |
+| Närmaste par, silhuett vid 56 px | inga dubbletter | 0,87 | 0,36 |
+
+Två fel kom bara fram genom mätningen. Papperet `#F2EFEF` mot Instagrams vita
+profilbakgrund ger kontrast 1,1:1 — plåten hade **ingen ytterkontur alls** i
+ljust läge. Nyckellinjen anges därför i `cqw` i stället för px, så att den skalar
+med visningsstorleken: omslaget ses bara litet, och linjen är dimensionerad för
+det. Och två märken låg för nära varandra i silhuett; kvarteret vreds mer och
+fick en huvudgata i full vikt, höjdens siktlinjer smalnades av.
 
 I studion sitter panelen **Omslag** överst i inspektören: förhandsvisning i 64
-och 56 px, alla femton märken som väljare, bild bakom märket i SKUGGA, och
-nedladdning — `Ladda ner omslaget` eller `Alla 14 omslag`. Exporten är
-1080 × 1920 PNG med märket centrerat; Instagram beskär själv till cirkeln.
+och 56 px, alla fjorton märken som väljare med namn och motiv, bild bakom märket
+i SKUGGA, och nedladdning — `Ladda ner omslaget` eller `Alla 14 omslag`.
+Exporten är 1080 × 1920 PNG med märket centrerat; Instagram beskär själv till
+cirkeln.
 
 ---
 
@@ -401,7 +436,7 @@ De kritiska luckorna, i ordning:
 v6/highlights.html      fristående underlag — öppna denna
 v6/shell.html           skalet: tokens, komponenter, layout
 v6/draw.js              geometri, media-slots, riktningsstilar, tretton primitiv × två riktningar,
-                        femton kapitelmärken, fyra kampanjmallar × tre format × två riktningar
+                        fjorton kapitelmärken, fyra kampanjmallar × tre format × två riktningar
 v6/content.js           innehållsmodell: kapitel, primitiv, riktningar, lagermodell
 v6/app.js               vyerna, editorn, exporten och spelaren
 v6/brand-geometry.json  spårad logotyp + safe-area-spec

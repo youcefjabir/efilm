@@ -883,55 +883,192 @@ function story(dirId, s, i, n){
    av systemet. Ordningen är fri.
    ===================================================================== */
 var GW = 100;                                       /* glyfernas viewBox */
+
+/* ---------------------------------------------------------------------
+   MÄRKENA — graverade kapitelmärken
+
+   Fyra försök ligger bakom den här uppsättningen och alla fyra lärde ut
+   något:
+
+     hårlinjer, små      generiska och för svaga — men läsbarheten vid
+                         56 px var faktiskt aldrig problemet
+     fyllda UI-figurer   massa nog, men läste som ett ikonbibliotek
+     beskurna fragment   grafiskt starka, men Bauhaus-affischer
+     ljusa tvättar       lugna, men så abstrakta att motivet försvann
+
+   Slutsatsen: linjen var rätt språk, skalan och specificiteten var fel.
+   Märkena är nu graverade teckningar — en enda linjevikt genom hela
+   uppsättningen, ritade STORT så att de fyller plåten, och varje motiv
+   är den faktiska leveransen: ett fönster med ljus, ett rum i
+   axonometri, ett kvarter med gator, en kontaktkarta.
+
+   Regler:
+     · en linjevikt (3,2 i 100-rutan) — inga blandade tjocklekar
+     · fyllning bara som svag tvätt, aldrig som huvudform
+     · exakt ett olivelement per märke, och det är alltid det som
+       betyder något: solen, ståpunkten, lampan, bostaden
+     · logotypen är enda undantaget och får vara helt i bläck
+
+   Varje glyf tar bläck, accent och GRUND. Grunden är vad urkarvningen
+   fylls med och skiljer sig mellan riktningarna — samma teckning, rätt
+   kontrast i båda.
+   --------------------------------------------------------------------- */
+function gid(){ return "g"+Math.random().toString(36).slice(2,8) }
+var LW = 3.2;                                 /* uppsättningens linjevikt */
+function ln(d, w, op){ return '<path d="'+d+'" fill="none" stroke="__C__" stroke-width="'
+  +(w||LW)+'" stroke-linecap="square" stroke-linejoin="miter"'+(op?' opacity="'+op+'"':'')+'/>' }
+function inkfix(str, c){ return str.split("__C__").join(c) }
+
 var GLYPHS = {
-  vmark:   {n:"V-märket",   svg:function(c,a){ return '<g transform="translate(14 20) scale(.084)">'
-              +'<path d="'+GEO.limb+'" fill="'+c+'"/>'
-              +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+a+'"/></g>' }},
-  aperture:{n:"Bländare",   svg:function(c,a){ return '<circle cx="50" cy="50" r="21" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
-              +'<path d="M18 50 H32 M68 50 H82" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
-              +'<circle cx="50" cy="50" r="5.5" fill="'+a+'"/>' }},
-  motion:  {n:"Rörelse",    svg:function(c,a){ return '<path d="M31 66 V34 M50 74 V26 M69 62 V38" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
-              +'<circle cx="50" cy="16" r="4" fill="'+a+'"/>' }},
-  room:    {n:"Rum",        svg:function(c,a){ return '<path d="M28 70 V32 H72 V70 Z" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
-              +'<path d="M28 32 L50 18 L72 32" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
-              +'<circle cx="50" cy="55" r="4.5" fill="'+a+'"/>' }},
-  halves:  {n:"Förvandling",svg:function(c,a){ return '<circle cx="50" cy="50" r="23" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
-              +'<path d="M50 27 A23 23 0 0 0 50 73 Z" fill="'+a+'"/>' }},
-  /* Ryggraden var nästan osynlig vid 56 px — stammen och noderna
-     kraftigare, annars tappar kapitlet sin markör i profilraden. */
-  spine:   {n:"Ryggrad",    svg:function(c,a){ return '<path d="M50 22 V78" stroke="'+c+'" stroke-width="3.2"/>'
-              +'<circle cx="50" cy="22" r="6.5" fill="'+a+'"/>'
-              +'<circle cx="50" cy="41" r="5.5" fill="'+c+'"/><circle cx="50" cy="59" r="5.5" fill="'+c+'"/>'
-              +'<circle cx="50" cy="78" r="5.5" fill="'+c+'"/>' }},
-  lines:   {n:"Text",       svg:function(c,a){ return '<path d="M26 38 H74 M26 50 H74 M26 62 H58" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
-              +'<circle cx="70" cy="62" r="4" fill="'+a+'"/>' }},
-  formats: {n:"Format",     svg:function(c,a){ return '<rect x="24" y="30" width="30" height="40" fill="none" stroke="'+c+'" stroke-width="3.2"/>'
-              +'<rect x="46" y="38" width="30" height="30" fill="none" stroke="'+c+'" stroke-width="3.2"/>'
-              +'<circle cx="76" cy="30" r="4.5" fill="'+a+'"/>' }},
-  gable:   {n:"Objekt",     svg:function(c,a){ return '<path d="M24 70 L50 28 L76 70" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
-              +'<path d="M24 70 H76" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
-              +'<circle cx="50" cy="58" r="4.5" fill="'+a+'"/>' }},
-  people:  {n:"Människor",  svg:function(c,a){ return '<circle cx="40" cy="50" r="17" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
-              +'<circle cx="60" cy="50" r="17" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
-              +'<circle cx="50" cy="50" r="4.5" fill="'+a+'"/>' }},
-  cube:    {n:"3D",         svg:function(c,a){ return '<path d="M50 22 L74 34 V62 L50 74 L26 62 V34 Z" fill="none" stroke="'+c+'" stroke-width="3.2" stroke-linejoin="round"/>'
-              +'<path d="M26 34 L50 46 L74 34 M50 46 V74" fill="none" stroke="'+c+'" stroke-width="2.2"/>'
-              +'<circle cx="50" cy="46" r="4.5" fill="'+a+'"/>' }},
-  sun:     {n:"Atmosphere", svg:function(c,a){ return '<path d="M22 66 H78" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
-              +'<path d="M32 66 A18 18 0 0 1 68 66" fill="none" stroke="'+c+'" stroke-width="3.4"/>'
-              +'<path d="M50 26 V34 M24 44 L30 48 M76 44 L70 48" stroke="'+a+'" stroke-width="3.2" stroke-linecap="round"/>' }},
-  /* Fyra tunna ringar försvann vid 44 px i profilraden — rotorerna är
-     fyllda i stället, så kvadkoptern läses även som liten. */
-  drone:   {n:"Drönare",    svg:function(c,a){ return '<path d="M34 34 L66 66 M66 34 L34 66" stroke="'+c+'" stroke-width="3.4" stroke-linecap="round"/>'
-              +'<circle cx="30" cy="30" r="7.5" fill="'+c+'"/><circle cx="70" cy="30" r="7.5" fill="'+c+'"/>'
-              +'<circle cx="30" cy="70" r="7.5" fill="'+c+'"/><circle cx="70" cy="70" r="7.5" fill="'+c+'"/>'
-              +'<circle cx="50" cy="50" r="6" fill="'+a+'"/>' }},
-  map:     {n:"Områdeskarta",svg:function(c,a){ return '<path d="M24 34 L42 28 L58 34 L76 28 V66 L58 72 L42 66 L24 72 Z" fill="none" stroke="'+c+'" stroke-width="3"/>'
-              +'<path d="M42 28 V66 M58 34 V72" stroke="'+c+'" stroke-width="2"/>'
-              +'<circle cx="50" cy="47" r="5.5" fill="'+a+'"/>' }},
-  door:    {n:"Hem",        svg:function(c,a){ return '<path d="M32 74 V36 A18 18 0 0 1 68 36 V74 Z" fill="none" stroke="'+c+'" stroke-width="3.4" stroke-linejoin="round"/>'
-              +'<circle cx="60" cy="56" r="4" fill="'+a+'"/>' }}
+
+  /* 01 · VIEWLY — logotypen. Enda kapitlet som får bära märket bokstavligt,
+     och enda märket som är massa i stället för linje. */
+  vmark:   {n:"V-märket", d:"Logotypen, spårad geometri",
+    svg:function(c,a,g){ return '<g transform="translate(9 18) scale(.0955)">'
+      +'<path d="'+GEO.limb+'" fill="'+c+'"/>'
+      +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+a+'"/></g>' }},
+
+  /* 02 · FOTOGRAFERING — fönstret, solen och ljuset som faller in på
+     golvet. "Ljus. Vi väntar in det." — kapitlets egen mening. */
+  aperture:{n:"Ljuset", d:"Fönstret, solen och ljuset på golvet",
+    svg:function(c,a,g){ return inkfix(
+       '<path d="M42 86 L64 58 H96 L88 86 Z" fill="__C__" opacity=".11"/>'
+      +ln("M42 86 L64 58 H96 L88 86", 2.4, ".34")
+      +ln("M16 12 H58 V64 H16 Z")
+      +ln("M37 12 V64 M16 38 H58", 2.2, ".48")
+      +'<circle cx="47.5" cy="25" r="7.5" fill="'+a+'"/>'
+      +ln("M4 86 H96"), c) }},
+
+  /* 03 · 3D VISNING — volymen i axonometri, och punkten där betraktaren
+     står inne i den. Matterports egen bild av bostaden. */
+  cube:    {n:"Volymen", d:"Rummet i axonometri, med ståpunkt",
+    svg:function(c,a,g){ return inkfix(
+       '<path d="M10 30 L50 50 V90 L10 70 Z" fill="__C__" opacity=".10"/>'
+      +ln("M50 10 L90 30 L50 50 L10 30 Z")
+      +ln("M10 30 V70 L50 90 L90 70 V30")
+      +ln("M50 50 V90")
+      +'<circle cx="50" cy="66" r="8.5" fill="'+a+'"/>', c) }},
+
+  /* 04 · E-STYLING — samma rum, halva möblerat. Sömmen i mitten är hela
+     tjänsten: tomt till vänster, inrett till höger. */
+  halves:  {n:"Halvan", d:"Tomt till vänster, inrett till höger",
+    svg:function(c,a,g){ return inkfix(
+       ln("M10 24 H90 V80 H10 Z")
+      +ln("M50 24 V80", 2.6, ".6")
+      +ln("M16 71 H43", 2.4, ".2")
+      +'<path d="M57 54 H86 V71 H57 Z" fill="__C__" opacity=".12"/>'
+      +ln("M57 54 H86 V71 H57 Z", 2.8)
+      +ln("M57 61.5 H86", 2.2, ".45")
+      +ln("M55 76 H88", 2.4, ".3")
+      +ln("M70 24 V33", 2.4)
+      +'<path d="M62 42 L78 42 L74.2 33 L65.8 33 Z" fill="'+a+'"/>', c) }},
+
+  /* 05 · ATMOSPHERE — solen halvt nere över horisonten. Tjänsten ändrar
+     ljus, väder och årstid; märket lovar inget annat. */
+  sun:     {n:"Himlen", d:"Halv sol över horisonten",
+    svg:function(c,a,g){ return inkfix(
+       '<path d="M27 64 A23 23 0 0 1 73 64 Z" fill="'+a+'"/>'
+      +ln("M4 64 H96")
+      +ln("M50 16 V27 M20 27 L27.5 34.5 M80 27 L72.5 34.5", 3, null)
+      +ln("M12 76 H88", 2.6, ".34")
+      +ln("M24 88 H76", 2.2, ".2"), c) }},
+
+  /* 06 · DRÖNARE — höjden. Blickfältet öppnar sig från en punkt i luften
+     ned över tomten. Kvadkoptern är verktyget och syns därför inte. */
+  drone:   {n:"Höjden", d:"Blickfältet ned över tomten",
+    svg:function(c,a,g){ return inkfix(
+       '<path d="M50 10 L78 88 H22 Z" fill="__C__" opacity=".07"/>'
+      +ln("M50 10 L72 62 M50 10 L28 62", 2.4, ".42")
+      +'<path d="M50 62 L64 74 V88 H36 V74 Z" fill="__C__" opacity=".13"/>'
+      +ln("M36 88 V74 L50 62 L64 74 V88")
+      +ln("M28 88 H72", 3, ".7")
+      +'<circle cx="50" cy="18" r="8.5" fill="'+a+'"/>', c) }},
+
+  /* 07 · OMRÅDESKARTA — kvarteret. Gatorna korsar plåten och går ut i
+     kant, ett kvarter är fyllt, punkten är bostaden. Ingen kartnål. */
+  map:     {n:"Kvarteret", d:"Gator som korsar, bostaden som punkt",
+    svg:function(c,a,g){ return inkfix('<g transform="rotate(-19 50 50)">'
+      +'<path d="M32 44 H72 V72 H32 Z" fill="__C__" opacity=".16"/>'
+      +'<path d="M-24 -10 H22 V30 H-24 Z" fill="__C__" opacity=".09"/>'
+      +ln("M-24 37 H124", 4.6, ".85")
+      +ln("M-24 79 H124", 2.6, ".3")
+      +ln("M25 -24 V124", 3.4, ".5")
+      +ln("M79 -24 V124", 2.4, ".28")
+      +'</g><circle cx="53" cy="58" r="8.5" fill="'+a+'"/>', c) }},
+
+  /* 08 · MOTION — tre bildrutor marscherar genom plåten, klippet ligger i
+     den främsta. Bilderna finns redan; filmen är nästa steg. */
+  motion:  {n:"Svepet", d:"Tre bildrutor, klippet i den främsta",
+    svg:function(c,a,g){ return inkfix(
+       ln("M6 26 H28 V74 H6 Z", 2.4, ".3")
+      +ln("M30 18 H56 V82 H30 Z", 2.8, ".55")
+      +'<path d="M58 10 H94 V90 H58 Z" fill="__C__" opacity=".09"/>'
+      +ln("M58 10 H94 V90 H58 Z")
+      +'<path d="M70 40 L84 50 L70 60 Z" fill="'+a+'"/>', c) }},
+
+  /* 09 · ANNONSEN — spalten. Rubriken i oliv, brödtexten under, sista
+     raden kort. Kapitlet säljer utfallet, inte AI:n bakom. */
+  lines:   {n:"Spalten", d:"Rubrik i oliv, brödtext under",
+    svg:function(c,a,g){ return inkfix(
+       '<rect x="14" y="22" width="50" height="7" rx="3.5" fill="'+a+'"/>'
+      +ln("M14 44 H86", 3.4, ".8")
+      +ln("M14 57 H86", 3.4, ".5")
+      +ln("M14 70 H86", 3.4, ".5")
+      +ln("M14 83 H58", 3.4, ".5"), c) }},
+
+  /* 10 · KAMPANJEN — formaten, nästlade i sanna proportioner. 9:16 ytterst,
+     4:5, 1:1 innerst. Samma objekt, tre ytor. */
+  formats: {n:"Formaten", d:"9:16, 4:5 och 1:1 nästlade",
+    svg:function(c,a,g){ return inkfix(
+       ln("M8 6 H52 V84 H8 Z", 2.4, ".34")
+      +ln("M25 22 H73 V82 H25 Z", 2.8, ".55")
+      +'<path d="M42 38 H90 V86 H42 Z" fill="__C__" opacity=".09"/>'
+      +ln("M42 38 H90 V86 H42 Z")
+      +'<rect x="42" y="38" width="48" height="5.4" fill="'+a+'"/>', c) }},
+
+  /* 11 · SYSTEMET — ryggraden. En axel genom plåten med sina noder;
+     den översta är tänd. Portalen är det som håller ihop de sju delarna. */
+  spine:   {n:"Ryggraden", d:"En axel, noderna på den",
+    svg:function(c,a,g){ return inkfix(
+       ln("M50 14 V90", 2.6, ".45")
+      +ln("M26 40 H45 M55 62 H74", 2.2, ".3")
+      +'<circle cx="50" cy="14" r="9.5" fill="'+a+'"/>'
+      +'<circle cx="50" cy="40" r="6.6" fill="__C__"/>'
+      +'<circle cx="50" cy="62" r="6.6" fill="__C__" opacity=".6"/>'
+      +'<circle cx="50" cy="84" r="6.6" fill="__C__" opacity=".35"/>'
+      +'<circle cx="26" cy="40" r="3.6" fill="__C__" opacity=".4"/>'
+      +'<circle cx="74" cy="62" r="3.6" fill="__C__" opacity=".3"/>', c) }},
+
+  /* 12 · OBJEKT — kontaktkartan. Ett enda objekt genom hela kedjan: sex
+     plåtar ur samma bostad, en av dem tänd. */
+  gable:   {n:"Kontaktkartan", d:"Sex plåtar ur samma bostad",
+    svg:function(c,a,g){ var r='';
+      for(var i=0;i<6;i++){ var x=10+(i%2)*42, y=12+(((i/3)|0))*0 + (((i/2)|0))*26;
+        r += (i===3)
+          ? '<rect x="'+x+'" y="'+y+'" width="38" height="22" fill="'+a+'"/>'
+          : ln("M"+x+" "+y+" H"+(x+38)+" V"+(y+22)+" H"+x+" Z", 2.6, (i===2?".8":".45")); }
+      return inkfix(r, c) }},
+
+  /* 13 · INIFRÅN — snittet. Två cirklar och det de delar: hantverk och
+     teknik, ingen av delarna räcker ensam. */
+  people:  {n:"Snittet", d:"Två cirklar och det de delar",
+    svg:function(c,a,g){ var id=gid();
+      return inkfix('<defs><clipPath id="'+id+'"><circle cx="34" cy="50" r="30"/></clipPath></defs>'
+      +'<g clip-path="url(#'+id+')"><circle cx="66" cy="50" r="30" fill="'+a+'"/></g>'
+      +'<circle cx="34" cy="50" r="30" fill="none" stroke="__C__" stroke-width="'+LW+'"/>'
+      +'<circle cx="66" cy="50" r="30" fill="none" stroke="__C__" stroke-width="'+LW+'"/>', c) }},
+
+  /* 14 · DITT HEM — dörren. Valvet, överljuset och handtaget. Kapitlets
+     enda fråga är hur man börjar, så märket är en ingång. */
+  door:    {n:"Dörren", d:"Valvet, överljuset och handtaget",
+    svg:function(c,a,g){ return inkfix(
+       '<path d="M22 88 V48 A28 28 0 0 1 78 48 V88 Z" fill="__C__" opacity=".10"/>'
+      +ln("M22 88 V48 A28 28 0 0 1 78 48 V88")
+      +ln("M34 56 H66", 2.6, ".55")
+      +ln("M8 88 H92")
+      +'<circle cx="68" cy="70" r="6" fill="'+a+'"/>', c) }}
 };
+
 var GLYPH_IDS = Object.keys(GLYPHS);
 
 /* omslagsredigeringar: symbol, bild, utsnitt — per kapitel */
@@ -940,26 +1077,69 @@ function cov(h, key){
   var e = CEDITS[h.id] || {};
   return e[key] != null ? e[key] : h[key];
 }
-function glyphSVG(h, col, accent, sizeCqw){
+function glyphSVG(h, col, accent, ground, sizeCqw){
   var g = GLYPHS[cov(h,"glyph")] || GLYPHS.vmark;
   return '<svg viewBox="0 0 '+GW+' '+GW+'" style="width:'+sizeCqw+'cqw;height:'+sizeCqw
-    +'cqw;display:block;overflow:visible" aria-hidden="true">'+g.svg(col, accent)+'</svg>';
+    +'cqw;display:block;overflow:visible" aria-hidden="true">'+g.svg(col, accent, ground)+'</svg>';
 }
-/* ar: "1:1" i profilraden, "9:16" vid export — märket sitter still, ytan växer */
+
+/* ---------------------------------------------------------------------
+   OMSLAGSGRUNDEN
+   Ett omslag är inte en ikon i en cirkel. Det är en liten tryckt plåt,
+   och den behöver tre saker som den förra versionen saknade:
+
+   1. En KANT. #F2EFEF mot Instagrams vita profilbakgrund har kontrast
+      1,1:1 — omslaget hade ingen ytterkontur alls i ljust läge. En
+      hårlinje i bläck ger 15:1 och läser som en tryckt plåtkant.
+   2. En GRUND med djup. Papperet får en svag lutning uppifrån och ned,
+      mörkret en varm lyftning bakom märket. Platt fyllning ser billigt
+      ut i just den här storleken.
+   3. STÖRRE MÄRKE. 34 cqw lämnade en tom ring runt varje symbol. 42 cqw
+      fyller plåten utan att röra kanten.
+   --------------------------------------------------------------------- */
+var COVGEO = {
+  /* Accenten är lyft ur systemets #6E7266 / #98A088. Samma hue, mer ljushet:
+     mot bläcket i ett märke läste den ursprungliga oliven som grå vid 56 px,
+     och då är accenten meningslös. Lyftet gäller bara omslagen. */
+  arkiv:  {ink:"#1C1C1E", accent:"#7E8A6B", ground:"#F1EDEA",
+           ring:"#1C1C1E", inner:"#C6BEB8"},
+  skugga: {ink:"#EFEDE7", accent:"#A9B394", ground:"#0E0E0D",
+           ring:"#6E6C66", inner:"#2A2A26"}
+};
+
+/* ar: "1:1" i profilraden, "9:16" vid export — plåten sitter still, ytan växer */
 function cover(dirId, h, ar){
   var sq = ar !== "9:16";
-  var gsz = sq ? 34 : 30;
+  var t = COVGEO[dirId] || COVGEO.arkiv;
+  /* Teckningen fyller plåten och beskärs av cirkeln. Ingen inre marginal:
+     marginalen är beskärningen. */
+  var plate = sq ? 'inset:0' : 'left:8cqw;right:8cqw;top:50%;transform:translateY(-50%);aspect-ratio:1';
+  var art = '<div style="position:absolute;inset:0;overflow:hidden;border-radius:50%">'
+    +'<svg viewBox="0 0 '+GW+' '+GW+'" preserveAspectRatio="xMidYMid slice" '
+    +'style="position:absolute;inset:0;width:100%;height:100%;display:block" aria-hidden="true">'
+    + (GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).svg(t.ink, t.accent, t.ground)
+    +'</svg></div>';
+  /* Nyckellinjen ligger överst. #F2EFEF mot Instagrams vita profil hade
+     kontrast 1,1:1 — plåten saknade ytterkontur helt i ljust läge. */
+  /* Mätt: en 1 px-ring gav plåten 1,7:1 mot Instagrams vita profil — under
+     3:1-tröskeln för icke-text, alltså ingen ytterkontur alls i ljust läge.
+     Linjen anges i cqw så att den skalar: 1,7 cqw är ~1 px vid 56 px, som
+     är den enda storlek omslaget faktiskt visas i. */
+  var ring = '<div style="position:absolute;inset:0;border:2.6cqw solid '+t.ring
+    +';border-radius:50%;opacity:'+(dirId==="skugga"?".85":"1")+';pointer-events:none"></div>';
+
   if(dirId==="skugga"){
-    return '<div style="position:absolute;inset:0;'+bg(cov(h,"cover"),"cover-"+h.id)+'"></div>'
-      +'<div style="position:absolute;inset:0;background:radial-gradient(58% 58% at 50% 50%,'
-      +'rgba(14,14,13,.80),rgba(14,14,13,.52) 62%,rgba(14,14,13,.93))"></div>'
-      +'<div style="position:absolute;inset:0;display:grid;place-items:center">'
-      + glyphSVG(h, "#EFEDE7", "#98A088", gsz) +'</div>';
+    return '<div style="position:absolute;'+plate+';border-radius:50%;background:#0E0E0D;overflow:hidden">'
+      /* Fotografiet är textur under teckningen, inte motiv. Utan den
+         nedtoningen blir varje omslag en egen gråton och raden faller isär. */
+      +'<div style="position:absolute;inset:0;'+bg(cov(h,"cover"),"cover-"+h.id)+';opacity:.26"></div>'
+      +'<div style="position:absolute;inset:0;background:radial-gradient(66% 66% at 50% 44%,'
+      +'rgba(14,14,13,.55),rgba(14,14,13,.88) 62%,rgba(14,14,13,.99))"></div>'
+      + art + ring +'</div>';
   }
-  return '<div style="position:absolute;inset:0;background:#F2EFEF;display:grid;place-items:center">'
-    +'<div style="position:absolute;'+(sq?'inset:6cqw':'left:9cqw;right:9cqw;top:50%;transform:translateY(-50%);aspect-ratio:1')
-    +';border:1px solid #CEC7C3;border-radius:50%"></div>'
-    + glyphSVG(h, "#1C1C1E", "#6E7266", gsz) +'</div>';
+  return '<div style="position:absolute;'+plate+';border-radius:50%;overflow:hidden;'
+      +'background:radial-gradient(72% 62% at 50% 32%,#F9F7F5,#F0ECE8 54%,#DED6CF)">'
+      + art + ring +'</div>';
 }
 
 /* =====================================================================
@@ -2794,10 +2974,13 @@ function refreshPosts(){
    --------------------------------------------------------------------- */
 function coverPanel(h){
   var d = state.dir;
+  /* Väljaren ritar på panelens egen bakgrund, så urkarvningen får den
+     färgen — annars blir carve-ytorna svarta hål i väljaren. */
+  var gsel = d==="skugga" ? ["#EFEDE7","#A9B394","#17171A"] : ["currentColor","#7E8A6B","#FBFAF9"];
   var glyphs = GLYPH_IDS.map(function(g){
     return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
-      +'title="'+GLYPHS[g].n+'"><span class="giw">'
-      +'<svg viewBox="0 0 100 100">'+GLYPHS[g].svg("currentColor","#6E7266")+'</svg></span></button>';
+      +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw">'
+      +'<svg viewBox="0 0 100 100">'+GLYPHS[g].svg(gsel[0],gsel[1],gsel[2])+'</svg></span></button>';
   }).join("");
   var e = CEDITS[h.id] || {};
   var img = e.cover || h.cover;
@@ -2805,7 +2988,9 @@ function coverPanel(h){
    +'<div class="covprev"><span class="cvbig">'+coverEl(d,h)+'</span>'
      +'<span class="cvsm">'+coverEl(d,h)+'</span>'
      +'<span class="mut" style="font-size:10.5px;line-height:1.5">Så ser det ut i profilraden,<br>64 px och 56 px.</span></div>'
-   +'<div class="mplab">Märke <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
+   +'<div class="mplab">'+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).n
+     +' — '+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).d
+     +' <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
    +'<div class="grow">'+glyphs+'</div>'
    +(d==="skugga"
      ? '<div class="mplab" style="margin-top:6px">Bild bakom märket <code class="mono">'+img+'</code></div>'
