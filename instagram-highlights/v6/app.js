@@ -674,6 +674,31 @@ async function renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, skip){
 }
 /* Spelar upp resultatet och läser längden. Rapporterar muxen ingen längd
    faller vi tillbaka på en storleksgräns. */
+var LASTCLIP = null;
+/* filens verkliga speltid, eller null om den inte går att läsa */
+function clipDur(blob){
+  return new Promise(function(res){
+    var url = URL.createObjectURL(blob), v = document.createElement("video");
+    var done = function(x){ URL.revokeObjectURL(url); res(x) };
+    var t = setTimeout(function(){ done(null) }, 4000);
+    v.preload = "metadata"; v.muted = true;
+    v.onloadedmetadata = function(){
+      clearTimeout(t);
+      /* webm från MediaRecorder rapporterar ibland Infinity tills man
+         söker förbi slutet — knuffa den så metadatan skrivs om */
+      if(!isFinite(v.duration)){
+        v.currentTime = 1e6;
+        v.ontimeupdate = function(){ v.ontimeupdate = null;
+          done(isFinite(v.duration) ? v.duration : null) };
+        setTimeout(function(){ done(isFinite(v.duration) ? v.duration : null) }, 1500);
+        return;
+      }
+      done(v.duration);
+    };
+    v.onerror = function(){ clearTimeout(t); done(null) };
+    v.src = url;
+  });
+}
 function verifyClip(blob, expected){
   if(!blob.size) return Promise.resolve(false);
   return new Promise(function(res){
@@ -1651,7 +1676,7 @@ async function exportMotion(btn){
   if(!m){ busy=false; return }
   var frameAt = sid ? function(tt){ return motionFrame(d, sid, tt) }
                     : function(tt){ return MK[m.cand][m.dir](d, tt) };
-  var FPS = 30, W = 1080, H = 1920, N = Math.round(m.dur*FPS);
+  var FPS = 30, W = 1080, H = 1920, fps = 0;
   btn.disabled = true;
   var dl = await downloads();
   if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled=false; busy=false;
@@ -1667,27 +1692,55 @@ async function exportMotion(btn){
       var chunks = [];
       rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) chunks.push(ev.data) };
       var stopped = new Promise(function(r){ rec.onstop = r });
+      /* ---------------------------------------------------------------
+         Klockan styr, inte en räknare.
+
+         Den förra versionen renderade dur x 30 rutor och försökte vänta
+         in 33 ms per ruta. Men en ruta kostar 26-57 ms att rastrera, så
+         väntan blev alltid negativ och slingan tog längre tid än klippet
+         skulle vara. MediaRecorder spelar in i REALTID — den bryr sig om
+         väggklockan, inte om hur många rutor vi hann med. Resultatet blev
+         ett klipp på 13 sekunder där det skulle stå 8,4, och rörelsen
+         gick alltså för långsamt. På en långsammare dator blev det 30 s.
+
+         Nu samplas tiden ur klockan precis som granskningsspelaren gör:
+         t = förfluten tid / klippets längd. Då stämmer längd och
+         hastighet exakt, oavsett hur snabb datorn är. Det som varierar
+         är bildfrekvensen, och den redovisas efteråt.
+         --------------------------------------------------------------- */
+      var render = async function(tt){
+        return svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
+          + xhtml(frameAt(tt), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
+      };
       /* första rutan innan start — annars blir klippet tomt */
       MOTION_T = 0;
-      var first = await svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
-        + xhtml(frameAt(0), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
-      ctx.drawImage(first, 0, 0, W, H);
+      ctx.drawImage(await render(0), 0, 0, W, H);
+      var TAIL = 140;                       /* slutbilden hålls kvar så länge */
+      var span = Math.max(1, m.dur*1000 - TAIL);
       rec.start(250);
-      var t0 = performance.now();
-      for(var f = 0; f < N; f++){
-        var tt = f/(N-1);
-        btn.textContent = "Renderar " + (f+1) + " / " + N + "…";
-        var img = await svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
-          + xhtml(frameAt(tt), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
+      var t0 = performance.now(), frames = 1, el = 0;
+      while(true){
+        el = (performance.now() - t0) / span;
+        if(el >= 1) break;
+        var img = await render(el);
         ctx.drawImage(img, 0, 0, W, H);
-        /* håll rutan kvar så inspelaren hinner fånga den */
-        var target = t0 + (f+1)*(1000/FPS);
-        var wait = target - performance.now();
-        if(wait > 0) await new Promise(function(r){ setTimeout(r, wait) });
+        frames++;
+        /* Knapptexten behöver inte skrivas varje ruta, och en rAF per ruta
+           kostade upp till 16 ms av en budget på 25 — nästan halva
+           bildfrekvensen bortslösad på att vänta in en skärmuppdatering
+           som inspelaren ändå inte bryr sig om. */
+        if((frames & 7) === 0){
+          btn.textContent = "Spelar in " + (el*m.dur).toFixed(1) + " / " + m.dur.toFixed(1) + " s…";
+          await new Promise(function(r){ setTimeout(r, 0) });
+        }
       }
-      rec.requestData(); await new Promise(function(r){ setTimeout(r, 320) });
+      ctx.drawImage(await render(1), 0, 0, W, H);
+      frames++;
+      await new Promise(function(r){ setTimeout(r, TAIL) });
+      rec.requestData(); await new Promise(function(r){ setTimeout(r, 60) });
       rec.stop(); await stopped;
       blob = new Blob(chunks, {type:mime});
+      fps = frames / m.dur;
       if(await verifyClip(blob, m.dur)) break;
       skip.push(mime); tries++; blob = null;
     }
@@ -1696,7 +1749,13 @@ async function exportMotion(btn){
   btn.disabled = false; btn.textContent = lbl; busy = false;
   if(blob){
     var ext = blob.type.indexOf("mp4") >= 0 ? "mp4" : "webm";
-    await offer(blob, "viewly-motion-"+slug(sid||m.cand)+"-"+m.dir+"-"+d+"."+ext, btn);
+    /* klippets faktiska längd läses ur filen, inte antas — det var
+       antagandet som dolde felet i första hand */
+    LASTCLIP = {dur:await clipDur(blob), fps:fps, size:blob.size, avsedd:m.dur};
+    var ok = await offer(blob, "viewly-motion-"+slug(sid||m.cand)+"-"+m.dir+"-"+d+"."+ext, btn);
+    if(ok) status("Klippet: " + m.dur.toFixed(1).replace(".",",") + " s · "
+      + Math.round(fps) + " bilder/s · " + fmtBytes(blob.size)
+      + (fps < 14 ? " — låg bildfrekvens, datorn hann inte mer" : ""));
   } else status("Inspelningen gav ingen giltig fil");
 }
 
@@ -2200,7 +2259,8 @@ window.__vstudio = {
   framePNG:framePNG, motionFrame:function(d,s,tt){ return motionFrame(d,s,tt) },
   exportMotion:exportMotion, BUILD:BUILD, runJobs:runJobs,
   stubDownloads:stubDownloads, stubCount:function(){ return STUB_N }, MTX:MTX,
-  zipBlob:zipBlob, runZip:runZip,
+  zipBlob:zipBlob, runZip:runZip, svgDoc:svgDoc, xhtml:xhtml, svgImage:svgImage,
+  durOf:function(c,d){ return durOf(c,d) }, get lastClip(){ return LASTCLIP },
   UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
   saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
   dropUpload:dropUpload, dropAllUploads:dropAllUploads,
