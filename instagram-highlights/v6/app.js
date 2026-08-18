@@ -65,9 +65,40 @@ function xhtml(html, w, h, bgc){
   d.innerHTML = html;
   return new XMLSerializer().serializeToString(d);
 }
+/* ---------------------------------------------------------------------
+   TYPSNITTEN LADDAS EN GANG, INTE PER BILDRUTA
+
+   VFONTS ar 127 kB base64 och bakades in i VARJE bildrutas SVG. En video
+   pa 8,4 sekunder i 30 rutor per sekund lat alltsa webblasaren avkoda och
+   tolka samma tva typsnitt 252 ganger. Uppmatt kostade det omkring en
+   tredjedel av tiden per ruta.
+
+   Som blob-URL laddas typsnittet en gang och cachas over alla
+   SVG-dokument, eftersom URL:en ar identisk varje gang. SVG-strangen
+   krymper samtidigt fran 221 kB till 95 kB, vilket ocksa kapar
+   serialiseringen.
+
+   Sjalva SVG:n maste daremot ligga kvar som data-URL. Med blob-URL aven
+   dar smittas canvasen och gar inte langre att exportera — mätt, inte
+   antaget.
+   --------------------------------------------------------------------- */
+var VFONT_CSS = null;
+function fontCSS(){
+  if(VFONT_CSS != null) return VFONT_CSS;
+  var raw = window.VFONTS || "";
+  try {
+    VFONT_CSS = raw.replace(/url\(data:([^;]+);base64,([A-Za-z0-9+/=]+)\)/g,
+      function(m, mime, b64){
+        var bin = atob(b64), n = bin.length, u8 = new Uint8Array(n);
+        for(var i = 0; i < n; i++) u8[i] = bin.charCodeAt(i);
+        return "url(" + URL.createObjectURL(new Blob([u8], {type:mime})) + ")";
+      });
+  } catch(e){ VFONT_CSS = raw }     /* faller tillbaka pa base64 */
+  return VFONT_CSS;
+}
 function svgDoc(w, h, body, extraCSS){
   return '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'">'
-   +'<style type="text/css">/*<![CDATA[*/'+(window.VFONTS||"")+FRAMECSS+CSS+(extraCSS||"")+'/*]]>*/</style>'
+   +'<style type="text/css">/*<![CDATA[*/'+fontCSS()+FRAMECSS+CSS+(extraCSS||"")+'/*]]>*/</style>'
    + body +'</svg>';
 }
 function rasterize(svg, w, h){
@@ -1676,86 +1707,201 @@ async function exportMotion(btn){
   if(!m){ busy=false; return }
   var frameAt = sid ? function(tt){ return motionFrame(d, sid, tt) }
                     : function(tt){ return MK[m.cand][m.dir](d, tt) };
-  var FPS = 30, W = 1080, H = 1920, fps = 0;
+  var W = 1080, H = 1920, PAP = d==="skugga" ? "#0E0E0D" : "#EFECE7";
   btn.disabled = true;
   var dl = await downloads();
   if(!dl){ btn.textContent = codeText("unavailable"); btn.disabled=false; busy=false;
     status(codeText("unavailable")); setTimeout(function(){btn.textContent=lbl},3400); return }
-  var keepT = MOTION_T, skip = [], blob = null, tries = 0;
-  try{
+
+  /* ===================================================================
+     JÄMN TAKT SLÅR HÖG TAKT
+
+     Tre versioner har krävts för att komma hit, och varje steg mättes:
+
+     1  Rutdriven slinga. Klippet fick fel längd — 26 s där det skulle stå
+        8,4 — eftersom MediaRecorder spelar in i realtid.
+     2  Klockdriven slinga. Rätt längd, men bildfrekvensen blev vad datorn
+        råkade orka: 33 rutor per sekund här, 5 på en strypt maskin, med
+        glapp upp till 246 ms. Det är hacket i den nedladdade filen.
+     3  Förrendering till JPEG och uppspelning. Bättre — 83 ms som värst —
+        men filen fick ändå bara 200 rutor av 252, och väntetiden växte
+        till 42 sekunder. Avkodningen av varje JPEG stal tid ur takten.
+
+     Ett separat prov visade var taket egentligen ligger: med rutorna
+     redan avkodade klarade kodaren 180 av 180 rutor i 30 per sekund med
+     50 ms som värsta glapp. Kodaren var alltså aldrig problemet. Det var
+     att rutorna producerades ojämnt.
+
+     Därför: mät vad en ruta kostar, VÄLJ en takt datorn klarar med
+     marginal, och håll den exakt. En jämn film i 20 rutor per sekund ser
+     bättre ut än en ryckig i 24, och väntetiden blir klippets längd i
+     stället för fem gånger den.
+     =================================================================== */
+  var keepT = MOTION_T, blob = null, fps = 0, FPS = 30;
+  try {
+    var render = function(tt){
+      return svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
+        + xhtml(frameAt(tt), W, H, PAP) +'</foreignObject>'), W, H);
+    };
+    /* Kostnaden mäts på tre riktiga rutor innan något bestäms. */
+    btn.textContent = "Förbereder…";
+    var probe = performance.now();
+    var first = await render(0);
+    await render(0.5); await render(1);
+    var per = (performance.now() - probe) / 3;
+    var kan = 1000 / (per * 1.4);
+    /* Snabb nog att producera i realtid? Då slipper vi vänta.
+       Annars är det bättre att rendera först och spela upp sedan — det
+       kostar väntetid men ger en jämn film i stället för en ryckig. */
+    var direkt = kan >= 22;
+    FPS = direkt ? (kan >= 30 ? 30 : kan >= 25 ? 25 : 24) : 20;
+
+    /* ---------- läge B: rendera allt först ---------- */
+    var shots = null;
+    if(!direkt){
+      var rc = document.createElement("canvas"); rc.width = W; rc.height = H;
+      var rx = rc.getContext("2d", {alpha:false});
+      var bake = function(img){
+        rx.fillStyle = PAP; rx.fillRect(0,0,W,H);
+        rx.drawImage(img, 0, 0, W, H);
+        return new Promise(function(res){ rc.toBlob(res, "image/jpeg", 0.94) });
+      };
+      var NB = Math.max(2, Math.round(m.dur * FPS));
+      shots = new Array(NB);
+      shots[0] = await bake(first);
+      /* Bilddekodningen sker utanför huvudtråden, så fyra rutor kan vara
+         under arbete samtidigt. Att rita och koda måste ske i tur och
+         ordning på en canvas. */
+      for(var bf = 1; bf < NB; bf += 4){
+        var ts = [];
+        for(var q = bf; q < Math.min(NB, bf + 4); q++) ts.push(q/(NB-1));
+        var imgs = await Promise.all(ts.map(render));
+        for(var q2 = 0; q2 < imgs.length; q2++) shots[bf+q2] = await bake(imgs[q2]);
+        btn.textContent = "Renderar " + Math.min(NB, bf+4) + " / " + NB
+          + " · " + Math.max(0, Math.round((NB-bf) * per / 1000)) + " s kvar";
+        await new Promise(function(r){ setTimeout(r, 0) });
+      }
+    }
+
+    var skip = [], tries = 0;
     while(tries < MIMES.length){
       var mime = pickMime(skip);
       if(!mime){ status("Webbläsaren stöder ingen videoinspelning"); break }
       var c = document.createElement("canvas"); c.width = W; c.height = H;
-      var ctx = c.getContext("2d");
-      var rec = new MediaRecorder(c.captureStream(FPS), {mimeType:mime, videoBitsPerSecond:9000000});
+      var ctx = c.getContext("2d", {alpha:false});
+      /* captureStream(0) ger exakt en ruta per requestFrame(), i stället
+         för att sampla canvasen på sin egen klocka och tappa det som inte
+         råkar sammanfalla. */
+      var stream = c.captureStream(0);
+      var vtrack = stream.getVideoTracks()[0];
+      var manual = vtrack && typeof vtrack.requestFrame === "function";
+      if(!manual){ stream = c.captureStream(FPS); vtrack = stream.getVideoTracks()[0] }
+      var rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:10000000});
       var chunks = [];
       rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) chunks.push(ev.data) };
       var stopped = new Promise(function(r){ rec.onstop = r });
-      /* ---------------------------------------------------------------
-         Klockan styr, inte en räknare.
-
-         Den förra versionen renderade dur x 30 rutor och försökte vänta
-         in 33 ms per ruta. Men en ruta kostar 26-57 ms att rastrera, så
-         väntan blev alltid negativ och slingan tog längre tid än klippet
-         skulle vara. MediaRecorder spelar in i REALTID — den bryr sig om
-         väggklockan, inte om hur många rutor vi hann med. Resultatet blev
-         ett klipp på 13 sekunder där det skulle stå 8,4, och rörelsen
-         gick alltså för långsamt. På en långsammare dator blev det 30 s.
-
-         Nu samplas tiden ur klockan precis som granskningsspelaren gör:
-         t = förfluten tid / klippets längd. Då stämmer längd och
-         hastighet exakt, oavsett hur snabb datorn är. Det som varierar
-         är bildfrekvensen, och den redovisas efteråt.
-         --------------------------------------------------------------- */
-      var render = async function(tt){
-        return svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
-          + xhtml(frameAt(tt), W, H, d==="skugga"?"#0E0E0D":"#EFECE7") +'</foreignObject>'), W, H);
-      };
-      /* första rutan innan start — annars blir klippet tomt */
-      MOTION_T = 0;
-      ctx.drawImage(await render(0), 0, 0, W, H);
-      var TAIL = 140;                       /* slutbilden hålls kvar så länge */
+      var TAIL = 140, STEP = 1000 / FPS;
       var span = Math.max(1, m.dur*1000 - TAIL);
-      rec.start(250);
-      var t0 = performance.now(), frames = 1, el = 0;
-      while(true){
-        el = (performance.now() - t0) / span;
-        if(el >= 1) break;
-        var img = await render(el);
-        ctx.drawImage(img, 0, 0, W, H);
-        frames++;
-        /* Knapptexten behöver inte skrivas varje ruta, och en rAF per ruta
-           kostade upp till 16 ms av en budget på 25 — nästan halva
-           bildfrekvensen bortslösad på att vänta in en skärmuppdatering
-           som inspelaren ändå inte bryr sig om. */
-        if((frames & 7) === 0){
-          btn.textContent = "Spelar in " + (el*m.dur).toFixed(1) + " / " + m.dur.toFixed(1) + " s…";
-          await new Promise(function(r){ setTimeout(r, 0) });
+      var drawn = 1;
+      MOTION_T = 0;
+
+      if(direkt){
+        /* ---------- läge A: producera i takt ----------
+           LÄNGDEN styrs av klockan — rutans innehåll hämtas för den tid
+           som faktiskt gått, aldrig för ett räknarsteg, så klippet blir
+           exakt så långt som det ska.
+           TAKTEN styrs av rutgränserna — hann vi före nästa gräns väntar
+           vi in den, så glappen blir jämna. */
+        ctx.drawImage(first, 0, 0, W, H);
+        rec.start(200);
+        if(manual) vtrack.requestFrame();
+        var t0 = performance.now(), f = 1;
+        while(true){
+          var el = (performance.now() - t0) / span;
+          if(el >= 1) break;
+          var img = await render(el);
+          var due = t0 + f*STEP, now = performance.now();
+          if(now < due - 1) await new Promise(function(r){ setTimeout(r, due - now) });
+          ctx.drawImage(img, 0, 0, W, H);
+          if(manual) vtrack.requestFrame();
+          drawn++;
+          f = Math.max(f + 1, Math.ceil((performance.now() - t0) / STEP));
+          if((drawn & 15) === 0){
+            btn.textContent = "Spelar in " + ((performance.now()-t0)/1000).toFixed(1)
+              + " / " + m.dur.toFixed(1) + " s…";
+          }
         }
+        ctx.drawImage(await render(1), 0, 0, W, H);
+        if(manual) vtrack.requestFrame();
+        drawn++;
+      } else {
+        /* ---------- läge B: spela upp det färdiga ----------
+           Avkodningen ligger tjugo rutor före uppspelningen, så en JPEG
+           aldrig hinner bli det som bromsar. Varje bitmap stängs direkt
+           efter att den ritats, så minnet står stilla. */
+        var NB2 = shots.length, bmp = new Array(NB2), AHEAD = 20;
+        var ahead = function(from){
+          for(var k = from; k < Math.min(NB2, from + AHEAD); k++){
+            if(bmp[k] === undefined){
+              bmp[k] = null;
+              (function(k){ createImageBitmap(shots[k]).then(
+                function(b){ bmp[k] = b }, function(){ bmp[k] = false }) })(k);
+            }
+          }
+        };
+        ahead(0);
+        while(bmp[0] == null) await new Promise(function(r){ setTimeout(r, 4) });
+        ctx.drawImage(bmp[0], 0, 0, W, H);
+        if(bmp[0].close) bmp[0].close();
+        bmp[0] = false;
+        rec.start(200);
+        if(manual) vtrack.requestFrame();
+        var tb = performance.now();
+        await new Promise(function(done){
+          var i = 1;
+          (function tick(){
+            if(i >= NB2) return done();
+            ahead(i);
+            if(performance.now() + 1 < tb + i*STEP) return requestAnimationFrame(tick);
+            if(bmp[i] == null) return requestAnimationFrame(tick);
+            if(bmp[i]){
+              ctx.drawImage(bmp[i], 0, 0, W, H);
+              if(manual) vtrack.requestFrame();
+              if(bmp[i].close) bmp[i].close();
+              bmp[i] = false;
+              drawn++;
+            }
+            if((i & 15) === 0){
+              btn.textContent = "Spelar in " + (i/FPS).toFixed(1) + " / " + m.dur.toFixed(1) + " s…";
+            }
+            i++;
+            requestAnimationFrame(tick);
+          })();
+        });
       }
-      ctx.drawImage(await render(1), 0, 0, W, H);
-      frames++;
+
       await new Promise(function(r){ setTimeout(r, TAIL) });
       rec.requestData(); await new Promise(function(r){ setTimeout(r, 60) });
       rec.stop(); await stopped;
       blob = new Blob(chunks, {type:mime});
-      fps = frames / m.dur;
+      fps = drawn / m.dur;
       if(await verifyClip(blob, m.dur)) break;
       skip.push(mime); tries++; blob = null;
     }
+    shots = null;
   } catch(e){ status("Kunde inte spela in: " + (e && e.message || e)) }
+  /* rutorna produceras löpande — inget att städa */
   MOTION_T = keepT;
   btn.disabled = false; btn.textContent = lbl; busy = false;
   if(blob){
     var ext = blob.type.indexOf("mp4") >= 0 ? "mp4" : "webm";
     /* klippets faktiska längd läses ur filen, inte antas — det var
        antagandet som dolde felet i första hand */
-    LASTCLIP = {dur:await clipDur(blob), fps:fps, size:blob.size, avsedd:m.dur};
+    LASTCLIP = {dur:await clipDur(blob), fps:fps, size:blob.size, avsedd:m.dur, blob:blob};
     var ok = await offer(blob, "viewly-motion-"+slug(sid||m.cand)+"-"+m.dir+"-"+d+"."+ext, btn);
     if(ok) status("Klippet: " + m.dur.toFixed(1).replace(".",",") + " s · "
       + Math.round(fps) + " bilder/s · " + fmtBytes(blob.size)
-      + (fps < 14 ? " — låg bildfrekvens, datorn hann inte mer" : ""));
+      + (direkt ? "" : " · renderades först eftersom datorn inte hann i realtid"));
   } else status("Inspelningen gav ingen giltig fil");
 }
 
@@ -2260,6 +2406,7 @@ window.__vstudio = {
   exportMotion:exportMotion, BUILD:BUILD, runJobs:runJobs,
   stubDownloads:stubDownloads, stubCount:function(){ return STUB_N }, MTX:MTX,
   zipBlob:zipBlob, runZip:runZip, svgDoc:svgDoc, xhtml:xhtml, svgImage:svgImage,
+  frameCSS:FRAMECSS, get cssText(){ return CSS },
   durOf:function(c,d){ return durOf(c,d) }, get lastClip(){ return LASTCLIP },
   UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
   saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
