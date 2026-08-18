@@ -296,8 +296,15 @@ function secMotion(){
   var cands = MCAND.map(function(c){
     var dirs = MDIRS.map(function(d){
       var f = (MK[c.id]||{})[d.id];
+      /* Rutorna byggs INTE här. Vy 07 har sju kandidater gånger fyra
+         riktningar gånger tre nyckelbilder = 84 fulla kompositioner, och
+         att bygga alla på en gång kostade 525 ms vid full fart och nästan
+         två sekunder på en strypt maskin. Här läggs bara en tom platta
+         med adressen till rutan; mlazy() fyller den när den närmar sig
+         fönstret. Det som aldrig scrollas fram byggs aldrig. */
       var frames = [0,.5,1].map(function(tt,st){
-        return '<div class="mkf"><div class="frame">'+(f?f(state.dir, tt):'')+'</div>'
+        return '<div class="mkf"><div class="frame"'
+         + (f ? ' data-mlazy="'+c.id+'|'+d.id+'|'+tt+'"' : '') +'></div>'
          +'<span class="mkfl">'+["Start","Nyckel","Slut"][st]+'</span></div>';
       }).join("");
       var board = (MSTORY[c.id]||{})[d.id] || [];

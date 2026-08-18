@@ -651,6 +651,55 @@ async function renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, skip){
   var dur = Math.min.apply(null, rects.map(function(r){ return VIDEOS[r.k].dur }).concat([VMAX]));
   var c = document.createElement("canvas"); c.width = w; c.height = h;
   var g = c.getContext("2d");
+
+  /* rita en bildruta ur källorna plus överlägget */
+  var paint = function(){
+    g.fillStyle = bgc; g.fillRect(0,0,w,h);
+    rects.forEach(function(r,i){ drawCover(g, vids[i], vids[i].videoWidth, vids[i].videoHeight, r) });
+    g.drawImage(overlay, 0, 0, w, h);
+  };
+
+  /* ===================================================================
+     SAMMA SAK HÄR: SÖK, SPELA INTE
+
+     Den här vägen lade bostadsvideon under ett överlägg och SPELADE UPP
+     den medan MediaRecorder tittade på. Alltså exakt samma fel som i
+     motionexporten: väggklockan bestämde tidsstämplarna, och varje hack
+     i webbläsaren skrevs in i filen.
+
+     I stället söker vi källvideon till ruta 0, 1, 2 … och kodar var och
+     en. Sökning är långsammare än uppspelning, men filen blir jämn, och
+     det är filen användaren behåller.
+
+     Ljudet följer inte med den här vägen. Källorna spelas muted i dag,
+     så spåret som lades till var redan tyst — men det ska sägas rakt ut
+     i stället för att upptäckas senare.
+     =================================================================== */
+  if(typeof VideoEncoder !== "undefined" && typeof mp4encode === "function"){
+    var FPSV = 30, NV = Math.max(2, Math.round(dur * FPSV));
+    var sok = function(v, t){
+      return new Promise(function(res){
+        if(Math.abs(v.currentTime - t) < 0.001) return res();
+        var klar = function(){ v.removeEventListener("seeked", klar); res() };
+        v.addEventListener("seeked", klar);
+        try { v.currentTime = t } catch(e){ v.removeEventListener("seeked", klar); res() }
+        setTimeout(function(){ v.removeEventListener("seeked", klar); res() }, 1200);
+      });
+    };
+    vids.forEach(function(v){ try{ v.pause() }catch(e){} });
+    try {
+      var rv = await mp4encode(c, w, h, FPSV, NV, async function(i){
+        var t = Math.min(dur - 0.001, i / FPSV);
+        await Promise.all(vids.map(function(v){ return sok(v, t) }));
+        paint();
+      }, function(i, n){ if(onProgress) onProgress(i/n) }, 12000000);
+      if(rv && rv.blob && await verifyClip(rv.blob, dur)){
+        vids.forEach(function(v){ v.src = ""; });
+        return {blob:rv.blob, ext:"mp4", kind:rv.kind};
+      }
+    } catch(e){ /* faller igenom till inspelning nedan */ }
+  }
+
   var stream = c.captureStream(30);
   try {
     var s0 = vids[0].captureStream ? vids[0].captureStream()
@@ -667,11 +716,6 @@ async function renderVideoFrom(holeHtml, measureHtml, dirId, onProgress, skip){
     var pr = v.play(); return (pr && pr.catch) ? pr.catch(function(){}) : Promise.resolve();
   }));
   /* rita en bildruta innan inspelningen startar — en tom ström ger en tom fil */
-  var paint = function(){
-    g.fillStyle = bgc; g.fillRect(0,0,w,h);
-    rects.forEach(function(r,i){ drawCover(g, vids[i], vids[i].videoWidth, vids[i].videoHeight, r) });
-    g.drawImage(overlay, 0, 0, w, h);
-  };
   paint();
   await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r) }) });
   rec.start(250);                       /* periodiska chunks — annars tappar vissa muxar allt */
@@ -1714,195 +1758,118 @@ async function exportMotion(btn){
     status(codeText("unavailable")); setTimeout(function(){btn.textContent=lbl},3400); return }
 
   /* ===================================================================
-     JÄMN TAKT SLÅR HÖG TAKT
+     FILEN BYGGS, DEN SPELAS INTE IN
 
-     Tre versioner har krävts för att komma hit, och varje steg mättes:
+     Fyra försök gick åt innan felet visade sig ligga i verktyget och
+     inte i användningen av det. Den fil användaren skickade in mättes
+     ruta för ruta:
 
-     1  Rutdriven slinga. Klippet fick fel längd — 26 s där det skulle stå
-        8,4 — eftersom MediaRecorder spelar in i realtid.
-     2  Klockdriven slinga. Rätt längd, men bildfrekvensen blev vad datorn
-        råkade orka: 33 rutor per sekund här, 5 på en strypt maskin, med
-        glapp upp till 246 ms. Det är hacket i den nedladdade filen.
-     3  Förrendering till JPEG och uppspelning. Bättre — 83 ms som värst —
-        men filen fick ändå bara 200 rutor av 252, och väntetiden växte
-        till 42 sekunder. Avkodningen av varje JPEG stal tid ur takten.
+        210 rutor, 137 olika avstånd mellan dem
+        kortast 7,3 ms, längst 258,3 ms
+        17 rutor (8 %) mer än 1,5 gånger medelavståndet
+        25,6 rutor per sekund där det skulle stå 30
+        fragmenterad ström, noll i längd i huvudet
 
-     Ett separat prov visade var taket egentligen ligger: med rutorna
-     redan avkodade klarade kodaren 180 av 180 rutor i 30 per sekund med
-     50 ms som värsta glapp. Kodaren var alltså aldrig problemet. Det var
-     att rutorna producerades ojämnt.
+     De tre första raderna är hacket. Den sista är varför telefonen inte
+     vill ta emot filen. Ingen av dem kommer ur hur snabbt rutorna ritas.
+     De kommer ur att MediaRecorder är en REALTIDSINSPELARE: den stämplar
+     varje ruta med väggklockan när den kommer in, och skriver en ström
+     avsedd att sändas, inte att sparas. Varje litet hack i webbläsaren
+     skrivs alltså in i filen som en tidsstämpel, och spelaren gör rätt
+     när den visar hacket — det står ju där.
 
-     Därför: mät vad en ruta kostar, VÄLJ en takt datorn klarar med
-     marginal, och håll den exakt. En jämn film i 20 rutor per sekund ser
-     bättre ut än en ryckig i 24, och väntetiden blir klippets längd i
-     stället för fem gånger den.
+     Därför kodar vi i stället. VideoEncoder tar en bildruta och en
+     tidsstämpel som vi själva sätter, och arbetar så fort maskinen
+     orkar. Sedan läggs rutorna i en vanlig MP4 där alla avstånd är
+     samma tal.
+
+     Följden: bildfrekvensen är alltid 30, oavsett dator. En långsam
+     maskin gör exporten långsammare — aldrig filmen ryckigare. Och
+     eftersom filen inte längre är fragmenterad öppnas den i telefonens
+     galleri.
      =================================================================== */
-  var keepT = MOTION_T, blob = null, fps = 0, FPS = 30;
+  var keepT = MOTION_T, blob = null, fps = 30, vag = "";
   try {
     var render = function(tt){
       return svgImage(svgDoc(W,H,'<foreignObject x="0" y="0" width="'+W+'" height="'+H+'">'
         + xhtml(frameAt(tt), W, H, PAP) +'</foreignObject>'), W, H);
     };
-    /* Kostnaden mäts på tre riktiga rutor innan något bestäms. */
-    btn.textContent = "Förbereder…";
-    var probe = performance.now();
-    var first = await render(0);
-    await render(0.5); await render(1);
-    var per = (performance.now() - probe) / 3;
-    var kan = 1000 / (per * 1.4);
-    /* Snabb nog att producera i realtid? Då slipper vi vänta.
-       Annars är det bättre att rendera först och spela upp sedan — det
-       kostar väntetid men ger en jämn film i stället för en ryckig. */
-    var direkt = kan >= 22;
-    FPS = direkt ? (kan >= 30 ? 30 : kan >= 25 ? 25 : 24) : 20;
+    var N = Math.max(2, Math.round(m.dur * fps));
+    var c = document.createElement("canvas"); c.width = W; c.height = H;
+    var ctx = c.getContext("2d", {alpha:false});
+    var t0 = performance.now();
+    var draw = async function(i){
+      var img = await render(i/(N-1));
+      ctx.fillStyle = PAP; ctx.fillRect(0,0,W,H);
+      ctx.drawImage(img, 0, 0, W, H);
+    };
+    var onp = function(i, n){
+      var kvar = i > 4 ? Math.round((performance.now()-t0)/i*(n-i)/1000) : 0;
+      btn.textContent = "Kodar " + i + " / " + n + (kvar ? " · " + kvar + " s kvar" : "");
+    };
 
-    /* ---------- läge B: rendera allt först ---------- */
-    var shots = null;
-    if(!direkt){
-      var rc = document.createElement("canvas"); rc.width = W; rc.height = H;
-      var rx = rc.getContext("2d", {alpha:false});
-      var bake = function(img){
-        rx.fillStyle = PAP; rx.fillRect(0,0,W,H);
-        rx.drawImage(img, 0, 0, W, H);
-        return new Promise(function(res){ rc.toBlob(res, "image/jpeg", 0.94) });
-      };
-      var NB = Math.max(2, Math.round(m.dur * FPS));
-      shots = new Array(NB);
-      shots[0] = await bake(first);
-      /* Bilddekodningen sker utanför huvudtråden, så fyra rutor kan vara
-         under arbete samtidigt. Att rita och koda måste ske i tur och
-         ordning på en canvas. */
-      for(var bf = 1; bf < NB; bf += 4){
-        var ts = [];
-        for(var q = bf; q < Math.min(NB, bf + 4); q++) ts.push(q/(NB-1));
-        var imgs = await Promise.all(ts.map(render));
-        for(var q2 = 0; q2 < imgs.length; q2++) shots[bf+q2] = await bake(imgs[q2]);
-        btn.textContent = "Renderar " + Math.min(NB, bf+4) + " / " + NB
-          + " · " + Math.max(0, Math.round((NB-bf) * per / 1000)) + " s kvar";
-        await new Promise(function(r){ setTimeout(r, 0) });
-      }
+    /* ---------- vägen: koda ---------- */
+    if(typeof VideoEncoder !== "undefined"){
+      btn.textContent = "Förbereder…";
+      try {
+        var r = await mp4encode(c, W, H, fps, N, draw, onp, 12000000);
+        /* Filen provläses innan den lämnas ut. Muxern är vår egen, och
+           en egen muxer som tyst producerar en trasig fil är värre än
+           ingen fil alls — då faller vi hellre tillbaka på inspelning. */
+        if(r && r.blob && await verifyClip(r.blob, m.dur)){ blob = r.blob; vag = r.kind }
+        else if(r && r.blob) status("Den kodade filen gick inte att läsa tillbaka");
+      } catch(e){ blob = null; status("Kodningen misslyckades: " + (e && e.message || e)) }
     }
 
-    var skip = [], tries = 0;
-    while(tries < MIMES.length){
-      var mime = pickMime(skip);
-      if(!mime){ status("Webbläsaren stöder ingen videoinspelning"); break }
-      var c = document.createElement("canvas"); c.width = W; c.height = H;
-      var ctx = c.getContext("2d", {alpha:false});
-      /* captureStream(0) ger exakt en ruta per requestFrame(), i stället
-         för att sampla canvasen på sin egen klocka och tappa det som inte
-         råkar sammanfalla. */
-      var stream = c.captureStream(0);
-      var vtrack = stream.getVideoTracks()[0];
-      var manual = vtrack && typeof vtrack.requestFrame === "function";
-      if(!manual){ stream = c.captureStream(FPS); vtrack = stream.getVideoTracks()[0] }
-      var rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:10000000});
-      var chunks = [];
-      rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) chunks.push(ev.data) };
-      var stopped = new Promise(function(r){ rec.onstop = r });
-      var TAIL = 140, STEP = 1000 / FPS;
-      var span = Math.max(1, m.dur*1000 - TAIL);
-      var drawn = 1;
-      MOTION_T = 0;
-
-      if(direkt){
-        /* ---------- läge A: producera i takt ----------
-           LÄNGDEN styrs av klockan — rutans innehåll hämtas för den tid
-           som faktiskt gått, aldrig för ett räknarsteg, så klippet blir
-           exakt så långt som det ska.
-           TAKTEN styrs av rutgränserna — hann vi före nästa gräns väntar
-           vi in den, så glappen blir jämna. */
-        ctx.drawImage(first, 0, 0, W, H);
-        rec.start(200);
-        if(manual) vtrack.requestFrame();
-        var t0 = performance.now(), f = 1;
-        while(true){
-          var el = (performance.now() - t0) / span;
-          if(el >= 1) break;
-          var img = await render(el);
-          var due = t0 + f*STEP, now = performance.now();
-          if(now < due - 1) await new Promise(function(r){ setTimeout(r, due - now) });
-          ctx.drawImage(img, 0, 0, W, H);
+    /* ---------- reservvägen: spela in ----------
+       Bara för webbläsare utan VideoEncoder. Filen blir då den sämre
+       sorten igen, och det säger vi rent ut i stället för att låtsas. */
+    if(!blob){
+      var mime = pickMime([]);
+      if(mime){
+        vag = "inspelad";
+        var stream = c.captureStream(0);
+        var vtrack = stream.getVideoTracks()[0];
+        var manual = vtrack && typeof vtrack.requestFrame === "function";
+        if(!manual){ stream = c.captureStream(fps); vtrack = stream.getVideoTracks()[0] }
+        var rec = new MediaRecorder(stream, {mimeType:mime, videoBitsPerSecond:10000000});
+        var chunks = [];
+        rec.ondataavailable = function(ev){ if(ev.data && ev.data.size) chunks.push(ev.data) };
+        var stopped = new Promise(function(r){ rec.onstop = r });
+        var STEP = 1000/fps, tb;
+        await draw(0);
+        rec.start(200); if(manual) vtrack.requestFrame();
+        tb = performance.now();
+        for(var i2 = 1; i2 < N; i2++){
+          await draw(i2);
+          var due = tb + i2*STEP, now = performance.now();
+          if(now < due - 1) await new Promise(function(r){ setTimeout(r, due-now) });
           if(manual) vtrack.requestFrame();
-          drawn++;
-          f = Math.max(f + 1, Math.ceil((performance.now() - t0) / STEP));
-          if((drawn & 15) === 0){
-            btn.textContent = "Spelar in " + ((performance.now()-t0)/1000).toFixed(1)
-              + " / " + m.dur.toFixed(1) + " s…";
-          }
+          if((i2 & 15) === 0) btn.textContent = "Spelar in " + i2 + " / " + N;
         }
-        ctx.drawImage(await render(1), 0, 0, W, H);
-        if(manual) vtrack.requestFrame();
-        drawn++;
-      } else {
-        /* ---------- läge B: spela upp det färdiga ----------
-           Avkodningen ligger tjugo rutor före uppspelningen, så en JPEG
-           aldrig hinner bli det som bromsar. Varje bitmap stängs direkt
-           efter att den ritats, så minnet står stilla. */
-        var NB2 = shots.length, bmp = new Array(NB2), AHEAD = 20;
-        var ahead = function(from){
-          for(var k = from; k < Math.min(NB2, from + AHEAD); k++){
-            if(bmp[k] === undefined){
-              bmp[k] = null;
-              (function(k){ createImageBitmap(shots[k]).then(
-                function(b){ bmp[k] = b }, function(){ bmp[k] = false }) })(k);
-            }
-          }
-        };
-        ahead(0);
-        while(bmp[0] == null) await new Promise(function(r){ setTimeout(r, 4) });
-        ctx.drawImage(bmp[0], 0, 0, W, H);
-        if(bmp[0].close) bmp[0].close();
-        bmp[0] = false;
-        rec.start(200);
-        if(manual) vtrack.requestFrame();
-        var tb = performance.now();
-        await new Promise(function(done){
-          var i = 1;
-          (function tick(){
-            if(i >= NB2) return done();
-            ahead(i);
-            if(performance.now() + 1 < tb + i*STEP) return requestAnimationFrame(tick);
-            if(bmp[i] == null) return requestAnimationFrame(tick);
-            if(bmp[i]){
-              ctx.drawImage(bmp[i], 0, 0, W, H);
-              if(manual) vtrack.requestFrame();
-              if(bmp[i].close) bmp[i].close();
-              bmp[i] = false;
-              drawn++;
-            }
-            if((i & 15) === 0){
-              btn.textContent = "Spelar in " + (i/FPS).toFixed(1) + " / " + m.dur.toFixed(1) + " s…";
-            }
-            i++;
-            requestAnimationFrame(tick);
-          })();
-        });
+        await new Promise(function(r){ setTimeout(r, 160) });
+        rec.requestData(); await new Promise(function(r){ setTimeout(r, 60) });
+        rec.stop(); await stopped;
+        blob = new Blob(chunks, {type:mime});
+        if(!(await verifyClip(blob, m.dur))) blob = null;
       }
-
-      await new Promise(function(r){ setTimeout(r, TAIL) });
-      rec.requestData(); await new Promise(function(r){ setTimeout(r, 60) });
-      rec.stop(); await stopped;
-      blob = new Blob(chunks, {type:mime});
-      fps = drawn / m.dur;
-      if(await verifyClip(blob, m.dur)) break;
-      skip.push(mime); tries++; blob = null;
     }
-    shots = null;
-  } catch(e){ status("Kunde inte spela in: " + (e && e.message || e)) }
-  /* rutorna produceras löpande — inget att städa */
+  } catch(e){ status("Kunde inte skapa klippet: " + (e && e.message || e)) }
   MOTION_T = keepT;
   btn.disabled = false; btn.textContent = lbl; busy = false;
   if(blob){
     var ext = blob.type.indexOf("mp4") >= 0 ? "mp4" : "webm";
     /* klippets faktiska längd läses ur filen, inte antas — det var
        antagandet som dolde felet i första hand */
-    LASTCLIP = {dur:await clipDur(blob), fps:fps, size:blob.size, avsedd:m.dur, blob:blob};
+    LASTCLIP = {dur:await clipDur(blob), fps:fps, size:blob.size, avsedd:m.dur,
+                blob:blob, vag:vag};
     var ok = await offer(blob, "viewly-motion-"+slug(sid||m.cand)+"-"+m.dir+"-"+d+"."+ext, btn);
-    if(ok) status("Klippet: " + m.dur.toFixed(1).replace(".",",") + " s · "
-      + Math.round(fps) + " bilder/s · " + fmtBytes(blob.size)
-      + (direkt ? "" : " · renderades först eftersom datorn inte hann i realtid"));
-  } else status("Inspelningen gav ingen giltig fil");
+    if(ok) status("Klippet: " + m.dur.toFixed(1).replace(".",",") + " s · 30 bilder/s jämnt · "
+      + fmtBytes(blob.size)
+      + (vag === "avc" ? "" :
+         vag === "vp9" ? " · webbläsaren saknar H.264, filen är VP9 och spelas inte på iPhone"
+                       : " · webbläsaren saknar videokodare, filen kan hacka"));
+  } else status("Kunde inte skapa någon giltig fil");
 }
 
 /* ---------- granskningsspelare ----------
@@ -2182,6 +2149,43 @@ function step(d){
    --------------------------------------------------------------------- */
 var lastView = null, MTXT = null;
 function viewKey(){ return state.sec + "|" + (state.edit ? state.edit.hl : "") }
+/* ---------------------------------------------------------------------
+   LATA BILDRUTOR
+
+   Vy 07 innehåller 84 fulla kompositioner i 1080 × 1920. Att bygga alla
+   samtidigt mättes till 525 ms vid full fart och 1967 ms med processorn
+   strypt fyra gånger — sidan stod alltså still i två sekunder varje gång
+   man bytte riktning eller skrev ett tecken i objektfältet.
+
+   Rutorna behövs inte förrän de syns. Observatören nedan bygger en ruta
+   när den är inom en skärmhöjd från fönstret och släpper den sedan. En
+   ruta som aldrig scrollas fram byggs aldrig.
+   --------------------------------------------------------------------- */
+var MLAZY = null;
+function mlazyFill(el){
+  var q = el.dataset.mlazy.split("|");
+  var f = (MK[q[0]] || {})[q[1]];
+  el.removeAttribute("data-mlazy");
+  if(f) el.innerHTML = f(state.dir, +q[2]);
+}
+function armLazy(root){
+  var lista = root.querySelectorAll("[data-mlazy]");
+  if(!lista.length) return;
+  if(!("IntersectionObserver" in window)){
+    /* utan observatör: bygg allt, som förr — hellre långsamt än tomt */
+    lista.forEach(mlazyFill); return;
+  }
+  if(MLAZY) MLAZY.disconnect();
+  MLAZY = new IntersectionObserver(function(poster, obs){
+    poster.forEach(function(p){
+      if(!p.isIntersecting) return;
+      obs.unobserve(p.target);
+      if(p.target.dataset.mlazy) mlazyFill(p.target);
+    });
+  }, {rootMargin:"1400px 0px"});
+  lista.forEach(function(el){ MLAZY.observe(el) });
+}
+
 function render(opts){
   opts = opts || {};
   var s = SECTIONS.filter(function(x){return x.id===state.sec})[0];
@@ -2197,6 +2201,7 @@ function render(opts){
   }
   $("#canvas").innerHTML = '<div class="sec" data-on>'+s.f()+'</div>';
   mountVideos($("#canvas"));
+  armLazy($("#canvas"));
   document.querySelectorAll(".navb").forEach(function(b){
     b.setAttribute("aria-current", String(b.dataset.s===state.sec))});
 
@@ -2408,6 +2413,13 @@ window.__vstudio = {
   zipBlob:zipBlob, runZip:runZip, svgDoc:svgDoc, xhtml:xhtml, svgImage:svgImage,
   frameCSS:FRAMECSS, get cssText(){ return CSS },
   durOf:function(c,d){ return durOf(c,d) }, get lastClip(){ return LASTCLIP },
+  drawMotionFrame:drawMotionFrame, stopMPlay:stopMPlay,
+  fyllLata:function(){ document.querySelectorAll("[data-mlazy]").forEach(mlazyFill) },
+  ingestVideo:ingestVideo, VIDEOS:VIDEOS, exportVideo:exportVideo,
+  renderVideoFrom:renderVideoFrom,
+  get motionT(){ return MOTION_T }, set motionT(v){ MOTION_T = v },
+  mp4build:typeof mp4build === "function" ? mp4build : null,
+  mp4encode:typeof mp4encode === "function" ? mp4encode : null,
   UPLOADS:UPLOADS, EDITS:EDITS, SLOTS:SLOTS, PICKS:PICKS, CEDITS:CEDITS, PEDITS:PEDITS,
   saveAll:saveAll, loadAll:loadAll, loadBank:loadBank, clearAll:clearAll,
   dropUpload:dropUpload, dropAllUploads:dropAllUploads,
