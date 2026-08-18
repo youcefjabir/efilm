@@ -269,7 +269,7 @@ var HL = [
     filmen och annonsen. Det måste ritas. Flödet följer stegen på
     viewly.se/maklare: intagning, produktion, mäklarportal,
     annonsskrivaren, Social / Ads Studio. */
- {glyph:"spine", id:"ekosystem", num:"15", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
+ {glyph:"orbitmark", id:"ekosystem", num:"15", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
   q:"Hur hänger allt ihop?",
   why:"Hela affärsidén i ett kapitel. Inte en tjänstelista — sambandet mellan delarna.",
   st:[

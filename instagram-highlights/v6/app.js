@@ -1551,10 +1551,10 @@ function coverPanel(h){
      bildrutornas förslag — och kan sätta samma system för hela raden,
      vilket är hur den ser bäst ut. */
   var sets = COVSETS.map(function(cs, j){
-    var prev = CPICKS[h.id]; CPICKS[h.id] = j;
+    var prev = CPICKS[h.id]; CPICKS[h.id] = cs.id;
     var art = coverEl(d, h);
     if(prev==null) delete CPICKS[h.id]; else CPICKS[h.id] = prev;
-    return '<button class="cset'+(j===set?" on":"")+'" type="button" data-cset="'+h.id+':'+j+'" '
+    return '<button class="cset'+(j===set?" on":"")+'" type="button" data-cset="'+h.id+':'+cs.id+'" '
       +'title="'+cs.d+'"><span class="csetc">'+art+'</span>'
       +'<span class="csetn"><b>'+cs.n+'</b></span></button>';
   }).join("");
@@ -1566,10 +1566,10 @@ function coverPanel(h){
     +' — '+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).d
     +' <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
     +'<div class="grow">'+GLYPH_IDS.map(function(g){
-      var f = (set===1 ? LINE : PICTO)[g];
+      /* rita motivet i det system som faktiskt är valt */
       return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
         +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw" style="background:'+GP.bg+'">'
-        +'<svg viewBox="0 0 100 100">'+f(GP)+'</svg></span></button>';
+        +'<svg viewBox="0 0 100 100">'+covMotifFor(set, g, GP)+'</svg></span></button>';
     }).join("")+'</div>';
 
   return '<div class="edsec"><div class="eyebrow">Omslag <em class="cnt">3 system</em></div>'
@@ -2256,9 +2256,9 @@ document.addEventListener("click",function(e){
     else if(a==="exportall"){ exportJSON(ac, true) }
     else if(a==="mplay"){ toggleMPlay(ac) }
     else if(a==="cset-all"){
-      var v = state.edit ? covSetIx(hlOf(state.edit.hl)) : 0;
-      HL.forEach(function(x){ CPICKS[x.id] = v });
-      saveAll(COVSETS[v].n+" satt för alla kapitel"); render() }
+      var vi = state.edit ? covSetIx(hlOf(state.edit.hl)) : 0;
+      HL.forEach(function(x){ CPICKS[x.id] = COVSETS[vi].id });
+      saveAll(COVSETS[vi].n+" satt för alla kapitel"); render() }
     else if(a==="bank-clear"){
       var bn=Object.keys(UPLOADS).length;
       if(bn && confirm("Ta bort alla "+bn+" egna bilder ur bildbanken? Bildrutor som använder dem går tillbaka till originalbilden.")){
@@ -2284,8 +2284,8 @@ document.addEventListener("click",function(e){
   if(ci){ var q2=ci.dataset.ci.split(":");
     CEDITS[q2[0]] = Object.assign({}, CEDITS[q2[0]], {cover:q2[1]}); render(); return }
   var cs=e.target.closest("[data-cset]");
-  if(cs){ var qc=cs.dataset.cset.split(":"); CPICKS[qc[0]] = +qc[1];
-    saveAll(COVSETS[+qc[1]].n+" valt"); render(); return }
+  if(cs){ var qc=cs.dataset.cset.split(":"); CPICKS[qc[0]] = qc[1];
+    saveAll(COVSETS[covIxOf(qc[1])].n+" valt"); render(); return }
   var mo=e.target.closest("[data-mo]");
   if(mo){
     var qm=mo.dataset.mo.split(":");

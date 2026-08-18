@@ -1157,6 +1157,16 @@ var PICTO = {
              +'<circle cx="50" cy="63" r="4.4" fill="'+P.bg+'"/>' },
 
   /* Ditt hem: huset med tänt fönster. */
+  /* Navet — ekosystemets motiv, i de aldre systemens skala */
+  orbitmark:function(P){
+    var out = '<circle cx="50" cy="50" r="13" fill="'+P.t2+'"/>';
+    for(var i = 0; i < 6; i++){
+      var a = (-90 + i*60)*Math.PI/180;
+      out += '<circle cx="'+(50+Math.cos(a)*27).toFixed(1)+'" cy="'+(50+Math.sin(a)*27).toFixed(1)
+        +'" r="6.4" fill="'+(i%2 ? P.t1 : P.t3)+'"/>';
+    }
+    return out;
+  },
   door:    function(P){ return '<path d="M22 48 L50 24 L78 48 Z" fill="'+P.t2+'"/>'
              +'<rect x="30" y="48" width="40" height="30" fill="'+P.t1+'"/>'
              +'<rect x="44" y="60" width="12" height="18" fill="'+P.t2+'"/>'
@@ -1221,6 +1231,15 @@ var LINE = {
   people:  function(P){ return ln2("M50 24 A11 11 0 1 1 49.9 24 Z", P.t2)
              +ln2("M26 80 V72 A24 24 0 0 1 74 72 V80", P.t2)
              +'<rect x="40" y="56" width="20" height="13" fill="'+P.t3+'"/>' },
+  orbitmark:function(P){
+    var out = '<circle cx="50" cy="50" r="13" fill="none" stroke="'+P.t2+'" stroke-width="3"/>';
+    for(var i = 0; i < 6; i++){
+      var a = (-90 + i*60)*Math.PI/180;
+      out += '<circle cx="'+(50+Math.cos(a)*27).toFixed(1)+'" cy="'+(50+Math.sin(a)*27).toFixed(1)
+        +'" r="6" fill="none" stroke="'+P.t2+'" stroke-width="3"/>';
+    }
+    return out;
+  },
   door:    function(P){ return ln2("M18 50 L50 22 L82 50", P.t2)
              +ln2("M28 50 V80 H72 V50", P.t2)
              +ln2("M44 80 V62 H56 V80", P.t2)
@@ -1235,7 +1254,8 @@ var GLYPHS = {
   map:{n:"Nålen", d:"Platsen på kartan"},     motion:{n:"Spelknappen", d:"Bildruta med play"},
   lines:{n:"Dokumentet", d:"Text med rubrik"},formats:{n:"Formaten", d:"9:16, 4:5, 1:1"},
   spine:{n:"Portalen", d:"Fyra ytor, en tänd"},gable:{n:"Plåtarna", d:"Tre kort på varandra"},
-  people:{n:"Fotografen", d:"Person med kamera"}, door:{n:"Huset", d:"Hem med tänt fönster"}
+  people:{n:"Fotografen", d:"Person med kamera"}, door:{n:"Huset", d:"Hem med tänt fönster"},
+  orbitmark:{n:"Navet", d:"Mitten och det som hänger ihop"}
 };
 var GLYPH_IDS = Object.keys(GLYPHS);
 
@@ -1250,6 +1270,151 @@ function cov(h, key){
    TRE SYSTEM — alla tre är ikoner
    Samma fjorton motiv, tre utföranden. Valet ligger i CPICKS[kapitel-id].
    --------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------
+   SIGNUM — det lilla märket
+
+   Referensen är de mäklarkontor som gör highlights bäst: en cirkel i en
+   lugn ton och ETT litet fyllt märke mitt i, med mycket luft omkring.
+   Ingenting mer.
+
+   Skillnaden mot våra tidigare system är mätbar, inte en smaksak:
+
+     storlek     märket upptar 32 av 100 enheter, alltså knappt en
+                 tredjedel av cirkeln. De gamla fyller 60–80 % och blir
+                 tunga i profilraden.
+     toner       EN ton på märket mot EN ton i fältet. De gamla använder
+                 tre, vilket vid 56 px blir grumligt i stället för
+                 elegant.
+     form        fyllda silhuetter, inga hårlinjer. En linje på 1 px
+                 försvinner i profilraden; en fylld form håller.
+
+   Det som gör vårt bättre än förlagan är att märkena inte är ett inköpt
+   ikonpaket. De är ritade i EN uppsättning på samma rutnät, med samma
+   optiska vikt och samma hörnradie, och var och en betyder något i vår
+   verksamhet — inte ett hjärta och ett flygplan.
+   --------------------------------------------------------------------- */
+var SIGN = {
+  /* logotypen, skalad till samma 32 enheter som allt annat */
+  vmark: function(P){
+    var k = 32/858.6;
+    return '<g transform="translate('+(50-858.6*k/2).toFixed(2)+' '+(50-756.3*k/2).toFixed(2)
+     +') scale('+k.toFixed(5)+')">'
+     +'<path d="'+GEO.limb+'" fill="'+P.ink+'"/>'
+     +'<circle cx="'+GEO.dot.cx+'" cy="'+GEO.dot.cy+'" r="'+GEO.dot.r+'" fill="'+P.ink+'"/></g>';
+  },
+  /* Fotografering — kamerahuset, objektivet utskuret */
+  aperture: function(P){
+    return '<path fill="'+P.ink+'" fill-rule="evenodd" d="'
+     +'M44.5 37 h11 a2 2 0 0 1 2 2 v2 h5.5 a3 3 0 0 1 3 3 v16 a3 3 0 0 1 -3 3 h-26 '
+     +'a3 3 0 0 1 -3 -3 v-16 a3 3 0 0 1 3 -3 h5.5 v-2 a2 2 0 0 1 2 -2 z '
+     +'M50 46 a6.2 6.2 0 1 0 0.01 0 z"/>';
+  },
+  /* 3D visning — kuben, kanterna utskurna */
+  cube: function(P){
+    return '<path fill="'+P.ink+'" d="M50 34 L66 43 V57 L50 66 L34 57 V43 Z"/>'
+     +'<path stroke="'+P.bg+'" stroke-width="1.6" fill="none" stroke-linejoin="round" '
+     +'d="M34 43 L50 52 L66 43 M50 52 V66"/>';
+  },
+  /* E-styling — fåtöljen. Rygg, armstöd och sits måste läsa isär vid
+     56 px, annars blir det en klump; därför luft mellan delarna. */
+  halves: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="38.5" y="34" width="23" height="12" rx="3"/>'
+     +'<rect x="34" y="44" width="6" height="13" rx="3"/>'
+     +'<rect x="60" y="44" width="6" height="13" rx="3"/>'
+     +'<rect x="41.5" y="48.5" width="17" height="8.5" rx="2"/>'
+     +'<rect x="40" y="59" width="3.4" height="6.5" rx="1.4"/>'
+     +'<rect x="56.6" y="59" width="3.4" height="6.5" rx="1.4"/></g>';
+  },
+  /* Atmosphere — solen över horisonten. Solen måste dominera, annars
+     läses figuren som tre streck. */
+  sun: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<path d="M35.5 51.2 a14.5 14.5 0 0 1 29 0 z"/>'
+     +'<rect x="34" y="54.7" width="32" height="3.2" rx="1.6"/>'
+     +'<rect x="42" y="60.7" width="16" height="2.6" rx="1.3"/></g>';
+  },
+  /* Drönare — kroppen, fyra armar i kors och fyra rotorer. Armarna satt
+     först inte med, men utan dem blev figuren fyra punkter runt en mitt
+     och gick inte att skilja från navet i Ekosystemet. Som fyllda armar
+     i stället för streck håller korset ihop även vid 56 bildpunkter. */
+  drone: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="33.9" y="48.3" width="32.2" height="3.4" rx="1.7" transform="rotate(45 50 50)"/>'
+     +'<rect x="33.9" y="48.3" width="32.2" height="3.4" rx="1.7" transform="rotate(-45 50 50)"/>'
+     +'<rect x="43" y="43" width="14" height="14" rx="3.4"/>'
+     +'<circle cx="38.6" cy="38.6" r="4.7"/><circle cx="61.4" cy="38.6" r="4.7"/>'
+     +'<circle cx="38.6" cy="61.4" r="4.7"/><circle cx="61.4" cy="61.4" r="4.7"/></g>';
+  },
+  /* Områdeskarta — nålen */
+  map: function(P){
+    return '<path fill="'+P.ink+'" fill-rule="evenodd" d="'
+     +'M50 34 a11 11 0 0 1 11 11 c0 8 -11 21 -11 21 s-11 -13 -11 -21 a11 11 0 0 1 11 -11 z '
+     +'M50 41 a4 4 0 1 0 0.01 0 z"/>';
+  },
+  /* Motion — bildrutan med play utskuret */
+  motion: function(P){
+    return '<path fill="'+P.ink+'" fill-rule="evenodd" d="'
+     +'M37 36 h26 a3 3 0 0 1 3 3 v22 a3 3 0 0 1 -3 3 h-26 a3 3 0 0 1 -3 -3 v-22 a3 3 0 0 1 3 -3 z '
+     +'M46 43 v14 l12 -7 z"/>';
+  },
+  /* Annonsen — den satta texten */
+  lines: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="34" y="35.8" width="17" height="5" rx="2.5"/>'
+     +'<rect x="34" y="45.8" width="32" height="3.4" rx="1.7"/>'
+     +'<rect x="34" y="53.3" width="32" height="3.4" rx="1.7"/>'
+     +'<rect x="34" y="60.8" width="21" height="3.4" rx="1.7"/></g>';
+  },
+  /* Kampanjen — de tre formaten, i sanna proportioner */
+  formats: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="34" y="36" width="9" height="28" rx="1.6"/>'
+     +'<rect x="45.5" y="50.25" width="11" height="13.75" rx="1.6"/>'
+     +'<rect x="59" y="57" width="7" height="7" rx="1.4"/></g>';
+  },
+  /* Systemet och Ekosystemet — portalens fyra ytor */
+  spine: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="34" y="34" width="14" height="14" rx="2.6"/>'
+     +'<rect x="52" y="34" width="14" height="14" rx="2.6"/>'
+     +'<rect x="34" y="52" width="14" height="14" rx="2.6"/>'
+     +'<rect x="52" y="52" width="14" height="14" rx="2.6"/></g>';
+  },
+  /* Objekt — plåtarna på varandra */
+  gable: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="41" y="34" width="25" height="23" rx="2.4"/>'
+     +'<path d="M34 41.6 h27.6 a2.4 2.4 0 0 1 2.4 2.4 v22 h-30 v-22 a2.4 2.4 0 0 1 2.4 -2.4 z" '
+     +'fill="'+P.bg+'"/>'
+     +'<rect x="34" y="43" width="26" height="23" rx="2.4"/></g>';
+  },
+  /* Inifrån — fotografen */
+  people: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<circle cx="50" cy="42" r="7"/>'
+     +'<path d="M35 66 a15 15 0 0 1 30 0 z"/></g>';
+  },
+  /* Ekosystemet — navet och det som hänger ihop med det. Systemet har
+     rutnätet; de två får inte dela märke. */
+  orbitmark: function(P){
+    var s = '<circle cx="50" cy="50" r="6.6" fill="'+P.ink+'"/>';
+    for(var i = 0; i < 6; i++){
+      var a = (-90 + i*60) * Math.PI/180;
+      s += '<circle cx="'+(50+Math.cos(a)*13.4).toFixed(2)+'" cy="'+(50+Math.sin(a)*13.4).toFixed(2)
+        +'" r="3.3" fill="'+P.ink+'"/>';
+    }
+    return s;
+  },
+  /* Ditt hem — huset med tänt fönster */
+  door: function(P){
+    return '<path fill="'+P.ink+'" fill-rule="evenodd" d="'
+     +'M50 34.5 L66 47.5 a1 1 0 0 1 -0.6 1.8 h-2.4 v13.4 a3 3 0 0 1 -3 3 h-20 a3 3 0 0 1 -3 -3 '
+     +'v-13.4 h-2.4 a1 1 0 0 1 -0.6 -1.8 z '
+     +'M46.4 53.5 h7.2 v11.2 h-7.2 z"/>';
+  }
+};
+
 /* ---------------------------------------------------------------------
    TRE SYSTEM TILL — ren design
 
@@ -1276,11 +1441,15 @@ function cov(h, key){
    --------------------------------------------------------------------- */
 var COVPAL2 = {
   arkiv: {
+    /* Lugnt varmgratt falt, market i mork oliv. Kontrasten ar 9,4:1 —
+       hogt over kravet aven vid 56 px. */
+    signum: {bg:"#E7E4DC", ink:"#333A2E"},
     falt:   {bg:"#6E7266", t1:"#8A9080", t2:"#F2EFEF", t3:"#1C1C1E"},
     snitt:  {bg:"#EFECE6", t1:"#C8CCBF", t2:"#1C1C1E", t3:"#6E7266"},
     relief: {bg:"#EFECE6", t1:"#C8CCBF", t2:"#1C1C1E", t3:"#6E7266"}
   },
   skugga: {
+    signum: {bg:"#22261F", ink:"#E7E4DC"},
     falt:   {bg:"#2C322A", t1:"#48503E", t2:"#EFEDE7", t3:"#98A088"},
     snitt:  {bg:"#0E0E0D", t1:"#33332F", t2:"#EFEDE7", t3:"#98A088"},
     relief: {bg:"#0E0E0D", t1:"#33332F", t2:"#EFEDE7", t3:"#98A088"}
@@ -1302,6 +1471,11 @@ function covMotif(key, P){
   return f(P);
 }
 /* ---- de tre nya ytorna, alla i en 0 0 100 100-ruta ---- */
+/* Fältet fyller hela rutan, märket ligger centrerat och litet. */
+function covSignum(key, P){
+  var f = SIGN[key] || SIGN.vmark;
+  return '<rect width="100" height="100" fill="'+P.bg+'"/>' + f(P);
+}
 function covFalt(key, P){
   /* Uppförstorat kring rutans mitt, inte kring origo — annars hamnar
      beskärningen där motivet råkar ligga och halva uppsättningen blir
@@ -1343,6 +1517,7 @@ function hashStr(s){
 
 var CPICKS = {};
 var COVSETS = [
+  {id:"signum",    k:"signum",    n:"Signum",    d:"Ett litet fyllt märke i mycket luft. En ton mot en ton, 32 av 100 enheter. Det som de bästa kontoren gör, ritat i vår egen uppsättning."},
   {id:"pictogram", k:"pictogram", n:"Pictogram", d:"Fylld form, utskurna detaljer. Rak och tyst."},
   {id:"linjen",    k:"line",      n:"Linjen",    d:"Samma motiv i hårlinje, med stort andrum."},
   {id:"negativ",   k:"negativ",   n:"Negativ",   d:"Formen urskuren ur en fylld olivplatta."},
@@ -1353,11 +1528,19 @@ var COVSETS = [
 ];
 /* Ett rent omslag ritar varken cirkel eller etikett. */
 function covPure(ix){ return !!(COVSETS[ix] && COVSETS[ix].pure) }
-/* Antalet system är inte längre tre — gränsen läses ur COVSETS i stället
-   för att stå i koden, annars hamnar varje nytt system tyst på nummer ett. */
+/* Valet lagras som SYSTEMETS ID, inte som dess plats i listan. Ett tal
+   pekar fel sa fort ordningen andras — och den andras varje gang ett nytt
+   system tillkommer. Gamla sparade tal tolkas mot den ordning de skrevs i. */
+var COVOLD = ["pictogram","linjen","negativ","falt","snitt","relief"];
+function covIxOf(id){
+  for(var i = 0; i < COVSETS.length; i++){ if(COVSETS[i].id === id) return i }
+  return 0;
+}
 function covSetIx(h){
   var v = CPICKS[h.id];
-  return (typeof v === "number" && v > 0 && v < COVSETS.length) ? v : 0;
+  if(typeof v === "string") return covIxOf(v);
+  if(typeof v === "number" && COVOLD[v]) return covIxOf(COVOLD[v]);
+  return 0;
 }
 function covPal(dirId, ix){
   var k = COVSETS[ix].k;
@@ -1365,16 +1548,25 @@ function covPal(dirId, ix){
   var d2 = COVPAL2[dirId] || COVPAL2.arkiv;
   return d[k] || d2[k];
 }
+/* Vilken ritning hör till vilket system? Uppslaget gick tidigare på
+   PLATSEN i listan — ix===1 antogs vara Linjen. Så fort ett system
+   tillkom pekade det fel, och ett motiv som bara fanns i en uppsättning
+   sprängde hela editorn. Nu frågar vi systemet vad det heter. */
+function covSet(ix){ return (COVSETS[ix] && COVSETS[ix].k) || "pictogram" }
+function covMotifFor(ix, key, P){
+  var k = covSet(ix);
+  var tab = k === "signum" ? SIGN : k === "line" ? LINE : PICTO;
+  var f = tab[key] || tab.vmark || PICTO.vmark;
+  return f(P);
+}
 function covArt(dirId, h, ix){
   var P = covPal(dirId, ix), key = cov(h,"glyph"), body;
   var k = COVSETS[ix].k;
-  if(k === "falt")        body = covFalt(key, P);
+  if(k === "signum")      body = covSignum(key, P);
+  else if(k === "falt")   body = covFalt(key, P);
   else if(k === "snitt")  body = covSnitt(key, P);
   else if(k === "relief") body = covRelief(key, P);
-  else {
-    var f = (ix===1 ? LINE : PICTO)[key] || (ix===1 ? LINE : PICTO).vmark;
-    body = f(P);
-  }
+  else body = covMotifFor(ix, key, P);
   return '<div style="position:absolute;inset:0;display:grid;place-items:center">'
     +'<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block" aria-hidden="true">'
     + body +'</svg></div>';
@@ -3688,7 +3880,7 @@ var HL = [
     filmen och annonsen. Det måste ritas. Flödet följer stegen på
     viewly.se/maklare: intagning, produktion, mäklarportal,
     annonsskrivaren, Social / Ads Studio. */
- {glyph:"spine", id:"ekosystem", num:"15", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
+ {glyph:"orbitmark", id:"ekosystem", num:"15", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
   q:"Hur hänger allt ihop?",
   why:"Hela affärsidén i ett kapitel. Inte en tjänstelista — sambandet mellan delarna.",
   st:[
@@ -5956,10 +6148,10 @@ function coverPanel(h){
      bildrutornas förslag — och kan sätta samma system för hela raden,
      vilket är hur den ser bäst ut. */
   var sets = COVSETS.map(function(cs, j){
-    var prev = CPICKS[h.id]; CPICKS[h.id] = j;
+    var prev = CPICKS[h.id]; CPICKS[h.id] = cs.id;
     var art = coverEl(d, h);
     if(prev==null) delete CPICKS[h.id]; else CPICKS[h.id] = prev;
-    return '<button class="cset'+(j===set?" on":"")+'" type="button" data-cset="'+h.id+':'+j+'" '
+    return '<button class="cset'+(j===set?" on":"")+'" type="button" data-cset="'+h.id+':'+cs.id+'" '
       +'title="'+cs.d+'"><span class="csetc">'+art+'</span>'
       +'<span class="csetn"><b>'+cs.n+'</b></span></button>';
   }).join("");
@@ -5971,10 +6163,10 @@ function coverPanel(h){
     +' — '+(GLYPHS[cov(h,"glyph")]||GLYPHS.vmark).d
     +' <code class="mono">'+(cov(h,"glyph")||"vmark")+'</code></div>'
     +'<div class="grow">'+GLYPH_IDS.map(function(g){
-      var f = (set===1 ? LINE : PICTO)[g];
+      /* rita motivet i det system som faktiskt är valt */
       return '<button class="gi'+(cov(h,"glyph")===g?" on":"")+'" type="button" data-gl="'+h.id+':'+g+'" '
         +'title="'+GLYPHS[g].n+' — '+GLYPHS[g].d+'"><span class="giw" style="background:'+GP.bg+'">'
-        +'<svg viewBox="0 0 100 100">'+f(GP)+'</svg></span></button>';
+        +'<svg viewBox="0 0 100 100">'+covMotifFor(set, g, GP)+'</svg></span></button>';
     }).join("")+'</div>';
 
   return '<div class="edsec"><div class="eyebrow">Omslag <em class="cnt">3 system</em></div>'
@@ -7022,9 +7214,9 @@ document.addEventListener("click",function(e){
     else if(a==="exportall"){ exportJSON(ac, true) }
     else if(a==="mplay"){ toggleMPlay(ac) }
     else if(a==="cset-all"){
-      var v = state.edit ? covSetIx(hlOf(state.edit.hl)) : 0;
-      HL.forEach(function(x){ CPICKS[x.id] = v });
-      saveAll(COVSETS[v].n+" satt för alla kapitel"); render() }
+      var vi = state.edit ? covSetIx(hlOf(state.edit.hl)) : 0;
+      HL.forEach(function(x){ CPICKS[x.id] = COVSETS[vi].id });
+      saveAll(COVSETS[vi].n+" satt för alla kapitel"); render() }
     else if(a==="bank-clear"){
       var bn=Object.keys(UPLOADS).length;
       if(bn && confirm("Ta bort alla "+bn+" egna bilder ur bildbanken? Bildrutor som använder dem går tillbaka till originalbilden.")){
@@ -7050,8 +7242,8 @@ document.addEventListener("click",function(e){
   if(ci){ var q2=ci.dataset.ci.split(":");
     CEDITS[q2[0]] = Object.assign({}, CEDITS[q2[0]], {cover:q2[1]}); render(); return }
   var cs=e.target.closest("[data-cset]");
-  if(cs){ var qc=cs.dataset.cset.split(":"); CPICKS[qc[0]] = +qc[1];
-    saveAll(COVSETS[+qc[1]].n+" valt"); render(); return }
+  if(cs){ var qc=cs.dataset.cset.split(":"); CPICKS[qc[0]] = qc[1];
+    saveAll(COVSETS[covIxOf(qc[1])].n+" valt"); render(); return }
   var mo=e.target.closest("[data-mo]");
   if(mo){
     var qm=mo.dataset.mo.split(":");
