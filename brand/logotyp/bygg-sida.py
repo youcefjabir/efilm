@@ -31,7 +31,7 @@ def kort(stem, namn, bg, ink, dot, txt, tva=False):
       '<div class="prov"><span class="p44">%s</span><span class="p24">%s</span>'
       '<span class="prund">%s</span><span class="plab">44 · 24 · rund</span></div>'
       '<figcaption><h4>%s</h4><p>%s</p><div class="matt">%s</div><div class="hex">%s</div>'
-      '<div class="hamta" hidden><button type="button" data-ext="svg">SVG</button>'
+      '<div class="hamta"><button type="button" data-ext="svg">SVG</button>'
       '<button type="button" data-ext="png">PNG</button></div></figcaption>'
       '</figure>' % (svg_in(P[bg],P[ink],P[dot]), svg_in(P[bg],P[ink],P[dot]),
                      svg_in(P[bg],P[ink],P[dot]), svg_in(P[bg],P[ink],P[dot],True),
@@ -98,7 +98,7 @@ for stem, nm, ink, dot, txt in [("viewly-marke-svart","Svart","svart","svart","F
       '<svg viewBox="%s" class="mk fri" aria-hidden="true">'
       '<path d="%s" fill="%s"/><circle cx="%.1f" cy="%.1f" r="%.1f" fill="%s"/></svg></div>'
       '<figcaption><h4>%s</h4><p>%s</p>'
-      '<div class="hamta" hidden><button type="button" data-ext="svg">SVG</button>'
+      '<div class="hamta"><button type="button" data-ext="svg">SVG</button>'
       '<button type="button" data-ext="png">PNG</button></div></figcaption></figure>'
       % (VB, LIMB, P[ink], DOT[0], DOT[1], DOT[2], P[dot], nm, txt))
 
@@ -398,7 +398,7 @@ tbody tr:hover td{background:rgba(255,255,255,.022)}
    Ett ark · SVG är svaret på det första: alla sjutton på en enda yta,
    fortfarande som vektor, i EN dialogruta. */
 (function(){
-  var DL = null, avbryt = false, arbetar = false;
+  var DL = null, dlFragat = false, avbryt = false, arbetar = false;
   var stat = document.getElementById("dlstat");
   var alla = ["allaPng","allaSvg","ettArk"].map(function(id){ return document.getElementById(id) });
 
@@ -510,7 +510,8 @@ tbody tr:hover td{background:rgba(255,255,255,.022)}
 
   async function sparaAlla(ext){
     var figs = [].slice.call(document.querySelectorAll("[data-fil]"));
-    avbryt = false; last(true);
+    avbryt = false; last(true); saga("Förbereder…");
+    if(!await hamtaDL()){ saknas(); last(false); return }
     var n = 0;
     for(var i = 0; i < figs.length; i++){
       if(avbryt) break;
@@ -527,17 +528,33 @@ tbody tr:hover td{background:rgba(255,255,255,.022)}
     last(false);
   }
 
-  (async function(){
-    try { DL = window.claude && claude.use ? await claude.use("downloads") : null }
+  /* Kapaciteten hämtas när någon KLICKAR, inte när sidan laddas.
+     Första versionen frågade vid inläsning och gömde knapparna om svaret
+     var nej — men värdens window.claude installeras efter sidans egna
+     skript, så svaret var alltid nej och knapparna försvann. Nu väntar vi
+     in den, och om den ändå inte kommer säger raden det i klartext i
+     stället för att knapparna tyst uteblir. */
+  async function hamtaDL(){
+    if(dlFragat) return DL;
+    for(var i = 0; i < 40 && !(window.claude && window.claude.use); i++){
+      await new Promise(function(r){ setTimeout(r, 50) });   /* upp till 2 s */
+    }
+    dlFragat = true;
+    try { DL = (window.claude && window.claude.use) ? await window.claude.use("downloads") : null }
     catch(e){ DL = null }
-    if(!DL) return;                       /* ingen nedladdning här — visa inga knappar */
-    document.querySelectorAll(".hamta").forEach(function(d){ d.hidden = false });
-    document.querySelector(".styr").classList.add("kan-hamta");
+    return DL;
+  }
+  function saknas(){
+    saga("Nedladdning är inte tillgänglig här — öppna sidan på claude.ai", true);
+  }
 
+  (function(){
     document.getElementById("allaPng").addEventListener("click", function(){ sparaAlla("png") });
     document.getElementById("allaSvg").addEventListener("click", function(){ sparaAlla("svg") });
     document.getElementById("ettArk").addEventListener("click", async function(){
-      last(true); saga("Sparar arket — svara i dialogrutan");
+      last(true); saga("Förbereder…");
+      if(!await hamtaDL()){ saknas(); last(false); return }
+      saga("Sparar arket — svara i dialogrutan");
       try {
         await DL.save({filename:"viewly-market-i-farg.svg", data:ettArkSvg()});
         saga("Arket sparat");
@@ -548,7 +565,9 @@ tbody tr:hover td{background:rgba(255,255,255,.022)}
       var b = e.target.closest(".hamta button");
       if(!b || arbetar) return;
       var fig = b.closest("[data-fil]"), ext = b.dataset.ext;
-      last(true); saga("Sparar " + fig.dataset.fil + "." + ext);
+      last(true); saga("Förbereder…");
+      if(!await hamtaDL()){ saknas(); last(false); return }
+      saga("Sparar " + fig.dataset.fil + "." + ext);
       try { await spara(fig, ext); saga(fig.dataset.fil + "." + ext + " sparad") }
       catch(err){ saga(felText((err && err.code) || "unknown"), true) }
       last(false);
