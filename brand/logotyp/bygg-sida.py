@@ -19,17 +19,20 @@ def svg_in(bg, ink, dot, rund=False, w=BREDD):
           '<g clip-path="url(#%s)">%s</g></svg>' % (kid, kid, inre))
     return '<svg viewBox="0 0 100 100" class="mk" aria-hidden="true">%s</svg>' % inre
 
-def kort(namn, bg, ink, dot, txt, tva=False):
+def kort(stem, namn, bg, ink, dot, txt, tva=False):
     k1, k2 = kontrast(P[bg], P[ink]), kontrast(P[bg], P[dot])
     matt = ('<span class="m">lem <b>%s</b></span><span class="m">punkt <b>%s</b></span>'
             % (kt(k1), kt(k2))) if tva else ('<span class="m">kontrast <b>%s</b></span>' % kt(k1))
     hexar = ('<code>%s</code><code>%s</code><code>%s</code>' % (P[bg], P[ink], P[dot])) if tva \
             else ('<code>%s</code><code>%s</code>' % (P[bg], P[ink]))
-    return ('<figure class="kort">'
+    return ('<figure class="kort" data-fil="%s">' % stem
+      +
       '<div class="stor">%s</div>'
       '<div class="prov"><span class="p44">%s</span><span class="p24">%s</span>'
       '<span class="prund">%s</span><span class="plab">44 · 24 · rund</span></div>'
-      '<figcaption><h4>%s</h4><p>%s</p><div class="matt">%s</div><div class="hex">%s</div></figcaption>'
+      '<figcaption><h4>%s</h4><p>%s</p><div class="matt">%s</div><div class="hex">%s</div>'
+      '<div class="hamta" hidden><button type="button" data-ext="svg">SVG</button>'
+      '<button type="button" data-ext="png">PNG</button></div></figcaption>'
       '</figure>' % (svg_in(P[bg],P[ink],P[dot]), svg_in(P[bg],P[ink],P[dot]),
                      svg_in(P[bg],P[ink],P[dot]), svg_in(P[bg],P[ink],P[dot],True),
                      namn, txt, matt, hexar))
@@ -81,18 +84,22 @@ def diagram():
       'alltså %.0f&nbsp;%% marginal.</figcaption></figure>'
       '</div>') % (a, b, c, hd, (1-hd/50)*100)
 
-ren  = "".join(kort(NAMN[bg]+" · "+NAMN[ink].lower(), bg, ink, ink, txt) for _,bg,ink,txt in REN)
-tva  = "".join(kort(NAMN[bg]+" · "+NAMN[ink].lower()+" och "+NAMN[dot].lower(), bg, ink, dot, txt, True)
-               for _,bg,ink,dot,txt in TVA)
+ren  = "".join(kort("viewly-ren-"+nm, NAMN[bg]+" · "+NAMN[ink].lower(), bg, ink, ink, txt)
+                for nm,bg,ink,txt in REN)
+tva  = "".join(kort("viewly-tva-"+nm, NAMN[bg]+" · "+NAMN[ink].lower()+" och "+NAMN[dot].lower(),
+                    bg, ink, dot, txt, True)
+                for nm,bg,ink,dot,txt in TVA)
 
 ensam = ""
-for nm, ink, dot, txt in [("Svart","svart","svart","För ljusa underlag."),
-                          ("Papper","papper","papper","För mörka underlag."),
-                          ("Två toner","svart","oliv","Punkten bär oliven.")]:
-    ensam += ('<figure class="kort fri"><div class="stor rutigt">'
+for stem, nm, ink, dot, txt in [("viewly-marke-svart","Svart","svart","svart","För ljusa underlag."),
+                          ("viewly-marke-papper","Papper","papper","papper","För mörka underlag."),
+                          ("viewly-marke-tva","Två toner","svart","oliv","Punkten bär oliven.")]:
+    ensam += ('<figure class="kort fri" data-fil="'+stem+'"><div class="stor rutigt">'
       '<svg viewBox="%s" class="mk fri" aria-hidden="true">'
       '<path d="%s" fill="%s"/><circle cx="%.1f" cy="%.1f" r="%.1f" fill="%s"/></svg></div>'
-      '<figcaption><h4>%s</h4><p>%s</p></figcaption></figure>'
+      '<figcaption><h4>%s</h4><p>%s</p>'
+      '<div class="hamta" hidden><button type="button" data-ext="svg">SVG</button>'
+      '<button type="button" data-ext="png">PNG</button></div></figcaption></figure>'
       % (VB, LIMB, P[ink], DOT[0], DOT[1], DOT[2], P[dot], nm, txt))
 
 # alla mått i en tabell
@@ -189,6 +196,21 @@ section{padding:64px 0 0}
 .styr button:hover{border-color:var(--oliv)}
 .styr button[aria-pressed="true"]{border-color:var(--varm);color:var(--varm)}
 .styr button:focus-visible{outline:2px solid var(--oliv);outline-offset:2px}
+
+.styr{position:sticky;top:0;z-index:6}
+.styr .delare{width:1px;align-self:stretch;background:var(--linje2);margin:0 4px}
+.dlstat{font-size:11.5px;letter-spacing:.02em;text-transform:none;font-weight:400;
+  color:var(--varm);min-height:1em}
+.dlstat.fel{color:#E0876B}
+.hamta{display:flex;gap:6px;margin-top:11px}
+.hamta button{font:inherit;font-size:10.5px;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--vagg-ink);background:transparent;
+  border:1px solid var(--vagg-kant);padding:5px 10px;cursor:pointer;
+  transition:border-color .15s,background .15s}
+.hamta button:hover{border-color:var(--vagg-ink);background:var(--vagg-chip)}
+.hamta button:focus-visible{outline:2px solid var(--oliv);outline-offset:2px}
+.hamta button[disabled]{opacity:.4;cursor:default}
+.styr button[disabled]{opacity:.4;cursor:default}
 
 .vagg{background:var(--vagg);padding:28px;margin-top:1px;transition:background .28s}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(206px,1fr));gap:26px}
@@ -290,6 +312,12 @@ tbody tr:hover td{background:rgba(255,255,255,.022)}
     <button type="button" data-vagg="#EFECE7" data-ljus="0" aria-pressed="false"><i style="background:#EFECE7"></i>Papper</button>
     <button type="button" data-vagg="#8E9084" data-ljus="0" aria-pressed="true"><i style="background:#8E9084"></i>Grå</button>
     <button type="button" data-vagg="#101210" data-ljus="1" aria-pressed="false"><i style="background:#101210"></i>Mörk</button>
+    <span class="delare" aria-hidden="true"></span>
+    <span>Hämta alla</span>
+    <button type="button" id="allaPng">PNG · 17 filer</button>
+    <button type="button" id="allaSvg">SVG · 17 filer</button>
+    <button type="button" id="ettArk">Ett ark · SVG</button>
+    <span id="dlstat" class="dlstat" role="status" aria-live="polite"></span>
   </div>
   <div class="vagg"><div class="grid">__REN__</div></div>
 </section>
@@ -339,14 +367,195 @@ tbody tr:hover td{background:rgba(255,255,255,.022)}
     er sak att bestämma.</p>
   </div>
   <div>
-    <h3>Filerna</h3>
-    <p>Alla sjutton finns som SVG och som PNG i 1024&nbsp;bildpunkter, levererade
-    vid sidan av den här sidan. SVG:erna är rena — en rect, en path, en circle.</p>
+    <h3>Att hämta filerna</h3>
+    <p>Varje bricka har <b>SVG</b> och <b>PNG</b> under sig. PNG:en ritas i
+    1024&nbsp;bildpunkter, SVG:en är ren — en rect, en path, en circle.</p>
+    <p>Sidan får inte starta en nedladdning själv, utan varje fil måste godkännas
+    i en dialogruta. <b>Alla · 17 filer</b> betyder därför sjutton dialogrutor i
+    rad; säger du nej i någon stannar kön där och raden berättar hur många som
+    hann sparas. Ett arkiv går inte — ZIP är inte en tillåten filtyp här.</p>
+    <p><b>Ett ark · SVG</b> är svaret på det: alla sjutton på en enda yta,
+    fortfarande som vektor, i en dialogruta. Öppna den i Illustrator eller Figma
+    och plocka ut den bricka du vill ha.</p>
   </div>
 </div>
 </div>
 
 <script>
+/* ---------------------------------------------------------------------
+   HÄMTA FILERNA
+
+   En publicerad sida får inte starta en nedladdning själv — den måste gå
+   genom claude.use("downloads"), och betraktaren godkänner varje fil.
+   Två saker följer av det, och båda syns i gränssnittet i stället för att
+   överraska:
+
+     · Ett arkiv går inte. ZIP finns inte bland de tillåtna filtyperna,
+       så "alla" betyder en dialogruta per fil. Knappen säger det.
+     · SVG ligger i den utökade uppsättningen och är inte påslagen i alla
+       vyer. Går den inte fram säger vi det och pekar på PNG i stället.
+
+   Ett ark · SVG är svaret på det första: alla sjutton på en enda yta,
+   fortfarande som vektor, i EN dialogruta. */
+(function(){
+  var DL = null, avbryt = false, arbetar = false;
+  var stat = document.getElementById("dlstat");
+  var alla = ["allaPng","allaSvg","ettArk"].map(function(id){ return document.getElementById(id) });
+
+  function saga(txt, fel){
+    stat.textContent = txt || "";
+    stat.className = "dlstat" + (fel ? " fel" : "");
+  }
+  function felText(kod){
+    return kod === "declined"            ? "Du avbröt" :
+           kod === "too_large"           ? "Filen är för stor" :
+           kod === "rate_limited"        ? "Dialogrutan hann inte stängas" :
+           kod === "rejected_extension"  ? "Filtypen tillåts inte" :
+           kod === "extension_not_enabled" ? "SVG är inte påslaget i den här vyn — ta PNG i stället" :
+           "Kunde inte spara (" + kod + ")";
+  }
+
+  /* Bricans SVG som fristående källa: samma noder, med ram och mått. */
+  function svgKalla(fig){
+    var org = fig.querySelector(".stor svg");
+    var kopia = org.cloneNode(true);
+    kopia.removeAttribute("class");
+    /* aria-hidden hör till sidan, inte till filen — en levererad logotyp
+       ska ha ett namn i stället för att vara gömd för uppläsare. */
+    kopia.removeAttribute("aria-hidden");
+    kopia.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    kopia.setAttribute("role", "img");
+    var titel = document.createElementNS("http://www.w3.org/2000/svg", "title");
+    titel.textContent = "Viewly";
+    kopia.insertBefore(titel, kopia.firstChild);
+    var vb = kopia.getAttribute("viewBox").split(/[ ,]+/);
+    var b = parseFloat(vb[2]), h = parseFloat(vb[3]);
+    var mal = 1024, sk = mal / b;
+    kopia.setAttribute("width", Math.round(b * sk));
+    kopia.setAttribute("height", Math.round(h * sk));
+    return {text:new XMLSerializer().serializeToString(kopia),
+            w:Math.round(b * sk), h:Math.round(h * sk)};
+  }
+
+  /* PNG: SVG:n ritas i en canvas. Data-URL, inte blob-URL — en blob-URL
+     smittar canvasen och då går bilden inte att läsa ut. */
+  function pngBlob(kalla){
+    return new Promise(function(res, rej){
+      var img = new Image();
+      img.onload = function(){
+        var c = document.createElement("canvas");
+        c.width = kalla.w; c.height = kalla.h;
+        c.getContext("2d").drawImage(img, 0, 0, kalla.w, kalla.h);
+        c.toBlob(function(b){ b ? res(b) : rej(new Error("tom bild")) }, "image/png");
+      };
+      img.onerror = function(){ rej(new Error("kunde inte rita bilden")) };
+      img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(kalla.text);
+    });
+  }
+
+  async function spara(fig, ext){
+    var kalla = svgKalla(fig);
+    var namn = fig.dataset.fil + "." + ext;
+    var data = ext === "svg" ? kalla.text : await pngBlob(kalla);
+    return DL.save({filename:namn, data:data});
+  }
+
+  /* Alla sjutton på en yta — en dialogruta, fortfarande vektor. */
+  function ettArkSvg(){
+    var figs = [].slice.call(document.querySelectorAll("[data-fil]"));
+    var KOL = 4, RUTA = 240, LUFT = 28, TEXT = 26;
+    var rader = Math.ceil(figs.length / KOL);
+    var B = KOL * RUTA + (KOL + 1) * LUFT;
+    var H = rader * (RUTA + TEXT) + (rader + 1) * LUFT + 46;
+    var ut = '<svg xmlns="http://www.w3.org/2000/svg" width="' + B + '" height="' + H
+      + '" viewBox="0 0 ' + B + ' ' + H + '">'
+      + '<rect width="' + B + '" height="' + H + '" fill="#8E9084"/>'
+      + '<text x="' + LUFT + '" y="32" font-family="Montserrat,Helvetica,sans-serif" '
+      + 'font-size="15" font-weight="600" letter-spacing="2.6" fill="#141416">'
+      + 'VIEWLY \u00b7 M\u00c4RKET I F\u00c4RG</text>';
+    figs.forEach(function(f, i){
+      var kx = i % KOL, ky = Math.floor(i / KOL);
+      var x = LUFT + kx * (RUTA + LUFT), y = 46 + LUFT + ky * (RUTA + TEXT + LUFT);
+      var org = f.querySelector(".stor svg");
+      var vb = org.getAttribute("viewBox").split(/[ ,]+/);
+      var bb = parseFloat(vb[2]), hh = parseFloat(vb[3]);
+      /* Brickorna har ramen 100 × 100; de fria märkena har märkets egen
+         ram. Utan den här skillnaden ritas de fria dubbelt så stora som
+         märket i brickorna bredvid. Alla celler normaliseras därför till
+         RUTA × RUTA, och det fria märket får samma bredd som märket i en
+         bricka — 50 av 100. */
+      var bricka = Math.abs(bb - 100) < 0.01 && Math.abs(hh - 100) < 0.01;
+      var sk = bricka ? RUTA / bb : (RUTA * 0.5) / bb;
+      var ox = bricka ? 0 : (RUTA - bb * sk) / 2;
+      var oy = bricka ? 0 : (RUTA - hh * sk) / 2;
+      if(!bricka){
+        ut += '<rect x="' + x + '" y="' + y + '" width="' + RUTA + '" height="' + RUTA
+          + '" fill="none" stroke="#141416" stroke-opacity=".22" stroke-width="1"'
+          + ' stroke-dasharray="4 4"/>';
+      }
+      ut += '<g transform="translate(' + (x + ox).toFixed(2) + ' ' + (y + oy).toFixed(2)
+        + ') scale(' + sk.toFixed(6) + ')">' + org.innerHTML + '</g>'
+        + '<text x="' + x + '" y="' + (y + RUTA + 17)
+        + '" font-family="Montserrat,Helvetica,sans-serif" font-size="11" fill="#141416">'
+        + f.dataset.fil.replace("viewly-", "") + '</text>';
+    });
+    return ut + '</svg>';
+  }
+
+  function last(pa){
+    arbetar = pa;
+    alla.forEach(function(b){ b.disabled = pa });
+    document.querySelectorAll(".hamta button").forEach(function(b){ b.disabled = pa });
+  }
+
+  async function sparaAlla(ext){
+    var figs = [].slice.call(document.querySelectorAll("[data-fil]"));
+    avbryt = false; last(true);
+    var n = 0;
+    for(var i = 0; i < figs.length; i++){
+      if(avbryt) break;
+      saga("Sparar " + (i + 1) + " av " + figs.length + " — svara i dialogrutan");
+      try { await spara(figs[i], ext); n++; }
+      catch(e){
+        var kod = (e && e.code) || "unknown";
+        /* Nej på en fil betyder nej till resten — vi tjatar inte. */
+        saga(felText(kod) + " · " + n + " av " + figs.length + " sparade", true);
+        last(false); return;
+      }
+    }
+    saga(n + " av " + figs.length + " sparade");
+    last(false);
+  }
+
+  (async function(){
+    try { DL = window.claude && claude.use ? await claude.use("downloads") : null }
+    catch(e){ DL = null }
+    if(!DL) return;                       /* ingen nedladdning här — visa inga knappar */
+    document.querySelectorAll(".hamta").forEach(function(d){ d.hidden = false });
+    document.querySelector(".styr").classList.add("kan-hamta");
+
+    document.getElementById("allaPng").addEventListener("click", function(){ sparaAlla("png") });
+    document.getElementById("allaSvg").addEventListener("click", function(){ sparaAlla("svg") });
+    document.getElementById("ettArk").addEventListener("click", async function(){
+      last(true); saga("Sparar arket — svara i dialogrutan");
+      try {
+        await DL.save({filename:"viewly-market-i-farg.svg", data:ettArkSvg()});
+        saga("Arket sparat");
+      } catch(e){ saga(felText((e && e.code) || "unknown"), true) }
+      last(false);
+    });
+    document.addEventListener("click", async function(e){
+      var b = e.target.closest(".hamta button");
+      if(!b || arbetar) return;
+      var fig = b.closest("[data-fil]"), ext = b.dataset.ext;
+      last(true); saga("Sparar " + fig.dataset.fil + "." + ext);
+      try { await spara(fig, ext); saga(fig.dataset.fil + "." + ext + " sparad") }
+      catch(err){ saga(felText((err && err.code) || "unknown"), true) }
+      last(false);
+    });
+  })();
+})();
+
 /* Väggen bakom brickorna. Att kunna byta underlag är hela poängen med ett
    provark: en logotyp som ser bra ut på grått kan tappa fotfästet på vitt. */
 (function(){
