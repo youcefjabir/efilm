@@ -313,28 +313,4 @@ var HL = [
 
    {p:"cta", h:"Ett objekt.", s:"Hela marknadsföringen.", k:"15 — Ekosystemet"}
   ]},
-
- /* 16 — KAMPANJBYGGAREN. Kapitel 10 visar VAD en kampanj är; det här
-    visar hur den blir till. Fem steg, ett per bildruta, plus delningen
-    som egen ruta eftersom den är en egen sak. */
- {glyph:"steps", id:"byggaren", num:"16", name:"KAMPANJBYGGAREN", label:"Kampanjbyggaren",
-  cover:"kitchen",
-  q:"Hur gör jag en kampanj?", why:"Produkten är ett förlopp på fem steg. Visas det som en funktionslista försvinner det som säljer: att det är gjort på några minuter, ur material som redan finns.",
-  st:[
-   {p:"mark", m:"kitchen", k:"KAMPANJBYGGAREN", h:"Fem steg",
-    s:"från levererad order till publicerad kampanj."},
-   {p:"steps", step:0, k:"Steg 01 — Objekt", h:"Börja i en order som redan är klar.",
-    s:"Ordrarna ligger där med sitt material. Ingenting laddas upp, ingenting letas fram."},
-   {p:"steps", step:1, k:"Steg 02 — Mallar", h:"Välj de mallar kampanjen ska bestå av.",
-    s:"En eller flera. Tre är vanligast: Kommande, Till salu och Visning."},
-   {p:"steps", step:2, k:"Steg 03 — Bilder", h:"En bild per mall, ur ordern.",
-    s:"Mall för mall. Bilderna är redan levererade och redan beskurna för formaten."},
-   {p:"steps", step:3, k:"Steg 04 — Kontroll", h:"Se att uppgifterna stämmer.",
-    s:"Adress, mallar, bilder och format. Inget nytt att fylla i — bara att godkänna."},
-   {p:"steps", step:4, k:"Steg 05 — Klar", h:"Kampanjen är byggd.",
-    s:"Tre inlägg i tre format vardera, med objektets egna uppgifter i sig."},
-   {p:"share", k:"Dela och schemalägg", h:"Ut i kanalerna direkt härifrån.",
-    s:"Instagram och Facebook ligger anslutna. Publicera nu, eller lägg det på en tid som passar veckan."},
-   {p:"cta", h:"Bygg kampanjen", s:"viewly.se", k:"16 — Kampanjbyggaren"}
-  ]}
 ];
