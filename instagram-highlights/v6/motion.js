@@ -115,7 +115,10 @@ var MCAND = [
   rank:"Ett påstående som bara går att bevisa genom att visa bytet."},
  {id:"tredim", num:"07", n:"3D — plan till volym", ref:["visning",2], prim:"product",
   claim:"Dollhouse och planritning.",
-  rank:"Rumslig förståelse är det enda som genuint kräver rörelse."}
+  rank:"Rumslig förståelse är det enda som genuint kräver rörelse."},
+ {id:"bygg", num:"08", n:"Kampanjbyggaren", ref:["byggaren",1], prim:"steps",
+  claim:"Fem steg från order till publicerad kampanj.",
+  rank:"Det starkaste skälet i biblioteket att göra rörligt alls. Produkten ÄR ett förlopp: en stillbild kan bara visa ett steg av fem, och blir då en skärmdump."}
 ];
 
 /* =====================================================================
@@ -138,6 +141,29 @@ var MDIRS = [
 
 /* ---------- storyboards ---------- */
 var MSTORY = {
+ bygg:{
+  stillhet:[["0,0 s","Ett fotografi ur ordern i 84 × 63 cqw. Under det STEG 01 AV 05 spärrat, rubriken Välj objekt i Cormorant och en rad om vad steget gör. Inget gränssnitt alls."],
+   ["1,5 s","Bilden byts maskerat från vänster och räkningen går till STEG 02. Rubriken byts med samma mask, så bytet läses som ETT skifte."],
+   ["4,5 s","STEG 04 — Kontrollera. Fyra rader att godkänna, sagt i en mening i stället för ritat."],
+   ["7,5 s","KLAR — Dela eller schemalägg. Sista takten, och första gången kanalerna nämns."],
+   ["9,0 s","Slutbild med märket."]],
+  editorial:[["0,0 s","Skenan med de fem stegen ligger överst och står still hela klippet. Under den rubriken Välj objekt stort, och panelen med de tre ordrarna."],
+   ["1,5 s","Panelen byts maskerat till mallarna. Skenan flyttar sin markering ett steg. Att skenan INTE rör sig är hela poängen — det är den som gör förloppet läsbart."],
+   ["3,0 s","Steg 03: mallen överst, orderns bilder som remsa under, en markerad."],
+   ["4,5 s","Steg 04: kvittensen, fyra rader."],
+   ["6,0 s","Steg 05: tre färdiga inlägg."],
+   ["7,5 s","Dela och schemalägg. Kanalerna ligger anslutna, valet står mellan nu och tisdag 08:00."],
+   ["9,0 s","Slutbild."]],
+  system:[["0,0 s","Rubrik: Fem steg, och ett till. Under den sex rader uppradade, alla släckta utom den första."],
+   ["1,5 s","02 Välj mallar tänds. Alla sex syns hela tiden — det säger hur många steg det är och att det tar slut, vilket en stillbild inte kan."],
+   ["4,5 s","04 Kontrollera."],
+   ["7,5 s","Sista raden har en pil i stället för en siffra: delningen är inte ett sjätte steg utan vad som händer efteråt."],
+   ["9,0 s","Slutbild med alla sex tända."]],
+  object:[["0,0 s","Tre tomma inläggsytor i 4:5 överst, orderns fem bilder som remsa under. Ingen skena, inga kryssrutor — materialet leder."],
+   ["1,5 s","Bilderna i remsan markeras en i taget, tre av fem."],
+   ["4,5 s","De tre inläggen fylls, ett i taget, med bilderna som markerats."],
+   ["7,5 s","Först nu syns gränssnitt: kanalerna tonas in under. Delningen hör till efter att kampanjen finns."],
+   ["9,0 s","Slutbild."]]},
  annons:{
   stillhet:[["0,0 s","Ett fotografi i passepartout, 84 × 100 cqw. Under det ANNONSEN spärrat och rubriken verktyget skrev — den hämtas ur objektet, inte ur koden. Märket uppe till vänster. Ingenting mer."],
    ["0,0–8,0 s","Bilden zoomar in 5,5 % linjärt över hela klippet. Ingen ease — ease läses som webbanimation. Texten står helt still hela vägen."],

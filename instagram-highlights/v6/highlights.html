@@ -1085,6 +1085,9 @@ var PICTO = {
              +'<circle cx="62" cy="42" r="5.5" fill="'+P.t3+'"/>' },
 
   /* 3D: kuben. Tre ytor, tre toner — det är hela poängen med volym. */
+  steps:   function(P){ return '<rect x="24" y="60" width="16" height="16" fill="'+P.t1+'"/>'
+             +'<rect x="42" y="42" width="16" height="16" fill="'+P.t2+'"/>'
+             +'<rect x="60" y="24" width="16" height="16" fill="'+P.t3+'"/>' },
   cube:    function(P){ return '<path d="M50 22 L78 38 L50 54 L22 38 Z" fill="'+P.t1+'"/>'
              +'<path d="M22 38 L50 54 V78 L22 62 Z" fill="'+P.t2+'"/>'
              +'<path d="M78 38 L50 54 V78 L78 62 Z" fill="'+P.t3+'"/>' },
@@ -1187,6 +1190,8 @@ var LINE = {
   aperture:function(P){ return ln2("M20 28 H80 V72 H20 Z", P.t2)
              +ln2("M20 64 L38 46 L50 58 L60 50 L80 66", P.t2)
              +'<circle cx="64" cy="40" r="6" fill="'+P.t3+'"/>' },
+  steps:   function(P){ return ln2("M20 76 H38 V58 H56 V40 H74 V22", P.t2)
+             +'<circle cx="74" cy="22" r="5" fill="'+P.t3+'"/>' },
   cube:    function(P){ return ln2("M50 18 L82 36 V64 L50 82 L18 64 V36 Z", P.t2)
              +ln2("M18 36 L50 54 L82 36 M50 54 V82", P.t2)
              +'<circle cx="50" cy="54" r="5" fill="'+P.t3+'"/>' },
@@ -1248,6 +1253,7 @@ var LINE = {
 
 /* Namn och beskrivning till väljaren och dokumentationen. */
 var GLYPHS = {
+  steps:{n:"Trappan", d:"Ett förlopp i fem steg"},
   vmark:{n:"V-märket", d:"Logotypen"},        aperture:{n:"Kortet", d:"Ett foto med landskap"},
   cube:{n:"Kuben", d:"Volym i tre ytor"},     halves:{n:"Fåtöljen", d:"Möblerat rum"},
   sun:{n:"Solen", d:"Sol över horisont"},     drone:{n:"Drönaren", d:"Kvadkopter med lins"},
@@ -1345,6 +1351,15 @@ var SIGN = {
      +'<rect x="43" y="43" width="14" height="14" rx="3.4"/>'
      +'<circle cx="38.6" cy="38.6" r="4.7"/><circle cx="61.4" cy="38.6" r="4.7"/>'
      +'<circle cx="38.6" cy="61.4" r="4.7"/><circle cx="61.4" cy="61.4" r="4.7"/></g>';
+  },
+  /* Kampanjbyggaren — trappan. Fem steg som stiger; tre block räcker
+     för att formen ska läsas som ett förlopp och inte som en graf.
+     Ritad i samma ruta som de andra: 32 av 100, mitt i 50/50. */
+  steps: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="34" y="56" width="10" height="10"/>'
+     +'<rect x="45" y="45" width="10" height="10"/>'
+     +'<rect x="56" y="34" width="10" height="10"/></g>';
   },
   /* Områdeskarta — nålen */
   map: function(P){
@@ -2248,6 +2263,305 @@ function post(dirId, p, ar){
   var set = dirId==="skugga" ? PB : PA;
   return (set[p.phase] || set.tillsalu)(p, ar||"4:5");
 }
+
+
+/* --------------------------------------------------------------------
+   KAMPANJBYGGAREN — data
+
+   Fem steg, och varje steg har en egen sak att välja. Datan nedan är
+   den som stegen plockar ur: färdiga ordrar med levererat material,
+   mallarna som redan finns i POSTS, och de kanaler kampanjen kan gå ut
+   i. Ingenting här kopplar mot något — det är ritat, inte anslutet.
+   -------------------------------------------------------------------- */
+var ORDERS = [
+  {id:"o1", addr:"Silvergården 9A", city:"Landskrona", n:42, when:"Levererad 12 mars",
+   ims:["hero","kitchen","living","dining"]},
+  {id:"o2", addr:"Kastanjevägen 12", city:"Lund",      n:28, when:"Levererad 8 mars",
+   ims:["dining2","boucle","eames"]},
+  {id:"o3", addr:"Strandgatan 4B",  city:"Malmö",      n:35, when:"Levererad 2 mars",
+   ims:["living","drone","hero"]}
+];
+/* mallarna är POSTS — samma fyra som kampanjkapitlet, inget nytt påhitt */
+var BMALL = [
+  {id:"kommande", n:"Kommande",  d:"Släpps snart", m:"hero"},
+  {id:"tillsalu", n:"Till salu", d:"Med fakta",    m:"kitchen"},
+  {id:"visning",  n:"Visning",   d:"Tid och plats",m:"living"},
+  {id:"sald",     n:"Såld",      d:"Efteråt",      m:"drone"}
+];
+var BKANAL = [
+  {id:"ig", n:"Instagram", h:"@viewly.se",       d:"Inlägg och story"},
+  {id:"fb", n:"Facebook",  h:"Viewly",           d:"Sida och grupp"}
+];
+/* de fem stegen, i ordning */
+var BSTEG = [
+  {n:"Objekt",  d:"Välj ur en levererad order"},
+  {n:"Mallar",  d:"Välj en eller flera"},
+  {n:"Bilder",  d:"En bild per mall"},
+  {n:"Kontroll",d:"Stämmer uppgifterna?"},
+  {n:"Klar",    d:"Dela eller schemalägg"}
+];
+
+
+/* =====================================================================
+   STEPS — kampanjbyggaren som primitiv
+
+   Ett flöde är svårt att visa i en stillbild: man ser vad som finns,
+   inte vad som händer. Lösningen här är att varje bildruta visar ETT
+   steg, och att alla fem stegen alltid finns kvar i en skena överst.
+   Läsaren ser hela vägen och var i den man står — samma sak en riktig
+   guide gör.
+
+   Skenan är inte dekoration. Den bär tre uppgifter: hur många steg det
+   är, vilket som är aktuellt, och vilka som redan är gjorda. Det är
+   därför den ritas som fyllda, aktuella och tomma rutor i stället för
+   som en rad prickar.
+   ===================================================================== */
+
+/* --- skenan: fem rutor, klara fyllda, aktuell inramad --- */
+function bRail(cur, dark){
+  var line = dark ? "#33332F" : "#D8D2CF";
+  var oli  = dark ? "#98A088" : "#6E7266";
+  var ink  = dark ? "#EFEDE7" : "#1C1C1E";
+  var mut  = dark ? "#6E6C66" : "#A9A29E";
+  return '<div style="display:flex;gap:1.2cqw;align-items:stretch">'
+   + BSTEG.map(function(x, j){
+       var gjort = j < cur, nu = j === cur;
+       return '<div style="flex:1;display:flex;flex-direction:column;gap:1.1cqw">'
+        +'<span style="display:block;height:.55cqw;background:'
+          +(gjort ? oli : nu ? oli : line)+';opacity:'+(gjort ? .5 : nu ? 1 : 1)+'"></span>'
+        +'<span style="font-family:Montserrat,sans-serif;font-size:1.7cqw;font-weight:'
+          +(nu ? 600 : 500)+';letter-spacing:.14em;text-transform:uppercase;color:'
+          +(nu ? ink : gjort ? oli : mut)+'">'+String(j+1).padStart(2,"0")+'</span>'
+        +'<span style="font-family:Montserrat,sans-serif;font-size:1.75cqw;line-height:1.25;color:'
+          +(nu ? ink : mut)+'">'+esc(x.n)+'</span>'
+        +'</div>';
+     }).join("")
+   +'</div>';
+}
+
+/* --- en liten bildruta med ram --- */
+function bThumb(k, w, h, dark, extra){
+  return '<div style="width:'+w+'cqw;height:'+h+'cqw;border:1px solid '
+   +(dark?"#33332F":"#D8D2CF")+';overflow:hidden;position:relative;flex:0 0 auto;'+(extra||'')+'">'
+   +'<div style="position:absolute;inset:0;'+bg(k)+'"></div></div>';
+}
+/* --- bocken: en fylld ruta med ett vitt kryss ur --- */
+function bTick(on, dark, s){
+  var d = s || 3.2, oli = dark ? "#98A088" : "#6E7266";
+  return '<span style="width:'+d+'cqw;height:'+d+'cqw;flex:0 0 '+d+'cqw;display:block;'
+   +'border:1px solid '+(on ? oli : (dark?"#3A3A34":"#C9C2BE"))+';background:'+(on?oli:"transparent")+';'
+   +'position:relative">'
+   + (on ? '<svg viewBox="0 0 24 24" style="position:absolute;inset:0;width:100%;height:100%">'
+         +'<path d="M6 12.4 L10.2 16.6 L18 8.8" fill="none" stroke="'+(dark?"#0E0E0D":"#F2EFEF")
+         +'" stroke-width="2.6" stroke-linecap="square"/></svg>' : '')
+   +'</span>';
+}
+/* --- radetikett i versal grotesk --- */
+function bLab(t, dark, col){
+  return '<div style="font-family:Montserrat,sans-serif;font-size:1.85cqw;font-weight:600;'
+   +'letter-spacing:.2em;text-transform:uppercase;color:'
+   +(col || (dark?"#98A088":"#6E7266"))+'">'+esc(t)+'</div>';
+}
+
+/* ---------- stegens innehåll ----------
+   Varje steg ritar exakt den valsituation det handlar om. Inga
+   påhittade kontroller: en lista att välja ur, kryssrutor, en remsa
+   bilder, en kvittens, ett resultat. */
+function bBody(s, dark){
+  var line = dark ? "#33332F" : "#D8D2CF";
+  var pl   = dark ? "#141416" : "#FFFFFF";
+  var ink  = dark ? "#EFEDE7" : "#1C1C1E";
+  var mut  = dark ? "#8E8C86" : "#7A736F";
+  var oli  = dark ? "#98A088" : "#6E7266";
+  var kort = function(inner, pad){
+    return '<div style="background:'+pl+';border:1px solid '+line+';padding:'+(pad||3)+'cqw">'+inner+'</div>';
+  };
+  var st = s.step;
+
+  /* 01 — ORDERN. En lista med levererade ordrar, den valda markerad.
+     Bilderna följer med i raden: det är materialet man bygger av. */
+  if(st === 0){
+    return kort(ORDERS.map(function(o, j){
+      var vald = j === 0;
+      return '<div style="display:flex;align-items:center;gap:2.4cqw;padding:2.2cqw 0'
+       +(j ? ';border-top:1px solid '+line : '')+';opacity:'+(vald?1:.42)+'">'
+       + bTick(vald, dark)
+       +'<span style="flex:1;min-width:0">'
+         +'<span style="display:block;font-family:\'Cormorant Garamond\',Georgia,serif;font-weight:300;'
+         +'font-size:4.4cqw;line-height:1.05;color:'+ink+'">'+esc(o.addr)+'</span>'
+         +'<span style="display:block;font-family:Montserrat,sans-serif;font-size:2cqw;'
+         +'letter-spacing:.06em;color:'+mut+';margin-top:.7cqw">'+esc(o.city)+' · '+o.n+' bilder · '
+         + esc(o.when)+'</span></span>'
+       +'<span style="display:flex;gap:.9cqw">'
+         + o.ims.slice(0,3).map(function(k){ return bThumb(k, 7.4, 7.4, dark) }).join("")
+       +'</span></div>';
+    }).join(""));
+  }
+
+  /* 02 — MALLARNA. Fyra kort, tre valda. Att flera går att välja är
+     hela poängen, så det ska synas att det är kryss och inte radio. */
+  if(st === 1){
+    var valda = [0,1,2];
+    return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:2.2cqw">'
+     + BMALL.map(function(m, j){
+        var on = valda.indexOf(j) >= 0;
+        return '<div style="background:'+pl+';border:1px solid '+(on?oli:line)+';padding:2.2cqw;'
+         +'display:flex;flex-direction:column;gap:1.8cqw;opacity:'+(on?1:.45)+'">'
+         +'<div style="display:flex;align-items:center;gap:1.6cqw">'+bTick(on, dark, 2.8)
+           +'<span style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:600;'
+           +'letter-spacing:.16em;text-transform:uppercase;color:'+ink+'">'+esc(m.n)+'</span></div>'
+         + bThumb(m.m, 0, 22, dark, "width:100%")
+         +'<span style="font-family:Montserrat,sans-serif;font-size:1.9cqw;color:'+mut+'">'+esc(m.d)+'</span>'
+         +'</div>';
+       }).join("")
+     +'</div>';
+  }
+
+  /* 03 — BILDEN. En mall åt gången, med orderns bilder som remsa under.
+     Räknaren säger var i serien man är: mall 2 av 3. */
+  if(st === 2){
+    var o = ORDERS[0];
+    return kort(
+      '<div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:2.2cqw">'
+      + bLab("Till salu", dark)
+      +'<span style="font-family:Montserrat,sans-serif;font-size:1.9cqw;color:'+mut+'">mall 2 av 3</span></div>'
+      + bThumb("kitchen", 0, 34, dark, "width:100%")
+      +'<div style="height:1px;background:'+line+';margin:2.6cqw 0"></div>'
+      + bLab("Ur ordern · "+o.n+" bilder", dark, mut)
+      +'<div style="display:flex;gap:1.2cqw;margin-top:1.8cqw">'
+      + ["kitchen","hero","living","dining","boucle"].map(function(k, j){
+          return bThumb(k, 13.4, 13.4, dark,
+            j === 0 ? "outline:2px solid "+oli+";outline-offset:1px" : "opacity:.5");
+        }).join("")
+      +'</div>');
+  }
+
+  /* 04 — KONTROLLEN. Ingen ny information, bara det man redan valt,
+     uppradat. Det är vad ett bekräftelsesteg ÄR. */
+  if(st === 3){
+    var rad = function(lab, val, sub){
+      return '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:3cqw;'
+       +'padding:2.1cqw 0;border-bottom:1px solid '+line+'">'
+       +'<span style="font-family:Montserrat,sans-serif;font-size:1.9cqw;font-weight:500;'
+       +'letter-spacing:.16em;text-transform:uppercase;color:'+mut+';flex:0 0 auto">'+esc(lab)+'</span>'
+       +'<span style="text-align:right"><span style="display:block;font-family:Montserrat,sans-serif;'
+       +'font-size:2.5cqw;color:'+ink+'">'+esc(val)+'</span>'
+       + (sub ? '<span style="display:block;font-family:Montserrat,sans-serif;font-size:1.85cqw;'
+         +'color:'+mut+';margin-top:.5cqw">'+esc(sub)+'</span>' : '')
+       +'</span></div>';
+    };
+    return kort(rad("Objekt", ORDERS[0].addr, ORDERS[0].city)
+      + rad("Mallar", "Tre", "Kommande · Till salu · Visning")
+      + rad("Bilder", "Tre valda", "en per mall")
+      + rad("Format", "4:5 · 1:1 · 9:16", "alla tre exporteras")
+      +'<div style="display:flex;align-items:center;gap:2cqw;padding-top:2.6cqw">'
+      + bTick(true, dark, 2.8)
+      +'<span style="font-family:Montserrat,sans-serif;font-size:2.1cqw;color:'+ink+'">'
+      +'Uppgifterna stämmer</span></div>');
+  }
+
+  /* 05 — KLAR. Resultatet, och först nu kanalerna. Delningen hör till
+     slutet av flödet och ingen annanstans. */
+  var klar = '<div style="display:flex;gap:1.8cqw;margin-bottom:2.8cqw">'
+    + ["hero","kitchen","living"].map(function(k){
+        return bThumb(k, 0, 27, dark, "flex:1");
+      }).join("")
+    +'</div>';
+  return kort(klar
+    +'<div style="height:1px;background:'+line+';margin-bottom:2.4cqw"></div>'
+    + bLab("Anslutna kanaler", dark, mut)
+    +'<div style="display:flex;gap:2.4cqw;margin-top:1.8cqw">'
+    + BKANAL.map(function(c){
+        return '<span style="display:flex;align-items:center;gap:1.4cqw;flex:1">'
+         + bTick(true, dark, 2.6)
+         +'<span><span style="display:block;font-family:Montserrat,sans-serif;font-size:2.15cqw;'
+         +'color:'+ink+'">'+esc(c.n)+'</span>'
+         +'<span style="display:block;font-family:Montserrat,sans-serif;font-size:1.8cqw;color:'+mut+'">'
+         + esc(c.h)+'</span></span></span>';
+      }).join("")
+    +'</div>');
+}
+
+/* ---------- STEPS i arkiv ---------- */
+A.steps = function(s,i,n){
+  return A.chrome(s.k, i, n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4cqw;padding:2cqw 0">'
+   + bRail(s.step, false)
+   +'<div>'
+     +'<div class="a-d sm" style="'+dsize(s.h, 7.6, SERIF)+'">'+esc(s.h)+'</div>'
+     + (s.s ? '<div class="a-l" style="font-size:2.5cqw;margin-top:1.8cqw;max-width:92%">'+esc(s.s)+'</div>' : '')
+   +'</div>'
+   + bBody(s, false)
+   +'</div>');
+};
+/* ---------- STEPS i skugga ---------- */
+B.steps = function(s,i,n){
+  return B.shell(B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+9)+'cqw">'+bRail(s.step, true)+'</div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+22)+'cqw">'
+     +'<div class="b-d" style="'+dsize(s.h, 7.2, SERIF)+'">'+esc(s.h)+'</div>'
+     + (s.s ? '<div class="b-l" style="font-size:2.4cqw;margin-top:1.8cqw;max-width:92%">'+esc(s.s)+'</div>' : '')
+   +'</div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+42)+'cqw">'+bBody(s, true)+'</div>'
+   + B.foot(i,n));
+};
+
+/* =====================================================================
+   SHARE — dela och schemalägg
+
+   Egen bildruta, för det är en egen sak. Fem steg bygger kampanjen;
+   det här är vad som händer efteråt. Två kanaler, ett val mellan nu
+   och senare, och en tidsangivelse. Ingenting mer — en schemaläggare
+   som visar en hel kalender skulle säga mindre, inte mer.
+   ===================================================================== */
+function bShare(dark){
+  var line = dark ? "#33332F" : "#D8D2CF";
+  var pl   = dark ? "#141416" : "#FFFFFF";
+  var ink  = dark ? "#EFEDE7" : "#1C1C1E";
+  var mut  = dark ? "#8E8C86" : "#7A736F";
+  var oli  = dark ? "#98A088" : "#6E7266";
+  var val = function(t, d, on){
+    return '<div style="flex:1;border:1px solid '+(on?oli:line)+';background:'+(on?(dark?"#1A1E18":"#F4F2ED"):"transparent")
+     +';padding:2.4cqw;display:flex;flex-direction:column;gap:1.2cqw;opacity:'+(on?1:.5)+'">'
+     +'<div style="display:flex;align-items:center;gap:1.4cqw">'+bTick(on, dark, 2.6)
+       +'<span style="font-family:Montserrat,sans-serif;font-size:2.2cqw;font-weight:600;'
+       +'letter-spacing:.14em;text-transform:uppercase;color:'+ink+'">'+esc(t)+'</span></div>'
+     +'<span style="font-family:Montserrat,sans-serif;font-size:1.9cqw;color:'+mut+'">'+esc(d)+'</span></div>';
+  };
+  return '<div style="background:'+pl+';border:1px solid '+line+';padding:3cqw">'
+   + BKANAL.map(function(c, j){
+       return '<div style="display:flex;align-items:center;gap:2.2cqw;padding:2.2cqw 0'
+        +(j ? ';border-top:1px solid '+line : '')+'">'
+        + bTick(true, dark)
+        +'<span style="flex:1"><span style="display:block;font-family:Montserrat,sans-serif;'
+        +'font-size:2.6cqw;color:'+ink+'">'+esc(c.n)+'</span>'
+        +'<span style="display:block;font-family:Montserrat,sans-serif;font-size:1.9cqw;color:'+mut+'">'
+        + esc(c.h)+' · '+esc(c.d)+'</span></span>'
+        +'<span style="font-family:Montserrat,sans-serif;font-size:1.8cqw;letter-spacing:.16em;'
+        +'text-transform:uppercase;color:'+oli+'">Ansluten</span></div>';
+     }).join("")
+   +'<div style="height:1px;background:'+line+';margin:2.4cqw 0"></div>'
+   +'<div style="display:flex;gap:2cqw">'+ val("Publicera nu","Går ut direkt", false)
+   + val("Schemalägg","Tisdag 08:00", true) +'</div></div>';
+}
+A.share = function(s,i,n){
+  return A.chrome(s.k, i, n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.4cqw;padding:2cqw 0">'
+   +'<div><div class="a-d sm" style="'+dsize(s.h, 8.2, SERIF)+'">'+esc(s.h)+'</div>'
+   + (s.s ? '<div class="a-l" style="font-size:2.5cqw;margin-top:1.8cqw;max-width:92%">'+esc(s.s)+'</div>' : '')
+   +'</div>'
+   + bShare(false)
+   +'</div>');
+};
+B.share = function(s,i,n){
+  return B.shell(B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+10)+'cqw">'
+     +'<div class="b-d" style="'+dsize(s.h, 7.8, SERIF)+'">'+esc(s.h)+'</div>'
+     + (s.s ? '<div class="b-l" style="font-size:2.4cqw;margin-top:1.8cqw;max-width:92%">'+esc(s.s)+'</div>' : '')
+   +'</div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+34)+'cqw">'+bShare(true)+'</div>'
+   + B.foot(i,n));
+};
 
 /* =====================================================================
    MOTION — tidsfunktioner
@@ -3585,11 +3899,13 @@ function mpost(id){
    --------------------------------------------------------------------- */
 var MSID = {
   "annonsen-2":"annons", "motion-2":"motion", "estyling-2":"estyl",
-  "kampanjen-3":"kampanj", "kampanjen-2":"format", "visning-3":"white", "visning-2":"tredim"
+  "kampanjen-3":"kampanj", "kampanjen-2":"format", "visning-3":"white", "visning-2":"tredim",
+  "byggaren-1":"bygg"
 };
 var MPICK = {};            /* sid -> "editorial" | "system" | "object" */
 var MOTION_T = 0;          /* nuvarande position 0–1, satt av spelaren/exporten */
-var MDUR = {annons:7.8, motion:6.4, estyl:6.2, kampanj:8.4, format:6.6, white:6.6, tredim:6.6};
+var MDUR = {annons:7.8, motion:6.4, estyl:6.2, kampanj:8.4, format:6.6, white:6.6, tredim:6.6,
+            bygg:9.0};
 /* Stillhet håller samma längd oavsett kandidat — lugnet är poängen, och
    en inzoomning på 5,5 % behöver tid för att läsas som rörelse alls. */
 var MDURX = {stillhet:8.0, kampanj_stillhet:9.6};
@@ -4264,6 +4580,30 @@ var HL = [
     s:"Tre led som brukar ligga hos tre leverantörer. Här är de ett."},
 
    {p:"cta", h:"Ett objekt.", s:"Hela marknadsföringen.", k:"15 — Ekosystemet"}
+  ]},
+
+ /* 16 — KAMPANJBYGGAREN. Kapitel 10 visar VAD en kampanj är; det här
+    visar hur den blir till. Fem steg, ett per bildruta, plus delningen
+    som egen ruta eftersom den är en egen sak. */
+ {glyph:"steps", id:"byggaren", num:"16", name:"KAMPANJBYGGAREN", label:"Kampanjbyggaren",
+  cover:"kitchen",
+  q:"Hur gör jag en kampanj?", why:"Produkten är ett förlopp på fem steg. Visas det som en funktionslista försvinner det som säljer: att det är gjort på några minuter, ur material som redan finns.",
+  st:[
+   {p:"mark", m:"kitchen", k:"KAMPANJBYGGAREN", h:"Fem steg",
+    s:"från levererad order till publicerad kampanj."},
+   {p:"steps", step:0, k:"Steg 01 — Objekt", h:"Börja i en order som redan är klar.",
+    s:"Ordrarna ligger där med sitt material. Ingenting laddas upp, ingenting letas fram."},
+   {p:"steps", step:1, k:"Steg 02 — Mallar", h:"Välj de mallar kampanjen ska bestå av.",
+    s:"En eller flera. Tre är vanligast: Kommande, Till salu och Visning."},
+   {p:"steps", step:2, k:"Steg 03 — Bilder", h:"En bild per mall, ur ordern.",
+    s:"Mall för mall. Bilderna är redan levererade och redan beskurna för formaten."},
+   {p:"steps", step:3, k:"Steg 04 — Kontroll", h:"Se att uppgifterna stämmer.",
+    s:"Adress, mallar, bilder och format. Inget nytt att fylla i — bara att godkänna."},
+   {p:"steps", step:4, k:"Steg 05 — Klar", h:"Kampanjen är byggd.",
+    s:"Tre inlägg i tre format vardera, med objektets egna uppgifter i sig."},
+   {p:"share", k:"Dela och schemalägg", h:"Ut i kanalerna direkt härifrån.",
+    s:"Instagram och Facebook ligger anslutna. Publicera nu, eller lägg det på en tid som passar veckan."},
+   {p:"cta", h:"Bygg kampanjen", s:"viewly.se", k:"16 — Kampanjbyggaren"}
   ]}
 ];
 /* =====================================================================
@@ -4802,7 +5142,68 @@ ALTS = {
 "ekosystem-7":[
  {p:"quiet", k:"15 — Ekosystemet", h:"Ett objekt.", em:"Hela marknadsföringen.",
   s:"Se hela flödet på viewly.se"},
- {p:"cta", h:"Vill du se hur det fungerar?", s:"Ansök om mäklarkonto", k:"15 — Ekosystemet"}]
+ {p:"cta", h:"Vill du se hur det fungerar?", s:"Ansök om mäklarkonto", k:"15 — Ekosystemet"}],
+
+/* ---------- 16 KAMPANJBYGGAREN ----------
+   Tre ingångar till samma förlopp, och skillnaden är principiell:
+
+     A  gränssnittet syns. Steget ritas som det ser ut.
+     B  materialet leder. Samma steg sagt med bostaden i bild och
+        gränssnittet bara antytt — för konton där en skärmbild känns
+        teknisk i flödet.
+     C  en mening. Kortast möjliga sätt att säga vad steget gör.
+
+   Det gör valet till något annat än smaksak: A säljer verktyget, B
+   säljer resultatet, C fungerar när rutan bara ska passera förbi. */
+"byggaren-0":[
+ {p:"editorial", m:"hero", k:"Kampanjbyggaren", h:"Kampanjen byggs på fem steg.",
+  s:"Ur en order som redan är levererad — ingen ny fotografering, ingen ny text."},
+ {p:"quiet", k:"16 — Kampanjbyggaren", h:"Materialet finns redan.", em:"Det som saknas är kampanjen.",
+  s:"Fem steg, några minuter."}],
+
+"byggaren-1":[
+ {p:"editorial", m:"kitchen", k:"Steg 01 — Objekt", h:"Ordern är utgångspunkten.",
+  s:"Varje levererad order ligger kvar med sina bilder. Kampanjen börjar i en av dem."},
+ {p:"quiet", k:"Steg 01 — Objekt", h:"Välj objekt.", em:"Ur en order som redan är klar.",
+  s:"Silvergården 9A · 42 bilder"}],
+
+"byggaren-2":[
+ {p:"system", k:"Steg 02 — Mallar", h:"Välj vad kampanjen ska bestå av.",
+  s:"En eller flera. De fyra mallarna följer objektets vecka, och de går att kombinera fritt.",
+  items:["Kommande — släpps snart","Till salu — med fakta","Visning — tid och plats","Såld — efteråt"]},
+ {p:"quiet", k:"Steg 02 — Mallar", h:"Tre mallar.", em:"Eller en. Eller alla fyra.",
+  s:"Kommande · Till salu · Visning · Såld"}],
+
+"byggaren-3":[
+ {p:"split", m:["kitchen","living"], la:"Ur ordern", lb:"Vald för mallen",
+  k:"Steg 03 — Bilder", h:"En bild per mall."},
+ {p:"quiet", k:"Steg 03 — Bilder", h:"En bild per mall.", em:"Ur ordern, inte ur en mapp.",
+  s:"Mall för mall, tills alla har en."}],
+
+"byggaren-4":[
+ {p:"system", k:"Steg 04 — Kontroll", h:"Fyra rader att godkänna.",
+  s:"Inget nytt att fylla i. Allt kommer från ordern och från valen i steg 01 till 03.",
+  items:["Objekt — Silvergården 9A","Mallar — tre valda","Bilder — en per mall","Format — 4:5, 1:1 och 9:16"]},
+ {p:"quiet", k:"Steg 04 — Kontroll", h:"Stämmer det?", em:"Då är kampanjen klar.",
+  s:"Ingenting fylls i på nytt."}],
+
+"byggaren-5":[
+ {p:"editorial", m:"living", k:"Steg 05 — Klar", h:"Tre inlägg, nio filer.",
+  s:"Varje mall exporteras i 4:5, 1:1 och 9:16 med objektets egna uppgifter i sig."},
+ {p:"quiet", k:"Steg 05 — Klar", h:"Kampanjen är byggd.", em:"Några minuter, inte en eftermiddag.",
+  s:"Tre mallar i tre format."}],
+
+"byggaren-6":[
+ {p:"system", k:"Dela och schemalägg", h:"Ut i kanalerna härifrån.",
+  s:"Kontot ligger anslutet i studion. Kampanjen behöver inte gå omvägen via skrivbordet.",
+  items:["Instagram — inlägg och story","Facebook — sida och grupp","Publicera nu","Schemalägg — tisdag 08:00"]},
+ {p:"quiet", k:"Dela och schemalägg", h:"Publicera nu.", em:"Eller tisdag 08:00.",
+  s:"Instagram och Facebook, direkt ur studion."}],
+
+"byggaren-7":[
+ {p:"mark", m:"kitchen", k:"KAMPANJBYGGAREN", h:"Fem steg", s:"Bygg kampanjen på viewly.se"},
+ {p:"quiet", k:"16 — Kampanjbyggaren", h:"Bygg kampanjen.", em:"Materialet har du redan.",
+  s:"viewly.se"}],
 };
 
 
@@ -7120,7 +7521,10 @@ var MCAND = [
   rank:"Ett påstående som bara går att bevisa genom att visa bytet."},
  {id:"tredim", num:"07", n:"3D — plan till volym", ref:["visning",2], prim:"product",
   claim:"Dollhouse och planritning.",
-  rank:"Rumslig förståelse är det enda som genuint kräver rörelse."}
+  rank:"Rumslig förståelse är det enda som genuint kräver rörelse."},
+ {id:"bygg", num:"08", n:"Kampanjbyggaren", ref:["byggaren",1], prim:"steps",
+  claim:"Fem steg från order till publicerad kampanj.",
+  rank:"Det starkaste skälet i biblioteket att göra rörligt alls. Produkten ÄR ett förlopp: en stillbild kan bara visa ett steg av fem, och blir då en skärmdump."}
 ];
 
 /* =====================================================================
@@ -7143,6 +7547,29 @@ var MDIRS = [
 
 /* ---------- storyboards ---------- */
 var MSTORY = {
+ bygg:{
+  stillhet:[["0,0 s","Ett fotografi ur ordern i 84 × 63 cqw. Under det STEG 01 AV 05 spärrat, rubriken Välj objekt i Cormorant och en rad om vad steget gör. Inget gränssnitt alls."],
+   ["1,5 s","Bilden byts maskerat från vänster och räkningen går till STEG 02. Rubriken byts med samma mask, så bytet läses som ETT skifte."],
+   ["4,5 s","STEG 04 — Kontrollera. Fyra rader att godkänna, sagt i en mening i stället för ritat."],
+   ["7,5 s","KLAR — Dela eller schemalägg. Sista takten, och första gången kanalerna nämns."],
+   ["9,0 s","Slutbild med märket."]],
+  editorial:[["0,0 s","Skenan med de fem stegen ligger överst och står still hela klippet. Under den rubriken Välj objekt stort, och panelen med de tre ordrarna."],
+   ["1,5 s","Panelen byts maskerat till mallarna. Skenan flyttar sin markering ett steg. Att skenan INTE rör sig är hela poängen — det är den som gör förloppet läsbart."],
+   ["3,0 s","Steg 03: mallen överst, orderns bilder som remsa under, en markerad."],
+   ["4,5 s","Steg 04: kvittensen, fyra rader."],
+   ["6,0 s","Steg 05: tre färdiga inlägg."],
+   ["7,5 s","Dela och schemalägg. Kanalerna ligger anslutna, valet står mellan nu och tisdag 08:00."],
+   ["9,0 s","Slutbild."]],
+  system:[["0,0 s","Rubrik: Fem steg, och ett till. Under den sex rader uppradade, alla släckta utom den första."],
+   ["1,5 s","02 Välj mallar tänds. Alla sex syns hela tiden — det säger hur många steg det är och att det tar slut, vilket en stillbild inte kan."],
+   ["4,5 s","04 Kontrollera."],
+   ["7,5 s","Sista raden har en pil i stället för en siffra: delningen är inte ett sjätte steg utan vad som händer efteråt."],
+   ["9,0 s","Slutbild med alla sex tända."]],
+  object:[["0,0 s","Tre tomma inläggsytor i 4:5 överst, orderns fem bilder som remsa under. Ingen skena, inga kryssrutor — materialet leder."],
+   ["1,5 s","Bilderna i remsan markeras en i taget, tre av fem."],
+   ["4,5 s","De tre inläggen fylls, ett i taget, med bilderna som markerats."],
+   ["7,5 s","Först nu syns gränssnitt: kanalerna tonas in under. Delningen hör till efter att kampanjen finns."],
+   ["9,0 s","Slutbild."]]},
  annons:{
   stillhet:[["0,0 s","Ett fotografi i passepartout, 84 × 100 cqw. Under det ANNONSEN spärrat och rubriken verktyget skrev — den hämtas ur objektet, inte ur koden. Märket uppe till vänster. Ingenting mer."],
    ["0,0–8,0 s","Bilden zoomar in 5,5 % linjärt över hela klippet. Ingen ease — ease läses som webbanimation. Texten står helt still hela vägen."],
@@ -7371,6 +7798,165 @@ function secMotion(){
    +' riktningar × 3 lägen. Video och bildsekvens finns per riktning nedan.</span></div>'
    + cands;
 }
+
+/* ---------- 08 KAMPANJBYGGAREN ----------
+   Den här funktionen är det starkaste argumentet i hela biblioteket för
+   att över huvud taget göra rörligt. Produkten ÄR ett förlopp: fem steg
+   som följer på varandra. En stillbild kan bara visa ett av dem, och då
+   blir det en skärmdump. Sex sekunder visar hela vägen — och det är
+   vägen, inte skärmen, som säljer.
+
+   Sex takter i alla fyra riktningar: fem steg plus delningen. Skenan
+   ligger still och bara innehållet byts, för det är precis så en guide
+   uppför sig. Delningen kommer sist och aldrig tidigare — den hör till
+   efter att kampanjen finns. */
+
+/* rubrik och underrad per takt, delad av riktningarna */
+var BTXT = [
+  ["Välj objekt",   "Ur en order som redan är levererad."],
+  ["Välj mallar",   "En eller flera. Tre är vanligast."],
+  ["Välj bilder",   "En bild per mall, ur ordern."],
+  ["Kontrollera",   "Fyra rader att godkänna. Inget nytt att fylla i."],
+  ["Kampanjen är byggd", "Tre mallar i tre format vardera."],
+  ["Dela eller schemalägg", "Instagram och Facebook, direkt ur studion."]
+];
+
+MK.bygg = {
+ /* 01 EDITORIAL — skenan står, panelen byts maskerat.
+    Rubriken är stor och byts med samma mask som panelen, så att bytet
+    läses som ETT skifte och inte som två saker som råkar hända. */
+ editorial:function(D, t){
+   var T = mtone(D), ph = mphN(t, 0, .97, 6), i = ph.i;
+   var sp = i > 0 ? Math.min(1, ph.local/.34) : 1;
+   var prv = BTXT[i > 0 ? i-1 : 0], cur = BTXT[i];
+   var panel = function(k){
+     return k >= 5 ? bShare(T.dark) : bBody({step:k}, T.dark);
+   };
+   return mshell(D, mkick(D, "Kampanjbyggaren · " + (i < 5 ? "steg " + (i+1) + " av 5" : "klar"))
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+(SAFE.top+9)+'cqw">'
+     + bRail(Math.min(4, i), T.dark) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+(SAFE.top+23)+'cqw">'
+     + mswap2(mdisp(D, prv[0], 8.6), mdisp(D, cur[0], 8.6), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+(SAFE.top+35)+'cqw">'
+     + mswap2(mbody(D, prv[1]), mbody(D, cur[1]), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+(SAFE.top+48)+'cqw">'
+     + mswap2(panel(i > 0 ? i-1 : 0), panel(i), sp) +'</div>'
+     + mfoot(D));
+ },
+
+ /* 02 SYSTEM — förloppet isärplockat.
+    Alla sex takterna står uppradade hela tiden och tänds i tur och
+    ordning. Det säger något stillbilden inte kan: hur MÅNGA steg det
+    är, och att det tar slut. */
+ system:function(D, t){
+   var T = mtone(D), now = mphN(t, .04, .96, 6).i;
+   var rows = BTXT.map(function(x, j){
+     var on = j <= now, nu = j === now;
+     return '<div style="display:flex;align-items:flex-start;gap:3cqw;padding:2.5cqw 0;'
+      +'border-bottom:1px solid '+T.line+';opacity:'+(nu?1:on?.78:.3)+'">'
+      +'<span style="font-family:Montserrat,sans-serif;font-size:2.1cqw;font-weight:600;'
+      +'letter-spacing:.16em;width:6cqw;flex:0 0 6cqw;margin-top:1.1cqw;color:'+(on?T.oli:T.mut)+'">'
+      + (j < 5 ? String(j+1).padStart(2,"0") : "→") +'</span>'
+      +'<span><span style="display:block;font-family:\'Cormorant Garamond\',Georgia,serif;'
+      +'font-weight:300;font-size:5.6cqw;line-height:1.06;color:'+T.ink+'">'+esc(x[0])+'</span>'
+      +'<span style="display:block;font-family:Montserrat,sans-serif;font-size:2.5cqw;'
+      +'line-height:1.55;margin-top:.9cqw;color:'+(T.dark?"#A8A6A0":"#4A4744")+'">'+esc(x[1])+'</span>'
+      +'</span></div>';
+   }).join("");
+   return mshell(D, mkick(D, "Så byggs en kampanj")
+     + mrule(D, 30, 6.4, 6.4)
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:33.5cqw">'
+     + mdisp(D, "Fem steg, och ett till", 6.8) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:50cqw">'+rows+'</div>'
+     + mfoot(D));
+ },
+
+ /* 03 OBJECT — materialet leder.
+    Ingen skena, inga kryssrutor. Orderns bilder ligger som en remsa och
+    blir tre färdiga inlägg framför tittaren. Gränssnitt syns bara i
+    sista takten, där det faktiskt förklarar något: kanalerna.
+
+    Första versionen la kanalpanelen UNDER remsan och sprängde ramen med
+    32 cqw. Mittzonen håller därför en sak i taget: remsan medan man
+    väljer, kanalerna när kampanjen finns. Rubriken står kvar på samma
+    höjd genom hela klippet, så bytet syns i innehållet och inte i
+    layouten. */
+ object:function(D, t){
+   var T = mtone(D), ph = mphN(t, 0, .97, 6), i = ph.i;
+   var sp = i > 0 ? Math.min(1, ph.local/.34) : 1;
+   var IM = ["hero","kitchen","living","dining","boucle"];
+   /* remsan: bilderna ur ordern, en i taget markerad */
+   var remsa = function(k){
+     return '<div style="display:flex;gap:1.6cqw">'
+      + IM.map(function(m, j){
+          var vald = j < Math.min(3, k);
+          return '<div style="flex:1;aspect-ratio:1/1;position:relative;overflow:hidden;'
+           +'outline:'+(vald ? '2px solid '+T.oli : '1px solid '+T.line)+';outline-offset:-1px;'
+           +'opacity:'+(vald ? 1 : .38)+'">'
+           +'<div style="position:absolute;inset:0;'+bg(m,"m-bygg-"+m)+'"></div></div>';
+        }).join("")
+      +'</div>';
+   };
+   /* de färdiga inläggen växer fram ett i taget */
+   var klara = function(k){
+     return '<div style="display:flex;gap:2cqw">'
+      + [0,1,2].map(function(j){
+          var pa = j < Math.max(0, k - 2);
+          /* Ramen håller full styrka hela tiden och bara BILDEN tonas.
+             Med opacitet på hela rutan blev de tre ytorna nästan osynliga
+             i första tredjedelen, och det lästes som att något var
+             sönder i stället för som att platsen väntar på sitt inlägg. */
+          return '<div style="flex:1;aspect-ratio:4/5;position:relative;overflow:hidden;'
+           +'border:1px solid '+T.line+';background:'+(T.dark?"#141416":"#FFFFFF")+'">'
+           +'<div style="position:absolute;inset:0;'+bg(IM[j],"m-bk-"+IM[j])
+           +';opacity:'+(pa ? 1 : 0)+'"></div>'
+           + (pa ? '' : '<span style="position:absolute;left:50%;top:50%;width:3.4cqw;height:1px;'
+               +'transform:translate(-50%,-50%);background:'+T.line+'"></span>')
+           +'</div>';
+        }).join("")
+      +'</div>';
+   };
+   var mitten = function(k){ return k >= 5 ? bShare(T.dark) : remsa(k) };
+   var prv = BTXT[i > 0 ? i-1 : 0], cur = BTXT[i];
+   return mshell(D,
+     '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+SAFE.top+'cqw;'
+     +'font-family:Montserrat,sans-serif;font-size:2.25cqw;font-weight:500;letter-spacing:.24em;'
+     +'text-transform:uppercase;color:'+T.oli+'">Kampanjbyggaren</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:33cqw">'+klara(i)+'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:76cqw">'
+     + mswap2(mitten(i > 0 ? i-1 : 0), mitten(i), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:126cqw">'
+     + mswap2(mdisp(D, prv[0], 7.8), mdisp(D, cur[0], 7.8), sp) +'</div>'
+     +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:138cqw">'
+     + mswap2(mbody(D, prv[1]), mbody(D, cur[1]), sp) +'</div>'
+     + mfoot(D));
+ },
+
+ /* 04 STILLHET — en mening i taget.
+    Inget gränssnitt alls, bara räkningen och en rad. För flöden där
+    lugnet är tonen och en skärmbild vore för högljudd. */
+ stillhet:function(D, t){
+   var T = mtone(D), ph = mphN(t, 0, .97, 6), i = ph.i;
+   var sp = i > 0 ? Math.min(1, ph.local/.36) : 1;
+   var w  = i > 0 ? eInOut(Math.min(1, ph.local/.28)) : 1;
+   var IM = ["hero","kitchen","living","dining","boucle","hero"];
+   var rakn = function(k){
+     return '<div style="font-family:Montserrat,sans-serif;font-size:2.15cqw;font-weight:500;'
+      +'letter-spacing:.38em;text-transform:uppercase;color:'+T.oli+'">'
+      + (k < 5 ? "Steg " + String(k+1).padStart(2,"0") + " av 05" : "Klar") +'</div>';
+   };
+   return mshell(D,
+     (i > 0 ? mimg(IM[i-1], 8, 44, 84, 63) : '')
+   + mimg(IM[i], 8, 44, 84, 63, w < 1 ? 'clip-path:inset(0 '+((1-w)*100).toFixed(1)+'% 0 0);' : '')
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:116cqw">'
+   + mswap2(rakn(i > 0 ? i-1 : 0), rakn(i), sp) +'</div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:122cqw">'
+   + mswap2(mdisp(D, BTXT[i > 0 ? i-1 : 0][0], 8.4), mdisp(D, BTXT[i][0], 8.4), sp) +'</div>'
+   +'<div style="position:absolute;left:8cqw;right:8cqw;top:136cqw">'
+   + mswap2(mbody(D, BTXT[i > 0 ? i-1 : 0][1]), mbody(D, BTXT[i][1]), sp) +'</div>'
+   + mmark(D));
+ }
+};
 
 
 var SECTIONS=[
@@ -7720,6 +8306,7 @@ window.__vstudio = {
   frameCSS:FRAMECSS, get cssText(){ return CSS },
   durOf:function(c,d){ return durOf(c,d) }, get lastClip(){ return LASTCLIP },
   drawMotionFrame:drawMotionFrame, stopMPlay:stopMPlay,
+  MK:MK, MDIRS:MDIRS, MCAND:MCAND, MSTORY:MSTORY,
   fyllLata:function(){ document.querySelectorAll("[data-mlazy]").forEach(mlazyFill) },
   ingestVideo:ingestVideo, VIDEOS:VIDEOS, exportVideo:exportVideo,
   renderVideoFrom:renderVideoFrom,

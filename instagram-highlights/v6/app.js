@@ -2414,6 +2414,7 @@ window.__vstudio = {
   frameCSS:FRAMECSS, get cssText(){ return CSS },
   durOf:function(c,d){ return durOf(c,d) }, get lastClip(){ return LASTCLIP },
   drawMotionFrame:drawMotionFrame, stopMPlay:stopMPlay,
+  MK:MK, MDIRS:MDIRS, MCAND:MCAND, MSTORY:MSTORY,
   fyllLata:function(){ document.querySelectorAll("[data-mlazy]").forEach(mlazyFill) },
   ingestVideo:ingestVideo, VIDEOS:VIDEOS, exportVideo:exportVideo,
   renderVideoFrom:renderVideoFrom,

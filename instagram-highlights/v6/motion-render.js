@@ -1334,11 +1334,13 @@ function mpost(id){
    --------------------------------------------------------------------- */
 var MSID = {
   "annonsen-2":"annons", "motion-2":"motion", "estyling-2":"estyl",
-  "kampanjen-3":"kampanj", "kampanjen-2":"format", "visning-3":"white", "visning-2":"tredim"
+  "kampanjen-3":"kampanj", "kampanjen-2":"format", "visning-3":"white", "visning-2":"tredim",
+  "byggaren-1":"bygg"
 };
 var MPICK = {};            /* sid -> "editorial" | "system" | "object" */
 var MOTION_T = 0;          /* nuvarande position 0–1, satt av spelaren/exporten */
-var MDUR = {annons:7.8, motion:6.4, estyl:6.2, kampanj:8.4, format:6.6, white:6.6, tredim:6.6};
+var MDUR = {annons:7.8, motion:6.4, estyl:6.2, kampanj:8.4, format:6.6, white:6.6, tredim:6.6,
+            bygg:9.0};
 /* Stillhet håller samma längd oavsett kandidat — lugnet är poängen, och
    en inzoomning på 5,5 % behöver tid för att läsas som rörelse alls. */
 var MDURX = {stillhet:8.0, kampanj_stillhet:9.6};

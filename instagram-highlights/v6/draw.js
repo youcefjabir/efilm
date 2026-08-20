@@ -540,6 +540,9 @@ var PICTO = {
              +'<circle cx="62" cy="42" r="5.5" fill="'+P.t3+'"/>' },
 
   /* 3D: kuben. Tre ytor, tre toner — det är hela poängen med volym. */
+  steps:   function(P){ return '<rect x="24" y="60" width="16" height="16" fill="'+P.t1+'"/>'
+             +'<rect x="42" y="42" width="16" height="16" fill="'+P.t2+'"/>'
+             +'<rect x="60" y="24" width="16" height="16" fill="'+P.t3+'"/>' },
   cube:    function(P){ return '<path d="M50 22 L78 38 L50 54 L22 38 Z" fill="'+P.t1+'"/>'
              +'<path d="M22 38 L50 54 V78 L22 62 Z" fill="'+P.t2+'"/>'
              +'<path d="M78 38 L50 54 V78 L78 62 Z" fill="'+P.t3+'"/>' },
@@ -642,6 +645,8 @@ var LINE = {
   aperture:function(P){ return ln2("M20 28 H80 V72 H20 Z", P.t2)
              +ln2("M20 64 L38 46 L50 58 L60 50 L80 66", P.t2)
              +'<circle cx="64" cy="40" r="6" fill="'+P.t3+'"/>' },
+  steps:   function(P){ return ln2("M20 76 H38 V58 H56 V40 H74 V22", P.t2)
+             +'<circle cx="74" cy="22" r="5" fill="'+P.t3+'"/>' },
   cube:    function(P){ return ln2("M50 18 L82 36 V64 L50 82 L18 64 V36 Z", P.t2)
              +ln2("M18 36 L50 54 L82 36 M50 54 V82", P.t2)
              +'<circle cx="50" cy="54" r="5" fill="'+P.t3+'"/>' },
@@ -703,6 +708,7 @@ var LINE = {
 
 /* Namn och beskrivning till väljaren och dokumentationen. */
 var GLYPHS = {
+  steps:{n:"Trappan", d:"Ett förlopp i fem steg"},
   vmark:{n:"V-märket", d:"Logotypen"},        aperture:{n:"Kortet", d:"Ett foto med landskap"},
   cube:{n:"Kuben", d:"Volym i tre ytor"},     halves:{n:"Fåtöljen", d:"Möblerat rum"},
   sun:{n:"Solen", d:"Sol över horisont"},     drone:{n:"Drönaren", d:"Kvadkopter med lins"},
@@ -800,6 +806,15 @@ var SIGN = {
      +'<rect x="43" y="43" width="14" height="14" rx="3.4"/>'
      +'<circle cx="38.6" cy="38.6" r="4.7"/><circle cx="61.4" cy="38.6" r="4.7"/>'
      +'<circle cx="38.6" cy="61.4" r="4.7"/><circle cx="61.4" cy="61.4" r="4.7"/></g>';
+  },
+  /* Kampanjbyggaren — trappan. Fem steg som stiger; tre block räcker
+     för att formen ska läsas som ett förlopp och inte som en graf.
+     Ritad i samma ruta som de andra: 32 av 100, mitt i 50/50. */
+  steps: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="34" y="56" width="10" height="10"/>'
+     +'<rect x="45" y="45" width="10" height="10"/>'
+     +'<rect x="56" y="34" width="10" height="10"/></g>';
   },
   /* Områdeskarta — nålen */
   map: function(P){
