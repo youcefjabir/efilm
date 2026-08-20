@@ -80,9 +80,9 @@ def diagram():
       'och märket ser topptungt ut.</figcaption></figure>'
       '<figure>%s<figcaption>Nedflyttat till 52,5. Inte hela vägen till tyngdpunkten — '
       'då hänger det i stället.</figcaption></figure>'
-      '<figure>%s<figcaption>Med rund beskärning. Märkets halvdiagonal är %.1f mot radien 50, '
+      '<figure>%s<figcaption>Med rund beskärning. Märkets halvdiagonal är %s mot radien 50, '
       'alltså %.0f&nbsp;%% marginal.</figcaption></figure>'
-      '</div>') % (a, b, c, hd, (1-hd/50)*100)
+      '</div>') % (a, b, c, ("%.1f" % hd).replace(".", ","), (1-hd/50)*100)
 
 ren  = "".join(kort("viewly-ren-"+nm, NAMN[bg]+" · "+NAMN[ink].lower(), bg, ink, ink, txt)
                 for nm,bg,ink,txt in REN)
