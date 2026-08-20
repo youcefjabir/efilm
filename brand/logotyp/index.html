@@ -1,0 +1,251 @@
+<title>Märket i färg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Montserrat:wght@400;500;600&display=swap">
+<style>
+/* En provvägg, inte en webbsida. Grunden är fast och neutral med avsikt:
+   ska man välja färg på ett märke får underlaget inte byta ton med
+   betraktarens systeminställning. Väggen bakom brickorna går däremot att
+   ställa om — det är själva verktyget. */
+:root{
+  --botten:#15171A; --panel:#1B1E21; --linje:#2B3034; --linje2:#3A4046;
+  --text:#E9EAE6; --dov:#98A09A; --oliv:#8E9682; --varm:#C7CBBD;
+  /* Väggen och det som står på den hänger ihop. Byter man vägg måste
+     bildtexterna byta med, annars försvinner de mot mörkt underlag. */
+  --vagg:#8E9084; --vagg-ink:rgba(0,0,0,.9); --vagg-dov:rgba(0,0,0,.62);
+  --vagg-svag:rgba(0,0,0,.5); --vagg-kant:rgba(0,0,0,.16); --vagg-chip:rgba(0,0,0,.09);
+  --f-d:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+  --f-b:Montserrat,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--botten);color:var(--text);
+  font-family:var(--f-b);font-size:15px;line-height:1.65;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 96px}
+.eb{font-size:11px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--oliv);margin:0}
+h1{font-family:var(--f-d);font-weight:300;font-size:clamp(40px,7vw,76px);
+  line-height:1.02;margin:14px 0 0;text-wrap:balance;letter-spacing:-.005em}
+h1 em{font-style:italic;color:var(--varm)}
+h2{font-family:var(--f-d);font-weight:300;font-size:clamp(28px,3.6vw,40px);
+  line-height:1.1;margin:0;text-wrap:balance}
+h3{font-family:var(--f-b);font-size:12px;font-weight:600;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--oliv);margin:0 0 14px}
+h4{font-family:var(--f-b);font-size:13.5px;font-weight:600;margin:0;letter-spacing:.005em}
+p{margin:0}
+.lede{font-size:17px;line-height:1.7;color:var(--dov);max-width:62ch;margin-top:20px}
+.lede b{color:var(--text);font-weight:500}
+
+header{padding:76px 0 52px;border-bottom:1px solid var(--linje)}
+
+/* geometrin: siffrorna som inte fick röras */
+.geo{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:1px;
+  background:var(--linje);border:1px solid var(--linje);margin:44px 0 0}
+.geo div{background:var(--panel);padding:16px 18px}
+.geo dt{font-size:10.5px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dov);margin:0 0 6px}
+.geo dd{margin:0;font-family:var(--f-d);font-size:26px;font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1}
+.geo dd small{font-family:var(--f-b);font-size:11px;font-weight:500;color:var(--dov);
+  display:block;margin-top:5px;letter-spacing:.02em}
+
+section{padding:64px 0 0}
+.shead{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 20px;margin-bottom:8px}
+.snote{color:var(--dov);max-width:60ch;margin-top:12px;font-size:14.5px}
+
+/* väggen — det som gör arket till ett verktyg */
+.diagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:22px;margin-top:30px}
+.diagrid figure{margin:0}
+.dia{width:100%;height:auto;display:block;outline:1px solid var(--linje2);outline-offset:-1px}
+.diagrid figcaption{font-size:12px;line-height:1.55;color:var(--dov);margin-top:10px}
+
+.styr{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  margin:32px 0 0;padding:14px 16px;background:var(--panel);
+  border:1px solid var(--linje)}
+.styr span{font-size:11px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--dov)}
+.styr button{font:inherit;font-size:12px;font-weight:500;letter-spacing:.04em;
+  color:var(--text);background:transparent;border:1px solid var(--linje2);
+  padding:7px 13px 7px 8px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;
+  transition:border-color .16s,color .16s}
+.styr button i{width:15px;height:15px;display:block;border:1px solid rgba(255,255,255,.22)}
+.styr button:hover{border-color:var(--oliv)}
+.styr button[aria-pressed="true"]{border-color:var(--varm);color:var(--varm)}
+.styr button:focus-visible{outline:2px solid var(--oliv);outline-offset:2px}
+
+.vagg{background:var(--vagg);padding:28px;margin-top:1px;transition:background .28s}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(206px,1fr));gap:26px}
+.grid.tre{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:760px){.grid.tre{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}}
+.kort{margin:0}
+.stor{position:relative}
+.mk{width:100%;height:auto;display:block}
+.stor .mk{outline:1px solid var(--vagg-kant);outline-offset:-1px}
+.prov{display:flex;align-items:center;gap:9px;margin-top:10px}
+.prov span{display:block;flex:0 0 auto}
+.p44 .mk{width:44px}.p24 .mk{width:24px}.prund .mk{width:36px}
+.prov .mk{outline:1px solid var(--vagg-kant);outline-offset:-1px}
+.prund .mk{outline:none}
+.plab{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--vagg-svag);margin-left:auto;text-align:right;line-height:1.3}
+figcaption{margin-top:12px}
+figcaption p{font-size:12px;line-height:1.5;color:var(--vagg-dov);margin-top:4px}
+figcaption h4{color:var(--vagg-ink)}
+.matt{display:flex;gap:14px;flex-wrap:wrap;margin-top:9px}
+.matt .m{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--vagg-svag)}
+.matt b{font-weight:600;color:var(--vagg-ink);font-variant-numeric:tabular-nums;letter-spacing:0}
+.hex{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.hex code{font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:10px;
+  background:var(--vagg-chip);color:var(--vagg-dov);padding:2px 5px;letter-spacing:.02em}
+
+/* märket utan fält */
+.fri .stor{background:
+   repeating-conic-gradient(var(--vagg-chip) 0% 25%, transparent 0% 50%) 50%/22px 22px;
+  padding:26px;display:flex;align-items:center;justify-content:center;min-height:150px}
+.mk.fri{width:78%;outline:none}
+
+/* mätbordet */
+.tabellhalla{overflow-x:auto;margin-top:26px;border:1px solid var(--linje)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:12.5px}
+th{background:var(--panel);text-align:left;padding:11px 14px;font-size:10px;font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--dov);
+  border-bottom:1px solid var(--linje);white-space:nowrap}
+td{padding:10px 14px;border-bottom:1px solid var(--linje);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+td.n{font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+td.en em{font-style:normal;color:var(--dov);font-size:10px;letter-spacing:.14em;
+  text-transform:uppercase;margin-left:10px}
+.sw{display:inline-block;width:11px;height:11px;margin-right:7px;vertical-align:-1px;
+  border:1px solid rgba(255,255,255,.2)}
+td.ja{color:var(--varm)}
+td.nja{color:var(--dov)}
+tbody tr:hover td{background:rgba(255,255,255,.022)}
+
+.slut{margin-top:64px;padding-top:30px;border-top:1px solid var(--linje);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:30px}
+.slut h3{margin-bottom:9px}
+.slut p{font-size:13.5px;line-height:1.62;color:var(--dov)}
+.slut p + p{margin-top:9px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:640px){
+  .wrap{padding:0 18px 64px} header{padding:48px 0 36px}
+  .vagg{padding:18px} .grid{gap:20px}
+}
+</style>
+
+<div class="wrap">
+<header>
+  <p class="eb">Viewly · logotyp</p>
+  <h1>Märket i färg,<br><em>utan cirkel</em></h1>
+  <p class="lede">Fjorton fält och tre fria märken. <b>Geometrin är orörd</b> — sökvägen
+  och punkten är spårade ur logotyp-filen med en överlappning på 0,9925 mot originalet,
+  och de talen står oförändrade i varje variant här. Det enda som varieras är färg.
+  Fältet är en fyrkant, aldrig en cirkel: den runda formen hör till Instagrams omslag
+  och ska inte byggas in i logotypen.</p>
+
+  <div class="geo">
+    <div><dt>Ram</dt><dd>858,6 × 756,3<small>förhållande 1,1353</small></dd></div>
+    <div><dt>Lemvinkel</dt><dd>58,0°<small>tangent 1,6003</small></dd></div>
+    <div><dt>Punkt</dt><dd>r 153,4<small>vid 705,2 / 153,4</small></dd></div>
+    <div><dt>Överlappning</dt><dd>0,9925<small>mot originalfilen</small></dd></div>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><h2>Var märket sitter i fältet</h2></div>
+  <p class="snote">Två mått avgjorde placeringen, och båda är mätta i stället för gissade.
+  Märkets <b>tyngdpunkt ligger på y&nbsp;37,1</b> medan ramens mitt ligger på 49,9 — lemmen är
+  bred upptill och slutar i en spets, punkten sitter högt. Ramcentrerat ser märket därför
+  topptungt ut. Ett prov på fyra lägen gav <b>52,5</b> som det som står stilla.
+  Bredden <b>50 av 100</b> valdes med cirkelbeskärningen påslagen: halvdiagonalen blir
+  33,3 mot radien 50, så märket klarar den runda beskärning som Instagram och LinkedIn
+  lägger på ändå.</p>
+  <div class="diagrid"><figure><svg viewBox="0 0 100 100" class="dia" role="img" aria-label="Tyngdpunkt mot ramens mitt"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 27.9787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g><line x1="0" y1="49.93" x2="100" y2="49.93" stroke="#141416" stroke-width=".5" stroke-dasharray="2 1.6"/><line x1="0" y1="37.13" x2="100" y2="37.13" stroke="#B4472F" stroke-width=".5" stroke-dasharray="2 1.6"/><text x="2" y="47.6" font-size="3.4" font-family="Montserrat,sans-serif" font-weight="500" letter-spacing=".08" fill="#141416">ramens mitt 49,9</text><text x="2" y="34.8" font-size="3.4" font-family="Montserrat,sans-serif" font-weight="500" letter-spacing=".08" fill="#B4472F">tyngdpunkt 37,1</text></svg><figcaption>Ramcentrerat. Tyngdpunkten ligger 12,8 enheter över mitten och märket ser topptungt ut.</figcaption></figure><figure><svg viewBox="0 0 100 100" class="dia" role="img" aria-label="Vald placering 52,5"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g><line x1="0" y1="52.5" x2="100" y2="52.5" stroke="#6E7266" stroke-width=".5" stroke-dasharray="2 1.6"/><text x="2" y="50.2" font-size="3.4" font-family="Montserrat,sans-serif" font-weight="500" letter-spacing=".08" fill="#6E7266">vald 52,5</text></svg><figcaption>Nedflyttat till 52,5. Inte hela vägen till tyngdpunkten — då hänger det i stället.</figcaption></figure><figure><svg viewBox="0 0 100 100" class="dia" role="img" aria-label="Cirkelbeskärning"><rect width="100" height="100" fill="#EFECE7"/><circle cx="50" cy="50" r="50" fill="none" stroke="#B4472F" stroke-width=".7"/><circle cx="50" cy="52.5" r="33.32" fill="none" stroke="#6E7266" stroke-width=".5" stroke-dasharray="2 1.6"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g><rect x="0" y="88" width="100" height="12" fill="#EFECE7"/><text x="2" y="93.4" font-size="3.4" font-family="Montserrat,sans-serif" font-weight="500" letter-spacing=".08" fill="#B4472F">beskärning r 50</text><text x="40" y="93.4" font-size="3.4" font-family="Montserrat,sans-serif" font-weight="500" letter-spacing=".08" fill="#6E7266">märket r 33,3</text></svg><figcaption>Med rund beskärning. Märkets halvdiagonal är 33.3 mot radien 50, alltså 33&nbsp;% marginal.</figcaption></figure></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Ren</h2></div>
+  <p class="snote">Ett fält, en märkesfärg. Lem och punkt i samma ton, så märket läses
+  som en enda form. Det här är den enklaste versionen och den som tål mest — tryck,
+  gravyr, broderi, en enfärgad stämpel.</p>
+  <div class="styr" role="group" aria-label="Vägg bakom brickorna">
+    <span>Vägg</span>
+    <button type="button" data-vagg="#EFECE7" data-ljus="0" aria-pressed="false"><i style="background:#EFECE7"></i>Papper</button>
+    <button type="button" data-vagg="#8E9084" data-ljus="0" aria-pressed="true"><i style="background:#8E9084"></i>Grå</button>
+    <button type="button" data-vagg="#101210" data-ljus="1" aria-pressed="false"><i style="background:#101210"></i>Mörk</button>
+  </div>
+  <div class="vagg"><div class="grid"><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k6a947203"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k6a947203)"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Papper · svart</h4><p>Grundformen. Den som gäller när inget annat är bestämt.</p><div class="matt"><span class="m">kontrast <b>15,6:1</b></span></div><div class="hex"><code>#EFECE7</code><code>#141416</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#141416"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#EFECE7"/><circle cx="705.2" cy="153.4" r="153.4" fill="#EFECE7"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#141416"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#EFECE7"/><circle cx="705.2" cy="153.4" r="153.4" fill="#EFECE7"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#141416"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#EFECE7"/><circle cx="705.2" cy="153.4" r="153.4" fill="#EFECE7"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k16c5fcde"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k16c5fcde)"><rect width="100" height="100" fill="#141416"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#EFECE7"/><circle cx="705.2" cy="153.4" r="153.4" fill="#EFECE7"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Svart · papper</h4><p>Inverterad. Samma tyngd, mörkt fält.</p><div class="matt"><span class="m">kontrast <b>15,6:1</b></span></div><div class="hex"><code>#141416</code><code>#EFECE7</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#333A2E"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#333A2E"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#333A2E"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="kf4ad6071"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#kf4ad6071)"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#333A2E"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Sand · djup oliv</h4><p>Varmare papper, mörk oliv. Mjukare än svart utan att tappa.</p><div class="matt"><span class="m">kontrast <b>9,3:1</b></span></div><div class="hex"><code>#E7E4DC</code><code>#333A2E</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#C8CCBF"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#C8CCBF"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#C8CCBF"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k08b5e51b"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k08b5e51b)"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#C8CCBF"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Natt · salvia</h4><p>Mörk oliv med ljus salvia. Den lugnaste av de mörka.</p><div class="matt"><span class="m">kontrast <b>9,4:1</b></span></div><div class="hex"><code>#22261F</code><code>#C8CCBF</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#98A088"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#98A088"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#98A088"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="kb2a9d8d6"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#kb2a9d8d6)"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#98A088"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Skugga · salvia dov</h4><p>Nästan svart fält, dämpad salvia. Diskret.</p><div class="matt"><span class="m">kontrast <b>7,1:1</b></span></div><div class="hex"><code>#0E0E0D</code><code>#98A088</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#2C322A"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#2C322A"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#2C322A"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="kf90051b3"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#kf90051b3)"><rect width="100" height="100" fill="#2C322A"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Skog · ljus</h4><p>Djupgrön botten, rent ljus form.</p><div class="matt"><span class="m">kontrast <b>11,5:1</b></span></div><div class="hex"><code>#2C322A</code><code>#F2EFEF</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k450cdc12"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k450cdc12)"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Oliv · ljus</h4><p>Husets oliv som fält. Märket i ljus.</p><div class="matt"><span class="m">kontrast <b>4,3:1</b></span></div><div class="hex"><code>#6E7266</code><code>#F2EFEF</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k826fff92"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k826fff92)"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Papper · oliv</h4><p>Oliv på papper. Lägst kontrast av alla — se måtten.</p><div class="matt"><span class="m">kontrast <b>4,2:1</b></span></div><div class="hex"><code>#EFECE7</code><code>#6E7266</code></div></figcaption></figure></div></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Två toner</h2></div>
+  <p class="snote">Husets eget uppträdande: lemmen bär ink, punkten bär oliven. Samma
+  geometri, två färger. Använd den där märket får plats att synas — omslag, sidfot,
+  profilbild. Under ungefär 24&nbsp;bildpunkter tappar punkten sin egen färg och den rena
+  versionen är bättre.</p>
+  <div class="vagg"><div class="grid"><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k031266b8"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k031266b8)"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Papper · svart och oliv</h4><p>Husets standard: svart lem, oliv punkt.</p><div class="matt"><span class="m">lem <b>15,6:1</b></span><span class="m">punkt <b>4,2:1</b></span></div><div class="hex"><code>#EFECE7</code><code>#141416</code><code>#6E7266</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k56afe724"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k56afe724)"><rect width="100" height="100" fill="#0E0E0D"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#98A088"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Skugga · ljus och salvia dov</h4><p>Mörk motsvarighet. Punkten bär salvian.</p><div class="matt"><span class="m">lem <b>16,9:1</b></span><span class="m">punkt <b>7,1:1</b></span></div><div class="hex"><code>#0E0E0D</code><code>#F2EFEF</code><code>#98A088</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k54f54872"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k54f54872)"><rect width="100" height="100" fill="#6E7266"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#F2EFEF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Oliv · ljus och svart</h4><p>Oliv fält, ljus lem, svart punkt.</p><div class="matt"><span class="m">lem <b>4,3:1</b></span><span class="m">punkt <b>3,7:1</b></span></div><div class="hex"><code>#6E7266</code><code>#F2EFEF</code><code>#141416</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k86cdcf45"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k86cdcf45)"><rect width="100" height="100" fill="#E7E4DC"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#333A2E"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Sand · djup oliv och oliv</h4><p>Varm sand, mörk lem, oliv punkt.</p><div class="matt"><span class="m">lem <b>9,3:1</b></span><span class="m">punkt <b>3,9:1</b></span></div><div class="hex"><code>#E7E4DC</code><code>#333A2E</code><code>#6E7266</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="k4639b7c9"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#k4639b7c9)"><rect width="100" height="100" fill="#22261F"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#C8CCBF"/><circle cx="705.2" cy="153.4" r="153.4" fill="#F2EFEF"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Natt · salvia och ljus</h4><p>Punkten ljusast — ögat går dit först.</p><div class="matt"><span class="m">lem <b>9,4:1</b></span><span class="m">punkt <b>13,5:1</b></span></div><div class="hex"><code>#22261F</code><code>#C8CCBF</code><code>#F2EFEF</code></div></figcaption></figure><figure class="kort"><div class="stor"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></div><div class="prov"><span class="p44"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></span><span class="p24"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></svg></span><span class="prund"><svg viewBox="0 0 100 100" class="mk" aria-hidden="true"><defs><clipPath id="kf5c7fd6b"><circle cx="50" cy="50" r="50"/></clipPath></defs><g clip-path="url(#kf5c7fd6b)"><rect width="100" height="100" fill="#EFECE7"/><g transform="translate(25.0000 30.4787) scale(0.058234)"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#6E7266"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></g></g></svg></span><span class="plab">44 · 24 · rund</span></div><figcaption><h4>Papper · oliv och svart</h4><p>Omvänd fördelning: oliv lem, svart punkt.</p><div class="matt"><span class="m">lem <b>4,2:1</b></span><span class="m">punkt <b>15,6:1</b></span></div><div class="hex"><code>#EFECE7</code><code>#6E7266</code><code>#141416</code></div></figcaption></figure></div></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Utan fält</h2></div>
+  <p class="snote">Märket i sin egen ram, utan bakgrund. Ingen optisk förskjutning här —
+  den hör till fältet, inte till formen. Den som placerar märket i en egen layout gör
+  sin egen justering.</p>
+  <div class="vagg"><div class="grid tre"><figure class="kort fri"><div class="stor rutigt"><svg viewBox="0 0 858.6 756.3" class="mk fri" aria-hidden="true"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#141416"/></svg></div><figcaption><h4>Svart</h4><p>För ljusa underlag.</p></figcaption></figure><figure class="kort fri"><div class="stor rutigt"><svg viewBox="0 0 858.6 756.3" class="mk fri" aria-hidden="true"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#EFECE7"/><circle cx="705.2" cy="153.4" r="153.4" fill="#EFECE7"/></svg></div><figcaption><h4>Papper</h4><p>För mörka underlag.</p></figcaption></figure><figure class="kort fri"><div class="stor rutigt"><svg viewBox="0 0 858.6 756.3" class="mk fri" aria-hidden="true"><path d="M 0 16.4 L 206.7 16.4 Q 243.7 16.4 259.7 43.4 L 588 552.6 L 462.2 756.3 Z" fill="#141416"/><circle cx="705.2" cy="153.4" r="153.4" fill="#6E7266"/></svg></div><figcaption><h4>Två toner</h4><p>Punkten bär oliven.</p></figcaption></figure></div></div>
+</section>
+
+<section>
+  <div class="shead"><h2>Måtten</h2></div>
+  <p class="snote">Kontrasten är räknad mot fältet för varje färg i märket. En logotyp
+  är en grafisk form och inte text, så kravet är <b>3:1</b> — alla fjorton klarar det,
+  lägst är 3,7:1. Kolumnen längst till höger säger vilka som dessutom klarar 4,5:1,
+  alltså textkravet, och därför också går att sätta ord bredvid i samma färg.</p>
+  <div class="tabellhalla"><table>
+    <thead><tr><th>Familj</th><th>Namn</th><th>Fält</th><th>Märke</th>
+      <th class="n">Lem</th><th class="n">Punkt</th><th>Håller</th></tr></thead>
+    <tbody><tr><td>Ren</td><td>Papper · svart</td><td><span class="sw" style="background:#EFECE7"></span>#EFECE7</td><td><span class="sw" style="background:#141416"></span>#141416</td><td class="n en" colspan="2">15,6:1<em>en färg</em></td><td class="ja">håller som text också</td></tr><tr><td>Ren</td><td>Svart · papper</td><td><span class="sw" style="background:#141416"></span>#141416</td><td><span class="sw" style="background:#EFECE7"></span>#EFECE7</td><td class="n en" colspan="2">15,6:1<em>en färg</em></td><td class="ja">håller som text också</td></tr><tr><td>Ren</td><td>Sand · djup oliv</td><td><span class="sw" style="background:#E7E4DC"></span>#E7E4DC</td><td><span class="sw" style="background:#333A2E"></span>#333A2E</td><td class="n en" colspan="2">9,3:1<em>en färg</em></td><td class="ja">håller som text också</td></tr><tr><td>Ren</td><td>Natt · salvia</td><td><span class="sw" style="background:#22261F"></span>#22261F</td><td><span class="sw" style="background:#C8CCBF"></span>#C8CCBF</td><td class="n en" colspan="2">9,4:1<em>en färg</em></td><td class="ja">håller som text också</td></tr><tr><td>Ren</td><td>Skugga · salvia dov</td><td><span class="sw" style="background:#0E0E0D"></span>#0E0E0D</td><td><span class="sw" style="background:#98A088"></span>#98A088</td><td class="n en" colspan="2">7,1:1<em>en färg</em></td><td class="ja">håller som text också</td></tr><tr><td>Ren</td><td>Skog · ljus</td><td><span class="sw" style="background:#2C322A"></span>#2C322A</td><td><span class="sw" style="background:#F2EFEF"></span>#F2EFEF</td><td class="n en" colspan="2">11,5:1<em>en färg</em></td><td class="ja">håller som text också</td></tr><tr><td>Ren</td><td>Oliv · ljus</td><td><span class="sw" style="background:#6E7266"></span>#6E7266</td><td><span class="sw" style="background:#F2EFEF"></span>#F2EFEF</td><td class="n en" colspan="2">4,3:1<em>en färg</em></td><td class="nja">grafik, inte text</td></tr><tr><td>Ren</td><td>Papper · oliv</td><td><span class="sw" style="background:#EFECE7"></span>#EFECE7</td><td><span class="sw" style="background:#6E7266"></span>#6E7266</td><td class="n en" colspan="2">4,2:1<em>en färg</em></td><td class="nja">grafik, inte text</td></tr><tr><td>Två</td><td>Papper · svart och oliv</td><td><span class="sw" style="background:#EFECE7"></span>#EFECE7</td><td><span class="sw" style="background:#141416"></span>#141416 / <span class="sw" style="background:#6E7266"></span>#6E7266</td><td class="n">15,6:1</td><td class="n">4,2:1</td><td class="nja">grafik, inte text</td></tr><tr><td>Två</td><td>Skugga · ljus och salvia dov</td><td><span class="sw" style="background:#0E0E0D"></span>#0E0E0D</td><td><span class="sw" style="background:#F2EFEF"></span>#F2EFEF / <span class="sw" style="background:#98A088"></span>#98A088</td><td class="n">16,9:1</td><td class="n">7,1:1</td><td class="ja">håller som text också</td></tr><tr><td>Två</td><td>Oliv · ljus och svart</td><td><span class="sw" style="background:#6E7266"></span>#6E7266</td><td><span class="sw" style="background:#F2EFEF"></span>#F2EFEF / <span class="sw" style="background:#141416"></span>#141416</td><td class="n">4,3:1</td><td class="n">3,7:1</td><td class="nja">grafik, inte text</td></tr><tr><td>Två</td><td>Sand · djup oliv och oliv</td><td><span class="sw" style="background:#E7E4DC"></span>#E7E4DC</td><td><span class="sw" style="background:#333A2E"></span>#333A2E / <span class="sw" style="background:#6E7266"></span>#6E7266</td><td class="n">9,3:1</td><td class="n">3,9:1</td><td class="nja">grafik, inte text</td></tr><tr><td>Två</td><td>Natt · salvia och ljus</td><td><span class="sw" style="background:#22261F"></span>#22261F</td><td><span class="sw" style="background:#C8CCBF"></span>#C8CCBF / <span class="sw" style="background:#F2EFEF"></span>#F2EFEF</td><td class="n">9,4:1</td><td class="n">13,5:1</td><td class="ja">håller som text också</td></tr><tr><td>Två</td><td>Papper · oliv och svart</td><td><span class="sw" style="background:#EFECE7"></span>#EFECE7</td><td><span class="sw" style="background:#6E7266"></span>#6E7266 / <span class="sw" style="background:#141416"></span>#141416</td><td class="n">4,2:1</td><td class="n">15,6:1</td><td class="nja">grafik, inte text</td></tr></tbody>
+  </table></div>
+</section>
+
+<div class="slut">
+  <div>
+    <h3>Vad som inte ändrats</h3>
+    <p>Sökvägen, punktens plats och radie, och förhållandet mellan bredd och höjd.
+    Ingen variant har en egen geometri.</p>
+    <p>Cirkeln som funnits runt märket i omslagen finns inte här. Den hör till
+    Instagram, inte till logotypen.</p>
+  </div>
+  <div>
+    <h3>Vad som är förslag</h3>
+    <p>Färgparen. Paletten är hämtad ur systemet — papper, sand, salvia, oliv, skog,
+    natt, svart — men vilka som är husets egna och vilka som är tillfälliga är
+    er sak att bestämma.</p>
+  </div>
+  <div>
+    <h3>Filerna</h3>
+    <p>Alla sjutton finns som SVG och som PNG i 1024&nbsp;bildpunkter, levererade
+    vid sidan av den här sidan. SVG:erna är rena — en rect, en path, en circle.</p>
+  </div>
+</div>
+</div>
+
+<script>
+/* Väggen bakom brickorna. Att kunna byta underlag är hela poängen med ett
+   provark: en logotyp som ser bra ut på grått kan tappa fotfästet på vitt. */
+(function(){
+  var knappar = document.querySelectorAll('.styr button');
+  knappar.forEach(function(b){
+    b.addEventListener('click', function(){
+      var r = document.documentElement, mork = b.dataset.ljus === "1";
+      r.style.setProperty('--vagg', b.dataset.vagg);
+      r.style.setProperty('--vagg-ink',  mork ? 'rgba(255,255,255,.92)' : 'rgba(0,0,0,.9)');
+      r.style.setProperty('--vagg-dov',  mork ? 'rgba(255,255,255,.62)' : 'rgba(0,0,0,.62)');
+      r.style.setProperty('--vagg-svag', mork ? 'rgba(255,255,255,.48)' : 'rgba(0,0,0,.5)');
+      r.style.setProperty('--vagg-kant', mork ? 'rgba(255,255,255,.20)' : 'rgba(0,0,0,.16)');
+      r.style.setProperty('--vagg-chip', mork ? 'rgba(255,255,255,.10)' : 'rgba(0,0,0,.09)');
+      knappar.forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)) });
+    });
+  });
+})();
+</script>
