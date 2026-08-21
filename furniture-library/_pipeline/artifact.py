@@ -308,7 +308,7 @@ def build():
   maskerna är samma render med andra färger — därför kan de inte glida ur läge.
   Ingen fullproduktion är påbörjad.</p>
   <div class="kpi">
-    <div><dt>Modeller</dt><dd>{s['models']}<small>{nvar} geometriska varianter</small></dd></div>
+    <div><dt>Tillgångar</dt><dd>{s['models']}<small>15 masterdesigner, {nvar} varianter av modulsoffan</small></dd></div>
     <div><dt>Topskala</dt><dd>6,0<small>px per cm, låst</small></dd></div>
     <div><dt>Transparens</dt><dd>{'100 %' if s['all_transparent'] else 'FEL'}<small>alla filer</small></dd></div>
     <div><dt>Skalfel</dt><dd>{'0' if s['all_top_scale_exact'] else 'JA'}<small>topvyns px mot fotavtryck</small></dd></div>
