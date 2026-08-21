@@ -341,6 +341,50 @@
       "variant": null
     },
     {
+      "id": "rug-berber-002",
+      "name": "Berber-inspired high pile rug 200x300",
+      "category": "rugs",
+      "subcategory": "berber",
+      "style": "warm-modern",
+      "folder": "rugs/berber/rug-berber-002/",
+      "dimensions_cm": {
+        "width": 200,
+        "depth": 299,
+        "height": 2
+      },
+      "footprint_cm": {
+        "width": 200,
+        "depth": 299
+      },
+      "materials": [
+        "fabric",
+        "pattern"
+      ],
+      "variant": null
+    },
+    {
+      "id": "rug-contemporary-003",
+      "name": "Contemporary neutral rug 160x230",
+      "category": "rugs",
+      "subcategory": "contemporary",
+      "style": "soft-minimal",
+      "folder": "rugs/contemporary/rug-contemporary-003/",
+      "dimensions_cm": {
+        "width": 160,
+        "depth": 230,
+        "height": 2
+      },
+      "footprint_cm": {
+        "width": 160,
+        "depth": 230
+      },
+      "materials": [
+        "fabric",
+        "pattern"
+      ],
+      "variant": null
+    },
+    {
       "id": "rug-scandinavian-wool-001",
       "name": "Scandinavian textured wool rug 200x300",
       "category": "rugs",

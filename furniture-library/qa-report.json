@@ -1,6 +1,6 @@
 {
   "summary": {
-    "models": 15,
+    "models": 17,
     "all_transparent": true,
     "all_ids_unique": true,
     "all_top_scale_exact": true,
@@ -484,6 +484,76 @@
         "height": 72
       },
       "max_deviation_cm": 7
+    },
+    {
+      "id": "rug-berber-002",
+      "unique_id": true,
+      "catalog_alpha": true,
+      "top_alpha": true,
+      "top_scale_ok": true,
+      "top_px": [
+        1272,
+        1866
+      ],
+      "top_px_expected": [
+        1272,
+        1866
+      ],
+      "masks_catalog": [
+        "fabric",
+        "pattern"
+      ],
+      "masks_top": [
+        "fabric",
+        "pattern"
+      ],
+      "no_empty_masks": true,
+      "dims_cm": {
+        "width": 200,
+        "depth": 299,
+        "height": 2
+      },
+      "design_intent_cm": {
+        "width": 200,
+        "depth": 300,
+        "height": 3
+      },
+      "max_deviation_cm": 1
+    },
+    {
+      "id": "rug-contemporary-003",
+      "unique_id": true,
+      "catalog_alpha": true,
+      "top_alpha": true,
+      "top_scale_ok": true,
+      "top_px": [
+        1032,
+        1452
+      ],
+      "top_px_expected": [
+        1032,
+        1452
+      ],
+      "masks_catalog": [
+        "fabric",
+        "pattern"
+      ],
+      "masks_top": [
+        "fabric",
+        "pattern"
+      ],
+      "no_empty_masks": true,
+      "dims_cm": {
+        "width": 160,
+        "depth": 230,
+        "height": 2
+      },
+      "design_intent_cm": {
+        "width": 160,
+        "depth": 230,
+        "height": 1
+      },
+      "max_deviation_cm": 1
     },
     {
       "id": "rug-scandinavian-wool-001",

@@ -370,6 +370,17 @@ masks/catalog/*.png    masks/top/*.png</pre></div>
       står kvar som <code>design_intent_cm</code>.</p>
       <p>Det är enda sättet att svara ärligt på frågan om fotavtrycket stämmer med
       tillgången. Avvikelserna syns i stället för att döljas.</p></div>
+    <div class="note"><h3>Mattornas väv syns inte — och varför jag inte tyst rättade det</h3>
+      <p>Mönstren är rätt: ränder, romber, frans och indragen ram ligger som egen
+      geometri med egen mask. Men luggen syns knappt i topvyn, och punkt 33 vill se
+      väv och textur.</p>
+      <p>Orsaken är mätt, inte gissad. En bump syns bara när ljuset stryker över
+      den. Topvyns rigg lyser nästan rakt ner, så luggen får ingen skuggsida. Det
+      går att lösa med ett lågt sidoljus enbart för mattor, eller med verklig
+      geometri i luggen.</p>
+      <p>Båda ändrar den låsta ljusstandarden och kräver omrendering av allt.
+      Därför ligger det som en fråga till granskningen i stället för som en
+      halvvägsändring — punkt 51.</p></div>
     <div class="note"><h3>Varför 3D och inte bildgenerering</h3>
       <p>Kravet att båda vyerna ska visa exakt samma fysiska möbel, att topvyn ska
       vara ortografisk, och att maskerna ska följa materialytan exakt — inget av
