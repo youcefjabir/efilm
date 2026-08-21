@@ -21,7 +21,12 @@ from lib import build as B, mats2
 W, D, H = 232.0, 104.0, 72.0
 PLINT_H = 8.0
 SEAT_Z  = PLINT_H + 14.0
-SHELL_W, SHELL_H = 15.0, 47.0        # skalets tvärsnitt: en vägg, inte ett rör
+# Tvärsnittet har varit fel åt två håll. 30 x 34 som oval gav tre feta
+# valsar — en korv. 15 x 47 som vägg gav tunna blad som inte omslöt
+# någonting; armarna såg ut som skivor ställda på högkant. En rundad
+# loungesoffa har TJOCKA mjuka armar. 24 cm bred vägg med 11 cm hörnradie
+# är stoppat gods, inte en skiva och inte ett rör.
+SHELL_W, SHELL_H = 24.0, 46.0
 
 def build(fabric="cream", wood=None):
     f  = mats2.boucle(fabric, loop_mm=7.5)
@@ -46,7 +51,11 @@ def build(fabric="cream", wood=None):
     def z_at(y):
         """Skalet stiger jämnt från främre spetsen till ryggen."""
         t = min(1.0, max(0.0, (y - fy)/span))
-        return SEAT_Z + 1.0 + 8.0*(t*t*(3.0 - 2.0*t))
+        # Skalet steg bara 8 cm mot ryggen, så överkanten låg på 54 cm
+        # medan ryggkuddarnas topp låg på 73. Kuddarna tornade alltså 20 cm
+        # över skalet och lästes som en list ovanpå soffan i stället för
+        # som kuddar inuti den. Ryggen ska nå upp till möbelns fulla höjd.
+        return SEAT_Z + 1.0 + 24.0*(t*t*(3.0 - 2.0*t))
 
     path = [(hx, fy, z_at(fy)), (hx, by - RC, z_at(by - RC))]
     for k in range(1, 6):                       # höger hörnbåge
@@ -68,7 +77,7 @@ def build(fabric="cream", wood=None):
     # Väggsnittet ger en rak yttersida och en mjukt rundad överkant, och
     # först då läser formen som en soffa.
     shell = B.sweep("shell", path, SHELL_W, SHELL_H, cyclic=False, mat=f,
-                    profile="rrect", corner=7.0,
+                    profile="rrect", corner=11.0,
                     taper=[(-100, 0.88, 0), (-88, 0.98, 0), (-70, 1.0, 0),
                            (  70, 1.0,  0), ( 88, 0.98, 0), (100, 0.88, 0)])
     P.append(shell)
@@ -87,18 +96,18 @@ def build(fabric="cream", wood=None):
                              (0, SEAT_Y, PLINT_H), mat=f, seg=8))
 
     # Två djupa dynor med rundad framkant.
-    cw = (W - SHELL_W*2.0 - 4.0)/2 - 1.6
+    cw = (W - SHELL_W*2.0 - 4.0)/2 - 2.4
     for i, x in enumerate((-(cw/2 + 0.9), cw/2 + 0.9)):
         c = B.cushion("seat_%d" % i, cw, SEAT_D, 21.0,
                       (x, SEAT_Y, PLINT_H + 14.0), soft=0.82, sag=0.17, mat=fs[i])
         P.append(c)
-        P.append(B.piping("seam_%d" % i, cw - 2.0, SEAT_D - 2.0, 10.5, 11.0,
-                          (x, SEAT_Y, PLINT_H + 14.0), thick=1.5, mat=fs[i]))
+        P.append(B.piping("seam_%d" % i, cw - 2.0, SEAT_D - 2.0, 11.0, 11.0,
+                          (x, SEAT_Y, PLINT_H + 14.0), thick=2.0, mat=fs[i]))
 
     # Två lösa ryggkuddar, lutade mot skalet.
     for i, x in enumerate((-(cw/2 + 0.9), cw/2 + 0.9)):
-        c = B.cushion("bck_%d" % i, cw - 2.0, 30.0, 34.0,
-                      (x, D/2 - SHELL_W - 13.0, PLINT_H + 31.0),
+        c = B.cushion("bck_%d" % i, cw - 3.0, 31.0, 30.0,
+                      (x, D/2 - SHELL_W - 13.0, PLINT_H + 33.0),
                       soft=0.9, sag=0.06, mat=fs[1-i])
         c.rotation_euler = (math.radians(-13.0), 0, 0)
         P.append(c)
