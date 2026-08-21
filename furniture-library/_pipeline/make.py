@@ -60,8 +60,14 @@ def one(modname, variant, cat_s, top_s):
                 height=round((hi.z-lo.z)*100))
     intent = dict(M["dimensions_cm"])
 
+    # Renderingen skriver till en arbetsmapp och flyttas på plats först när
+    # modellen är helt klar. Förut tömdes målmappen innan renderingen
+    # började och fylldes under de femton minuter den tog, så biblioteket
+    # stod halvfärdigt i arbetsträdet hela tiden — en modell utan topvy och
+    # utan metadata ser ut som ett fel även när den bara är halvvägs.
     folder = os.path.join(M["category"], M["subcategory"], M["id"])
-    out = os.path.join(ROOT, folder)
+    final = os.path.join(ROOT, folder)
+    out = final + ".ofardig"
     if os.path.isdir(out): shutil.rmtree(out)
     os.makedirs(out, exist_ok=True)
 
@@ -103,6 +109,9 @@ def one(modname, variant, cat_s, top_s):
     M["variant"] = variant
     with open(os.path.join(out, "metadata.json"), "w", encoding="utf-8") as fh:
         json.dump(M, fh, ensure_ascii=False, indent=2)
+    # bytet på plats: målmappen är antingen den gamla kompletta eller den nya
+    if os.path.isdir(final): shutil.rmtree(final)
+    os.rename(out, final)
     return M, folder
 
 def run(cat_s=96, top_s=80, only=None):

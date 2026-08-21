@@ -1,0 +1,104 @@
+{
+  "id": "sofa-japandi-003",
+  "name": "Japandi low-profile sofa",
+  "category": "living-room",
+  "subcategory": "sofas",
+  "style": "japandi",
+  "dimensions_cm": {
+    "width": 216,
+    "depth": 96,
+    "height": 65
+  },
+  "footprint_cm": {
+    "width": 216,
+    "depth": 96
+  },
+  "seat_height_cm": 38,
+  "seats": 2,
+  "materials": [
+    "fabric",
+    "wood"
+  ],
+  "default_colors": {
+    "fabric": "beige",
+    "wood": "smoked-oak"
+  },
+  "recommended_colors": {
+    "fabric": [
+      "cream",
+      "sand",
+      "beige",
+      "taupe",
+      "warm-brown",
+      "muted-green"
+    ],
+    "wood": [
+      "smoked-oak",
+      "natural-oak",
+      "walnut",
+      "dark-wood"
+    ]
+  },
+  "design_intent_cm": {
+    "width": 216,
+    "depth": 96,
+    "height": 66
+  },
+  "assets": {
+    "catalog": {
+      "file": "catalog.webp",
+      "px": [
+        1200,
+        1200
+      ],
+      "background": "transparent",
+      "camera": "perspective-85mm",
+      "angle_deg": {
+        "azimuth": 34.0,
+        "elevation": 21.0
+      }
+    },
+    "top": {
+      "file": "top.webp",
+      "px": [
+        1368,
+        648
+      ],
+      "background": "transparent",
+      "camera": "orthographic",
+      "px_per_cm": 6.0,
+      "padding_cm": 6.0,
+      "footprint_px": [
+        1296,
+        576
+      ]
+    },
+    "masks": {
+      "catalog": [
+        {
+          "material": "fabric",
+          "file": "masks/catalog/fabric.png",
+          "coverage_pct": 11.811
+        },
+        {
+          "material": "wood",
+          "file": "masks/catalog/wood.png",
+          "coverage_pct": 4.821
+        }
+      ],
+      "top": [
+        {
+          "material": "fabric",
+          "file": "masks/top/fabric.png",
+          "coverage_pct": 68.999
+        },
+        {
+          "material": "wood",
+          "file": "masks/top/wood.png",
+          "coverage_pct": 15.326
+        }
+      ]
+    }
+  },
+  "variant": null
+}
