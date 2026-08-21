@@ -14,18 +14,29 @@ för det är de som gör att åttio bilder känns som ETT bibliotek:
 
   SCENEN   sömlös vit bakgrund, stor mjuk softbox uppifrån, svag nyckel
            från övre vänster, EN kontaktskugga rakt under möbeln
-  KAMERAN  trekvartsvy, 85 mm, strax ovanför möbeln, minimal distorsion,
-           hela möbeln i bild med jämn marginal
+  KAMERAN  HÖJD trekvartsvy, omkring 40 grader ovanifrån, 50 mm
 
 Det som varierar är möbeln.
+
+VARFÖR KAMERAN LIGGER SÅ HÖGT
+Rekonstruktionen bygger bara det den SER. Vid låg trekvartsvinkel ser den
+knappt möbelns ovansida, och då hamnar den inte i meshen. Sängen visade
+det tydligast: fotot hade täcke, veck och kuddar, meshen hade en slät
+skiva, och topvyn blev en vit rektangel. Med kameran uppe på fyrtio grader
+följer bäddningen med hela vägen in i topvyn.
+
+Topvyn är bibliotekets huvudprodukt. Alltså ska källfotot vara taget så
+att ovansidan syns.
 """
 
 SCEN = (
     "Professional furniture catalogue studio photograph of one single piece of "
     "furniture standing alone. Seamless pure white background. Large soft overhead "
     "softbox plus a gentle key light from the upper left. Exactly one subtle contact "
-    "shadow directly beneath the piece and no other shadow. Three-quarter front view, "
-    "85mm lens, camera slightly above the piece, minimal perspective distortion. The "
+    "shadow directly beneath the piece and no other shadow. Elevated three-quarter "
+    "view looking down on the piece from about forty degrees above, so its whole top "
+    "surface is clearly visible and well lit while the front and side faces also "
+    "remain visible. 50mm lens, minimal perspective distortion. The "
     "entire piece is fully inside the frame with generous even margin on every side. "
     "Photorealistic, sharp throughout, premium Scandinavian contemporary design, "
     "quiet luxury, warm neutral palette, honest natural materials. "

@@ -25,6 +25,7 @@ sys.path.insert(0, "/home/user/efilm/furniture-library/_pipeline")
 import bpy
 from mathutils import Vector
 from lib import scene, studio
+from gen import cleanup as CL
 from lib.scene import PX_PER_CM, TOP_PAD_CM
 
 EMISSION = 0.72
@@ -108,6 +109,20 @@ def shoot(glb, outdir, W, D, H, samples=120, qa=True):
     studio.studio_world()
     _WSTR = bpy.context.scene.world.node_tree.nodes["Background"].inputs['Strength'].default_value
     P = prepare(glb, W, D, H)
+    # Sanera FÖRE mätningen: spegling, planutjämning och riktning. Mätt
+    # sänker det symmetrifelet från omkring 1,2 procent till under 0,01.
+    P, cinfo = CL.clean(P)
+    # skalan kan ha ändrats en aning av speglingen — normalisera om
+    lo, hi = _bounds(P); d = hi - lo
+    from mathutils import Vector as V
+    s2 = V((W/100.0/max(d.x,1e-6), D/100.0/max(d.y,1e-6), H/100.0/max(d.z,1e-6)))
+    for o in P: o.scale = s2
+    bpy.context.view_layer.objects.active = P[0]
+    for o in P: o.select_set(True)
+    bpy.ops.object.transform_apply(scale=True)
+    lo, hi = _bounds(P); c = (lo + hi)/2
+    for o in P: o.location -= V((c.x, c.y, lo.z))
+    bpy.context.view_layer.update()
     bake_shading()
     lo, hi = _bounds(P)
     meas = dict(width=round((hi.x-lo.x)*100,1), depth=round((hi.y-lo.y)*100,1),
@@ -144,8 +159,10 @@ def shoot(glb, outdir, W, D, H, samples=120, qa=True):
         sc.render.filepath = os.path.join(outdir, "qa_catalog")
         bpy.ops.render.render(write_still=True)
         qa_px = 700
+    from gen import measure as MS
     return dict(top_px=[w, h], measured_cm=meas, px_per_cm=PX_PER_CM,
-                pad_cm=TOP_PAD_CM, qa_px=qa_px)
+                pad_cm=TOP_PAD_CM, qa_px=qa_px, cleanup=cinfo,
+                geometry=MS.measure(P))
 
 if __name__ == "__main__":
     glb, out, W, D, H = sys.argv[-5], sys.argv[-4], float(sys.argv[-3]), float(sys.argv[-2]), float(sys.argv[-1])
