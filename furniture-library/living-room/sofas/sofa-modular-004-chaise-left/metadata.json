@@ -1,6 +1,6 @@
 {
-  "id": "sofa-modular-004-chaise-right",
-  "name": "Modular sofa — Chaise right",
+  "id": "sofa-modular-004-chaise-left",
+  "name": "Modular sofa — Chaise left",
   "category": "living-room",
   "subcategory": "sofas",
   "style": "contemporary-scandinavian",
@@ -78,22 +78,22 @@
         {
           "material": "fabric",
           "file": "masks/catalog/fabric.png",
-          "coverage_pct": 12.616
+          "coverage_pct": 13.297
         },
         {
           "material": "wood",
           "file": "masks/catalog/wood.png",
-          "coverage_pct": 0.112
+          "coverage_pct": 0.097
         }
       ],
       "top": [
         {
           "material": "fabric",
           "file": "masks/top/fabric.png",
-          "coverage_pct": 65.718
+          "coverage_pct": 65.739
         }
       ]
     }
   },
-  "variant": "chaise-right"
+  "variant": "chaise-left"
 }
