@@ -29,7 +29,13 @@ VARIANTS = {
 }
 
 def _seat_block(P, f, x, w, d, ycen):
-    P.append(B.box("base_%.0f" % x, w, d, BASE_H, (x, ycen, LEG_H), bevel=1.4, mat=f))
+    # Stommens fram- och bakstycke låg på exakt samma plan som armstödets
+    # och ryggens. Två sammanfallande ytor kan renderaren inte ordna, och
+    # resultatet blev svarta rutor i armarnas framkant. Stommen dras in en
+    # halv centimeter runtom så den ligger tydligt innanför de delar som
+    # täcker den. Fem millimeter är osynligt vid bibliotekets skala.
+    P.append(B.box("base_%.0f" % x, w, d - 1.0, BASE_H, (x, ycen, LEG_H),
+                   bevel=1.4, mat=f))
     P.append(B.cushion("seat_%.0f" % x, w - 2.6, d - 16.0, SEAT_T,
                        (x, ycen - 6.0, LEG_H + BASE_H - 1.0),
                        soft=0.58, sag=0.13, mat=f))
@@ -79,7 +85,7 @@ def build(variant="straight", fabric="light-grey", wood="black-stained-wood"):
         # divanmodulen: egen kropp och egen lång dyna
         cx = (W/2 - MOD_W/2) if side < 0 else (-W/2 + MOD_W/2)
         ext = CH_D - D
-        P.append(B.box("ch_base", MOD_W - 0.8, ext + 2.0, BASE_H,
+        P.append(B.box("ch_base", MOD_W - 0.8, ext + 1.0, BASE_H,
                        (cx, y0 + D + ext/2 - 1.0, LEG_H), bevel=1.4, mat=f))
         P.append(B.cushion("ch_seat", MOD_W - 3.4, ext - 4.0, SEAT_T,
                            (cx, y0 + D + ext/2 - 1.0, LEG_H + BASE_H - 1.0),
