@@ -1,0 +1,84 @@
+{
+  "id": "table-dining-round-002",
+  "name": "Premium round dining table",
+  "category": "dining",
+  "subcategory": "dining-tables",
+  "style": "quiet-luxury",
+  "dimensions_cm": {
+    "width": 120,
+    "depth": 120,
+    "height": 74
+  },
+  "footprint_cm": {
+    "width": 120,
+    "depth": 120
+  },
+  "seats": 4,
+  "shape": "round",
+  "materials": [
+    "stone"
+  ],
+  "default_colors": {
+    "stone": "travertine"
+  },
+  "recommended_colors": {
+    "stone": [
+      "travertine",
+      "warm-stone",
+      "ceramic",
+      "dark-stone"
+    ]
+  },
+  "design_intent_cm": {
+    "width": 120,
+    "depth": 120,
+    "height": 74
+  },
+  "assets": {
+    "catalog": {
+      "file": "catalog.webp",
+      "px": [
+        1200,
+        1200
+      ],
+      "background": "transparent",
+      "camera": "perspective-85mm",
+      "angle_deg": {
+        "azimuth": 34.0,
+        "elevation": 21.0
+      }
+    },
+    "top": {
+      "file": "top.webp",
+      "px": [
+        792,
+        792
+      ],
+      "background": "transparent",
+      "camera": "orthographic",
+      "px_per_cm": 6.0,
+      "padding_cm": 6.0,
+      "footprint_px": [
+        720,
+        720
+      ]
+    },
+    "masks": {
+      "catalog": [
+        {
+          "material": "stone",
+          "file": "masks/catalog/stone.png",
+          "coverage_pct": 11.489
+        }
+      ],
+      "top": [
+        {
+          "material": "stone",
+          "file": "masks/top/stone.png",
+          "coverage_pct": 64.875
+        }
+      ]
+    }
+  },
+  "variant": null
+}

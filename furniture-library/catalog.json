@@ -1,0 +1,82 @@
+{
+  "library_version": "1.0",
+  "phase": "1 — visual QA",
+  "generated_from": "parametric 3D master models rendered in Cycles",
+  "conventions": {
+    "units": "cm",
+    "catalog_view": {
+      "camera": "perspective 85mm",
+      "azimuth_deg": 34,
+      "elevation_deg": 21,
+      "background": "transparent",
+      "format": "webp"
+    },
+    "top_view": {
+      "camera": "orthographic",
+      "angle": "90deg straight down",
+      "px_per_cm": 6.0,
+      "padding_cm": 6.0,
+      "background": "transparent",
+      "format": "webp"
+    },
+    "masks": {
+      "format": "png",
+      "value": "white = material, black = other, transparent = outside object",
+      "per_view": true,
+      "empty_masks": "never written"
+    },
+    "footprint": "physical furniture only; canvas padding and shadow excluded"
+  },
+  "material_groups": [
+    "fabric",
+    "pattern",
+    "wood",
+    "metal",
+    "stone"
+  ],
+  "models": [
+    {
+      "id": "table-dining-round-002",
+      "name": "Premium round dining table",
+      "category": "dining",
+      "subcategory": "dining-tables",
+      "style": "quiet-luxury",
+      "folder": "dining/dining-tables/table-dining-round-002/",
+      "dimensions_cm": {
+        "width": 120,
+        "depth": 120,
+        "height": 74
+      },
+      "footprint_cm": {
+        "width": 120,
+        "depth": 120
+      },
+      "materials": [
+        "stone"
+      ],
+      "variant": null
+    },
+    {
+      "id": "sofa-scandinavian-001",
+      "name": "Contemporary Scandinavian 3-seat sofa",
+      "category": "living-room",
+      "subcategory": "sofas",
+      "style": "contemporary-scandinavian",
+      "folder": "living-room/sofas/sofa-scandinavian-001/",
+      "dimensions_cm": {
+        "width": 224,
+        "depth": 95,
+        "height": 81
+      },
+      "footprint_cm": {
+        "width": 224,
+        "depth": 95
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": null
+    }
+  ]
+}

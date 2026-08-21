@@ -1,0 +1,79 @@
+{
+  "summary": {
+    "models": 2,
+    "all_transparent": true,
+    "all_ids_unique": true,
+    "all_top_scale_exact": true,
+    "no_empty_masks": true,
+    "largest_dimension_deviation_cm": 3
+  },
+  "models": [
+    {
+      "id": "table-dining-round-002",
+      "unique_id": true,
+      "catalog_alpha": true,
+      "top_alpha": true,
+      "top_scale_ok": true,
+      "top_px": [
+        792,
+        792
+      ],
+      "top_px_expected": [
+        792,
+        792
+      ],
+      "masks_catalog": [
+        "stone"
+      ],
+      "masks_top": [
+        "stone"
+      ],
+      "no_empty_masks": true,
+      "dims_cm": {
+        "width": 120,
+        "depth": 120,
+        "height": 74
+      },
+      "design_intent_cm": {
+        "width": 120,
+        "depth": 120,
+        "height": 74
+      },
+      "max_deviation_cm": 0
+    },
+    {
+      "id": "sofa-scandinavian-001",
+      "unique_id": true,
+      "catalog_alpha": true,
+      "top_alpha": true,
+      "top_scale_ok": true,
+      "top_px": [
+        1416,
+        642
+      ],
+      "top_px_expected": [
+        1416,
+        642
+      ],
+      "masks_catalog": [
+        "fabric",
+        "wood"
+      ],
+      "masks_top": [
+        "fabric"
+      ],
+      "no_empty_masks": true,
+      "dims_cm": {
+        "width": 224,
+        "depth": 95,
+        "height": 81
+      },
+      "design_intent_cm": {
+        "width": 224,
+        "depth": 92,
+        "height": 78
+      },
+      "max_deviation_cm": 3
+    }
+  ]
+}
