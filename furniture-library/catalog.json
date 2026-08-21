@@ -36,6 +36,71 @@
   ],
   "models": [
     {
+      "id": "bed-upholstered-001",
+      "name": "Scandinavian upholstered bed 160",
+      "category": "bedroom",
+      "subcategory": "beds",
+      "style": "contemporary-scandinavian",
+      "folder": "bedroom/beds/bed-upholstered-001/",
+      "dimensions_cm": {
+        "width": 169,
+        "depth": 221,
+        "height": 97
+      },
+      "footprint_cm": {
+        "width": 169,
+        "depth": 221
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": null
+    },
+    {
+      "id": "bed-wood-002",
+      "name": "Minimal wooden platform bed 160",
+      "category": "bedroom",
+      "subcategory": "beds",
+      "style": "japandi",
+      "folder": "bedroom/beds/bed-wood-002/",
+      "dimensions_cm": {
+        "width": 184,
+        "depth": 219,
+        "height": 74
+      },
+      "footprint_cm": {
+        "width": 184,
+        "depth": 219
+      },
+      "materials": [
+        "wood",
+        "fabric"
+      ],
+      "variant": null
+    },
+    {
+      "id": "table-dining-oval-001",
+      "name": "Scandinavian oval oak dining table",
+      "category": "dining",
+      "subcategory": "dining-tables",
+      "style": "contemporary-scandinavian",
+      "folder": "dining/dining-tables/table-dining-oval-001/",
+      "dimensions_cm": {
+        "width": 200,
+        "depth": 100,
+        "height": 74
+      },
+      "footprint_cm": {
+        "width": 200,
+        "depth": 100
+      },
+      "materials": [
+        "wood"
+      ],
+      "variant": null
+    },
+    {
       "id": "table-dining-round-002",
       "name": "Premium round dining table",
       "category": "dining",
@@ -53,6 +118,159 @@
       },
       "materials": [
         "stone"
+      ],
+      "variant": null
+    },
+    {
+      "id": "armchair-lounge-001",
+      "name": "Scandinavian lounge chair",
+      "category": "living-room",
+      "subcategory": "armchairs",
+      "style": "contemporary-scandinavian",
+      "folder": "living-room/armchairs/armchair-lounge-001/",
+      "dimensions_cm": {
+        "width": 73,
+        "depth": 76,
+        "height": 80
+      },
+      "footprint_cm": {
+        "width": 73,
+        "depth": 76
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": null
+    },
+    {
+      "id": "armchair-soft-002",
+      "name": "Soft upholstered armchair",
+      "category": "living-room",
+      "subcategory": "armchairs",
+      "style": "soft-minimal",
+      "folder": "living-room/armchairs/armchair-soft-002/",
+      "dimensions_cm": {
+        "width": 88,
+        "depth": 89,
+        "height": 70
+      },
+      "footprint_cm": {
+        "width": 88,
+        "depth": 89
+      },
+      "materials": [
+        "fabric",
+        "metal"
+      ],
+      "variant": null
+    },
+    {
+      "id": "sofa-japandi-003",
+      "name": "Japandi low-profile sofa",
+      "category": "living-room",
+      "subcategory": "sofas",
+      "style": "japandi",
+      "folder": "living-room/sofas/sofa-japandi-003/",
+      "dimensions_cm": {
+        "width": 216,
+        "depth": 96,
+        "height": 65
+      },
+      "footprint_cm": {
+        "width": 216,
+        "depth": 96
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": null
+    },
+    {
+      "id": "sofa-modular-004-chaise-left",
+      "name": "Modular sofa — Chaise left",
+      "category": "living-room",
+      "subcategory": "sofas",
+      "style": "contemporary-scandinavian",
+      "folder": "living-room/sofas/sofa-modular-004-chaise-left/",
+      "dimensions_cm": {
+        "width": 257,
+        "depth": 164,
+        "height": 77
+      },
+      "footprint_cm": {
+        "width": 257,
+        "depth": 164
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": "chaise-left"
+    },
+    {
+      "id": "sofa-modular-004-chaise-right",
+      "name": "Modular sofa — Chaise right",
+      "category": "living-room",
+      "subcategory": "sofas",
+      "style": "contemporary-scandinavian",
+      "folder": "living-room/sofas/sofa-modular-004-chaise-right/",
+      "dimensions_cm": {
+        "width": 257,
+        "depth": 164,
+        "height": 77
+      },
+      "footprint_cm": {
+        "width": 257,
+        "depth": 164
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": "chaise-right"
+    },
+    {
+      "id": "sofa-modular-004",
+      "name": "Modular sofa — Straight, 3 modules",
+      "category": "living-room",
+      "subcategory": "sofas",
+      "style": "contemporary-scandinavian",
+      "folder": "living-room/sofas/sofa-modular-004/",
+      "dimensions_cm": {
+        "width": 258,
+        "depth": 100,
+        "height": 77
+      },
+      "footprint_cm": {
+        "width": 258,
+        "depth": 100
+      },
+      "materials": [
+        "fabric",
+        "wood"
+      ],
+      "variant": "straight"
+    },
+    {
+      "id": "sofa-rounded-002",
+      "name": "Soft rounded premium sofa",
+      "category": "living-room",
+      "subcategory": "sofas",
+      "style": "quiet-luxury",
+      "folder": "living-room/sofas/sofa-rounded-002/",
+      "dimensions_cm": {
+        "width": 236,
+        "depth": 103,
+        "height": 69
+      },
+      "footprint_cm": {
+        "width": 236,
+        "depth": 103
+      },
+      "materials": [
+        "fabric"
       ],
       "variant": null
     },
@@ -75,6 +293,116 @@
       "materials": [
         "fabric",
         "wood"
+      ],
+      "variant": null
+    },
+    {
+      "id": "desk-scandinavian-001",
+      "name": "Scandinavian desk",
+      "category": "office",
+      "subcategory": "desks",
+      "style": "contemporary-scandinavian",
+      "folder": "office/desks/desk-scandinavian-001/",
+      "dimensions_cm": {
+        "width": 130,
+        "depth": 62,
+        "height": 74
+      },
+      "footprint_cm": {
+        "width": 130,
+        "depth": 62
+      },
+      "materials": [
+        "wood",
+        "metal"
+      ],
+      "variant": null
+    },
+    {
+      "id": "outdoor-lounge-chair-001",
+      "name": "Scandinavian outdoor lounge chair",
+      "category": "outdoor",
+      "subcategory": "lounge-chairs",
+      "style": "contemporary-scandinavian",
+      "folder": "outdoor/lounge-chairs/outdoor-lounge-chair-001/",
+      "dimensions_cm": {
+        "width": 70,
+        "depth": 72,
+        "height": 79
+      },
+      "footprint_cm": {
+        "width": 70,
+        "depth": 72
+      },
+      "materials": [
+        "wood",
+        "fabric"
+      ],
+      "variant": null
+    },
+    {
+      "id": "rug-berber-002",
+      "name": "Berber-inspired high pile rug 200x300",
+      "category": "rugs",
+      "subcategory": "berber",
+      "style": "warm-modern",
+      "folder": "rugs/berber/rug-berber-002/",
+      "dimensions_cm": {
+        "width": 200,
+        "depth": 299,
+        "height": 1
+      },
+      "footprint_cm": {
+        "width": 200,
+        "depth": 299
+      },
+      "materials": [
+        "fabric",
+        "pattern"
+      ],
+      "variant": null
+    },
+    {
+      "id": "rug-contemporary-003",
+      "name": "Contemporary neutral rug 160x230",
+      "category": "rugs",
+      "subcategory": "contemporary",
+      "style": "soft-minimal",
+      "folder": "rugs/contemporary/rug-contemporary-003/",
+      "dimensions_cm": {
+        "width": 160,
+        "depth": 230,
+        "height": 1
+      },
+      "footprint_cm": {
+        "width": 160,
+        "depth": 230
+      },
+      "materials": [
+        "fabric",
+        "pattern"
+      ],
+      "variant": null
+    },
+    {
+      "id": "rug-scandinavian-wool-001",
+      "name": "Scandinavian textured wool rug 200x300",
+      "category": "rugs",
+      "subcategory": "scandinavian",
+      "style": "contemporary-scandinavian",
+      "folder": "rugs/scandinavian/rug-scandinavian-wool-001/",
+      "dimensions_cm": {
+        "width": 200,
+        "depth": 300,
+        "height": 1
+      },
+      "footprint_cm": {
+        "width": 200,
+        "depth": 300
+      },
+      "materials": [
+        "fabric",
+        "pattern"
       ],
       "variant": null
     }
