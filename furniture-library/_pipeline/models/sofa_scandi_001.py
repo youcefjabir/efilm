@@ -16,6 +16,7 @@ alltid in i varandra med några millimeter.
 """
 import math
 from lib import build as B, mats
+from lib import mats2
 
 W, D, H   = 224.0, 92.0, 78.0
 ARM_W     = 16.0
@@ -27,8 +28,9 @@ BACK_T    = 16.0                    # ryggstommens tjocklek
 INNER     = W - 2*ARM_W             # fri bredd mellan armstöden
 
 def build(fabric="sand", wood="natural-oak"):
-    f = mats.make("fabric", fabric)
-    w = mats.make("wood", wood)
+    # V2-materialen: väv, ådring och tonvariation i stället för platt färg
+    f = mats2.fabric(fabric, weave_mm=4.2)
+    w = mats2.wood(wood, along="z")          # benens fiber löper längs benet
     P = []
 
     # sarg mellan armstöden, indragen 3 mm i djupled så inget plan sammanfaller
