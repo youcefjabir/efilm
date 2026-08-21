@@ -1,0 +1,107 @@
+{
+  "id": "bed-upholstered-001",
+  "name": "Scandinavian upholstered bed 160",
+  "category": "bedroom",
+  "subcategory": "beds",
+  "style": "contemporary-scandinavian",
+  "dimensions_cm": {
+    "width": 169,
+    "depth": 221,
+    "height": 97
+  },
+  "footprint_cm": {
+    "width": 169,
+    "depth": 221
+  },
+  "mattress_cm": {
+    "width": 160,
+    "length": 200
+  },
+  "size_presets": [
+    "140x200",
+    "160x200",
+    "180x200"
+  ],
+  "materials": [
+    "fabric",
+    "wood"
+  ],
+  "default_colors": {
+    "fabric": "light-grey",
+    "wood": "natural-oak"
+  },
+  "recommended_colors": {
+    "fabric": [
+      "cream",
+      "sand",
+      "beige",
+      "taupe",
+      "light-grey",
+      "medium-grey",
+      "charcoal"
+    ],
+    "wood": [
+      "light-oak",
+      "natural-oak",
+      "smoked-oak",
+      "walnut"
+    ]
+  },
+  "design_intent_cm": {
+    "width": 168,
+    "depth": 214,
+    "height": 96
+  },
+  "assets": {
+    "catalog": {
+      "file": "catalog.webp",
+      "px": [
+        1200,
+        1200
+      ],
+      "background": "transparent",
+      "camera": "perspective-85mm",
+      "angle_deg": {
+        "azimuth": 34.0,
+        "elevation": 21.0
+      }
+    },
+    "top": {
+      "file": "top.webp",
+      "px": [
+        1086,
+        1398
+      ],
+      "background": "transparent",
+      "camera": "orthographic",
+      "px_per_cm": 6.0,
+      "padding_cm": 6.0,
+      "footprint_px": [
+        1014,
+        1326
+      ]
+    },
+    "masks": {
+      "catalog": [
+        {
+          "material": "fabric",
+          "file": "masks/catalog/fabric.png",
+          "coverage_pct": 19.132
+        },
+        {
+          "material": "wood",
+          "file": "masks/catalog/wood.png",
+          "coverage_pct": 0.063
+        }
+      ],
+      "top": [
+        {
+          "material": "fabric",
+          "file": "masks/top/fabric.png",
+          "coverage_pct": 88.173
+        }
+      ]
+    }
+  },
+  "variant": null
+}

@@ -1,0 +1,110 @@
+{
+  "id": "bed-wood-002",
+  "name": "Minimal wooden platform bed 160",
+  "category": "bedroom",
+  "subcategory": "beds",
+  "style": "japandi",
+  "dimensions_cm": {
+    "width": 184,
+    "depth": 219,
+    "height": 74
+  },
+  "footprint_cm": {
+    "width": 184,
+    "depth": 219
+  },
+  "mattress_cm": {
+    "width": 160,
+    "length": 200
+  },
+  "size_presets": [
+    "140x200",
+    "160x200",
+    "180x200"
+  ],
+  "materials": [
+    "wood",
+    "fabric"
+  ],
+  "default_colors": {
+    "wood": "smoked-oak",
+    "fabric": "warm-white"
+  },
+  "recommended_colors": {
+    "wood": [
+      "light-oak",
+      "natural-oak",
+      "smoked-oak",
+      "walnut",
+      "black-stained-wood"
+    ],
+    "fabric": [
+      "warm-white",
+      "cream",
+      "sand",
+      "light-grey"
+    ]
+  },
+  "design_intent_cm": {
+    "width": 184,
+    "depth": 216,
+    "height": 78
+  },
+  "assets": {
+    "catalog": {
+      "file": "catalog.webp",
+      "px": [
+        1200,
+        1200
+      ],
+      "background": "transparent",
+      "camera": "perspective-85mm",
+      "angle_deg": {
+        "azimuth": 34.0,
+        "elevation": 21.0
+      }
+    },
+    "top": {
+      "file": "top.webp",
+      "px": [
+        1176,
+        1386
+      ],
+      "background": "transparent",
+      "camera": "orthographic",
+      "px_per_cm": 6.0,
+      "padding_cm": 6.0,
+      "footprint_px": [
+        1104,
+        1314
+      ]
+    },
+    "masks": {
+      "catalog": [
+        {
+          "material": "fabric",
+          "file": "masks/catalog/fabric.png",
+          "coverage_pct": 11.793
+        },
+        {
+          "material": "wood",
+          "file": "masks/catalog/wood.png",
+          "coverage_pct": 4.888
+        }
+      ],
+      "top": [
+        {
+          "material": "fabric",
+          "file": "masks/top/fabric.png",
+          "coverage_pct": 77.565
+        },
+        {
+          "material": "wood",
+          "file": "masks/top/wood.png",
+          "coverage_pct": 11.388
+        }
+      ]
+    }
+  },
+  "variant": null
+}
