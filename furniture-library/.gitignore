@@ -1,2 +1,7 @@
 _pipeline/__pycache__/
 _index_partial.json
+
+# Mellansteg. Renderaren skriver PNG och konverterar till WebP, varefter
+# PNG:en tas bort — de här två filnamnen är aldrig en färdig tillgång.
+catalog.png
+top.png
