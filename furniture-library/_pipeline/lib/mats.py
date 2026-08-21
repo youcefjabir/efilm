@@ -70,40 +70,33 @@ def _tex(nt, bsdf, kind, scale, bump):
         nt.links.new(w.outputs['Fac'], mix.inputs[3])
         nt.links.new(mix.outputs[0], b.inputs['Height'])
 
-def make(group, color_name, name=None, mask=None):
-    """mask styr vilken maskfil ytan hamnar i. Normalt = gruppen, men en
-       mönstrad matta har två tygytor som ska kunna färgas var för sig:
-       fältet och motivet. Då sätts mask="fabric" respektive "pattern"."""
-    """Ett material ur en av de fyra grupperna. group sparas på materialet
-       så maskrenderingen vet vilken yta som är vilken."""
-    rgb = srgb_to_linear(PALETTE[color_name])
-    m = bpy.data.materials.new(name or (group + "-" + color_name))
-    m.use_nodes = True
-    nt = m.node_tree
-    b = _pbsdf(nt)
-    b.inputs['Base Color'].default_value = (*rgb, 1)
+def make(group, color_name, name=None, mask=None, along=None, finish=None):
+    """Ett material ur en av de fyra grupperna.
+
+       ÖVERGÅNG TILL V2. Tolv av modellerna byggdes mot den här funktionen
+       medan tre skrevs om mot mats2. Resultatet syntes direkt: det ovala
+       matbordet renderades som en platt orange skiva bredvid en soffa med
+       synlig väv. Skillnaden var inte modellen utan shadern.
+
+       I stället för att skriva om tolv modellfiler pekar den gamla
+       ingången nu på V2. Anropen ser likadana ut, ytorna blir de nya.
+       mask, vg_group och vg_color sätts av V2-funktionerna på exakt samma
+       sätt, så maskrenderingen och omfärgningen är oförändrade.
+
+       along och finish är nya och frivilliga: fiberriktning för trä,
+       ytbehandling för metall. Utan dem gäller vettiga standardvärden."""
+    from . import mats2
     if group == "fabric":
-        b.inputs['Roughness'].default_value = 0.92
-        b.inputs['Sheen Weight'].default_value = 0.30
-        b.inputs['Sheen Roughness'].default_value = 0.45
-        b.inputs['Specular IOR Level'].default_value = 0.22
-        _tex(nt, b, "weave", 620.0, 0.30)
-    elif group == "wood":
-        b.inputs['Roughness'].default_value = 0.40
-        b.inputs['Specular IOR Level'].default_value = 0.44
-        _tex(nt, b, "grain", 180.0, 0.10)
-    elif group == "metal":
-        b.inputs['Metallic'].default_value = 1.0
-        b.inputs['Roughness'].default_value = 0.34
-        _tex(nt, b, "grain", 900.0, 0.05)
-    elif group == "stone":
-        b.inputs['Roughness'].default_value = 0.30
-        b.inputs['Specular IOR Level'].default_value = 0.52
-        _tex(nt, b, "grain", 90.0, 0.08)
-    m["vg_group"] = group
-    m["vg_mask"] = mask or group
-    m["vg_color"] = color_name
-    return m
+        return mats2.fabric(color_name, name=name, mask=mask or "fabric")
+    if group == "wood":
+        return mats2.wood(color_name, along=along or "y",
+                          name=name, mask=mask or "wood")
+    if group == "metal":
+        return mats2.metal(color_name, finish=finish or "satin",
+                           along=along or "z", name=name, mask=mask or "metal")
+    if group == "stone":
+        return mats2.stone(color_name, name=name, mask=mask or "stone")
+    raise ValueError("okänd materialgrupp: " + group)
 
 # ---------------------------------------------------------------------
 # MATTOR

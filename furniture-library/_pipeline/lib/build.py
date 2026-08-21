@@ -59,8 +59,15 @@ def cushion(name, w, d, h, loc=(0,0,0), soft=0.42, sag=0.10, mat=None, seam=True
         v.co.y = y*0.5*cm(d)*bulge
         dip = sag * (1.0 - min(1.0, (x*x + y*y)*0.85))
         v.co.z = (z*0.5 - (dip if z > 0 else 0.0)) * cm(h)
+    # Fasen får ALDRIG vara bredare än rutnätets minsta cell. Kuben är
+    # delad i sju steg per axel; en 16 cm hög dyna har alltså 2,3 cm mellan
+    # kantslingorna, och en fas på 2,2 cm äter upp hela cellen. Resultatet
+    # blir överlappande fasar som läser som en stapel pannkakor. Det var
+    # precis det som hände.
+    cell = min(w, d, h)/7.0
+    off  = min(min(w, d, h)*0.20*soft + 0.9, cell*0.42)
     bmesh.ops.bevel(bm, geom=list(bm.verts)+list(bm.edges)+list(bm.faces),
-                    offset=cm(min(w, d, h)*0.20*soft+0.9), segments=4,
+                    offset=cm(off), segments=4,
                     profile=0.5, affect='EDGES')
     o = _new(name, [], [])
     _bm_to(o, bm)
@@ -82,6 +89,11 @@ def cyl(name, r, h, loc=(0,0,0), verts=48, mat=None, r_top=None, bevel=0.5, zc=F
     bmesh.ops.create_cone(bm, cap_ends=True, cap_tris=False, segments=verts,
                           radius1=cm(r), radius2=cm(rt), depth=cm(h))
     if bevel > 0:
+        # Samma sak för valsen: med 64 segment på radie 11 cm är varje
+        # sidoyta 1,1 cm bred, och en fas på 0,5 cm åt vardera hållet äter
+        # upp den. Då blir en slät kon räfflad.
+        seg_w = 2.0*math.pi*max(r, rt)/max(verts, 3)
+        bevel = min(bevel, seg_w*0.30, min(r, rt, h)*0.30)
         bmesh.ops.bevel(bm, geom=list(bm.verts)+list(bm.edges)+list(bm.faces),
                         offset=cm(bevel), segments=2, profile=0.5, affect='EDGES')
     o = _new(name, [], [])
@@ -193,22 +205,43 @@ def _bezier(name, pts, cyclic=False):
     return o
 
 def sweep(name, path_pts, prof_w, prof_h, cyclic=False, mat=None,
-          taper=None, res=16):
-    """Sveper ett rundat tvärsnitt längs en kurva i planet.
-       prof_w/prof_h i cm ger tvärsnittets bredd och höjd — ett liggande
-       ovalt snitt läser som en stoppad rulle, inte som ett rör.
-       taper är en kurva som krymper snittet längs vägen."""
+          taper=None, res=16, profile="oval", corner=None):
+    """Sveper ett tvärsnitt längs en kurva i planet.
+
+       profile="oval"  liggande ovalt snitt — en stoppad rulle.
+       profile="rrect" rundad rektangel — en stoppad VÄGG.
+
+       Skillnaden är avgörande för hur en rundad soffa läses. Ett ovalt
+       snitt på 30 x 34 cm längs en U-kurva ger tre feta valsar som sitter
+       ihop; det blir en korv, inte en möbel. En rundad rektangel på
+       14 x 46 med 7 cm hörnradie ger i stället ett sammanhängande stoppat
+       skal med en vertikal yttersida och en mjukt rundad överkant, vilket
+       är vad en riktig rundad loungesoffa faktiskt är."""
     path = _bezier(name + "_path", path_pts, cyclic)
     pc = bpy.data.curves.new(name + "_prof", 'CURVE')
     pc.dimensions = '2D'; pc.resolution_u = 8
     sp = pc.splines.new('BEZIER')
-    n = 12
-    sp.bezier_points.add(n-1)
-    for i in range(n):
-        a = 2*math.pi*i/n
-        bp = sp.bezier_points[i]
-        bp.co = (math.cos(a)*cm(prof_w)/2, math.sin(a)*cm(prof_h)/2, 0)
-        bp.handle_left_type = bp.handle_right_type = 'AUTO'
+    if profile == "rrect":
+        r = cm(corner if corner is not None else min(prof_w, prof_h)*0.5)
+        hw, hh = cm(prof_w)/2 - r, cm(prof_h)/2 - r
+        pts = []
+        for cx, cy, a0 in ((hw, hh, 0), (-hw, hh, 90), (-hw, -hh, 180), (hw, -hh, 270)):
+            for k in range(4):
+                a = math.radians(a0 + k*30.0)
+                pts.append((cx + math.cos(a)*r, cy + math.sin(a)*r))
+        sp.bezier_points.add(len(pts)-1)
+        for i, (x, y) in enumerate(pts):
+            bp = sp.bezier_points[i]
+            bp.co = (x, y, 0)
+            bp.handle_left_type = bp.handle_right_type = 'AUTO'
+    else:
+        n = 12
+        sp.bezier_points.add(n-1)
+        for i in range(n):
+            a = 2*math.pi*i/n
+            bp = sp.bezier_points[i]
+            bp.co = (math.cos(a)*cm(prof_w)/2, math.sin(a)*cm(prof_h)/2, 0)
+            bp.handle_left_type = bp.handle_right_type = 'AUTO'
     sp.use_cyclic_u = True
     prof = bpy.data.objects.new(name + "_prof", pc)
     bpy.context.collection.objects.link(prof)

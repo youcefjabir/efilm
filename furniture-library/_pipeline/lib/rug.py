@@ -11,7 +11,7 @@ Mönstren är originalritade geometriska figurer i berbertradition, inte
 kopior av någon kommersiell matta.
 """
 import math
-from lib import build as B, mats
+from lib import build as B, mats, mats2
 
 T_BASE = 1.5      # fältets tjocklek i cm
 T_PAT  = 0.5      # motivet ligger ovanpå fältet, som en tätare lugg
@@ -22,7 +22,12 @@ T_PAT  = 0.5      # motivet ligger ovanpå fältet, som en tätare lugg
 # alls — bara fransen, som sitter utanför kanten, kom fram.
 
 def field(w, d, base_col, shape="rect", pile=0.55):
-    m = mats.rug_pile(mats.make("fabric", base_col, mask="fabric"), 150.0, 0.75 + pile*0.5)
+    # Mattan gick från fabric+rug_pile till ullshadern i V2. rug_pile lade
+    # en egen bumpnod SIST i kedjan och kopplade bort allt före den, så en
+    # matta fick aldrig något av V2:s struktur. Ull är dessutom rätt
+    # material: luggen är knippen, inte väv, och färgen varierar per
+    # knippe — det är den variationen som bär mattan rakt uppifrån.
+    m = mats2.wool(base_col, pile_mm=11.0 + pile*6.0, tone=0.11, mask="fabric")
     if shape == "round":
         return [B.disc("field", w/2, T_BASE, (0, 0, 0), m, verts=128, bevel=0.2)]
     if shape == "oval":
@@ -30,7 +35,11 @@ def field(w, d, base_col, shape="rect", pile=0.55):
     return [B.rounded_plate("field", w, d, T_BASE, 1.2, (0, 0, 0), mat=m, seg=2)]
 
 def pat_mat(col, pile=0.75):
-    return mats.rug_pile(mats.make("fabric", col, mask="pattern"), 190.0, 0.8 + pile*0.5)
+    # Motivet är tätare knutet än fältet: kortare lugg, något mattare.
+    # tone sattes explicit till 0.13, vilket slog ut den automatiska
+    # mörkerkompensationen i wool(). På kolgrått ger 13 % ingen synlig
+    # skillnad alls och romberna blev svarta plattor utan lugg.
+    return mats2.wool(col, pile_mm=7.5, rough=0.98, mask="pattern")
 
 def diamonds(w, d, col, rows=3, cols=5, sz=0.62):
     """Berbermotiv: rutade romber i rader. Storleken följer mattan, så

@@ -3,14 +3,14 @@
 import sys, os, importlib, json, math
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bpy
-from lib import scene, mats, build, render
+from lib import scene, mats, build, render, studio
 from lib.scene import bounds
 
 def shoot(modname, outdir, cat_s=180, top_s=180, do_masks=True, scale=100):
     scene.nuke()
     sc = scene.setup_render()
     sc.render.resolution_percentage = scale
-    scene.world_gradient()
+    studio.studio_world()
     mod = importlib.import_module("models." + modname)
     importlib.reload(mod)
     parts = mod.build()

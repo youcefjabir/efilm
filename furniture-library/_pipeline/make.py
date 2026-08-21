@@ -14,7 +14,7 @@ import sys, os, json, importlib, shutil, math, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bpy
 from PIL import Image
-from lib import scene, mats, build, render
+from lib import scene, mats, build, render, studio
 from lib.scene import bounds, PX_PER_CM, TOP_PAD_CM
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
@@ -48,7 +48,7 @@ def webp(src, dst, q=92):
 def one(modname, variant, cat_s, top_s):
     scene.nuke()
     sc = scene.setup_render()
-    scene.world_gradient()
+    studio.studio_world()
     mod = importlib.import_module("models." + modname)
     importlib.reload(mod)
     parts = mod.build(variant) if variant else mod.build()
