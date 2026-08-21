@@ -113,7 +113,12 @@ def make(group, color_name, name=None, mask=None):
 # Luggen görs med förskjutning i shadern, inte med geometri. Det ger
 # textur i topvyn utan att en matta kostar en miljon polygoner.
 # ---------------------------------------------------------------------
-def rug_pile(mat, scale=900.0, strength=0.55, dist=0.0035):
+def rug_pile(mat, scale=150.0, strength=0.95, dist=0.007):
+    """Luggen måste synas vid 6 px/cm, annars blir mattan en platt
+       rektangel — precis det punkt 33 förbjuder. Med skala 760 blev
+       varje fiber 2,6 mm, alltså under en och en halv bildpunkt, och
+       medelvärdesbildades bort. Skala 150 ger ungefär 1,3 cm, som är
+       åtta bildpunkter: det läses som väv."""
     nt = mat.node_tree; b = _pbsdf(nt)
     n = nt.nodes.new("ShaderNodeTexNoise")
     n.inputs['Scale'].default_value = scale
