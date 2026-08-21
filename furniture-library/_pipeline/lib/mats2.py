@@ -79,13 +79,18 @@ def _tint(rgb, k):
 # skala utan att bli en tygprovkarta. Ovanpå väven ligger en långsam
 # tonvariation som imiterar ojämn infärgning.
 # ---------------------------------------------------------------------
-def fabric(color, weave_mm=4.0, tone=None, sheen=0.34, name=None, mask="fabric"):
+def fabric(color, weave_mm=9.0, tone=None, sheen=0.34, name=None, mask="fabric", jitter=0.0):
     rgb = srgb_to_linear(PALETTE[color])
     # En mörk yta tål — och behöver — större relativ tonvariation än en
     # ljus. Olive såg platt ut med samma 5,5 % som sand.
     if tone is None:
         lum = 0.2126*rgb[0] + 0.7152*rgb[1] + 0.0722*rgb[2]
-        tone = 0.055 + 0.13*(1.0 - min(1.0, lum*2.2))
+        tone = 0.085 + 0.17*(1.0 - min(1.0, lum*2.2))
+    # jitter ger en dyna en aning annan ton än grannen. Riktiga dynor är
+    # aldrig exakt lika, och skillnaden är det som gör att tre sittdynor
+    # läses som tre dynor och inte som ett fält.
+    if jitter:
+        rgb = tuple(min(1.0, max(0.0, c*(1.0 + jitter))) for c in rgb)
     m = bpy.data.materials.new(name or "fabric-" + color)
     nt, b = _nt(m)
     co = _coord(nt, weave_mm/10.0)
@@ -122,7 +127,7 @@ def fabric(color, weave_mm=4.0, tone=None, sheen=0.34, name=None, mask="fabric")
     h.inputs[0].default_value = 0.32
     nt.links.new(cross.outputs[0], h.inputs[2])
     nt.links.new(fuzz.outputs['Fac'], h.inputs[3])
-    _bump(nt, b, h.outputs[0], 0.62, 0.06)
+    _bump(nt, b, h.outputs[0], 0.85, 0.11)
 
     # långsam tonvariation: ojämn infärgning
     slow = nt.nodes.new("ShaderNodeTexNoise")
@@ -130,7 +135,7 @@ def fabric(color, weave_mm=4.0, tone=None, sheen=0.34, name=None, mask="fabric")
     slow.inputs['Detail'].default_value = 3.0
     nt.links.new(co.outputs['Vector'], slow.inputs['Vector'])
     both = nt.nodes.new("ShaderNodeMix"); both.data_type = 'FLOAT'
-    both.inputs[0].default_value = 0.40
+    both.inputs[0].default_value = 0.52
     nt.links.new(slow.outputs['Fac'], both.inputs[2])
     nt.links.new(cross.outputs[0], both.inputs[3])
     ramp = _ramp(nt, both.outputs[0],

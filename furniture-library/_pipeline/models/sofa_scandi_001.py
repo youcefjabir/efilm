@@ -29,7 +29,9 @@ INNER     = W - 2*ARM_W             # fri bredd mellan armstöden
 
 def build(fabric="sand", wood="natural-oak"):
     # V2-materialen: väv, ådring och tonvariation i stället för platt färg
-    f = mats2.fabric(fabric, weave_mm=4.2)
+    f  = mats2.fabric(fabric, weave_mm=9.0)
+    fs = [mats2.fabric(fabric, weave_mm=9.0, jitter=j) for j in (-0.035, 0.0, 0.03)]
+    fb = [mats2.fabric(fabric, weave_mm=9.0, jitter=j) for j in (0.02, -0.025, 0.01)]
     w = mats2.wood(wood, along="z")          # benens fiber löper längs benet
     P = []
 
@@ -53,14 +55,14 @@ def build(fabric="sand", wood="natural-oak"):
     for i, x in enumerate((-INNER/3.0, 0.0, INNER/3.0)):
         P.append(B.cushion("seat_%d" % i, cw, D - BACK_T - 6.0, SEAT_T,
                            (x, -(BACK_T/2 + 1.0), LEG_H + BASE_H - 1.0),
-                           soft=0.60, sag=0.14, mat=f))
+                           soft=0.60, sag=0.14, mat=fs[i]))
 
     # tre ryggdynor, fylligare än sittdynorna och lutade med ryggen
     bh = H - (LEG_H + BASE_H + SEAT_T) + 6.0
     for i, x in enumerate((-INNER/3.0, 0.0, INNER/3.0)):
         c = B.cushion("bck_%d" % i, cw, 17.0, bh,
                       (x, D/2 - BACK_T - 4.0, LEG_H + BASE_H + SEAT_T - 5.0),
-                      soft=0.72, sag=0.06, mat=f)
+                      soft=0.72, sag=0.06, mat=fb[i])
         c.rotation_euler = (math.radians(-11.0), 0, 0)
         P.append(c)
 
