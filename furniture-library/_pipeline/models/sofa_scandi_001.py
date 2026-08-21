@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-sofa-scandinavian-001 — Contemporary Scandinavian 3-sits
+sofa-scandinavian-001 — Linnesoffa 3-sits
 
 Låg rak stomme i tyg, tre sittdynor, tre ryggdynor, smala rakskurna
 armstöd och låga svagt utåtlutande ekben. Armstödets bredd är det som
@@ -43,6 +43,8 @@ def build(fabric="sand", wood="natural-oak"):
     for sgn, nm in ((-1, "arm_l"), (1, "arm_r")):
         P.append(B.box(nm, ARM_W, D, ARM_H - LEG_H, (sgn*(W/2 - ARM_W/2), 0, LEG_H),
                        bevel=3.0, seg=4, mat=f))
+        P.append(B.piping(nm + "_seam", ARM_W - 2.6, D - 2.6, ARM_H - LEG_H - 1.4, 3.4,
+                          (sgn*(W/2 - ARM_W/2), 0, LEG_H), thick=1.1, mat=f))
 
     # ryggstomme, svagt bakåtlutad, indragen mellan armstöden
     bk = B.box("back", INNER + 1.0, BACK_T, H - LEG_H - 4.0,
@@ -56,6 +58,11 @@ def build(fabric="sand", wood="natural-oak"):
         P.append(B.cushion("seat_%d" % i, cw, D - BACK_T - 6.0, SEAT_T,
                            (x, -(BACK_T/2 + 1.0), LEG_H + BASE_H - 1.0),
                            soft=0.60, sag=0.14, mat=fs[i]))
+        # Sömmen är en fysisk fåra, inte en textur. Vid sex bildpunkter
+        # per centimeter syns geometri; en tecknad söm gör det inte.
+        P.append(B.piping("seat_seam_%d" % i, cw - 1.6, D - BACK_T - 7.6, 8.0, 5.0,
+                          (x, -(BACK_T/2 + 1.0), LEG_H + BASE_H - 1.0),
+                          thick=1.25, mat=fs[i]))
 
     # tre ryggdynor, fylligare än sittdynorna och lutade med ryggen
     bh = H - (LEG_H + BASE_H + SEAT_T) + 6.0
@@ -65,6 +72,11 @@ def build(fabric="sand", wood="natural-oak"):
                       soft=0.72, sag=0.06, mat=fb[i])
         c.rotation_euler = (math.radians(-11.0), 0, 0)
         P.append(c)
+        sm = B.piping("bck_seam_%d" % i, cw - 1.6, 15.6, bh/2 - 1.0, 5.0,
+                      (x, D/2 - BACK_T - 4.0, LEG_H + BASE_H + SEAT_T - 5.0),
+                      thick=1.15, mat=fb[i])
+        sm.rotation_euler = (math.radians(-11.0), 0, 0)
+        P.append(sm)
 
     # ben: koniska, svagt utåtlutade åt båda håll
     lx, ly = W/2 - 14.0, D/2 - 14.0
@@ -76,7 +88,7 @@ def build(fabric="sand", wood="natural-oak"):
 
 META = dict(
     id="sofa-scandinavian-001",
-    name="Contemporary Scandinavian 3-seat sofa",
+    name="Linnesoffa 3-sits", display_name="Linnesoffa",
     category="living-room", subcategory="sofas",
     style="contemporary-scandinavian",
     dimensions_cm=dict(width=int(W), depth=int(D), height=int(H)),

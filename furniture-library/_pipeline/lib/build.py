@@ -164,3 +164,94 @@ def mirror_x(o, name):
     n.location.x = -o.location.x
     n.scale.x = -o.scale.x
     return n
+
+# =====================================================================
+# SVEPTA FORMER OCH SÖMMAR
+#
+# Två saker som V1 saknade och som är precis vad kritiken handlade om.
+#
+# En rundad soffa byggd av en låda plus två liggande valsar blir rund
+# OCH fyrkantig samtidigt. En genuint rundad form måste svepas: ett
+# tvärsnitt som följer en kurva i planet, i ett enda stycke.
+#
+# En söm som är en textur syns inte vid sex bildpunkter per centimeter.
+# En söm som är en fysisk fåra gör det. Därför är piping riktig geometri.
+# =====================================================================
+
+def _bezier(name, pts, cyclic=False):
+    cu = bpy.data.curves.new(name, 'CURVE')
+    cu.dimensions = '3D'; cu.resolution_u = 12
+    sp = cu.splines.new('BEZIER')
+    sp.bezier_points.add(len(pts)-1)
+    for i, (x, y, z) in enumerate(pts):
+        bp = sp.bezier_points[i]
+        bp.co = (cm(x), cm(y), cm(z))
+        bp.handle_left_type = bp.handle_right_type = 'AUTO'
+    sp.use_cyclic_u = cyclic
+    o = bpy.data.objects.new(name, cu)
+    bpy.context.collection.objects.link(o)
+    return o
+
+def sweep(name, path_pts, prof_w, prof_h, cyclic=False, mat=None,
+          taper=None, res=16):
+    """Sveper ett rundat tvärsnitt längs en kurva i planet.
+       prof_w/prof_h i cm ger tvärsnittets bredd och höjd — ett liggande
+       ovalt snitt läser som en stoppad rulle, inte som ett rör.
+       taper är en kurva som krymper snittet längs vägen."""
+    path = _bezier(name + "_path", path_pts, cyclic)
+    pc = bpy.data.curves.new(name + "_prof", 'CURVE')
+    pc.dimensions = '2D'; pc.resolution_u = 8
+    sp = pc.splines.new('BEZIER')
+    n = 12
+    sp.bezier_points.add(n-1)
+    for i in range(n):
+        a = 2*math.pi*i/n
+        bp = sp.bezier_points[i]
+        bp.co = (math.cos(a)*cm(prof_w)/2, math.sin(a)*cm(prof_h)/2, 0)
+        bp.handle_left_type = bp.handle_right_type = 'AUTO'
+    sp.use_cyclic_u = True
+    prof = bpy.data.objects.new(name + "_prof", pc)
+    bpy.context.collection.objects.link(prof)
+    path.data.bevel_mode = 'OBJECT'
+    path.data.bevel_object = prof
+    path.data.use_fill_caps = True
+    if taper is not None:
+        # Taper-kurvans Y ÄR skalfaktorn, i blenderenheter. _bezier räknar
+        # om centimeter till meter, så en faktor 0,7 blev 0,007 och
+        # kollapsade hela formen. Värdena skalas därför upp först.
+        tp = _bezier(name + "_taper", [(x, y*100.0, z) for x, y, z in taper], False)
+        path.data.taper_object = tp
+        tp.hide_render = True; tp.hide_viewport = True
+    prof.hide_render = True; prof.hide_viewport = True
+    # gör om till mesh så maskrendering och mätning fungerar likadant
+    bpy.context.view_layer.objects.active = path
+    bpy.ops.object.select_all(action='DESELECT'); path.select_set(True)
+    bpy.ops.object.convert(target='MESH')
+    o = bpy.context.object; o.name = name
+    shade_smooth(o, 55)
+    if mat: assign(o, mat)
+    return o
+
+def piping(name, w, d, h, r, loc=(0,0,0), thick=1.1, mat=None):
+    """En söm runt en dynas kant, som fysisk geometri. Vid planritningens
+       skala är det den som gör att en dyna läses som en klädd dyna."""
+    hw, hd, rr = w/2 - r, d/2 - r, r
+    pts = []
+    for cx, cy, a0 in ((hw, hd, 0), (-hw, hd, 90), (-hw, -hd, 180), (hw, -hd, 270)):
+        for k in range(5):
+            a = math.radians(a0 + k*22.5)
+            pts.append((cx + math.cos(a)*rr, cy + math.sin(a)*rr, 0))
+    pts = [(x + loc[0], y + loc[1], loc[2] + h) for x, y, _ in pts]
+    return sweep(name, pts, thick, thick*0.72, cyclic=True, mat=mat)
+
+def channel_tufting(name, w, h, t, n, loc, mat, gap=0.9):
+    """Lodräta kanaler i en stoppad gavel. Varje kanal är en egen svagt
+       buktande panel — det är mellanrummen som syns uppifrån."""
+    out = []
+    cw = (w - gap*(n-1))/n
+    for i in range(n):
+        x = -w/2 + cw/2 + i*(cw + gap)
+        p = box(name + "_%d" % i, cw, t, h, (loc[0] + x, loc[1], loc[2]),
+                bevel=min(1.6, cw*0.16), seg=4, mat=mat)
+        out.append(p)
+    return out

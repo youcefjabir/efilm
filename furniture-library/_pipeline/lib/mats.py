@@ -18,6 +18,8 @@ PALETTE = {
  # tyg
  "cream":(0.855,0.835,0.795), "warm-white":(0.905,0.890,0.860),
  "sand":(0.760,0.712,0.630),  "beige":(0.700,0.655,0.585),
+ # greige: den grå-beige som är V1:s textilbas enligt planen
+ "greige":(0.678,0.652,0.612),
  "taupe":(0.545,0.505,0.462), "light-grey":(0.672,0.672,0.665),
  "medium-grey":(0.470,0.472,0.470), "charcoal":(0.212,0.215,0.218),
  "warm-brown":(0.385,0.300,0.232), "olive":(0.372,0.382,0.290),
