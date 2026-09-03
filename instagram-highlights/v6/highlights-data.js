@@ -209,11 +209,72 @@ var HL = [
    {p:"cta", h:"Ett objekt.", s:"Hela kampanjen.", k:"10 — Kampanjen"}
   ]},
 
- /* 11 — SYSTEMET. Portalen som håller ihop de sju tjänsterna. */
- {glyph:"spine", id:"systemet", num:"11", name:"SYSTEMET", label:"Systemet", cover:"portal", coverFy:.55,
+  /* 11 — PLANRITNINGEN. Övergripande kapitel för den interaktiva
+    planritningen: möbler man kan flytta, mått som stämmer, och en
+    solbana som visar ljuset över dygnet och året. Två djupdykningar
+    följer som egna kapitel — 12 Möblera rätt, 13 Solbanan — så samma
+    funktion går att välja både som helhet och i sina delar. */
+ {glyph:"plan", id:"planritning", num:"11", name:"PLANRITNINGEN", label:"Planritningen", cover:"living",
+  q:"Går möbler in?",
+  why:"Nytt kapitel. Introducerar den interaktiva planritningen som helhet innan 12 och 13 går på djupet.",
+  st:[
+   {p:"mark", m:"living", k:"PLANRITNINGEN", h:"En planritning som lever.", s:"Möbler, mått och solljus — innan första visningen.",
+    need:"Skärmdump av planritningen med möbler utplacerade och en dimensionslinje synlig, vertikalt beskuren 9:16."},
+   {p:"quiet", h:"Inte en skiss.", em:"En kalibrerad yta.", s:"Varje vägg och varje möbel har sitt verkliga mått — samma som i verkligheten.", k:"11 — Planritningen"},
+   {p:"system", k:"Tre frågor", h:"Det spekulanten faktiskt undrar.",
+    items:["Får möbeln plats?","Hur möbleras rummet bäst?","När får bostaden sol?"],
+    s:"En planritning som svarar, inte bara visar."},
+   {p:"product", m:"eames", k:"Möbelbiblioteket", h:"Möbler i rätt skala.", s:"Skandinaviskt, japanskt, italienskt — kuraterat, inte generiskt.",
+    need:"Skärmdump: möbelbiblioteket öppet i sidopanelen, med en möbel mitt i en dragrörelse."},
+   {p:"product", m:"skyAft", k:"Solbanan", h:"Ljuset, timme för timme.", s:"Vår, sommar, höst, vinter — samma bostad, olika ljus.",
+    need:"Skärmdump: solbanans tidslinje och skuggkarta över planritningen."},
+   {p:"quiet", h:"Delas med en länk.", em:"Inget konto. Ingen app.", s:"Fungerar lika bra i mobilen som på datorn — och på mäklarens egen sida.", k:"11 — Planritningen"},
+   {p:"cta", h:"En planritning.", s:"Möblerad, mätt, i rätt ljus.", k:"11 — Planritningen"}
+  ]},
+
+ /* 12 — MÖBLERA RÄTT. Djupdykning i möbleringen: välja, placera,
+    rotera, mäta. Själva mekaniken, med biblioteket som bevis. */
+ {glyph:"topview", id:"mobler", num:"12", name:"MÖBLERA RÄTT", label:"Möblera rätt", cover:"eames",
+  q:"Får möbeln plats?",
+  why:"Djupdykning i möbleringsdelen. Chain-primitivet visar mekaniken i tre steg.",
+  st:[
+   {p:"mark", m:"eames", k:"MÖBLERA RÄTT", h:"Dra in. Vrid. Mät.", s:"Möblera planritningen som om du redan stod i rummet.",
+    need:"Skärmdump: en soffa mitt i en drag-och-släpp-rörelse på planritningen."},
+   {p:"quiet", h:"Måttbandet.", em:"Inbyggt i varje möbel.", s:"Vrid en soffa nittio grader och se direkt om den får plats.", k:"12 — Möblera rätt"},
+   {p:"chain", k:"Så går det till", h:"Från tom yta till möblerat rum.", now:2,
+    items:[["Välj möbel","Sök i biblioteket eller bläddra per rum."],
+           ["Placera och vrid","Dra möbeln på plats, rotera den fritt."],
+           ["Mät","Avstånd och ytor räknas ut automatiskt."]],
+    s:"Allt kalibrerat mot bostadens verkliga mått."},
+   {p:"system", k:"Biblioteket", h:"Möbler i tre traditioner.",
+    items:["Skandinaviskt","Japanskt","Italienskt"], s:"Kuraterat för att visa en riktning, inte en katalog."},
+   {p:"product", m:"eames", k:"Resultatet", h:"Ett möblerat förslag.", s:"Spekulanten ser inte en tom yta — hen ser ett hem.",
+    need:"Skärmdump: helt möblerat rum i planritningen, vy ovanifrån."},
+   {p:"cta", h:"Möblera det.", s:"Innan du frågar om det går.", k:"12 — Möblera rätt"}
+  ]},
+
+ /* 13 — SOLBANAN. Djupdykning i solsimuleringen: astronomiskt korrekt,
+    fyra årstider, ett reglage per timme. */
+ {glyph:"arc", id:"solbana", num:"13", name:"SOLBANAN", label:"Solbanan", cover:"dining2",
+  q:"När får bostaden sol?",
+  why:"Djupdykning i solbanan. System-primitivet bär de fyra årstiderna typografiskt, inte som ikoner.",
+  st:[
+   {p:"mark", m:"dining2", k:"SOLBANAN", h:"Solen, exakt som den går.", s:"Astronomiskt beräknad efter bostadens egna koordinater.",
+    need:"Skärmdump: solbanan projicerad över planritningen med tydlig skuggkastning."},
+   {p:"quiet", h:"Samma metod.", em:"Som arkitekten använder.", s:"Inte en uppskattning — en beräkning.", k:"13 — Solbanan"},
+   {p:"system", k:"Fyra årstider", h:"Ett klick byter säsong.",
+    items:["Vår","Sommar","Höst","Vinter"], s:"Samma bostad, fyra helt olika ljusförhållanden."},
+   {p:"product", m:"dining2", k:"Timme för timme", h:"Flytta reglaget.", s:"Se var skuggan ligger klockan sju på morgonen — och klockan sju på kvällen.",
+    need:"Skärmdump: tidsreglaget med skuggor vid två olika klockslag, helst en delad före/efter-vy."},
+   {p:"quiet", h:"Morgonsolen i köket.", em:"Eller kvällssolen på balkongen.", s:"Frågan spekulanten alltid ställer, besvarad utan att behöva fråga.", k:"13 — Solbanan"},
+   {p:"cta", h:"Se ljuset.", s:"Innan du flyttar in.", k:"13 — Solbanan"}
+  ]},
+
+/* 14 — SYSTEMET. Portalen som håller ihop de sju tjänsterna. */
+ {glyph:"spine", id:"systemet", num:"14", name:"SYSTEMET", label:"Systemet", cover:"portal", coverFy:.55,
   q:"Hur fungerar det?", why:"Den kommersiellt viktigaste. Talar direkt till mäklaren.",
   st:[
-   {p:"quiet", h:"Mer tid för affären.", em:"Mindre tid i mappar.", k:"11 — Systemet"},
+   {p:"quiet", h:"Mer tid för affären.", em:"Mindre tid i mappar.", k:"14 — Systemet"},
    {p:"product", m:"portal", fy:.55, zoom:1.12, k:"Mäklarportalen", h:"Ett ställe för hela bostaden.", s:"Boka, följ, hämta, publicera.",
     need:"Vertikala portalskärmar 9:16."},
    {p:"system", k:"Flödet", h:"Fyra steg.", s:"Från bokning till publicerad kampanj.",
@@ -221,11 +282,11 @@ var HL = [
    {p:"editorial", m:"hero", k:"Skillnaden", h:"Inte en mapp med filer.", s:"En färdig presentation, redo att publiceras."},
    {p:"product", m:"portal", fy:.6, zoom:1.12, k:"Samlat", h:"En faktura. Ett konto.", s:"Beställning, mallar, material och fakturering på samma ställe.",
     need:"Vertikal portalvy 9:16: faktureringsöversikt."},
-   {p:"cta", h:"Ett ställe.", s:"Hela produktionen.", k:"11 — Systemet"}
+   {p:"cta", h:"Ett ställe.", s:"Hela produktionen.", k:"14 — Systemet"}
   ]},
 
  /* 12 — OBJEKT. Beviset: tjänsterna samlade på ett enda objekt. */
- {glyph:"gable", id:"objekt", num:"12", name:"OBJEKT", label:"Objekt", cover:"eames",
+ {glyph:"gable", id:"objekt", num:"15", name:"OBJEKT", label:"Objekt", cover:"eames",
   q:"Kan jag lita på dem?", why:"Beviset. Varje case är en liten redaktionell feature. Skalar utan omdesign.",
   st:[
    {p:"case", m:"drone", k:"Objekt 01", h:"Silvergården 9A", s:"Landskrona",
@@ -234,32 +295,32 @@ var HL = [
    {p:"editorial", m:"eames", k:"Detalj", h:"", s:"", need:"Detalj från samma objekt."},
    {p:"product", m:"threed", k:"3D", h:"Planlösningen.", s:"", need:"3D-vy från samma objekt."},
    {p:"fullbleed", m:"dining2", k:"Rörelse", h:"", s:"", need:"Motion-frame från samma objekt."},
-   {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"12 — Objekt"}
+   {p:"cta", h:"Ett objekt.", s:"Hela presentationen.", k:"15 — Objekt"}
   ]},
 
  /* 13 — INIFRÅN. Om oss + fotografer. */
- {glyph:"people", id:"inifran", num:"13", name:"INIFRÅN", label:"Inifrån", cover:"om3",
+ {glyph:"people", id:"inifran", num:"16", name:"INIFRÅN", label:"Inifrån", cover:"om3",
   q:"Vilka är ni?", why:"Om oss + fotografer sammanslagna. Rekrytering blir en följd av varumärket, inte en jobbannons.",
   st:[
    {p:"mark", m:"om1", k:"INIFRÅN", h:"Människorna", s:"bakom presentationen."},
-   {p:"quiet", h:"Vi bygger inte för hur bostäder presenterades igår.", k:"13 — Inifrån"},
+   {p:"quiet", h:"Vi bygger inte för hur bostäder presenterades igår.", k:"16 — Inifrån"},
    {p:"editorial", m:"om3", k:"Så arbetar vi", h:"Hantverk och teknik.", s:"Ingen av delarna räcker ensam."},
    {p:"fullbleed", m:"om4", k:"", h:"", s:""},
    {p:"editorial", m:"kontakt", k:"Fotograferna", h:"Fotografen är inte en underleverantör.", s:"Fotografen är Viewly.",
     need:"Reportagebild: fotograf i arbete på plats."},
-   {p:"quiet", h:"Din blick. Ditt hantverk.", em:"Vår organisation.", k:"13 — Inifrån"},
-   {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"13 — Inifrån"}
+   {p:"quiet", h:"Din blick. Ditt hantverk.", em:"Vår organisation.", k:"16 — Inifrån"},
+   {p:"cta", h:"Fotografera med Viewly", s:"viewly.se/fotografer", k:"16 — Inifrån"}
   ]},
 
  /* 14 — DITT HEM. Sekundär målgrupp. Medvetet kort. */
- {glyph:"door", id:"ditthem", num:"14", name:"DITT HEM", label:"Ditt hem", cover:"dining",
+ {glyph:"door", id:"ditthem", num:"17", name:"DITT HEM", label:"Ditt hem", cover:"dining",
   q:"Hur börjar jag?", why:"Sekundär målgrupp. Medvetet kort — svarar på en enda fråga.",
   st:[
-   {p:"fullbleed", m:"dining", k:"14 — Ditt hem", h:"", s:""},
-   {p:"quiet", h:"Ditt hem säljs en gång.", em:"Presentationen betyder något.", k:"14 — Ditt hem"},
+   {p:"fullbleed", m:"dining", k:"17 — Ditt hem", h:"", s:""},
+   {p:"quiet", h:"Ditt hem säljs en gång.", em:"Presentationen betyder något.", k:"17 — Ditt hem"},
    {p:"fullbleed", m:"living", k:"", h:"", s:""},
    {p:"editorial", m:"hero", k:"Vad Viewly tillför", h:"Foto, rum och rörelse i en presentation.", s:"Din mäklare beställer. Vi producerar."},
-   {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"14 — Ditt hem"}
+   {p:"cta", h:"Arbetar din mäklare med Viewly?", s:"Gör bostadstestet", k:"17 — Ditt hem"}
   ]}
 ,
 
@@ -269,11 +330,11 @@ var HL = [
     filmen och annonsen. Det måste ritas. Flödet följer stegen på
     viewly.se/maklare: intagning, produktion, mäklarportal,
     annonsskrivaren, Social / Ads Studio. */
- {glyph:"orbitmark", id:"ekosystem", num:"15", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
+ {glyph:"orbitmark", id:"ekosystem", num:"18", name:"EKOSYSTEMET", label:"Ekosystemet", cover:"portal",
   q:"Hur hänger allt ihop?",
   why:"Hela affärsidén i ett kapitel. Inte en tjänstelista — sambandet mellan delarna.",
   st:[
-   {p:"quiet", k:"15 — Ekosystemet", h:"Ett objekt.", em:"Hela bostadsaffären.",
+   {p:"quiet", k:"18 — Ekosystemet", h:"Ett objekt.", em:"Hela bostadsaffären.",
     s:"Viewly är inte sju tjänster bredvid varandra. Det är en kedja där varje steg gör nästa enklare."},
 
    {p:"orbit", k:"Grundmaterialet", dir:"in", h:"Allt börjar i bostaden.",
@@ -311,6 +372,6 @@ var HL = [
            ["Marknadsföring","Annons, kampanj och sociala medier ur samma underlag."]],
     s:"Tre led som brukar ligga hos tre leverantörer. Här är de ett."},
 
-   {p:"cta", h:"Ett objekt.", s:"Hela marknadsföringen.", k:"15 — Ekosystemet"}
+   {p:"cta", h:"Ett objekt.", s:"Hela marknadsföringen.", k:"18 — Ekosystemet"}
   ]},
 ];

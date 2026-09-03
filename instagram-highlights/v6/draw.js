@@ -625,6 +625,27 @@ var PICTO = {
     }
     return out;
   },
+  /* Planritningen: rum, en möbel i det, en dimensionslinje under. */
+  plan:    function(P){ return '<rect x="24" y="24" width="52" height="44" fill="'+P.t2+'"/>'
+             +'<rect x="29" y="29" width="42" height="34" fill="'+P.bg+'"/>'
+             +'<rect x="36" y="46" width="28" height="12" fill="'+P.t3+'"/>'
+             +'<rect x="24" y="74" width="52" height="3" fill="'+P.t1+'"/>'
+             +'<rect x="24" y="71" width="3" height="9" fill="'+P.t1+'"/>'
+             +'<rect x="73" y="71" width="3" height="9" fill="'+P.t1+'"/>' },
+
+  /* Möblera: en soffa sedd rakt uppifrån. Arm, rygg, sits. */
+  topview: function(P){ return '<rect x="24" y="46" width="52" height="20" fill="'+P.t2+'"/>'
+             +'<rect x="24" y="38" width="52" height="10" fill="'+P.t3+'"/>'
+             +'<rect x="24" y="38" width="8" height="28" fill="'+P.t1+'"/>'
+             +'<rect x="68" y="38" width="8" height="28" fill="'+P.t1+'"/>' },
+
+  /* Solbanan: tre lägen, lågt — högt — lågt, över ett hus. */
+  arc:     function(P){ return '<path d="M32 66 L50 50 L68 66 Z" fill="'+P.t2+'"/>'
+             +'<rect x="38" y="66" width="24" height="12" fill="'+P.t1+'"/>'
+             +'<circle cx="28" cy="44" r="5" fill="'+P.t3+'"/>'
+             +'<circle cx="50" cy="26" r="6" fill="'+P.t3+'"/>'
+             +'<circle cx="72" cy="44" r="5" fill="'+P.t3+'"/>' },
+
   door:    function(P){ return '<path d="M22 48 L50 24 L78 48 Z" fill="'+P.t2+'"/>'
              +'<rect x="30" y="48" width="40" height="30" fill="'+P.t1+'"/>'
              +'<rect x="44" y="60" width="12" height="18" fill="'+P.t2+'"/>'
@@ -700,6 +721,21 @@ var LINE = {
     }
     return out;
   },
+  plan:    function(P){ return ln2("M24 24 H76 V68 H24 Z", P.t2)
+             +'<rect x="36" y="46" width="28" height="12" fill="'+P.t3+'"/>'
+             +ln2("M24 74 H76", P.t2)
+             +ln2("M24 70 V78 M76 70 V78", P.t2) },
+  topview: function(P){ return ln2("M24 38 H76 V66 H24 Z", P.t2)
+             +ln2("M32 38 V66 M68 38 V66", P.t2)
+             +ln2("M32 48 H68", P.t2)
+             +'<rect x="46" y="41" width="8" height="4" fill="'+P.t3+'"/>' },
+  arc:     function(P){ return ln2("M32 66 L50 50 L68 66", P.t2)
+             +ln2("M38 66 H62 V78 H38 Z", P.t2)
+             +'<rect x="47" y="70" width="6" height="6" fill="'+P.t3+'"/>'
+             +'<circle cx="28" cy="44" r="5" fill="none" stroke="'+P.t2+'" stroke-width="2"/>'
+             +'<circle cx="72" cy="44" r="5" fill="none" stroke="'+P.t2+'" stroke-width="2"/>'
+             +'<circle cx="50" cy="26" r="6" fill="'+P.t3+'"/>' },
+
   door:    function(P){ return ln2("M18 50 L50 22 L82 50", P.t2)
              +ln2("M28 50 V80 H72 V50", P.t2)
              +ln2("M44 80 V62 H56 V80", P.t2)
@@ -716,7 +752,10 @@ var GLYPHS = {
   lines:{n:"Dokumentet", d:"Text med rubrik"},formats:{n:"Formaten", d:"9:16, 4:5, 1:1"},
   spine:{n:"Portalen", d:"Fyra ytor, en tänd"},gable:{n:"Plåtarna", d:"Tre kort på varandra"},
   people:{n:"Fotografen", d:"Person med kamera"}, door:{n:"Huset", d:"Hem med tänt fönster"},
-  orbitmark:{n:"Navet", d:"Mitten och det som hänger ihop"}
+  orbitmark:{n:"Navet", d:"Mitten och det som hänger ihop"},
+  plan:{n:"Planen", d:"Rum, möbel och mått"},
+  topview:{n:"Soffan uppifrån", d:"Möbel sedd rakt ovanifrån"},
+  arc:{n:"Solbanan", d:"Tre lägen över ett hus"}
 };
 var GLYPH_IDS = Object.keys(GLYPHS);
 
@@ -882,6 +921,34 @@ var SIGN = {
      +'M50 34.5 L66 47.5 a1 1 0 0 1 -0.6 1.8 h-2.4 v13.4 a3 3 0 0 1 -3 3 h-20 a3 3 0 0 1 -3 -3 '
      +'v-13.4 h-2.4 a1 1 0 0 1 -0.6 -1.8 z '
      +'M46.4 53.5 h7.2 v11.2 h-7.2 z"/>';
+  },
+  /* Planritningen — rum, en möbel i det, en mätlinje under. Samma
+     komposition som Objekts lagerteknik: en fylld yta, ett urskuret
+     fält i bakgrundstonen, en ny fylld form ovanpå. */
+  plan: function(P){
+    return '<g fill="'+P.ink+'">'
+     +'<rect x="34" y="34" width="32" height="20" rx="2.4"/></g>'
+     +'<rect x="38" y="37" width="24" height="13" rx="1.4" fill="'+P.bg+'"/>'
+     +'<g fill="'+P.ink+'">'
+     +'<rect x="42" y="41" width="16" height="6" rx="1.4"/>'
+     +'<rect x="34" y="60" width="32" height="2.6" rx="1.3"/>'
+     +'<rect x="34" y="57" width="2.6" height="8" rx="1"/>'
+     +'<rect x="63.4" y="57" width="2.6" height="8" rx="1"/></g>';
+  },
+  /* Möblera rätt — sofamodulen uppifrån, sedd som en enda kropp med
+     en söm mellan rygg och sits. */
+  topview: function(P){
+    return '<rect x="34" y="38" width="32" height="22" rx="3" fill="'+P.ink+'"/>'
+     +'<rect x="34" y="44" width="32" height="2.2" fill="'+P.bg+'"/>';
+  },
+  /* Solbanan — huset, och solens tre lägen ovanför det: lågt, högt, lågt. */
+  arc: function(P){
+    return '<path fill="'+P.ink+'" d="M50 44 L64 54.5 V66 a2 2 0 0 1 -2 2 h-24 a2 2 0 0 1 -2 -2 '
+     +'V54.5 Z"/>'
+     +'<g fill="'+P.ink+'">'
+     +'<circle cx="37.5" cy="39" r="3.3"/>'
+     +'<circle cx="50" cy="31.5" r="3.9"/>'
+     +'<circle cx="62.5" cy="39" r="3.3"/></g>';
   }
 };
 
