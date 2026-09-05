@@ -343,7 +343,87 @@ ALTS = {
  {p:"cta", k:"10 — Kampanjen", h:"Öppna Social / Ads Studio", s:"viewly.se/some-studio"},
  {p:"mark", m:"hero", k:"SOCIAL / ADS STUDIO", h:"Ett objekt", s:"Hela kampanjen."}],
 
-/* ---------- 11 SYSTEMET ---------- */
+/* ---------- 11 PLANRITNINGEN ---------- */
+"planritning-0":[
+ {p:"quiet", h:"Inte en skiss.", em:"En kalibrerad yta man möblerar.", s:"Mått, möbler och solljus i samma vy."},
+ {p:"editorial", m:"living", k:"Planritningen", h:"Möblera. Mät. Se ljuset.", s:"Allt i en enda interaktiv vy, innan första visningen."}],
+"planritning-1":[
+ {p:"system", k:"En kalibrerad yta", h:"Samma mått som verkligheten.",
+  items:["Väggar","Möbler","Solljus"], s:"Allt skalenligt, inte skissat."},
+ {p:"product", m:"living", k:"Kalibrerad", h:"Millimeterexakt.", s:"Byggd på bostadens riktiga ritning.",
+  need:"Skärmdump: en dimensionslinje mellan två väggar i planritningen."}],
+"planritning-2":[
+ {p:"quiet", h:"Det spekulanten faktiskt undrar.", em:"Får möbeln plats?", s:"Hur möbleras rummet bäst? När får bostaden sol?"},
+ {p:"chain", k:"Tre frågor", h:"En planritning som svarar.", now:2,
+  items:[["Möbler","Får det plats?"],["Layout","Hur möbleras rummet bäst?"],["Ljus","När får bostaden sol?"]],
+  s:"Inte bara visar."}],
+"planritning-3":[
+ {p:"editorial", m:"eames", k:"Möbelbiblioteket", h:"Möbler i rätt skala.", s:"Skandinaviskt, japanskt, italienskt."},
+ {p:"quiet", h:"Ingen generisk katalog.", em:"Ett kuraterat bibliotek.", s:"Möbler i rätt skala, i tre designtraditioner."}],
+"planritning-4":[
+ {p:"quiet", h:"Ljuset, timme för timme.", em:"Vår, sommar, höst, vinter.", s:"Samma bostad, olika ljus."},
+ {p:"system", k:"Solbanan", h:"Fyra årstider, ett klick.",
+  items:["Vår","Sommar","Höst","Vinter"], s:"Astronomiskt beräknat."}],
+"planritning-5":[
+ {p:"system", k:"Delning", h:"Ingen app. Inget konto.",
+  items:["Öppnas i webbläsaren","Fungerar i mobilen","Läggs på mäklarens sida"], s:"En länk räcker."},
+ {p:"product", m:"living", k:"Delning", h:"En länk, alla enheter.", s:"Samma upplevelse i mobilen som på datorn.",
+  need:"Skärmdump: planritningen öppen i mobilläge."}],
+"planritning-6":[
+ {p:"quiet", k:"11 — Planritningen", h:"Möblerad.", em:"Mätt. I rätt ljus.", s:"En planritning som lever."},
+ {p:"mark", m:"living", k:"PLANRITNINGEN", h:"Se den själv.", s:"viewly.se/interaktiv-planritning"}],
+
+/* ---------- 12 MÖBLERA RÄTT ---------- */
+"mobler-0":[
+ {p:"quiet", h:"Möblera planritningen.", em:"Som om du stod i rummet.", s:"Dra in, vrid, mät — direkt i webbläsaren."},
+ {p:"editorial", m:"eames", k:"Möblera rätt", h:"Dra in. Vrid. Mät.", s:"Ingen app, inget CAD-program."}],
+"mobler-1":[
+ {p:"system", k:"Måttbandet", h:"Inbyggt i varje möbel.",
+  items:["Bredd","Djup","Vridvinkel"], s:"Vrid en soffa och se direkt om den får plats."},
+ {p:"product", m:"eames", k:"Måttbandet", h:"Se det direkt.", s:"Ingen gissning, inget måttband i handen.",
+  need:"Skärmdump: mått visas live medan en möbel dras i planritningen."}],
+"mobler-2":[
+ {p:"system", k:"Så går det till", h:"Tre steg till möblerat rum.",
+  items:["Välj möbel","Placera och vrid","Mät"], s:"Allt kalibrerat mot bostadens verkliga mått."},
+ {p:"quiet", h:"Ingen ritutbildning krävs.", em:"Tre steg räcker.", s:"Välj, placera, mät."}],
+"mobler-3":[
+ {p:"quiet", h:"Inte en generisk katalog.", em:"Tre designtraditioner.", s:"Skandinaviskt, japanskt, italienskt."},
+ {p:"editorial", m:"eames", k:"Biblioteket", h:"Möbler i tre traditioner.", s:"Kuraterat för att visa en riktning, inte en katalog."}],
+"mobler-4":[
+ {p:"quiet", h:"Ett möblerat förslag.", em:"Inte en tom yta.", s:"Spekulanten ser ett hem, inte en ritning."},
+ {p:"case", m:"eames", k:"Resultatet", h:"Ett hem, inte en tom yta.", s:"Möblerat innan första visningen."}],
+"mobler-5":[
+ {p:"quiet", k:"12 — Möblera rätt", h:"Möblera det.", em:"Innan du frågar om det går.", s:"Dra in, vrid, mät."},
+ {p:"mark", m:"eames", k:"MÖBLERA RÄTT", h:"Testa själv", s:"viewly.se/interaktiv-planritning"}],
+
+/* ---------- 13 SOLBANAN ---------- */
+"solbana-0":[
+ {p:"quiet", h:"Solen, exakt som den går.", em:"Inte en uppskattning.", s:"Astronomiskt beräknad efter bostadens koordinater."},
+ {p:"editorial", m:"dining2", k:"Solbanan", h:"Solen, exakt som den går.", s:"Samma metod som arkitekten använder."}],
+"solbana-1":[
+ {p:"system", k:"Beräkningen", h:"Samma metod som arkitekten.",
+  items:["Bostadens koordinater","Datum och tid","Solens verkliga position"], s:"Inte en uppskattning."},
+ {p:"product", m:"dining2", k:"Beräkningen", h:"Astronomiskt korrekt.", s:"Byggd på bostadens egna koordinater.",
+  need:"Skärmdump: solens position markerad över planritningen med koordinater synliga."}],
+"solbana-2":[
+ {p:"quiet", h:"Ett klick byter säsong.", em:"Vår, sommar, höst, vinter.", s:"Samma bostad, fyra helt olika ljusförhållanden."},
+ {p:"chain", k:"Fyra årstider", h:"Samma bostad, olika ljus.", now:3,
+  items:[["Vår","Mjukt, stigande ljus."],["Sommar","Högt, långt solljus."],["Höst","Lågt, varmt ljus."],["Vinter","Kort dag, låg sol."]],
+  s:"Ett klick byter säsong."}],
+"solbana-3":[
+ {p:"quiet", h:"Flytta reglaget.", em:"Timme för timme.", s:"Se var skuggan ligger klockan sju på morgonen — och på kvällen."},
+ {p:"system", k:"Timme för timme", h:"Ett reglage, hela dygnet.",
+  items:["Morgon","Middag","Kväll"], s:"Skuggan flyttas i realtid."}],
+"solbana-4":[
+ {p:"system", k:"Frågan som alltid kommer", h:"När får rummet sol?",
+  items:["Morgonsol i köket?","Kvällssol på balkongen?","Skugga mitt på dagen?"], s:"Besvarad utan att behöva fråga."},
+ {p:"product", m:"dining2", k:"Morgonsolen", h:"Se den innan du flyttar in.", s:"Köket, balkongen, sovrummet — vid vilken tid som helst.",
+  need:"Skärmdump: morgonljus respektive kvällsljus i samma rum, delad vy."}],
+"solbana-5":[
+ {p:"quiet", k:"13 — Solbanan", h:"Se ljuset.", em:"Innan du flyttar in.", s:"Solbanan, timme för timme, år för år."},
+ {p:"mark", m:"dining2", k:"SOLBANAN", h:"Testa själv", s:"viewly.se/interaktiv-planritning"}],
+
+/* ---------- 14 SYSTEMET ---------- */
 "systemet-0":[
  {p:"mark", m:"portal", k:"SYSTEMET", h:"Mäklarportalen", s:"Mer tid för affären."},
  {p:"editorial", m:"hero", k:"11 — Systemet", h:"Mindre tid i mappar.",
@@ -373,7 +453,7 @@ ALTS = {
  {p:"cta", k:"11 — Systemet", h:"Skapa konto", s:"viewly.se"},
  {p:"mark", m:"portal", k:"SYSTEMET", h:"Ett ställe", s:"Hela produktionen."}],
 
-/* ---------- 12 OBJEKT ---------- */
+/* ---------- 15 OBJEKT ---------- */
 "objekt-0":[
  {p:"mark", m:"drone", k:"OBJEKT 01", h:"Silvergården 9A", s:"Landskrona",
   need:"Verklig exteriör för caset."},
@@ -400,7 +480,7 @@ ALTS = {
   items:["Fotografering","3D visning","Motion","Annonstext","Kampanjmallar"]},
  {p:"cta", k:"12 — Objekt", h:"Se fler objekt", s:"viewly.se"}],
 
-/* ---------- 13 INIFRÅN ---------- */
+/* ---------- 16 INIFRÅN ---------- */
 "inifran-0":[
  {p:"fullbleed", m:"om1", k:"13 — Inifrån", h:"Människorna bakom"},
  {p:"editorial", m:"om1", k:"INIFRÅN", h:"Vilka vi är.", s:"Fotografer, redigerare och utvecklare i samma organisation."}],
@@ -430,7 +510,7 @@ ALTS = {
  {p:"cta", k:"13 — Inifrån", h:"Fotografera med Viewly", s:"viewly.se/fotografer"},
  {p:"mark", m:"kontakt", k:"INIFRÅN", h:"Bli fotograf", s:"viewly.se/fotografer"}],
 
-/* ---------- 14 DITT HEM ---------- */
+/* ---------- 17 DITT HEM ---------- */
 "ditthem-0":[
  {p:"mark", m:"dining", k:"DITT HEM", h:"Din bostad", s:"säljs en gång."},
  {p:"editorial", m:"dining", k:"14 — Ditt hem", h:"Presentationen betyder något.",
@@ -453,7 +533,7 @@ ALTS = {
  {p:"quiet", k:"14 — Ditt hem", h:"Arbetar din mäklare med Viewly?", em:"Fråga innan ni bestämmer.",
   s:"viewly.se"}],
 
-/* ---------- 15 EKOSYSTEMET ----------
+/* ---------- 18 EKOSYSTEMET ----------
    Inga fotografier här heller, i något av förslagen. Kapitlet ska bära
    sambandet mellan delarna, och det syns bara i geometri och typografi. */
 "ekosystem-0":[
