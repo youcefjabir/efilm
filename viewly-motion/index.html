@@ -1,0 +1,3281 @@
+<title>Viewly Motion</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap">
+<style>
+/* ============================================================
+   VIEWLY MOTION — deliberate single-theme (dark) working surface.
+   A colour-critical video tool is judged on a dark ground; the
+   palette is painted explicitly so it holds on any host ground.
+   ============================================================ */
+:root{
+  --ground:#0E1113; --surface:#171B1E; --raised:#212729; --sunken:#0A0D0F;
+  --line:#2C3438; --line-soft:#222A2D;
+  --text:#E9EBE7; --text-2:#B4BDC0; --muted:#8B9599; --faint:#5C666A;
+  --sel:#93B7CE; --sel-dim:#3C596B; --sel-wash:rgba(147,183,206,.12);
+  --money:#C2A25E; --money-dim:#6B5A34;
+  --ok:#6FBF8B; --warn:#E0A94A; --crit:#D9614C; --idle:#5C666A;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --disp:"Fraunces",Georgia,"Times New Roman",serif;
+  --r:3px; --rl:6px; --pad:20px;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--ground);color:var(--text);font:400 13px/1.5 var(--sans);-webkit-font-smoothing:antialiased;overscroll-behavior:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--sel);outline-offset:1px}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+::-webkit-scrollbar-track{background:transparent}
+
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:500 10px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.credits{font-family:var(--mono);font-variant-numeric:tabular-nums;color:var(--money)}
+h1,h2,h3{margin:0;font-weight:400;text-wrap:balance}
+.h-page{font:300 22px/1.2 var(--disp);letter-spacing:-.01em}
+.h-sec{font:500 11px/1 var(--sans);letter-spacing:.13em;text-transform:uppercase;color:var(--muted)}
+.dim{color:var(--muted)} .faint{color:var(--faint)}
+hr.rule{border:none;border-top:1px solid var(--line-soft);margin:0}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:var(--r);border:1px solid var(--line);background:var(--raised);color:var(--text-2);font-size:12px;transition:border-color .12s,color .12s,background .12s;white-space:nowrap}
+.btn:hover{border-color:var(--faint);color:var(--text)}
+.btn[disabled]{opacity:.38;cursor:not-allowed}
+.btn[disabled]:hover{border-color:var(--line);color:var(--text-2)}
+.btn.primary{background:var(--sel);border-color:var(--sel);color:#0B1014;font-weight:500}
+.btn.primary:hover{background:#A8C7DA;border-color:#A8C7DA;color:#0B1014}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);background:var(--raised)}
+.btn.danger:hover{border-color:var(--crit);color:var(--crit)}
+.btn.sm{padding:4px 9px;font-size:11px}
+.btn.xs{padding:2px 7px;font-size:10.5px}
+
+.field{display:flex;flex-direction:column;gap:5px}
+.field > label{font:500 10px/1 var(--sans);letter-spacing:.11em;text-transform:uppercase;color:var(--faint)}
+input[type=text],input[type=number],select,textarea{background:var(--sunken);border:1px solid var(--line);border-radius:var(--r);padding:6px 8px;font-size:12px;width:100%}
+input[type=text]:focus,select:focus,textarea:focus{border-color:var(--sel-dim);outline:none}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;height:16px;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:var(--line);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--sel);margin-top:-4.5px}
+input[type=range]::-moz-range-track{height:2px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:11px;height:11px;border:none;border-radius:50%;background:var(--sel)}
+input[type=color]{width:100%;height:26px;padding:0;border:1px solid var(--line);border-radius:var(--r);background:var(--sunken);cursor:pointer}
+
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--sunken)}
+.seg button{padding:5px 11px;font-size:11.5px;color:var(--muted);border-right:1px solid var(--line-soft)}
+.seg button:last-child{border-right:none}
+.seg button[aria-pressed=true]{background:var(--sel-wash);color:var(--sel)}
+.seg button:hover:not([aria-pressed=true]){color:var(--text)}
+
+.chip{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:2px;font:500 10px/1.6 var(--sans);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted)}
+.dot{width:5px;height:5px;border-radius:50%;flex:none;background:var(--idle)}
+.dot.ok{background:var(--ok)} .dot.run{background:var(--sel);animation:pulse 1.4s ease-in-out infinite} .dot.warn{background:var(--warn)} .dot.crit{background:var(--crit)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.note{border-left:2px solid var(--line);padding:9px 12px;background:var(--surface);color:var(--text-2);font-size:12px;line-height:1.55}
+.note.info{border-left-color:var(--sel-dim)}
+.note.warn{border-left-color:var(--warn)}
+.note b{font-weight:600;color:var(--text)}
+.note code{font-family:var(--mono);font-size:11px;color:var(--sel);background:var(--sunken);padding:1px 4px;border-radius:2px}
+
+#app{height:100%;display:flex;flex-direction:column}
+.topbar{height:46px;flex:none;display:flex;align-items:center;gap:14px;padding:0 14px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{display:flex;align-items:baseline;gap:7px;cursor:pointer}
+.brand .w{font:300 17px/1 var(--disp);letter-spacing:-.01em}
+.brand .m{font:500 9.5px/1 var(--sans);letter-spacing:.22em;text-transform:uppercase;color:var(--money)}
+.topbar .sp{flex:1}
+.projname{font-size:12.5px;color:var(--text-2);border-left:1px solid var(--line);padding-left:14px}
+.projname b{font-weight:500;color:var(--text)}
+
+.main{flex:1;display:flex;min-height:0}
+.rail{width:196px;flex:none;border-right:1px solid var(--line);background:var(--surface);padding:14px 0;display:flex;flex-direction:column;gap:1px;overflow-y:auto}
+.rail .rlabel{padding:6px 16px 8px}
+.step{display:grid;grid-template-columns:20px 1fr 6px;align-items:center;gap:9px;padding:8px 16px;text-align:left;color:var(--muted);font-size:12.5px;position:relative}
+.step:hover{color:var(--text);background:var(--raised)}
+.step[aria-current=true]{color:var(--text);background:var(--raised)}
+.step[aria-current=true]::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--sel)}
+.step[disabled]{opacity:.34;cursor:not-allowed}
+.step[disabled]:hover{background:none;color:var(--muted)}
+.step .n{font-family:var(--mono);font-size:10px;color:var(--faint)}
+.step[aria-current=true] .n{color:var(--sel)}
+.step .tick{width:5px;height:5px;border-radius:50%;background:var(--ok)}
+
+.work{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.workhead{flex:none;padding:16px var(--pad) 13px;border-bottom:1px solid var(--line);display:flex;align-items:flex-end;gap:16px;background:var(--surface)}
+.workhead .sub{font-size:12px;color:var(--muted);max-width:62ch;margin-top:5px;line-height:1.5}
+.workhead .sp{flex:1}
+.workbody{flex:1;overflow-y:auto;padding:var(--pad);min-height:0}
+.workbody.pad0{padding:0}
+.inspector{width:296px;flex:none;border-left:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:var(--pad);display:flex;flex-direction:column;gap:18px}
+.igroup{display:flex;flex-direction:column;gap:10px}
+.irow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:12px}
+.irow .k{color:var(--muted)}
+.irow .v{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:11.5px}
+.empty{color:var(--faint);font-size:12px;line-height:1.6;padding:26px 0;text-align:center}
+
+/* ---------- projects ---------- */
+.projwrap{max-width:960px;margin:0 auto;padding:44px 24px}
+.projhero{display:flex;align-items:flex-end;gap:20px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.projhero h1{font:300 34px/1.05 var(--disp);letter-spacing:-.02em}
+.projhero .sp{flex:1}
+.projgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(214px,1fr));gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);margin-top:26px}
+.projcard{background:var(--ground);padding:15px;text-align:left;display:flex;flex-direction:column;gap:9px;min-height:132px}
+.projcard:hover{background:var(--surface)}
+.projcard .pt{font-size:14px;color:var(--text)}
+.projcard .pa{font-size:11.5px;color:var(--muted)}
+.projcard .sp{flex:1}
+.projcard .pf{display:flex;align-items:center;gap:8px;font-size:10.5px;color:var(--faint)}
+.projcard.new{align-items:center;justify-content:center;text-align:center;color:var(--muted);gap:6px}
+.projcard.new .plus{font:300 26px/1 var(--disp);color:var(--sel)}
+
+/* ---------- material ---------- */
+.imggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:12px}
+.icard{background:var(--surface);border:1px solid var(--line);border-radius:var(--rl);overflow:hidden;display:flex;flex-direction:column;position:relative;transition:border-color .12s}
+.icard[data-sel=true]{border-color:var(--sel)}
+.icard[data-inc=false]{opacity:.42}
+.icard .thumb{aspect-ratio:4/3;background:var(--sunken);position:relative;cursor:grab;overflow:hidden}
+.icard .thumb img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.icard.drag{opacity:.3}
+.icard.over{border-color:var(--sel);box-shadow:inset 0 0 0 1px var(--sel)}
+.icard .ord{position:absolute;top:6px;left:6px;background:rgba(10,13,15,.82);color:var(--text);font-family:var(--mono);font-size:10px;padding:2px 6px;border-radius:2px;letter-spacing:.04em}
+.icard .imp{position:absolute;top:6px;right:6px;font:500 9px/1.6 var(--sans);letter-spacing:.09em;text-transform:uppercase;padding:2px 6px;border-radius:2px;background:rgba(10,13,15,.82);color:var(--muted)}
+.icard .imp[data-i=HERO]{color:var(--money);box-shadow:inset 0 0 0 1px var(--money-dim)}
+.icard .imp[data-i=HIGH]{color:var(--sel)}
+.icard .meta{padding:9px 10px;display:flex;flex-direction:column;gap:7px}
+.icard select{padding:4px 6px;font-size:11px}
+.icard .row{display:flex;gap:6px;align-items:center}
+.icard .row .sp{flex:1}
+.sugg{font-size:10px;color:var(--faint);display:flex;align-items:center;gap:5px}
+.sugg b{color:var(--sel);font-weight:500;cursor:pointer}
+.dropzone{border:1px dashed var(--line);border-radius:var(--rl);padding:30px;text-align:center;color:var(--muted);font-size:12.5px;background:var(--surface);transition:border-color .12s,color .12s}
+.dropzone.hot{border-color:var(--sel);color:var(--sel);background:var(--sel-wash)}
+
+/* ---------- option cards (direction / density / family) ---------- */
+.optrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(196px,1fr));gap:12px}
+.opt{border:1px solid var(--line);border-radius:var(--rl);padding:14px;background:var(--surface);text-align:left;display:flex;flex-direction:column;gap:7px;transition:border-color .12s,background .12s}
+.opt:hover{border-color:var(--faint)}
+.opt[aria-pressed=true]{border-color:var(--sel);background:var(--sel-wash)}
+.opt .ot{font-size:14px;color:var(--text)}
+.opt .od{font-size:11.5px;color:var(--muted);line-height:1.5}
+.opt .om{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.02em}
+.opt[aria-pressed=true] .om{color:var(--sel)}
+
+/* ---------- music ---------- */
+.tracklist{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--rl);overflow:hidden}
+.track{display:grid;grid-template-columns:30px 1fr 118px 62px 78px 96px;align-items:center;gap:12px;padding:10px 13px;border-bottom:1px solid var(--line-soft);text-align:left;background:var(--surface)}
+.track:last-child{border-bottom:none}
+.track:hover{background:var(--raised)}
+.track[aria-pressed=true]{background:var(--sel-wash)}
+.track .tt{font-size:13px;color:var(--text)}
+.track .ts{font-size:11px;color:var(--muted);margin-top:2px}
+.track .play{width:24px;height:24px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--muted);font-size:9px}
+.track .play:hover{border-color:var(--sel);color:var(--sel)}
+.trackhead{display:grid;grid-template-columns:30px 1fr 118px 62px 78px 96px;gap:12px;padding:0 13px 7px}
+.meter{display:flex;gap:2px;align-items:center}
+.meter i{width:3px;height:9px;background:var(--line);border-radius:1px;display:block}
+.meter i.on{background:var(--sel)}
+.meter.money i.on{background:var(--money)}
+
+/* ---------- waveform / timing ---------- */
+.wavewrap{border:1px solid var(--line);border-radius:var(--rl);background:var(--sunken);position:relative;overflow:hidden}
+.wavewrap canvas{display:block;width:100%}
+.playhead{position:absolute;top:0;bottom:0;width:1px;background:var(--sel);pointer-events:none;box-shadow:0 0 6px var(--sel)}
+.shotstrip{display:flex;gap:2px;height:66px}
+.shotcell{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:2px;overflow:hidden;min-width:0;cursor:pointer;transition:border-color .12s}
+.shotcell:hover{border-color:var(--faint)}
+.shotcell[data-sel=true]{border-color:var(--sel)}
+.shotcell img{width:100%;height:100%;object-fit:cover;opacity:.5}
+.shotcell .lab{position:absolute;inset:auto 0 0 0;padding:3px 5px;background:linear-gradient(transparent,rgba(10,13,15,.9));font-family:var(--mono);font-size:9.5px;color:var(--text-2);display:flex;justify-content:space-between;gap:4px}
+.shotcell .num{position:absolute;top:3px;left:4px;font-family:var(--mono);font-size:9.5px;color:var(--text-2)}
+
+/* ---------- stage / preview ---------- */
+.stage{flex:1;min-height:0;display:grid;place-items:center;background:var(--sunken);padding:16px;overflow:hidden}
+.stage canvas{max-width:100%;max-height:100%;background:#000;border:1px solid var(--line);box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.transport{flex:none;display:flex;align-items:center;gap:12px;padding:9px var(--pad);border-top:1px solid var(--line);background:var(--surface)}
+.transport .tc{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--text-2)}
+.transport .sp{flex:1}
+.pbtn{width:30px;height:30px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--text-2);flex:none}
+.pbtn:hover{border-color:var(--sel);color:var(--sel)}
+.pbtn.big{width:36px;height:36px}
+
+/* ---------- production ---------- */
+.joblist{display:flex;flex-direction:column;gap:1px;background:var(--line-soft);border:1px solid var(--line-soft);border-radius:var(--rl);overflow:hidden}
+.job{display:grid;grid-template-columns:82px 1fr 132px 104px 86px 104px;align-items:center;gap:14px;padding:11px 14px;background:var(--ground);font-size:12px}
+.job .jt{display:flex;align-items:center;gap:8px}
+.job .jn{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.job video{width:74px;height:42px;object-fit:cover;background:#000;border-radius:2px;border:1px solid var(--line)}
+.job .thumbmini{width:74px;height:42px;object-fit:cover;border-radius:2px;border:1px solid var(--line)}
+.prog{height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--sel);transition:width .3s}
+
+/* ---------- editor timeline ---------- */
+.tlwrap{flex:none;border-top:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;height:236px}
+.tlhead{display:flex;align-items:center;gap:10px;padding:7px 12px;border-bottom:1px solid var(--line-soft)}
+.tlhead .sp{flex:1}
+.tlscroll{flex:1;overflow-x:auto;overflow-y:hidden;position:relative}
+.tlinner{position:relative;height:100%;min-width:100%}
+.tlruler{height:19px;border-bottom:1px solid var(--line-soft);position:relative}
+.tlruler .tk{position:absolute;top:0;bottom:0;border-left:1px solid var(--line-soft);padding-left:3px;font-family:var(--mono);font-size:9px;color:var(--faint);line-height:19px}
+.tltrack{height:52px;border-bottom:1px solid var(--line-soft);position:relative}
+.tltrack .tlab{position:absolute;left:0;top:0;bottom:0;width:0;z-index:3}
+.tlname{position:sticky;left:0;z-index:4;background:var(--surface)}
+.clip{position:absolute;top:5px;bottom:5px;border-radius:2px;overflow:hidden;border:1px solid var(--line);background:var(--raised);cursor:pointer;min-width:2px}
+.clip[data-sel=true]{border-color:var(--sel);box-shadow:0 0 0 1px var(--sel)}
+.clip .cl{position:absolute;inset:0;padding:4px 6px;font-family:var(--mono);font-size:9.5px;color:var(--text-2);pointer-events:none;display:flex;flex-direction:column;justify-content:space-between}
+.clip img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.34}
+.clip.gfx{background:linear-gradient(180deg,rgba(147,183,206,.18),rgba(147,183,206,.07));border-color:var(--sel-dim)}
+.clip.gfx[data-sel=true]{background:var(--sel-wash)}
+.clip .hnd{position:absolute;top:0;bottom:0;width:6px;cursor:ew-resize;z-index:2}
+.clip .hnd.l{left:0} .clip .hnd.r{right:0}
+.clip .hnd:hover{background:var(--sel)}
+.tlplay{position:absolute;top:0;bottom:0;width:1px;background:var(--sel);z-index:5;pointer-events:none}
+.tlplay::before{content:"";position:absolute;top:0;left:-4px;border-left:4.5px solid transparent;border-right:4.5px solid transparent;border-top:6px solid var(--sel)}
+.evmark{position:absolute;bottom:0;width:1px;background:var(--faint)}
+.tracklabels{width:88px;flex:none;border-right:1px solid var(--line-soft);background:var(--surface);z-index:6}
+.tracklabels div{height:52px;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;padding:0 10px;font:500 9.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--faint)}
+.tracklabels .sph{height:19px;border-bottom:1px solid var(--line-soft)}
+
+/* ---------- graphics library ---------- */
+.gfxgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:11px}
+.gfxcard{border:1px solid var(--line);border-radius:var(--rl);overflow:hidden;background:var(--surface);text-align:left;display:flex;flex-direction:column}
+.gfxcard:hover{border-color:var(--sel)}
+.gfxcard canvas{width:100%;display:block;background:#0A0D0F;border-bottom:1px solid var(--line-soft)}
+.gfxcard .gm{padding:8px 10px;display:flex;flex-direction:column;gap:3px}
+.gfxcard .gt{font-size:12px;color:var(--text)}
+.gfxcard .gd{font-size:10.5px;color:var(--faint);line-height:1.45}
+
+/* ---------- brand ---------- */
+.brandgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.swatch{height:42px;border-radius:var(--r);border:1px solid var(--line)}
+.logobox{height:74px;border:1px solid var(--line);border-radius:var(--r);display:grid;place-items:center;padding:12px;background:var(--sunken)}
+.logobox img{max-width:100%;max-height:100%;object-fit:contain}
+.logobox.light{background:#F2F1ED}
+.logobox.dark{background:#0A0D0F}
+
+/* ---------- misc ---------- */
+.modal{position:fixed;inset:0;background:rgba(6,8,9,.74);display:grid;place-items:center;z-index:50;padding:24px}
+.modalbox{background:var(--surface);border:1px solid var(--line);border-radius:var(--rl);width:min(560px,100%);max-height:84vh;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:16px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--raised);border:1px solid var(--line);border-radius:var(--r);padding:9px 15px;font-size:12px;z-index:60;box-shadow:0 8px 26px rgba(0,0,0,.5)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.stack.lg{gap:22px}
+.row{display:flex;align-items:center;gap:10px}
+.row.wrap{flex-wrap:wrap}
+.row .sp{flex:1}
+.panel{border:1px solid var(--line);border-radius:var(--rl);background:var(--surface);padding:16px;display:flex;flex-direction:column;gap:13px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:12px;align-items:baseline}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:11.5px}
+table.cost{width:100%;border-collapse:collapse;font-size:11.5px}
+table.cost th{text-align:left;font:500 9.5px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:0 0 7px}
+table.cost td{padding:5px 0;border-top:1px solid var(--line-soft);font-family:var(--mono);font-variant-numeric:tabular-nums}
+table.cost td:first-child,table.cost th:first-child{font-family:var(--sans)}
+table.cost td.num,table.cost th.num{text-align:right}
+@media (max-width:1180px){.inspector{width:250px}.rail{width:168px}}
+@media (max-width:900px){.rail{display:none}.inspector{display:none}}
+</style>
+<div id="app"></div>
+<script>
+"use strict";
+/* ==========================================================================
+   VIEWLY MOTION
+   Plan first, generate second. Music drives timing. Higgsfield is an adapter.
+   ========================================================================== */
+
+const VERSION = "viewly.motion.project.v1";
+const clamp = (v,a,b)=>Math.min(b,Math.max(a,v));
+const uid = ()=>Math.random().toString(36).slice(2,10);
+const fmt = (s,d=2)=>Number(s).toFixed(d);
+const tc = s => { s=Math.max(0,s); const m=Math.floor(s/60), r=s-m*60;
+  return `${String(m).padStart(2,"0")}:${r.toFixed(2).padStart(5,"0")}`; };
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const el = (h)=>{const t=document.createElement("template");t.innerHTML=h.trim();return t.content.firstElementChild;};
+
+/* ==========================================================================
+   1. PROVIDER CAPABILITIES — audited live from the Higgsfield MCP catalog.
+   Nothing here is guessed. `models_explore(get)` supplied the parameter
+   surface; every credit figure came back from a `get_cost:true` preflight
+   against the real account on 2026-09-06.
+   ========================================================================== */
+
+const PROVIDER_AUDIT_DATE = "2026-09-06";
+
+const MODELS = {
+  kling3_0: {
+    id:"kling3_0", label:"Kling v3.0", provider:"Kling", recommended:true,
+    blurb:"Multi-shot, motion transfer. Best geometry stability on interiors.",
+    durationRange:[3,15], durationStep:1,          // integer seconds only
+    aspectRatios:["16:9","9:16","1:1"],
+    roles:["start_image","end_image"],
+    modes:[
+      {id:"std", label:"Standard", note:"Default. 1080p-class delivery."},
+      {id:"pro", label:"Pro",      note:"Higher quality pass."},
+      {id:"4k",  label:"4K",       note:"4K resolution. 4x the standard rate."}
+    ],
+    sound:true, soundDefault:"off",
+    // credits per generated second, keyed `${mode}/${sound}`.
+    // Every entry below was returned by a live get_cost preflight.
+    rates:{
+      "std/off":{rate:1.50, verified:true, samples:"3s=4.5 · 4s=6 · 5s=7.5 · 6s=9 · 10s=15"},
+      "std/on" :{rate:2.00, verified:true, samples:"5s=10"},
+      "pro/off":{rate:1.75, verified:true, samples:"5s=8.75 · 10s=17.5"},
+      "pro/on" :{rate:2.50, verified:true, samples:"5s=12.5"},
+      "4k/off" :{rate:6.00, verified:true, samples:"5s=30 · 8s=48"},
+      "4k/on"  :{rate:null, verified:false, samples:"not preflighted"}
+    },
+    aspectAffectsCost:false   // verified: 16:9, 9:16 and 1:1 all priced identically
+  },
+  kling3_0_turbo: {
+    id:"kling3_0_turbo", label:"Kling 3.0 Turbo", provider:"Kling",
+    blurb:"Fast single start-frame animation. Cheaper drafts.",
+    durationRange:[3,15], durationStep:1,
+    aspectRatios:["16:9","9:16","1:1"],
+    roles:["start_image"],
+    resolutions:["720p","1080p"], sound:false,
+    rates:{
+      "1080p":{rate:2.00, verified:true, samples:"5s=10"},
+      "720p" :{rate:null, verified:false, samples:"not preflighted"}
+    },
+    aspectAffectsCost:false
+  }
+};
+const DEFAULT_MODEL = "kling3_0";
+
+/* Cost engine — reads the audited rate table, never a hardcoded guess.
+   Returns {credits, verified, rateKey, rate, billedSeconds} */
+function shotCost(model, opts){
+  const m = MODELS[model]; if(!m) return {credits:0,verified:false,reason:"unknown model"};
+  const key = m.id==="kling3_0" ? `${opts.mode||"std"}/${opts.sound||"off"}` : (opts.resolution||"720p");
+  const e = m.rates[key];
+  const billed = billedSeconds(model, opts.duration);
+  if(!e || e.rate==null) return {credits:null,verified:false,rateKey:key,rate:null,billedSeconds:billed};
+  return {credits:+(e.rate*billed).toFixed(2), verified:e.verified, rateKey:key, rate:e.rate, billedSeconds:billed};
+}
+/* Kling bills whole seconds. A 3.72s planned shot is generated at 4s and
+   trimmed on the music event in the edit — so cost follows the ceiling. */
+function billedSeconds(model, planned){
+  const m = MODELS[model];
+  return clamp(Math.ceil(planned - 1e-6), m.durationRange[0], m.durationRange[1]);
+}
+
+/* ==========================================================================
+   2. CREATIVE VOCABULARY
+   ========================================================================== */
+
+const ROOMS = {
+  EXTERIOR:{sv:"Exteriör",      pref:4.2, range:[3.4,5.0], motion:"CINEMATIC_PUSH", hero:true},
+  VARDAGSRUM:{sv:"Vardagsrum",  pref:3.7, range:[3.2,4.4], motion:"SLOW_PUSH_IN"},
+  KOK:{sv:"Kök",                pref:3.8, range:[3.3,4.4], motion:"PAN_RIGHT"},
+  MATPLATS:{sv:"Matplats",      pref:3.4, range:[2.9,4.1], motion:"PAN_LEFT"},
+  SOVRUM:{sv:"Sovrum",          pref:3.3, range:[2.8,3.9], motion:"SLOW_PUSH_IN"},
+  BADRUM:{sv:"Badrum",          pref:2.8, range:[2.4,3.3], motion:"SUBTLE_DRIFT"},
+  HALL:{sv:"Hall",              pref:2.6, range:[2.2,3.1], motion:"SLOW_PUSH_IN"},
+  BALKONG:{sv:"Balkong",        pref:3.6, range:[3.0,4.4], motion:"PAN_RIGHT"},
+  UTEPLATS:{sv:"Uteplats",      pref:3.8, range:[3.2,4.6], motion:"SLOW_PULL_OUT"},
+  UTSIKT:{sv:"Utsikt",          pref:4.1, range:[3.5,4.9], motion:"SLOW_PUSH_IN", hero:true},
+  DETALJ:{sv:"Detalj",          pref:2.4, range:[2.0,3.0], motion:"SUBTLE_DRIFT"},
+  OMRADE:{sv:"Område",          pref:3.4, range:[2.9,4.2], motion:"PAN_RIGHT"},
+  ANNAT:{sv:"Annat",            pref:3.2, range:[2.7,4.0], motion:"SUBTLE_DRIFT"}
+};
+const ROOM_KEYS = Object.keys(ROOMS);
+
+/* Filename-keyword classifier. This is a real, honest heuristic — not a
+   vision model. It reports its own confidence and never overwrites a
+   category the user has touched. */
+const ROOM_HINTS = [
+  [/\b(exterior|exterior|fasad|utsida|entre|entré|framsida|hus|villa|facade)\b/i,"EXTERIOR",.8],
+  [/\b(vardagsrum|living|lounge|soffa|sallskapsrum|sällskapsrum)\b/i,"VARDAGSRUM",.85],
+  [/\b(kok|kök|kitchen|kokso|kitchenette)\b/i,"KOK",.85],
+  [/\b(matplats|matrum|dining|matsal|esszimmer)\b/i,"MATPLATS",.8],
+  [/\b(sovrum|bedroom|master|gastrum|gästrum)\b/i,"SOVRUM",.85],
+  [/\b(badrum|bathroom|bath|wc|dusch|toalett|shower)\b/i,"BADRUM",.85],
+  [/\b(hall|entre|hallway|korridor|foyer)\b/i,"HALL",.7],
+  [/\b(balkong|balcony|loggia)\b/i,"BALKONG",.85],
+  [/\b(uteplats|terrass|terrace|patio|altan|tradgard|trädgård|garden)\b/i,"UTEPLATS",.8],
+  [/\b(utsikt|view|vy|panorama|havsutsikt)\b/i,"UTSIKT",.8],
+  [/\b(detalj|detail|narbild|närbild|closeup|kakel|handtag)\b/i,"DETALJ",.7],
+  [/\b(omrade|område|area|grannskap|neighbourhood|neighborhood|karta)\b/i,"OMRADE",.7]
+];
+function guessRoom(filename, index, total){
+  const name = filename.replace(/[_\-.]/g," ");
+  for(const [re,room,conf] of ROOM_HINTS) if(re.test(name)) return {room, conf, why:"filnamn"};
+  // Positional prior: the first frame of a property reel is almost always
+  // the exterior, the last is the closing exterior.
+  if(index===0) return {room:"EXTERIOR", conf:.35, why:"position"};
+  if(index===total-1 && total>3) return {room:"EXTERIOR", conf:.3, why:"position"};
+  return {room:"ANNAT", conf:.15, why:"fallback"};
+}
+
+const IMPORTANCE = {
+  HERO:{label:"Hero", mult:1.18, w:3},
+  HIGH:{label:"High", mult:1.07, w:2},
+  NORMAL:{label:"Normal", mult:1.00, w:1},
+  SUPPORTING:{label:"Supporting", mult:0.88, w:0}
+};
+function guessImportance(room, index, total){
+  if(index===0) return "HERO";
+  if(index===total-1 && total>3) return "HERO";
+  if(ROOMS[room]?.hero) return "HIGH";
+  if(room==="VARDAGSRUM"||room==="KOK") return "HIGH";
+  if(room==="DETALJ"||room==="HALL") return "SUPPORTING";
+  return "NORMAL";
+}
+
+const DIRECTIONS = {
+  LUGN:{label:"Lugn", sv:"Långa andetag, få klipp, mjuk kamera.",
+    durScale:1.16, minEventStrength:.72, motionIntensity:.7, gfxDensity:"MINIMAL",
+    meta:"längre shots · starka events"},
+  BALANSERAD:{label:"Balanserad", sv:"Premiumtempo. Standard för bostad.",
+    durScale:1.00, minEventStrength:.55, motionIntensity:1.0, gfxDensity:"BALANCED",
+    meta:"3–4 s typiskt · frasaccenter"},
+  DYNAMISK:{label:"Dynamisk", sv:"Tätare klipp, mer driv, redaktionellt.",
+    durScale:.84, minEventStrength:.40, motionIntensity:1.3, gfxDensity:"BALANCED",
+    meta:"kortare shots · fler events"}
+};
+
+/* Camera motions. Prompts are deliberately minimal — the source image already
+   defines the scene, so the prompt describes the move and nothing else. */
+const MOTIONS = {
+  STATIC:{label:"Static", prompt:"Static camera.", pan:[0,0], zoom:0},
+  SLOW_PUSH_IN:{label:"Slow push in", prompt:"Slow dolly forward.", pan:[0,0], zoom:.10},
+  SLOW_PULL_OUT:{label:"Slow pull out", prompt:"Slow dolly backward.", pan:[0,0], zoom:-.10},
+  PAN_LEFT:{label:"Pan left", prompt:"Slow pan left.", pan:[-.09,0], zoom:.03},
+  PAN_RIGHT:{label:"Pan right", prompt:"Slow pan right.", pan:[.09,0], zoom:.03},
+  TILT_UP:{label:"Tilt up", prompt:"Slow tilt up.", pan:[0,-.08], zoom:.03},
+  TILT_DOWN:{label:"Tilt down", prompt:"Slow tilt down.", pan:[0,.08], zoom:.03},
+  CINEMATIC_PUSH:{label:"Cinematic push", prompt:"Slow cinematic dolly forward.", pan:[0,0], zoom:.15},
+  CINEMATIC_PULL:{label:"Cinematic pull", prompt:"Slow cinematic dolly backward.", pan:[0,0], zoom:-.15},
+  SUBTLE_DRIFT:{label:"Subtle drift", prompt:"Very subtle cinematic camera drift.", pan:[.035,-.02], zoom:.045}
+};
+const MOTION_KEYS = Object.keys(MOTIONS);
+
+const ASPECTS = {"9:16":[1080,1920], "16:9":[1920,1080], "1:1":[1080,1080]};
+
+/* ==========================================================================
+   3. PERSISTENCE
+   Project JSON in localStorage; image/audio bytes in IndexedDB (blobs would
+   blow the localStorage quota after two photos). Both sit behind one
+   interface so a server-backed store is a drop-in replacement.
+   ========================================================================== */
+
+const Blobs = (()=>{
+  let dbp=null;
+  const open = ()=> dbp ||= new Promise((res,rej)=>{
+    const r = indexedDB.open("viewly-motion",1);
+    r.onupgradeneeded = ()=> r.result.createObjectStore("blobs");
+    r.onsuccess = ()=> res(r.result);
+    r.onerror = ()=> rej(r.error);
+  });
+  const tx = async (mode,fn)=>{ const db=await open();
+    return new Promise((res,rej)=>{ const t=db.transaction("blobs",mode);
+      const rq=fn(t.objectStore("blobs")); rq.onsuccess=()=>res(rq.result); rq.onerror=()=>rej(rq.error); }); };
+  return {
+    put:(k,b)=>tx("readwrite",s=>s.put(b,k)).catch(()=>null),
+    get:(k)=>tx("readonly",s=>s.get(k)).catch(()=>null),
+    del:(k)=>tx("readwrite",s=>s.delete(k)).catch(()=>null)
+  };
+})();
+
+const Store = {
+  key:"viewly.motion.v1",
+  read(){ try{ return JSON.parse(localStorage.getItem(this.key)) || {projects:[],brands:{}}; }
+          catch{ return {projects:[],brands:{}}; } },
+  write(d){ try{ localStorage.setItem(this.key, JSON.stringify(d)); return true; }
+            catch(e){ toast("Kunde inte spara lokalt — lagringen är full."); return false; } }
+};
+
+/* ==========================================================================
+   4. BACKEND CONTRACT
+   The only part of the app that cannot run in a browser sandbox is the
+   Higgsfield call itself (the MCP/API needs a server-side key). Everything
+   talks to this interface. Point API_BASE at a real server and the mock
+   transport disappears without a single change to the UI.
+
+     POST   /api/motion/production            -> {productionId, jobs[]}
+     GET    /api/motion/production/:id        -> {productionId, status, jobs[]}
+     POST   /api/motion/production/:id/retry  -> {job}
+     POST   /api/motion/cost                  -> {total, perShot[]}   (live get_cost)
+
+   Server-side, each job maps 1:1 onto the audited MCP call:
+     generate_video_batch({ requests:[{ index, params:{
+        model, prompt, duration, mode, sound, aspect_ratio,
+        medias:[{role:"start_image", value:<media_id>}] }}]})
+     -> jobs_wait(...) -> show_generation_by_ids(...)
+   Images are uploaded first with media_upload / media_import_url.
+   ========================================================================== */
+
+const API_BASE = null;   // e.g. "https://api.viewly.se" — null selects the mock transport.
+
+const MotionAPI = {
+  get live(){ return !!API_BASE; },
+
+  async createProduction(spec){
+    if(this.live) return this._post("/api/motion/production", spec);
+    return MockBackend.createProduction(spec);
+  },
+  async getProduction(id){
+    if(this.live) return this._get(`/api/motion/production/${id}`);
+    return MockBackend.getProduction(id);
+  },
+  async retryShot(id, shotId){
+    if(this.live) return this._post(`/api/motion/production/${id}/retry`, {shotId});
+    return MockBackend.retryShot(id, shotId);
+  },
+  /* Live cost is authoritative: the server proxies get_cost:true, which
+     returns the provider's own figure. Offline we fall back to the audited
+     rate table and label the estimate as such. */
+  async cost(spec){
+    if(this.live){ try{ return await this._post("/api/motion/cost", spec); }catch{} }
+    return localCost(spec);
+  },
+  async _post(p,b){ const r=await fetch(API_BASE+p,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(b)});
+    if(!r.ok) throw new Error(`${r.status} ${await r.text()}`); return r.json(); },
+  async _get(p){ const r=await fetch(API_BASE+p); if(!r.ok) throw new Error(r.status); return r.json(); }
+};
+
+function localCost(spec){
+  const perShot = spec.shots.map(s=>{
+    const c = shotCost(spec.model, {duration:s.duration, mode:spec.mode, sound:spec.sound, resolution:spec.resolution});
+    return {shotId:s.shotId, ...c};
+  });
+  const known = perShot.filter(p=>p.credits!=null);
+  return {
+    total: +known.reduce((a,b)=>a+b.credits,0).toFixed(2),
+    unpriced: perShot.length - known.length,
+    perShot,
+    source: "audited-rate-table",
+    auditedAt: PROVIDER_AUDIT_DATE
+  };
+}
+
+/* --- Mock transport -------------------------------------------------------
+   Reproduces the real job lifecycle (queued -> generating -> completed|failed)
+   with realistic latency, so every production/retry/error path in the UI is
+   exercised for real. It returns no video URL: a mocked clip would be a lie.
+   The editor falls back to rendering the still with its planned camera move,
+   and each shot is clearly badged SIMULERAD until a server returns real MP4s.
+   -------------------------------------------------------------------------- */
+const MockBackend = {
+  runs:{},
+  createProduction(spec){
+    const id = "prod_"+uid();
+    this.runs[id] = {
+      productionId:id, status:"running", createdAt:Date.now(), spec,
+      jobs: spec.shots.map((s,i)=>({
+        index:i, shotId:s.shotId, jobId:"job_"+uid(), status:"queued",
+        startedAt:Date.now()+i*900 + Math.random()*600,
+        durationMs: 7000 + Math.random()*9000,
+        // one in twelve fails, so the retry path is a real path
+        willFail: Math.random() < 0.085,
+        resultUrl:null, actualCredits:null, error:null
+      }))
+    };
+    return Promise.resolve(this._snap(id));
+  },
+  getProduction(id){ return Promise.resolve(this._snap(id)); },
+  retryShot(id, shotId){
+    const run=this.runs[id]; if(!run) return Promise.reject(new Error("no run"));
+    const j=run.jobs.find(j=>j.shotId===shotId); if(!j) return Promise.reject(new Error("no job"));
+    Object.assign(j,{status:"queued",startedAt:Date.now(),durationMs:6000+Math.random()*6000,
+      willFail:Math.random()<0.04, error:null, resultUrl:null, jobId:"job_"+uid(), retried:(j.retried||0)+1});
+    run.status="running";
+    return Promise.resolve(this._snap(id));
+  },
+  _snap(id){
+    const run=this.runs[id]; if(!run) throw new Error("unknown production");
+    const now=Date.now();
+    for(const j of run.jobs){
+      if(j.status==="completed"||j.status==="failed") continue;
+      if(now < j.startedAt){ j.status="queued"; continue; }
+      const p = (now-j.startedAt)/j.durationMs;
+      if(p<1){ j.status="generating"; j.progress=clamp(p,0,.98); }
+      else if(j.willFail){ j.status="failed"; j.progress=1;
+        j.error="Provider returned NSFW_OR_UNSUPPORTED_FRAME for the start image."; }
+      else {
+        const shot = run.spec.shots.find(s=>s.shotId===j.shotId);
+        const c = shotCost(run.spec.model,{duration:shot.duration,mode:run.spec.mode,sound:run.spec.sound,resolution:run.spec.resolution});
+        j.status="completed"; j.progress=1; j.resultUrl=null; j.simulated=true;
+        j.actualCredits = c.credits;
+        j.generatedSeconds = c.billedSeconds;
+      }
+    }
+    const done = run.jobs.every(j=>j.status==="completed"||j.status==="failed");
+    run.status = done ? (run.jobs.some(j=>j.status==="failed") ? "partial" : "completed") : "running";
+    return JSON.parse(JSON.stringify(run));
+  }
+};
+
+/* ==========================================================================
+   5. MUSIC ANALYSIS
+   Real DSP on the decoded buffer — spectral-flux onsets, autocorrelation
+   tempo, an inferred beat grid, energy novelty for section boundaries.
+   Output is one Music Event Map that cuts, transitions and graphics all read.
+   ========================================================================== */
+
+function fft(re, im){                     // in-place radix-2, n = power of two
+  const n = re.length;
+  for(let i=1,j=0;i<n;i++){
+    let bit=n>>1; for(;j&bit;bit>>=1) j^=bit; j^=bit;
+    if(i<j){ [re[i],re[j]]=[re[j],re[i]]; [im[i],im[j]]=[im[j],im[i]]; }
+  }
+  for(let len=2;len<=n;len<<=1){
+    const ang=-2*Math.PI/len, wr=Math.cos(ang), wi=Math.sin(ang);
+    for(let i=0;i<n;i+=len){
+      let cr=1, ci=0;
+      for(let k=0;k<len/2;k++){
+        const ur=re[i+k], ui=im[i+k];
+        const vr=re[i+k+len/2]*cr - im[i+k+len/2]*ci;
+        const vi=re[i+k+len/2]*ci + im[i+k+len/2]*cr;
+        re[i+k]=ur+vr; im[i+k]=ui+vi;
+        re[i+k+len/2]=ur-vr; im[i+k+len/2]=ui-vi;
+        const ncr=cr*wr-ci*wi; ci=cr*wi+ci*wr; cr=ncr;
+      }
+    }
+  }
+}
+
+const AN = {WIN:1024, HOP:256, SR:22050};   // ~86 frames/s — enough for piano onsets
+
+function analyseBuffer(buf){
+  // ---- downmix + resample to a fixed analysis rate
+  const src = buf.getChannelData(0);
+  const src2 = buf.numberOfChannels>1 ? buf.getChannelData(1) : null;
+  const ratio = buf.sampleRate/AN.SR;
+  const n = Math.floor(buf.length/ratio);
+  const x = new Float32Array(n);
+  for(let i=0;i<n;i++){ const j=Math.floor(i*ratio);
+    x[i] = src2 ? (src[j]+src2[j])*.5 : src[j]; }
+
+  const nFrames = Math.max(1, Math.floor((n-AN.WIN)/AN.HOP));
+  const nBins = AN.WIN/2;
+  const win = new Float32Array(AN.WIN);
+  for(let i=0;i<AN.WIN;i++) win[i]=.5-.5*Math.cos(2*Math.PI*i/(AN.WIN-1));
+
+  const flux=new Float32Array(nFrames), rms=new Float32Array(nFrames),
+        centroid=new Float32Array(nFrames), lowFlux=new Float32Array(nFrames);
+  let prev=new Float32Array(nBins);
+  const re=new Float32Array(AN.WIN), im=new Float32Array(AN.WIN);
+
+  for(let f=0;f<nFrames;f++){
+    const off=f*AN.HOP;
+    let e=0;
+    for(let i=0;i<AN.WIN;i++){ const v=x[off+i]||0; re[i]=v*win[i]; im[i]=0; e+=v*v; }
+    rms[f]=Math.sqrt(e/AN.WIN);
+    fft(re,im);
+    let fl=0, lf=0, num=0, den=0;
+    for(let b=1;b<nBins;b++){
+      const mag=Math.sqrt(re[b]*re[b]+im[b]*im[b]);
+      const d=mag-prev[b];
+      if(d>0){ fl+=d; if(b<nBins*0.08) lf+=d; }   // <~900 Hz: kick / bass / left hand
+      num+=b*mag; den+=mag;
+      prev[b]=mag;
+    }
+    flux[f]=fl; lowFlux[f]=lf; centroid[f]= den>0 ? num/den/nBins : 0;
+  }
+
+  const norm=a=>{ let m=0; for(const v of a) m=Math.max(m,v); return m>0? a.map(v=>v/m) : Array.from(a); };
+  const fluxN=norm(flux), lowN=norm(lowFlux), rmsN=norm(rms);
+  const tOf = f => f*AN.HOP/AN.SR;
+
+  // ---- onset peak-picking against a local adaptive threshold
+  const onsets=[];
+  const W=12;
+  for(let f=2;f<nFrames-2;f++){
+    if(fluxN[f]<=fluxN[f-1] || fluxN[f]<fluxN[f+1]) continue;
+    let sum=0,c=0;
+    for(let k=f-W;k<=f+W;k++){ if(k<0||k>=nFrames) continue; sum+=fluxN[k]; c++; }
+    const thr=sum/c*1.42+0.018;
+    if(fluxN[f]>thr){
+      const last=onsets[onsets.length-1];
+      if(last && tOf(f)-last.t < .055){ if(fluxN[f]>last.raw){ last.t=tOf(f); last.raw=fluxN[f]; last.low=lowN[f]; } }
+      else onsets.push({t:tOf(f), raw:fluxN[f], low:lowN[f]});
+    }
+  }
+
+  // ---- tempo by autocorrelating the onset envelope (60–180 BPM)
+  const fps=AN.SR/AN.HOP;
+  let best={bpm:0,score:0};
+  for(let bpm=60;bpm<=180;bpm+=.25){
+    const lag=Math.round(60/bpm*fps);
+    if(lag<4||lag>=nFrames/2) continue;
+    let s=0;
+    for(let f=0;f<nFrames-lag;f++) s+=fluxN[f]*fluxN[f+lag];
+    s/= (nFrames-lag);
+    if(s>best.score) best={bpm,score:s};
+  }
+  const bpm = best.bpm||110;
+  const beatLen = 60/bpm;
+
+  // ---- beat phase: the offset that lands most onset energy on the grid
+  let phase=0, phBest=-1;
+  for(let p=0;p<beatLen;p+=beatLen/48){
+    let s=0;
+    for(let t=p;t<tOf(nFrames-1);t+=beatLen){
+      const f=Math.round(t*fps); if(f>0&&f<nFrames) s+=fluxN[f];
+    }
+    if(s>phBest){ phBest=s; phase=p; }
+  }
+  const beats=[];
+  for(let t=phase;t<buf.duration;t+=beatLen) beats.push(t);
+
+  // ---- bar phase: which beat-of-4 carries the most low-end energy
+  let barOff=0, barBest=-1;
+  for(let o=0;o<4;o++){
+    let s=0;
+    for(let i=o;i<beats.length;i+=4){ const f=Math.round(beats[i]*fps); if(f>0&&f<nFrames) s+=lowN[f]; }
+    if(s>barBest){ barBest=s; barOff=o; }
+  }
+
+  // ---- sections: novelty in smoothed energy + brightness
+  const smooth=(a,k)=>a.map((_,i)=>{ let s=0,c=0;
+    for(let j=i-k;j<=i+k;j++){ if(j<0||j>=a.length) continue; s+=a[j]; c++; } return s/c; });
+  const rs=smooth(rmsN,26), cs=smooth(Array.from(centroid),26);
+  const sections=[0];
+  const gap=Math.max(6, beatLen*8);
+  for(let f=30;f<nFrames-30;f++){
+    const dE=Math.abs(rs[f+22]-rs[f-22]), dC=Math.abs(cs[f+22]-cs[f-22]);
+    const nov=dE*1.0+dC*0.55;
+    if(nov>0.16){
+      const t=tOf(f);
+      if(t-sections[sections.length-1]>gap) sections.push(t);
+    }
+  }
+
+  // ---- assemble the Music Event Map
+  const snap=(t,arr,tol)=>{ let bi=-1,bd=tol;
+    for(let i=0;i<arr.length;i++){ const d=Math.abs(arr[i]-t); if(d<bd){bd=d;bi=i;} } return bi; };
+  const events=[];
+  const push=(t,type,strength,meta)=>{ if(t>=0&&t<=buf.duration) events.push({t:+t.toFixed(3),type,strength:+clamp(strength,0,1).toFixed(3),...meta}); };
+
+  sections.forEach((t,i)=> push(t,"SECTION_START", i===0?1:0.95));
+  beats.forEach((t,i)=>{
+    const f=Math.round(t*fps);
+    const energy = f>0&&f<nFrames ? fluxN[f] : 0;
+    const isBar=(i-barOff)%4===0, bar=Math.floor((i-barOff)/4);
+    const isPhrase = isBar && bar>=0 && bar%4===0;
+    if(isPhrase)     push(t,"PHRASE_ACCENT", clamp(.80+energy*.20,0,1), {bar});
+    else if(isBar)   push(t,"DOWNBEAT",      clamp(.62+energy*.25,0,1), {bar});
+    else             push(t,"BEAT",          clamp(.20+energy*.25,0,1));
+  });
+  onsets.forEach(o=>{
+    if(snap(o.t,beats,.075)>=0) return;              // already covered by the grid
+    const perc = o.low>0.35;
+    push(o.t, perc?"PERCUSSION_HIT":"ONSET", clamp((perc?.40:.34)+o.raw*.42,0,1));
+  });
+
+  events.sort((a,b)=>a.t-b.t);
+  // collapse events closer than 40 ms, keeping the strongest
+  const map=[];
+  for(const e of events){
+    const p=map[map.length-1];
+    if(p && e.t-p.t<.04){ if(e.strength>p.strength) map[map.length-1]=e; }
+    else map.push(e);
+  }
+
+  const energyCurve=[]; const step=Math.max(1,Math.floor(nFrames/420));
+  for(let f=0;f<nFrames;f+=step) energyCurve.push(+rmsN[f].toFixed(3));
+
+  // Editability: can this track actually be cut on? Strong, regular, well-spread
+  // events matter more than whether it is pleasant music.
+  const strong = map.filter(e=>e.strength>=.6);
+  const spread = strong.length>2 ? (()=>{ const g=[]; for(let i=1;i<strong.length;i++) g.push(strong[i].t-strong[i-1].t);
+      const mean=g.reduce((a,b)=>a+b,0)/g.length;
+      const sd=Math.sqrt(g.reduce((a,b)=>a+(b-mean)**2,0)/g.length);
+      return clamp(1-sd/Math.max(mean,.001),0,1); })() : .2;
+  const density = clamp(strong.length/Math.max(buf.duration,1)/1.1,0,1);
+  const editability = clamp(.45*spread + .35*density + .20*clamp(best.score*180,0,1), 0, 1);
+
+  return {
+    duration:+buf.duration.toFixed(3), bpm:+bpm.toFixed(1), beatLen:+beatLen.toFixed(4),
+    events:map, beats:beats.map(t=>+t.toFixed(3)), sections:sections.map(t=>+t.toFixed(3)),
+    energyCurve, peaks:buildPeaks(x), editability:+editability.toFixed(2),
+    counts:{ total:map.length, strong:strong.length,
+      section:map.filter(e=>e.type==="SECTION_START").length,
+      phrase:map.filter(e=>e.type==="PHRASE_ACCENT").length,
+      downbeat:map.filter(e=>e.type==="DOWNBEAT").length,
+      onset:map.filter(e=>e.type==="ONSET"||e.type==="PERCUSSION_HIT").length }
+  };
+}
+function buildPeaks(x, n=1400){
+  const out=new Array(n).fill(0), block=Math.floor(x.length/n)||1;
+  for(let i=0;i<n;i++){ let m=0; const s=i*block;
+    for(let j=0;j<block;j+=3){ const v=Math.abs(x[s+j]||0); if(v>m) m=v; }
+    out[i]=+m.toFixed(3); }
+  const mx=Math.max(...out,.001);
+  return out.map(v=>+(v/mx).toFixed(3));
+}
+
+const EVENT_WEIGHT = {SECTION_START:1.0, PHRASE_ACCENT:.88, DOWNBEAT:.68, PERCUSSION_HIT:.46, ONSET:.42, BEAT:.24};
+
+/* ==========================================================================
+   6. SHOT TIMING ENGINE
+   Each image gets a preferred duration and an allowed range from its room,
+   its importance and the creative direction. The engine then walks the
+   Music Event Map and places each cut on the strongest event inside that
+   range — never on a fixed grid, never on every beat. Total video length is
+   an output, not an input.
+   ========================================================================== */
+
+function shotPriors(img, direction){
+  const r = ROOMS[img.room] || ROOMS.ANNAT;
+  const imp = IMPORTANCE[img.importance] || IMPORTANCE.NORMAL;
+  const d = DIRECTIONS[direction] || DIRECTIONS.BALANSERAD;
+  const k = imp.mult * d.durScale;
+  return {
+    preferred:+(r.pref*k).toFixed(2),
+    min:+(r.range[0]*k).toFixed(2),
+    max:+(r.range[1]*k).toFixed(2)
+  };
+}
+
+function planTiming(images, music, direction){
+  const dir = DIRECTIONS[direction] || DIRECTIONS.BALANSERAD;
+  const included = images.filter(i=>i.include);
+  const shots=[]; let t=0;
+
+  for(let i=0;i<included.length;i++){
+    const img=included[i];
+    const p = img.lockDuration ? {preferred:img.duration, min:img.duration, max:img.duration}
+                               : shotPriors(img, direction);
+    const isLast = i===included.length-1;
+    let end = t + p.preferred, chosen=null;
+
+    if(music && music.events.length && !img.lockDuration){
+      const lo=t+p.min, hi=t+p.max;
+      const cands = music.events.filter(e=>e.t>=lo && e.t<=hi &&
+        e.strength*EVENT_WEIGHT[e.type] >= dir.minEventStrength*0.62);
+      if(cands.length){
+        let bestScore=-Infinity;
+        for(const e of cands){
+          const w = e.strength*EVENT_WEIGHT[e.type];
+          // proximity to the preferred length, normalised across the allowed span
+          const drift = Math.abs(e.t-end)/Math.max(p.max-p.min,.001);
+          // the closing shot is rewarded for resolving on a section or phrase
+          const closing = isLast && (e.type==="SECTION_START"||e.type==="PHRASE_ACCENT") ? .45 : 0;
+          const score = w*1.35 - drift*0.9 + closing;
+          if(score>bestScore){ bestScore=score; chosen=e; }
+        }
+        end = chosen.t;
+      }
+    }
+    if(music) end = Math.min(end, music.duration);
+    const dur = Math.max(1.2, +(end-t).toFixed(3));
+    shots.push({
+      shotId:img.id, imageId:img.id, index:i,
+      start:+t.toFixed(3), duration:dur, end:+(t+dur).toFixed(3),
+      preferred:p.preferred, min:p.min, max:p.max,
+      cutEvent: chosen ? {t:chosen.t, type:chosen.type, strength:chosen.strength} : null,
+      aligned: !!chosen,
+      motion: img.motion || (ROOMS[img.room]?.motion) || "SUBTLE_DRIFT",
+      trimIn:0
+    });
+    t += dur;
+  }
+  return {
+    shots, total:+t.toFixed(3),
+    alignedCuts: shots.filter(s=>s.aligned).length,
+    rawPreferred:+shots.reduce((a,s)=>a+s.preferred,0).toFixed(2),
+    endsOnResolution: shots.length ? ["SECTION_START","PHRASE_ACCENT"].includes(shots[shots.length-1].cutEvent?.type) : false
+  };
+}
+
+/* ==========================================================================
+   7. PROJECT MODEL
+   ========================================================================== */
+
+function newProject(name){
+  return {
+    schema:VERSION, id:"prj_"+uid(), name:name||"Namnlöst objekt",
+    createdAt:Date.now(), updatedAt:Date.now(),
+    property:{address:"",city:"",property_type:"",living_area_m2:null},
+    broker:{name:"",phone:"",image_url:""},
+    brandId:null,
+    images:[], music:null, direction:"BALANSERAD",
+    output:{aspect:"9:16", model:DEFAULT_MODEL, mode:"std", sound:"off", resolution:"1080p"},
+    plan:null, production:null,
+    graphics:[], graphicFamily:"EDITORIAL", graphicDensity:"BALANCED", brandLock:true,
+    step:"material"
+  };
+}
+
+const App = {
+  data:Store.read(),
+  project:null,
+  view:"projects",
+  sel:{image:null, shot:null, graphic:null},
+  audio:{ctx:null, buffer:null, source:null, gain:null, playing:false, startedAt:0, offset:0},
+  undo:[], redo:[],
+
+  save(){
+    if(!this.project) return;
+    this.project.updatedAt=Date.now();
+    const i=this.data.projects.findIndex(p=>p.id===this.project.id);
+    const lean = {...this.project, images:this.project.images.map(im=>({...im, url:undefined, el:undefined}))};
+    if(i>=0) this.data.projects[i]=lean; else this.data.projects.push(lean);
+    Store.write(this.data);
+  },
+  snapshot(label){
+    if(!this.project) return;
+    this.undo.push({label, state:JSON.stringify({images:this.project.images.map(i=>({...i,url:undefined,el:undefined})),
+      plan:this.project.plan, graphics:this.project.graphics})});
+    if(this.undo.length>40) this.undo.shift();
+    this.redo.length=0;
+  },
+  restore(stack, other){
+    if(!stack.length) return;
+    const s=stack.pop();
+    other.push({label:s.label, state:JSON.stringify({images:this.project.images.map(i=>({...i,url:undefined,el:undefined})),
+      plan:this.project.plan, graphics:this.project.graphics})});
+    const st=JSON.parse(s.state);
+    st.images.forEach(im=>{ const cur=this.project.images.find(x=>x.id===im.id);
+      Object.assign(im,{url:cur?.url, el:cur?.el}); });
+    this.project.images=st.images; this.project.plan=st.plan; this.project.graphics=st.graphics;
+    this.save(); render(); toast(`Ångrade: ${s.label}`);
+  },
+  replan(){
+    if(!this.project) return;
+    const inc=this.project.images.filter(i=>i.include);
+    if(!inc.length){ this.project.plan=null; return; }
+    this.project.plan = planTiming(this.project.images, this.project.music?.analysis, this.project.direction);
+    this.save();
+  }
+};
+
+/* ==========================================================================
+   8. RENDERER — one implementation drives the animatic, the editor preview
+   and the export. Preview is the render.
+   ========================================================================== */
+
+function easeInOut(t){ return t<.5 ? 2*t*t : 1-Math.pow(-2*t+2,2)/2; }
+
+function drawShot(ctx, W, H, img, motion, p, opts={}){
+  ctx.save();
+  ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+  if(img && img.complete && img.naturalWidth){
+    const m = MOTIONS[motion] || MOTIONS.STATIC;
+    const e = easeInOut(clamp(p,0,1));
+    const intensity = opts.intensity ?? 1;
+    const z = 1 + Math.abs(m.zoom)*intensity*0.6 + (m.zoom>=0 ? m.zoom*intensity*e : m.zoom*intensity*(e-1));
+    const scale = Math.max(W/img.naturalWidth, H/img.naturalHeight) * Math.max(1.001, z);
+    const dw=img.naturalWidth*scale, dh=img.naturalHeight*scale;
+    const px = m.pan[0]*intensity*(e-.5)*(dw-W||W*.1);
+    const py = m.pan[1]*intensity*(e-.5)*(dh-H||H*.1);
+    ctx.drawImage(img, (W-dw)/2 - px, (H-dh)/2 - py, dw, dh);
+  } else {
+    ctx.fillStyle="#14181A"; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle="#3A4448"; ctx.font=`500 ${Math.round(W*.026)}px ui-sans-serif,sans-serif`;
+    ctx.textAlign="center"; ctx.fillText("Ingen bild", W/2, H/2);
+  }
+  ctx.restore();
+}
+
+/* ==========================================================================
+   9. MOTION GRAPHICS
+   A separate, editable layer composited over the cut video — never baked
+   into the generation. Components are built from reusable primitives so a
+   line that grows in one treatment is the same line that grows in the next.
+   BRAND decides typeface and colour. FAMILY decides construction and timing.
+   ========================================================================== */
+
+const FAMILIES = {
+  EDITORIAL:{label:"Editorial", desc:"Hairline rules, generous tracking, asymmetric weight.",
+    line:1.0, ease:"quart", tracking:1.0, pace:1.0},
+  ARCHITECTURAL:{label:"Architectural", desc:"Constructed corners, dimension lines, drawing logic.",
+    line:1.15, ease:"expo", tracking:.9, pace:.92},
+  QUIET_LUXURY:{label:"Quiet Luxury", desc:"Slow fades, minimal linework, wide breathing room.",
+    line:.75, ease:"sine", tracking:1.25, pace:1.28},
+  MODERN_PRECISION:{label:"Modern Precision", desc:"Fast masks, tight geometry, decisive holds.",
+    line:1.0, ease:"expo", tracking:.85, pace:.82},
+  CINEMATIC:{label:"Cinematic", desc:"Soft scrims, letterbox weight, slow resolve.",
+    line:.9, ease:"sine", tracking:1.1, pace:1.15}
+};
+const EASES = {
+  quart:t=>t<.5?8*t*t*t*t:1-Math.pow(-2*t+2,4)/2,
+  expo:t=>t===0?0:t===1?1:t<.5?Math.pow(2,20*t-10)/2:(2-Math.pow(2,-20*t+10))/2,
+  sine:t=>-(Math.cos(Math.PI*t)-1)/2
+};
+const DENSITY = {
+  MINIMAL:{label:"Minimal", desc:"Intro och outro. Inget mer.", max:3},
+  BALANCED:{label:"Balanced", desc:"Intro, ett par fakta, outro.", max:5},
+  EXPRESSIVE:{label:"Expressive", desc:"Tätare rytm mot musiken.", max:8}
+};
+
+/* ---- primitives ---------------------------------------------------------- */
+const P = {
+  line(ctx,x1,y1,x2,y2,p,w=1){
+    if(p<=0) return; ctx.save(); ctx.lineWidth=w; ctx.lineCap="butt";
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x1+(x2-x1)*p, y1+(y2-y1)*p); ctx.stroke(); ctx.restore();
+  },
+  maskReveal(ctx,x,y,w,h,p,draw,dir="left"){
+    if(p<=0) return; ctx.save(); ctx.beginPath();
+    const rw=w*clamp(p,0,1);
+    if(dir==="left") ctx.rect(x,y,rw,h);
+    else if(dir==="right") ctx.rect(x+w-rw,y,rw,h);
+    else ctx.rect(x,y+h-h*p,w,h*p);
+    ctx.clip(); draw(); ctx.restore();
+  },
+  trackingResolve(ctx,text,x,y,p,{size,family,weight=400,color,track=.3,align="left"}){
+    const e=clamp(p,0,1);
+    ctx.save();
+    ctx.font=`${weight} ${size}px ${family}`;
+    ctx.fillStyle=color; ctx.globalAlpha=clamp(e*1.5,0,1); ctx.textBaseline="alphabetic";
+    const sp = size*track*(1-e);
+    const chars=[...text];
+    let total=0; for(const c of chars) total+=ctx.measureText(c).width+sp;
+    total-=sp;
+    let cx = align==="center" ? x-total/2 : align==="right" ? x-total : x;
+    const sc = 1 + .012*(1-e);
+    ctx.translate(cx,y); ctx.scale(sc,sc);
+    let ox=0;
+    for(const c of chars){ ctx.fillText(c,ox,0); ox+=ctx.measureText(c).width+sp; }
+    ctx.restore();
+    return total;
+  },
+  corner(ctx,x,y,w,h,p,lw=1,flip=1){
+    const half=clamp(p*2,0,1), second=clamp(p*2-1,0,1);
+    ctx.save(); ctx.lineWidth=lw;
+    ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+w*half*flip,y); ctx.stroke();
+    if(second>0){ ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x,y+h*second); ctx.stroke(); }
+    ctx.restore();
+  },
+  partialFrame(ctx,x,y,w,h,p,lw=1){
+    const s=clamp(p,0,1);
+    ctx.save(); ctx.lineWidth=lw;
+    P.line(ctx,x,y,x+w*.34,y,clamp(s*2.2,0,1),lw);
+    P.line(ctx,x+w,y,x+w,y+h*.42,clamp(s*2.2-.4,0,1),lw);
+    P.line(ctx,x+w,y+h,x+w*.66,y+h,clamp(s*2.2-.8,0,1),lw);
+    P.line(ctx,x,y+h,x,y+h*.58,clamp(s*2.2-1.2,0,1),lw);
+    ctx.restore();
+  },
+  dimension(ctx,x1,x2,y,p,lw=1,cap=7){
+    const s=clamp(p,0,1);
+    ctx.save(); ctx.lineWidth=lw;
+    ctx.globalAlpha=clamp(s*3,0,1);
+    ctx.beginPath(); ctx.moveTo(x1,y-cap); ctx.lineTo(x1,y+cap); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2,y-cap); ctx.lineTo(x2,y+cap); ctx.stroke();
+    ctx.globalAlpha=1;
+    P.line(ctx,x1,y,x2,y,clamp(s*1.4-.15,0,1),lw);
+    ctx.restore();
+  },
+  /* Monoline architectural icon set — consistent stroke, square caps, no clipart. */
+  icon(ctx,name,x,y,s,p,lw=1){
+    ctx.save(); ctx.lineWidth=lw; ctx.lineCap="square"; ctx.lineJoin="miter";
+    ctx.translate(x,y);
+    const seg=(a,b,c,d,f,t)=>P.line(ctx,a*s,b*s,c*s,d*s,clamp((p-f)/Math.max(t-f,.001),0,1),lw);
+    if(name==="roof"){ seg(-.5,.15,0,-.35,0,.5); seg(0,-.35,.5,.15,.4,.9); seg(-.35,.15,-.35,.5,.75,1); seg(.35,.15,.35,.5,.75,1); }
+    else if(name==="area"){ seg(-.45,-.45,.45,-.45,0,.35); seg(.45,-.45,.45,.45,.3,.6); seg(.45,.45,-.45,.45,.55,.82); seg(-.45,.45,-.45,-.45,.78,1); }
+    else if(name==="pin"){ seg(0,.45,0,-.1,0,.45); seg(-.28,-.1,0,-.42,.4,.75); seg(0,-.42,.28,-.1,.65,1); seg(-.28,-.1,.28,-.1,.85,1); }
+    else if(name==="window"){ seg(-.4,-.45,.4,-.45,0,.3); seg(.4,-.45,.4,.45,.25,.5); seg(.4,.45,-.4,.45,.45,.7); seg(-.4,.45,-.4,-.45,.65,.85); seg(0,-.45,0,.45,.8,1); }
+    else if(name==="stair"){ seg(-.45,.45,-.15,.45,0,.25); seg(-.15,.45,-.15,.1,.2,.4); seg(-.15,.1,.15,.1,.35,.6); seg(.15,.1,.15,-.25,.55,.78); seg(.15,-.25,.45,-.25,.75,1); }
+    ctx.restore();
+  },
+  scrim(ctx,W,H,p,from=.0,to=.55,dir="bottom"){
+    const a=clamp(p,0,1)*to;
+    const g=ctx.createLinearGradient(0, dir==="bottom"?H:0, 0, dir==="bottom"?H*.42:H*.58);
+    g.addColorStop(0,`rgba(6,8,9,${a})`); g.addColorStop(1,"rgba(6,8,9,0)");
+    ctx.save(); ctx.fillStyle=g; ctx.fillRect(0,0,W,H); ctx.restore();
+  },
+  portraitMask(ctx,img,x,y,r,p){
+    if(!img||!img.complete) return;
+    ctx.save(); ctx.beginPath(); ctx.arc(x,y,r*clamp(p*1.1,0,1),0,Math.PI*2); ctx.clip();
+    const s=Math.max(r*2/img.naturalWidth, r*2/img.naturalHeight);
+    ctx.drawImage(img,x-img.naturalWidth*s/2,y-img.naturalHeight*s/2,img.naturalWidth*s,img.naturalHeight*s);
+    ctx.restore();
+  }
+};
+
+/* ---- component library --------------------------------------------------- */
+/* Each draw(g) receives a fully-resolved context: brand, fonts, colours,
+   family, unit scale, and the phase-mapped progress values. */
+
+const GFX = {};
+const def = (id,o)=>{ GFX[id]={id,...o}; };
+
+def("line_address",{
+  name:"Line → Address", group:"Intro",
+  desc:"Hairline grows, address reveals through the mask, city follows.",
+  fields:["address","city"], defaultDur:3.4,
+  draw(g){
+    const {ctx,W,H,u,c,f,e,anchor}=g;
+    const x=anchor.x, y=anchor.y;
+    ctx.strokeStyle=c.accent;
+    P.line(ctx,x,y-3.2*u,x+16*u,y-3.2*u, clamp(e*2.1,0,1), g.lw);
+    const t2=clamp(e*1.9-.55,0,1);
+    P.maskReveal(ctx,x,y-2.6*u,26*u,7*u,t2,()=>{
+      ctx.fillStyle=c.text; ctx.textBaseline="alphabetic";
+      ctx.font=`400 ${4.6*u}px ${f.display}`;
+      ctx.fillText(g.content.address||"—", x, y+1.6*u);
+    });
+    const t3=clamp(e*1.8-1.0,0,1);
+    if(t3>0){ ctx.save(); ctx.globalAlpha=t3;
+      P.trackingResolve(ctx,(g.content.city||"").toUpperCase(),x,y+4.6*u,t3,
+        {size:1.55*u,family:f.body,weight:500,color:c.muted,track:.42*g.fam.tracking});
+      ctx.restore(); }
+  }
+});
+
+def("corner_facts",{
+  name:"Corner → Facts", group:"Facts",
+  desc:"Two strokes build a corner; the corner releases the property data.",
+  fields:["type","area","rooms"], defaultDur:3.6,
+  draw(g){
+    const {ctx,W,H,u,c,f,e,anchor}=g;
+    const x=anchor.x, y=anchor.y;
+    ctx.strokeStyle=c.accent;
+    P.corner(ctx,x,y,10*u,7*u, clamp(e*2.2,0,1), g.lw);
+    const rows=[[g.content.type,"Typ"],[g.content.area?g.content.area+" m²":"","Boarea"],[g.content.rooms,"Rum"]].filter(r=>r[0]);
+    rows.forEach((r,i)=>{
+      const t=clamp(e*2.0-.6-i*.22,0,1); if(t<=0) return;
+      const ry=y+2.2*u+i*4.1*u;
+      P.maskReveal(ctx,x+2.4*u,ry-2.4*u,22*u,4*u,t,()=>{
+        ctx.fillStyle=c.text; ctx.font=`400 ${3.1*u}px ${f.display}`; ctx.textBaseline="alphabetic";
+        ctx.fillText(String(r[0]), x+2.4*u, ry);
+        ctx.fillStyle=c.muted; ctx.font=`500 ${1.25*u}px ${f.body}`;
+        ctx.fillText(r[1].toUpperCase(), x+2.4*u, ry+1.9*u);
+      });
+    });
+  }
+});
+
+def("dimension_area",{
+  name:"Dimension → Area", group:"Facts",
+  desc:"Drawing endpoints, a measured line, the figure. No CAD gimmickry.",
+  fields:["area"], defaultDur:3.0,
+  draw(g){
+    const {ctx,u,c,f,e,anchor}=g;
+    const x=anchor.x, y=anchor.y, w=20*u;
+    ctx.strokeStyle=c.accent;
+    P.dimension(ctx,x,x+w,y,clamp(e*2.1,0,1),g.lw,1.5*u);
+    const t=clamp(e*1.9-.6,0,1);
+    if(t>0){
+      ctx.save(); ctx.globalAlpha=t;
+      ctx.fillStyle=c.text; ctx.font=`400 ${5.4*u}px ${f.display}`;
+      ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+      ctx.fillText(`${g.content.area||"—"}`, x+w/2, y-2.4*u);
+      ctx.font=`500 ${1.35*u}px ${f.body}`; ctx.fillStyle=c.muted;
+      ctx.fillText("KVADRATMETER BOAREA", x+w/2, y+4.4*u);
+      ctx.restore(); ctx.textAlign="left";
+    }
+  }
+});
+
+def("tracking_title",{
+  name:"Tracking Resolve", group:"Intro",
+  desc:"Wide tracking collapses inward as opacity rises. No slide.",
+  fields:["address","city"], defaultDur:3.2,
+  draw(g){
+    const {ctx,W,u,c,f,e,anchor}=g;
+    P.trackingResolve(ctx,(g.content.address||"").toUpperCase(),anchor.x,anchor.y,clamp(e*1.7,0,1),
+      {size:3.6*u,family:f.display,weight:400,color:c.text,track:.55*g.fam.tracking,align:anchor.align});
+    const t=clamp(e*1.7-.5,0,1);
+    if(t>0){ ctx.save(); ctx.globalAlpha=t; ctx.strokeStyle=c.accent;
+      const half=9*u;
+      P.line(ctx,anchor.x-(anchor.align==="center"?half:0),anchor.y+2.6*u,
+                 anchor.x+(anchor.align==="center"?half:half*2),anchor.y+2.6*u,t,g.lw);
+      P.trackingResolve(ctx,(g.content.city||"").toUpperCase(),anchor.x,anchor.y+5.4*u,t,
+        {size:1.5*u,family:f.body,weight:500,color:c.muted,track:.5*g.fam.tracking,align:anchor.align});
+      ctx.restore(); }
+  }
+});
+
+def("icon_spec",{
+  name:"Icon Construct", group:"Facts",
+  desc:"Strokes assemble a monoline icon; the data grows out of its structure.",
+  fields:["icon","value","label"], defaultDur:3.4,
+  draw(g){
+    const {ctx,u,c,f,e,anchor}=g;
+    const x=anchor.x, y=anchor.y;
+    ctx.strokeStyle=c.accent;
+    P.icon(ctx,g.content.icon||"area",x+3*u,y,4.6*u,clamp(e*2.0,0,1),g.lw);
+    const t=clamp(e*1.9-.72,0,1); if(t<=0) return;
+    P.line(ctx,x+6.6*u,y,x+9.2*u,y,clamp(t*2,0,1),g.lw);
+    P.maskReveal(ctx,x+10*u,y-3.4*u,22*u,7*u,t,()=>{
+      ctx.fillStyle=c.text; ctx.font=`400 ${3.4*u}px ${f.display}`; ctx.textBaseline="alphabetic";
+      ctx.fillText(String(g.content.value||"—"), x+10*u, y+.6*u);
+      ctx.fillStyle=c.muted; ctx.font=`500 ${1.25*u}px ${f.body}`;
+      ctx.fillText(String(g.content.label||"").toUpperCase(), x+10*u, y+2.9*u);
+    });
+  }
+});
+
+def("rule_location",{
+  name:"Rule → Location", group:"Location",
+  desc:"A rule extends from the frame edge and hands off to the place name.",
+  fields:["city","area"], defaultDur:2.8,
+  draw(g){
+    const {ctx,W,u,c,f,e,anchor}=g;
+    ctx.strokeStyle=c.accent;
+    P.line(ctx,anchor.x-6*u,anchor.y,anchor.x-1*u,anchor.y,clamp(e*2.4,0,1),g.lw);
+    const t=clamp(e*2-.5,0,1); if(t<=0) return;
+    P.maskReveal(ctx,anchor.x,anchor.y-2.6*u,24*u,5*u,t,()=>{
+      ctx.fillStyle=c.text; ctx.font=`400 ${2.9*u}px ${f.display}`; ctx.textBaseline="middle";
+      ctx.fillText(g.content.city||"—", anchor.x, anchor.y-.2*u);
+      if(g.content.area){ ctx.fillStyle=c.muted; ctx.font=`500 ${1.2*u}px ${f.body}`;
+        ctx.fillText(String(g.content.area).toUpperCase(), anchor.x, anchor.y+2.4*u); }
+    });
+  }
+});
+
+def("stack_facts",{
+  name:"Stacked Facts", group:"Facts",
+  desc:"Rows reveal on their own rules, staggered against the music.",
+  fields:["type","area","rooms"], defaultDur:3.8,
+  draw(g){
+    const {ctx,u,c,f,e,anchor}=g;
+    const rows=[["Typ",g.content.type],["Boarea",g.content.area?g.content.area+" m²":""],["Rum",g.content.rooms]].filter(r=>r[1]);
+    rows.forEach((r,i)=>{
+      const t=clamp(e*2.1-i*.26,0,1); if(t<=0) return;
+      const y=anchor.y+i*4.4*u;
+      ctx.strokeStyle=c.line;
+      P.line(ctx,anchor.x,y+1.7*u,anchor.x+18*u,y+1.7*u,t,g.lw*.8);
+      P.maskReveal(ctx,anchor.x,y-2.6*u,18*u,4.4*u,clamp(t*1.5-.2,0,1),()=>{
+        ctx.fillStyle=c.muted; ctx.font=`500 ${1.2*u}px ${f.body}`; ctx.textBaseline="alphabetic";
+        ctx.fillText(r[0].toUpperCase(), anchor.x, y);
+        ctx.fillStyle=c.text; ctx.font=`400 ${2.7*u}px ${f.display}`; ctx.textAlign="right";
+        ctx.fillText(String(r[1]), anchor.x+18*u, y); ctx.textAlign="left";
+      });
+    });
+  }
+});
+
+def("frame_intro",{
+  name:"Partial Frame", group:"Intro",
+  desc:"An incomplete frame constructs around the title and holds it.",
+  fields:["address","city"], defaultDur:3.6,
+  draw(g){
+    const {ctx,W,H,u,c,f,e,anchor}=g;
+    const w=30*u,h=14*u, x=anchor.x-w/2, y=anchor.y-h/2;
+    ctx.strokeStyle=c.accent;
+    P.partialFrame(ctx,x,y,w,h,clamp(e*1.9,0,1),g.lw);
+    const t=clamp(e*1.8-.55,0,1); if(t<=0) return;
+    P.maskReveal(ctx,x+2*u,anchor.y-4*u,w-4*u,9*u,t,()=>{
+      ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+      ctx.fillStyle=c.text; ctx.font=`400 ${3.4*u}px ${f.display}`;
+      ctx.fillText(g.content.address||"—", anchor.x, anchor.y+.8*u);
+      ctx.fillStyle=c.muted; ctx.font=`500 ${1.3*u}px ${f.body}`;
+      ctx.fillText((g.content.city||"").toUpperCase(), anchor.x, anchor.y+3.6*u);
+      ctx.textAlign="left";
+    });
+  }
+});
+
+def("broker_card",{
+  name:"Broker Card", group:"Outro",
+  desc:"Portrait resolves inside a circular mask; contact lines follow.",
+  fields:["name","phone"], defaultDur:3.4,
+  draw(g){
+    const {ctx,u,c,f,e,anchor}=g;
+    const r=4.4*u, x=anchor.x+r, y=anchor.y;
+    if(g.brokerImg) P.portraitMask(ctx,g.brokerImg,x,y,r,clamp(e*1.8,0,1));
+    else { ctx.save(); ctx.globalAlpha=clamp(e*1.8,0,1); ctx.strokeStyle=c.line; ctx.lineWidth=g.lw;
+      ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.stroke(); ctx.restore(); }
+    ctx.save(); ctx.globalAlpha=clamp(e*1.8,0,1); ctx.strokeStyle=c.accent; ctx.lineWidth=g.lw;
+    ctx.beginPath(); ctx.arc(x,y,r,-Math.PI/2,-Math.PI/2+Math.PI*2*clamp(e*1.6,0,1)); ctx.stroke(); ctx.restore();
+    const t=clamp(e*1.8-.5,0,1); if(t<=0) return;
+    P.maskReveal(ctx,x+r+2*u,y-3.4*u,22*u,7*u,t,()=>{
+      ctx.fillStyle=c.text; ctx.font=`400 ${2.6*u}px ${f.display}`; ctx.textBaseline="alphabetic";
+      ctx.fillText(g.content.name||"—", x+r+2*u, y-.2*u);
+      ctx.fillStyle=c.muted; ctx.font=`400 ${1.6*u}px ${f.body}`;
+      ctx.fillText(g.content.phone||"", x+r+2*u, y+2.6*u);
+    });
+  }
+});
+
+def("quiet_outro",{
+  name:"Quiet Outro", group:"Outro",
+  desc:"Footage settles under a scrim, the mark fades up, the film breathes.",
+  fields:[], defaultDur:3.6,
+  draw(g){
+    const {ctx,W,H,u,c,f,e}=g;
+    P.scrim(ctx,W,H,clamp(e*1.6,0,1),0,.62,"bottom");
+    ctx.save(); ctx.globalAlpha=clamp(e*1.5-.18,0,1);
+    if(g.logoImg && g.logoImg.complete && g.logoImg.naturalWidth){
+      const lw=Math.min(W*.34, 22*u), lh=lw*g.logoImg.naturalHeight/g.logoImg.naturalWidth;
+      ctx.drawImage(g.logoImg,(W-lw)/2,H*.5-lh/2,lw,lh);
+    } else {
+      ctx.textAlign="center"; ctx.fillStyle=c.text; ctx.font=`300 ${3.6*u}px ${f.display}`;
+      ctx.fillText(g.content.office||"", W/2, H*.5); ctx.textAlign="left";
+    }
+    ctx.restore();
+    const t=clamp(e*1.5-.5,0,1);
+    if(t>0){ ctx.save(); ctx.globalAlpha=t; ctx.strokeStyle=c.accent;
+      P.line(ctx,W/2-5*u,H*.5+4.4*u,W/2+5*u,H*.5+4.4*u,t,g.lw); ctx.restore(); }
+  }
+});
+
+def("corner_mark",{
+  name:"Corner Brandmark", group:"Brand",
+  desc:"Persistent small mark. Sits in the corner and stays out of the way.",
+  fields:[], defaultDur:6.0,
+  draw(g){
+    const {ctx,W,H,u,c,f,e,anchor}=g;
+    ctx.save(); ctx.globalAlpha=clamp(e*2.2,0,1)*.92;
+    if(g.logoImg && g.logoImg.complete && g.logoImg.naturalWidth){
+      const lw=8.5*u, lh=lw*g.logoImg.naturalHeight/g.logoImg.naturalWidth;
+      ctx.drawImage(g.logoImg,anchor.x,anchor.y-lh/2,lw,lh);
+    } else {
+      ctx.fillStyle=c.text; ctx.font=`500 ${1.5*u}px ${f.body}`; ctx.textBaseline="middle";
+      P.trackingResolve(ctx,(g.content.office||"").toUpperCase(),anchor.x,anchor.y,clamp(e*2,0,1),
+        {size:1.5*u,family:f.body,weight:500,color:c.text,track:.34});
+    }
+    ctx.restore();
+  }
+});
+
+def("section_slate",{
+  name:"Section Slate", group:"Transition",
+  desc:"A full-bleed hold on a musical section change. Use once, at most.",
+  fields:["label"], defaultDur:2.2,
+  draw(g){
+    const {ctx,W,H,u,c,f,e}=g;
+    const a=Math.sin(clamp(e,0,1)*Math.PI);
+    ctx.save(); ctx.globalAlpha=a*.88; ctx.fillStyle=c.dark||"#0A0D0F"; ctx.fillRect(0,0,W,H);
+    ctx.globalAlpha=a;
+    P.trackingResolve(ctx,(g.content.label||"").toUpperCase(),W/2,H/2,clamp(e*2,0,1),
+      {size:2.4*u,family:f.body,weight:500,color:c.text,track:.6,align:"center"});
+    ctx.restore();
+  }
+});
+
+const GFX_KEYS = Object.keys(GFX);
+
+/* ---- graphic instances, anchors, compositing ----------------------------- */
+
+const ANCHORS = {
+  TOP_LEFT:[.5,.5,"left"],      TOP_CENTER:[0,.5,"center"],   TOP_RIGHT:[-.5,.5,"right"],
+  MIDDLE_LEFT:[.5,0,"left"],    CENTER:[0,0,"center"],        MIDDLE_RIGHT:[-.5,0,"right"],
+  BOTTOM_LEFT:[.5,-.5,"left"],  BOTTOM_CENTER:[0,-.5,"center"],BOTTOM_RIGHT:[-.5,-.5,"right"]
+};
+const ANCHOR_KEYS = Object.keys(ANCHORS);
+
+function resolveAnchor(name, W, H, dx, dy){
+  const [ax,ay,align] = ANCHORS[name] || ANCHORS.BOTTOM_LEFT;
+  const mx = W*0.088, my = H*0.075;
+  const x = W/2 + ax*(W - mx*2) + (dx/100)*W;
+  const y = H/2 - ay*(H - my*2) + (dy/100)*H;
+  return {x, y, align};
+}
+
+function newGraphic(componentId, start, project, brand){
+  const comp = GFX[componentId];
+  const p = project.property, b = project.broker;
+  const content = {
+    address:p.address||"", city:p.city||"", type:p.property_type||"",
+    area:p.living_area_m2??"", rooms:p.rooms||"",
+    name:b.name||"", phone:b.phone||"",
+    office:brand?.office_name||"", label:"", icon:"area", value:p.living_area_m2??"", label2:""
+  };
+  if(componentId==="icon_spec"){ content.value=p.living_area_m2??"—"; content.label="m² boarea"; }
+  const dur = comp.defaultDur;
+  return {
+    id:"gfx_"+uid(), componentId, start:+start.toFixed(3), duration:dur,
+    enter:0.85, exit:0.6, anchor:defaultAnchor(componentId), dx:0, dy:0,
+    scale:1, opacity:1, content, colorRole:"accent", locked:false
+  };
+}
+function defaultAnchor(id){
+  return ({line_address:"BOTTOM_LEFT", tracking_title:"CENTER", frame_intro:"CENTER",
+    corner_facts:"BOTTOM_LEFT", stack_facts:"BOTTOM_LEFT", dimension_area:"CENTER",
+    icon_spec:"BOTTOM_LEFT", rule_location:"BOTTOM_LEFT", broker_card:"BOTTOM_LEFT",
+    quiet_outro:"CENTER", corner_mark:"TOP_LEFT", section_slate:"CENTER"})[id] || "BOTTOM_LEFT";
+}
+
+function brandColors(brand){
+  const c = brand?.colors || {};
+  return {
+    accent: c.accent || c.primary || "#C2A25E",
+    primary: c.primary || "#E9EBE7",
+    text: c.light || "#FFFFFF",
+    muted: "rgba(255,255,255,.66)",
+    line: "rgba(255,255,255,.34)",
+    dark: c.dark || "#0A0D0F"
+  };
+}
+function brandFonts(brand, lock){
+  const disp = lock && brand?.typography?.display_family ? brand.typography.display_family : "Fraunces";
+  const body = lock && brand?.typography?.body_family ? brand.typography.body_family : "IBM Plex Sans";
+  return { display:`"${disp}", Georgia, serif`, body:`"${body}", system-ui, sans-serif` };
+}
+
+/* Composite the graphics layer at time t. Same function for the animatic,
+   the editor preview and the exporter — so preview is the render. */
+function drawGraphics(ctx, W, H, t, project, brand, assets){
+  const fam = FAMILIES[project.graphicFamily] || FAMILIES.EDITORIAL;
+  const ease = EASES[fam.ease] || EASES.quart;
+  const c = brandColors(brand), f = brandFonts(brand, project.brandLock);
+  const u = Math.min(W,H)/100 * 3.2;                    // unit scale, resolution-independent
+
+  for(const gi of project.graphics){
+    const tl = t - gi.start;
+    if(tl < 0 || tl > gi.duration) continue;
+    const comp = GFX[gi.componentId]; if(!comp) continue;
+    const enter = gi.enter*fam.pace, exit = gi.exit*fam.pace;
+    let e = 1, alpha = 1;
+    if(tl < enter) e = ease(clamp(tl/enter,0,1));
+    if(tl > gi.duration - exit) alpha = 1 - ease(clamp((tl-(gi.duration-exit))/Math.max(exit,.001),0,1));
+    const anchor = resolveAnchor(gi.anchor, W, H, gi.dx, gi.dy);
+    ctx.save();
+    ctx.globalAlpha = alpha * gi.opacity;
+    ctx.translate(anchor.x, anchor.y); ctx.scale(gi.scale, gi.scale); ctx.translate(-anchor.x, -anchor.y);
+    ctx.textBaseline="alphabetic"; ctx.textAlign="left";
+    try{
+      comp.draw({ctx, W, H, u, c, f, e, alpha, anchor, fam,
+        lw: Math.max(1, u*0.11*fam.line),
+        content: gi.content,
+        logoImg: assets?.logo, brokerImg: assets?.broker});
+    }catch(err){ /* one broken graphic must never kill the frame */ }
+    ctx.restore();
+  }
+}
+
+/* Auto Composer — reads the timeline, the property data, the density and the
+   music map, and proposes a graphics plan. The user can change everything. */
+function composeGraphics(project, brand){
+  const plan = project.plan; if(!plan || !plan.shots.length) return [];
+  const dens = DENSITY[project.graphicDensity] || DENSITY.BALANCED;
+  const music = project.music?.analysis;
+  const p = project.property;
+  const total = plan.total;
+  const out = [];
+
+  const snapEvent = (t, window=.6)=>{
+    if(!music) return t;
+    const c = music.events.filter(e=>Math.abs(e.t-t)<=window && e.strength>=.4);
+    if(!c.length) return t;
+    return c.reduce((a,b)=> (b.strength*EVENT_WEIGHT[b.type] > a.strength*EVENT_WEIGHT[a.type] ? b : a)).t;
+  };
+
+  // Intro: on the first cut, not on frame zero — let the property land first.
+  const introAt = snapEvent(Math.min(0.7, plan.shots[0].duration*0.35));
+  const introId = project.graphicFamily==="ARCHITECTURAL" ? "corner_facts"
+                : project.graphicFamily==="QUIET_LUXURY" ? "tracking_title"
+                : project.graphicFamily==="MODERN_PRECISION" ? "frame_intro" : "line_address";
+  if(p.address) out.push({...newGraphic(introId, introAt, project, brand), duration:3.4});
+
+  if(dens.max>=4){
+    // Facts land on the second half, on a strong event inside a mid shot.
+    const mid = plan.shots[Math.floor(plan.shots.length*0.42)];
+    if(mid && p.living_area_m2)
+      out.push({...newGraphic(project.graphicFamily==="ARCHITECTURAL"?"dimension_area":"icon_spec",
+        snapEvent(mid.start+0.5), project, brand)});
+    const mid2 = plan.shots[Math.floor(plan.shots.length*0.66)];
+    if(mid2 && (p.property_type||p.living_area_m2))
+      out.push({...newGraphic("stack_facts", snapEvent(mid2.start+0.4), project, brand)});
+  }
+  if(dens.max>=5 && p.city){
+    const s = plan.shots[Math.floor(plan.shots.length*0.22)];
+    if(s) out.push({...newGraphic("rule_location", snapEvent(s.start+0.5), project, brand)});
+  }
+  if(dens.max>=8 && project.broker.name){
+    const s = plan.shots[plan.shots.length-2];
+    if(s) out.push({...newGraphic("broker_card", snapEvent(s.start+0.3), project, brand)});
+  }
+  // Outro: always the last thing, sized to the closing shot's breathing room.
+  const last = plan.shots[plan.shots.length-1];
+  const outroDur = Math.min(3.6, Math.max(2.0, last.duration));
+  out.push({...newGraphic("quiet_outro", Math.max(0,total-outroDur), project, brand), duration:outroDur});
+
+  return out.filter(g=>g.start+g.duration<=total+0.01 || (g.start=Math.max(0,total-g.duration))>=0);
+}
+
+/* ==========================================================================
+   10. BRAND — versioned import, validated and normalised, stored per office.
+   ========================================================================== */
+
+const IMPORT_SCHEMAS = ["viewly.motion-import.v1","viewly.motion-import.v2"];
+
+function normaliseImport(raw){
+  const warn=[];
+  if(!raw || typeof raw!=="object") throw new Error("Payloaden är inte ett objekt.");
+  const schema = raw.schema || "viewly.motion-import.v2";
+  if(!IMPORT_SCHEMAS.includes(schema)) warn.push(`Okänt schema "${schema}" — läser den som v2.`);
+
+  const p = raw.property||{}, b = raw.broker||{}, br = raw.brand||{};
+  const num = v => (v==null||v==="") ? null : (isNaN(+v)?null:+v);
+
+  const property = {
+    address: String(p.address||"").trim(),
+    city: String(p.city||"").trim(),
+    property_type: String(p.property_type||"").trim(),
+    living_area_m2: num(p.living_area_m2),
+    rooms: p.rooms!=null ? String(p.rooms) : ""
+  };
+  if(!property.address) warn.push("Adress saknas — intro-grafiken får ingen text.");
+  if(property.living_area_m2==null) warn.push("Boarea saknas — faktagrafiken hoppas över.");
+  if(p.asking_price!=null || p.viewing_time!=null)
+    warn.push("Pris/visningstid ignorerades — de ingår inte i Motion-schemat.");
+
+  const broker = {name:String(b.name||"").trim(), phone:String(b.phone||"").trim(), image_url:String(b.image_url||"").trim()};
+  if(!broker.image_url && broker.name) warn.push("Mäklarbild saknas — Broker Card ritar en tom ring.");
+
+  const id = br.brand_id || br.office_id || null;
+  if(!id) warn.push("brand_id/office_id saknas — brandprofilen kan inte återanvändas mellan projekt.");
+
+  const hex = v => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(v||"")) ? String(v) : null;
+  const colors = {};
+  for(const k of ["primary","secondary","accent","light","dark"]){
+    const v = hex(br.colors?.[k]);
+    if(br.colors?.[k] && !v) warn.push(`Färgen "${k}" är inte giltig hex och ignorerades.`);
+    if(v) colors[k]=v;
+  }
+  const brand = id ? {
+    brand_id:id, office_id:br.office_id||id,
+    office_name:String(br.office_name||"Okänt kontor").trim(),
+    logos:{primary:br.logos?.primary||"", light:br.logos?.light||"", dark:br.logos?.dark||""},
+    typography:{
+      display_family:String(br.typography?.display_family||"").trim(),
+      body_family:String(br.typography?.body_family||"").trim(),
+      allowed_weights:Array.isArray(br.typography?.allowed_weights)?br.typography.allowed_weights:[]
+    },
+    colors, importedAt:Date.now()
+  } : null;
+  if(brand && (brand.typography.display_family||brand.typography.body_family))
+    warn.push("Brandfonter registrerade. De renderas när fontfilerna serveras — annars används fallback.");
+
+  return {property, broker, brand, warnings:warn, schema};
+}
+
+const SAMPLE_IMPORT = {
+  schema:"viewly.motion-import.v2",
+  property:{address:"Pumpvägen 12", city:"Båstad", property_type:"Villa", living_area_m2:143, rooms:"5"},
+  broker:{name:"Elin Sandberg", phone:"+46 70 415 22 08", image_url:""},
+  brand:{brand_id:"bst-01", office_id:"bst-01", office_name:"Bjärehalvön Fastighetsmäklare",
+    logos:{primary:"",light:"",dark:""},
+    typography:{display_family:"Fraunces", body_family:"IBM Plex Sans", allowed_weights:[300,400,500]},
+    colors:{primary:"#1F2A2E", secondary:"#5C6B70", accent:"#B08A4E", light:"#F5F3EE", dark:"#12181A"}}
+};
+
+/* ==========================================================================
+   11. UI SHELL
+   ========================================================================== */
+
+const root = document.getElementById("app");
+let toastTimer;
+function toast(msg){
+  document.querySelector(".toast")?.remove();
+  const t=el(`<div class="toast">${esc(msg)}</div>`);
+  document.body.appendChild(t); clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.remove(),2600);
+}
+
+const STEPS = [
+  {id:"material", n:"01", label:"Material",  ok:p=>p.images.filter(i=>i.include).length>0},
+  {id:"direction",n:"02", label:"Direction", ok:p=>!!p.direction},
+  {id:"music",    n:"03", label:"Musik",     ok:p=>!!p.music?.analysis},
+  {id:"timing",   n:"04", label:"Timing",    ok:p=>!!p.plan},
+  {id:"camera",   n:"05", label:"Kamera",    ok:p=>!!p.plan},
+  {id:"brand",    n:"06", label:"Brand",     ok:p=>!!p.brandId},
+  {id:"preflight",n:"07", label:"Preflight", ok:p=>!!p.plan},
+  {id:"produce",  n:"08", label:"Produktion",ok:p=>!!p.production},
+  {id:"editor",   n:"09", label:"Editor",    ok:p=>!!p.production}
+];
+const stepEnabled = (p,id)=>{
+  if(id==="material"||id==="direction") return true;
+  if(id==="music") return p.images.some(i=>i.include);
+  if(id==="brand") return true;
+  if(["timing","camera","preflight"].includes(id)) return !!p.plan;
+  if(id==="produce") return !!p.plan;
+  if(id==="editor") return !!p.production;
+  return false;
+};
+
+function goto(step){
+  if(!stepEnabled(App.project, step)) return;
+  Playback.stop();
+  App.project.step=step; App.save(); render();
+}
+
+function render(){
+  const scrollTop = root.querySelector(".workbody")?.scrollTop || 0;
+  root.innerHTML="";
+  if(App.view==="projects"){ root.appendChild(viewProjects()); return; }
+  const p=App.project;
+  root.appendChild(topbar());
+  const main=el(`<div class="main"></div>`);
+  main.appendChild(rail());
+  const v = ({material:viewMaterial, direction:viewDirection, music:viewMusic, timing:viewTiming,
+    camera:viewCamera, brand:viewBrand, preflight:viewPreflight, produce:viewProduce, editor:viewEditor})[p.step];
+  main.appendChild(v ? v() : el(`<div class="work"><div class="workbody">Okänt steg</div></div>`));
+  root.appendChild(main);
+  const wb=root.querySelector(".workbody"); if(wb) wb.scrollTop=scrollTop;
+}
+
+function topbar(){
+  const p=App.project;
+  const t=el(`<header class="topbar">
+    <div class="brand" role="button" tabindex="0"><span class="w">Viewly</span><span class="m">Motion</span></div>
+    <div class="projname"><b>${esc(p.name)}</b>${p.property.city?` · ${esc(p.property.city)}`:""}</div>
+    <div class="sp"></div>
+    <div class="row" style="gap:6px">
+      <span class="chip" title="Higgsfield-anrop går via backend-routen /api/motion/production">
+        <span class="dot ${MotionAPI.live?"ok":"warn"}"></span>${MotionAPI.live?"Backend live":"Mock-backend"}</span>
+      <button class="btn ghost sm" data-a="undo" ${App.undo.length?"":"disabled"} title="Ångra">↺</button>
+      <button class="btn ghost sm" data-a="redo" ${App.redo.length?"":"disabled"} title="Gör om">↻</button>
+      <button class="btn sm" data-a="projects">Projekt</button>
+    </div></header>`);
+  t.querySelector(".brand").onclick=()=>{Playback.stop();App.view="projects";render();};
+  t.querySelector('[data-a=projects]').onclick=()=>{Playback.stop();App.view="projects";render();};
+  t.querySelector('[data-a=undo]').onclick=()=>App.restore(App.undo,App.redo);
+  t.querySelector('[data-a=redo]').onclick=()=>App.restore(App.redo,App.undo);
+  return t;
+}
+
+function rail(){
+  const p=App.project;
+  const r=el(`<nav class="rail"><div class="rlabel eyebrow">Produktion</div></nav>`);
+  STEPS.forEach(s=>{
+    const on = p.step===s.id, en = stepEnabled(p,s.id), done = en && s.ok(p);
+    const b=el(`<button class="step" ${on?'aria-current="true"':""} ${en?"":"disabled"}>
+      <span class="n">${s.n}</span><span>${s.label}</span>${done&&!on?'<span class="tick"></span>':'<span></span>'}</button>`);
+    b.onclick=()=>goto(s.id);
+    r.appendChild(b);
+  });
+  return r;
+}
+
+function work(title, sub, actions, bodyClass=""){
+  const w=el(`<section class="work">
+    <header class="workhead"><div><h1 class="h-page">${esc(title)}</h1>
+    ${sub?`<p class="sub">${sub}</p>`:""}</div><div class="sp"></div><div class="row acts"></div></header>
+    <div class="workbody ${bodyClass}"></div></section>`);
+  (actions||[]).forEach(a=>w.querySelector(".acts").appendChild(a));
+  return w;
+}
+const nextBtn = (label, step, enabled=true)=>{
+  const b=el(`<button class="btn primary" ${enabled?"":"disabled"}>${esc(label)} →</button>`);
+  b.onclick=()=>goto(step); return b;
+};
+
+/* ==========================================================================
+   12. PROJECTS
+   ========================================================================== */
+
+function viewProjects(){
+  const wrap=el(`<div style="height:100%;overflow-y:auto"><div class="projwrap">
+    <div class="projhero">
+      <div><div class="row" style="gap:8px;margin-bottom:9px">
+        <span class="brand"><span class="w" style="font-size:15px">Viewly</span><span class="m">Motion</span></span></div>
+        <h1>Bostadsfilm som planeras<br>innan den genereras.</h1></div>
+      <div class="sp"></div>
+      <div style="text-align:right">
+        <div class="eyebrow" style="margin-bottom:6px">Provider</div>
+        <div class="mono" style="font-size:11.5px;color:var(--text-2)">Kling v3.0 · Higgsfield</div>
+        <div class="mono" style="font-size:10.5px;color:var(--faint);margin-top:3px">Priser auditerade ${PROVIDER_AUDIT_DATE}</div>
+      </div>
+    </div>
+    <div class="projgrid"></div>
+    <div style="margin-top:26px"><div class="note info">
+      <b>Så här fungerar motorn.</b> Bilder får rumstyp och vikt, musiken analyseras till en
+      event-karta, och shotlängderna landar på riktiga musikaliska händelser inom sitt tillåtna
+      intervall. Filmens totallängd är ett <i>resultat</i>, inte en inställning. Först därefter
+      skickas jobben till Kling — via backend-routen <code>POST /api/motion/production</code>.
+    </div></div>
+  </div></div>`);
+  const g=wrap.querySelector(".projgrid");
+  const nb=el(`<button class="projcard new"><span class="plus">+</span><span>Nytt Motion-projekt</span>
+    <span class="faint" style="font-size:10.5px">6–12 bostadsbilder</span></button>`);
+  nb.onclick=createProject; g.appendChild(nb);
+
+  App.data.projects.slice().sort((a,b)=>b.updatedAt-a.updatedAt).forEach(p=>{
+    const inc=p.images.filter(i=>i.include).length;
+    const status = p.production ? "Producerad" : p.plan ? "Planerad" : inc ? "Material" : "Tom";
+    const c=el(`<button class="projcard">
+      <div class="pt">${esc(p.name)}</div>
+      <div class="pa">${esc(p.property.address||"Ingen adress")}${p.property.city?", "+esc(p.property.city):""}</div>
+      <div class="sp"></div>
+      <div class="pf"><span class="dot ${p.production?"ok":p.plan?"run":""}"></span>${status}
+        <span style="margin-left:auto" class="mono">${inc} bild${inc===1?"":"er"}${p.plan?` · ${fmt(p.plan.total,1)}s`:""}</span></div>
+    </button>`);
+    c.onclick=()=>openProject(p.id);
+    g.appendChild(c);
+  });
+  return wrap;
+}
+
+function createProject(){
+  const name = prompt("Objektets namn (t.ex. adressen):","");
+  if(name===null) return;
+  const p=newProject(name.trim()||"Namnlöst objekt");
+  App.data.projects.push(p); Store.write(App.data);
+  App.project=p; App.view="project"; App.undo=[]; App.redo=[];
+  render();
+}
+async function openProject(id){
+  const p=App.data.projects.find(x=>x.id===id); if(!p) return;
+  App.project=p; App.view="project"; App.undo=[]; App.redo=[];
+  render();
+  await rehydrate(p);
+  if(p.music?.blobKey && !p.music.analysis) { /* analysis is persisted, nothing to do */ }
+  render();
+}
+async function rehydrate(p){
+  for(const im of p.images){
+    if(im.url) continue;
+    const b=await Blobs.get(im.blobKey);
+    if(b){ im.url=URL.createObjectURL(b); im.el=await loadImg(im.url); }
+  }
+  if(p.music?.blobKey && !p.music.url){
+    const b=await Blobs.get(p.music.blobKey);
+    if(b) p.music.url=URL.createObjectURL(b);
+  }
+}
+function loadImg(url){
+  return new Promise(res=>{ const i=new Image(); i.onload=()=>res(i); i.onerror=()=>res(null); i.src=url; });
+}
+
+/* ==========================================================================
+   13. PLAYBACK — one engine for the animatic, the editor and the exporter.
+   ========================================================================== */
+
+const Playback = {
+  canvas:null, ctx:null, raf:null, t:0, playing:false, startWall:0, startT:0,
+  src:null, gain:null, onFrame:null, showGraphics:true, useVideo:false, muted:false,
+
+  ac(){ App.audio.ctx ||= new (window.AudioContext||window.webkitAudioContext)(); return App.audio.ctx; },
+  attach(canvas,{onFrame,showGraphics=true}={}){
+    this.canvas=canvas; this.ctx=canvas.getContext("2d");
+    this.onFrame=onFrame; this.showGraphics=showGraphics; this.draw();
+  },
+  duration(){ const p=App.project; return p?.plan?.total || p?.music?.analysis?.duration || 0; },
+
+  play(){
+    const p=App.project; if(!p||this.playing) return;
+    const dur=this.duration(); if(dur<=0) return;
+    if(this.t>=dur-0.02) this.t=0;
+    const ctxA=this.ac(); if(ctxA.state==="suspended") ctxA.resume();
+    if(App.audio.buffer && !this.muted){
+      this.src=ctxA.createBufferSource(); this.src.buffer=App.audio.buffer;
+      this.gain=ctxA.createGain(); this.gain.gain.value=.9;
+      this.src.connect(this.gain).connect(ctxA.destination);
+      try{ this.src.start(0, this.t); }catch{}
+    }
+    this.playing=true; this.startWall=performance.now()/1000; this.startT=this.t;
+    this.loop();
+  },
+  pause(){
+    if(!this.playing) return;
+    this.playing=false; try{this.src?.stop();}catch{} this.src=null;
+    cancelAnimationFrame(this.raf); this.draw();
+  },
+  stop(){ this.pause(); this.t=0; },
+  seek(t){ const was=this.playing; this.pause(); this.t=clamp(t,0,Math.max(this.duration()-.01,0));
+    this.draw(); if(was) this.play(); },
+  toggle(){ this.playing?this.pause():this.play(); },
+  loop(){
+    if(!this.playing) return;
+    this.t = this.startT + (performance.now()/1000 - this.startWall);
+    const d=this.duration();
+    if(this.t>=d){ this.t=d; this.pause(); this.onFrame?.(this.t); return; }
+    this.draw();
+    this.raf=requestAnimationFrame(()=>this.loop());
+  },
+  shotAt(t){
+    const plan=App.project?.plan; if(!plan) return null;
+    for(const s of plan.shots) if(t>=s.start && t<s.end) return s;
+    return plan.shots[plan.shots.length-1]||null;
+  },
+  draw(){
+    if(!this.ctx) return;
+    const p=App.project, W=this.canvas.width, H=this.canvas.height, ctx=this.ctx;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#000"; ctx.fillRect(0,0,W,H);
+    const s=this.shotAt(this.t);
+    if(s){
+      const img=p.images.find(i=>i.id===s.imageId);
+      const local=clamp((this.t-s.start)/Math.max(s.duration,.001),0,1);
+      const intensity=(DIRECTIONS[p.direction]?.motionIntensity)||1;
+      drawShot(ctx,W,H,img?.el,s.motion,local,{intensity});
+    }
+    if(this.showGraphics && p) drawGraphics(ctx,W,H,this.t,p,currentBrand(),{logo:App.logoImg,broker:App.brokerImg});
+    this.onFrame?.(this.t);
+  }
+};
+function currentBrand(){ return App.project?.brandId ? App.data.brands[App.project.brandId] : null; }
+
+/* ==========================================================================
+   14. STEP 1 — MATERIAL
+   ========================================================================== */
+
+function viewMaterial(){
+  const p=App.project;
+  const w=work("Material",
+    "Ladda upp bostadsbilderna och sätt ordning, rumstyp och vikt. Rumstypen styr shotlängd och kamerarörelse — den är inte bara en etikett.",
+    [nextBtn("Direction","direction", p.images.some(i=>i.include))]);
+  const body=w.querySelector(".workbody");
+
+  const dz=el(`<div class="dropzone" tabindex="0" role="button">
+    <div style="font-size:13px;color:var(--text-2)">Släpp bostadsbilder här, eller klicka för att välja</div>
+    <div style="margin-top:5px;font-size:11.5px">JPG eller PNG · 6–12 bilder är normalfallet</div></div>`);
+  const input=el(`<input type="file" accept="image/*" multiple hidden>`);
+  dz.onclick=()=>input.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add("hot");};
+  dz.ondragleave=()=>dz.classList.remove("hot");
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove("hot");addImages([...e.dataTransfer.files]);};
+  input.onchange=()=>addImages([...input.files]);
+  body.append(dz,input);
+
+  if(p.images.length){
+    const bar=el(`<div class="row wrap" style="margin:16px 0 12px">
+      <span class="eyebrow">${p.images.filter(i=>i.include).length} av ${p.images.length} med i filmen</span>
+      <div class="sp"></div>
+      <button class="btn sm" data-a="suggest">Föreslå ordning</button>
+      <button class="btn sm" data-a="autoclass">Kategorisera om</button>
+    </div>`);
+    bar.querySelector('[data-a=suggest]').onclick=suggestOrder;
+    bar.querySelector('[data-a=autoclass]').onclick=()=>{
+      App.snapshot("kategorisera om");
+      p.images.forEach((im,i)=>{ const g=guessRoom(im.name,i,p.images.length);
+        im.room=g.room; im.roomConf=g.conf; im.roomWhy=g.why; im.roomAuto=true;
+        im.importance=guessImportance(im.room,i,p.images.length); im.importanceAuto=true;
+        im.motion=ROOMS[im.room].motion; });
+      App.replan(); render(); toast("Kategorier och vikter omräknade");
+    };
+    body.appendChild(bar);
+
+    const grid=el(`<div class="imggrid"></div>`);
+    p.images.forEach((im,i)=>grid.appendChild(imageCard(im,i)));
+    body.appendChild(grid);
+  }
+  return w;
+}
+
+function imageCard(im,i){
+  const p=App.project;
+  const c=el(`<div class="icard" draggable="true" data-id="${im.id}" data-inc="${im.include}">
+    <div class="thumb">${im.url?`<img src="${im.url}" alt="${esc(im.name)}">`:""}
+      <span class="ord mono">${String(i+1).padStart(2,"0")}</span>
+      <span class="imp" data-i="${im.importance}">${IMPORTANCE[im.importance].label}</span></div>
+    <div class="meta">
+      <select data-f="room">${ROOM_KEYS.map(k=>`<option value="${k}" ${im.room===k?"selected":""}>${ROOMS[k].sv}</option>`).join("")}</select>
+      ${im.roomAuto?`<div class="sugg">Föreslagen · ${im.roomWhy||"heuristik"} · ${Math.round((im.roomConf||0)*100)}%</div>`:`<div class="sugg">Bekräftad av dig</div>`}
+      <div class="row">
+        <select data-f="importance" style="flex:1">${Object.keys(IMPORTANCE).map(k=>`<option value="${k}" ${im.importance===k?"selected":""}>${IMPORTANCE[k].label}</option>`).join("")}</select>
+        <button class="btn xs" data-a="inc" title="Med i filmen">${im.include?"✓":"—"}</button>
+        <button class="btn xs danger" data-a="del" title="Ta bort">✕</button>
+      </div>
+      <div class="sugg mono" style="color:var(--faint)">${(()=>{const pr=shotPriors(im,p.direction);
+        return `${fmt(pr.preferred,1)}s · ${fmt(pr.min,1)}–${fmt(pr.max,1)}s`;})()}</div>
+    </div></div>`);
+
+  c.querySelector('[data-f=room]').onchange=e=>{
+    App.snapshot("rumstyp"); im.room=e.target.value; im.roomAuto=false;
+    im.motion=ROOMS[im.room].motion; App.replan(); render(); };
+  c.querySelector('[data-f=importance]').onchange=e=>{
+    App.snapshot("vikt"); im.importance=e.target.value; im.importanceAuto=false; App.replan(); render(); };
+  c.querySelector('[data-a=inc]').onclick=()=>{ App.snapshot("inkludera"); im.include=!im.include; App.replan(); render(); };
+  c.querySelector('[data-a=del]').onclick=()=>{
+    if(!confirm(`Ta bort ${im.name}?`)) return;
+    App.snapshot("ta bort bild"); Blobs.del(im.blobKey);
+    p.images=p.images.filter(x=>x.id!==im.id); reindex(); App.replan(); render(); };
+
+  c.ondragstart=e=>{ e.dataTransfer.setData("text/plain",im.id); c.classList.add("drag"); };
+  c.ondragend=()=>{ c.classList.remove("drag"); document.querySelectorAll(".icard.over").forEach(x=>x.classList.remove("over")); };
+  c.ondragover=e=>{ e.preventDefault(); c.classList.add("over"); };
+  c.ondragleave=()=>c.classList.remove("over");
+  c.ondrop=e=>{
+    e.preventDefault(); c.classList.remove("over");
+    const srcId=e.dataTransfer.getData("text/plain"); if(!srcId||srcId===im.id) return;
+    App.snapshot("ordning");
+    const arr=p.images, from=arr.findIndex(x=>x.id===srcId), to=arr.findIndex(x=>x.id===im.id);
+    arr.splice(to,0,arr.splice(from,1)[0]); reindex(); App.replan(); render();
+  };
+  return c;
+}
+function reindex(){ App.project.images.forEach((im,i)=>im.order=i); }
+
+async function addImages(files){
+  const p=App.project;
+  const imgs=files.filter(f=>/^image\//.test(f.type));
+  if(!imgs.length){ toast("Inga bildfiler hittades."); return; }
+  App.snapshot("lägg till bilder");
+  for(const f of imgs){
+    const id="img_"+uid(), blobKey=`${p.id}/${id}`;
+    await Blobs.put(blobKey,f);
+    const url=URL.createObjectURL(f);
+    const im={id, name:f.name.replace(/\.[a-z0-9]+$/i,""), blobKey, url, order:p.images.length,
+      include:true, room:"ANNAT", importance:"NORMAL", motion:"SUBTLE_DRIFT",
+      roomAuto:true, importanceAuto:true, lockDuration:false};
+    im.el=await loadImg(url);
+    p.images.push(im);
+  }
+  p.images.forEach((im,i)=>{
+    if(im.roomAuto){ const g=guessRoom(im.name,i,p.images.length);
+      im.room=g.room; im.roomConf=g.conf; im.roomWhy=g.why; im.motion=ROOMS[g.room].motion; }
+    if(im.importanceAuto) im.importance=guessImportance(im.room,i,p.images.length);
+    im.order=i;
+  });
+  App.replan(); render();
+  toast(`${imgs.length} bild${imgs.length===1?"":"er"} tillagd${imgs.length===1?"":"a"}`);
+}
+
+/* Suggests a stronger sequence — hero first, strong close, detail shots spread
+   out — but only ever as a proposal. The user's order is never changed silently. */
+function suggestOrder(){
+  const p=App.project;
+  const inc=p.images.filter(i=>i.include);
+  if(inc.length<3){ toast("För få bilder för ett förslag."); return; }
+  const score=im=>{ let s=IMPORTANCE[im.importance].w*10;
+    if(ROOMS[im.room]?.hero) s+=6; if(im.room==="DETALJ") s-=6; if(im.room==="HALL") s-=4;
+    if(im.room==="VARDAGSRUM"||im.room==="KOK") s+=3; return s; };
+  const sorted=[...inc].sort((a,b)=>score(b)-score(a));
+  const open=sorted[0], close=sorted.find(x=>x!==open && ROOMS[x.room]?.hero) || sorted[1];
+  const middle=inc.filter(x=>x!==open&&x!==close);
+  const proposal=[open,...middle,close];
+  const same = proposal.every((x,i)=>x.id===inc[i].id);
+  if(same){ toast("Ordningen ser redan bra ut."); return; }
+  const list=proposal.map((x,i)=>`${i+1}. ${x.name} (${ROOMS[x.room].sv})`).join("\n");
+  if(!confirm(`Förslag på ordning:\n\n${list}\n\nTillämpa?`)) return;
+  App.snapshot("föreslagen ordning");
+  const rest=p.images.filter(i=>!i.include);
+  p.images=[...proposal,...rest]; reindex(); App.replan(); render();
+}
+
+/* ==========================================================================
+   15. STEP 2 — CREATIVE DIRECTION
+   ========================================================================== */
+
+function viewDirection(){
+  const p=App.project;
+  const w=work("Creative Direction",
+    "Riktningen är inte bara ett utseende. Den skalar shotlängder, hur stark en musikalisk händelse måste vara för att få bli ett klipp, kamerans intensitet och senare grafikens täthet.",
+    [nextBtn("Musik","music", p.images.some(i=>i.include))]);
+  const b=w.querySelector(".workbody");
+  const row=el(`<div class="optrow"></div>`);
+  Object.entries(DIRECTIONS).forEach(([k,d])=>{
+    const o=el(`<button class="opt" ${p.direction===k?'aria-pressed="true"':""}>
+      <div class="ot">${d.label}</div><div class="od">${d.sv}</div><div class="om">${d.meta}</div></button>`);
+    o.onclick=()=>{ App.snapshot("direction"); p.direction=k; App.replan(); render(); };
+    row.appendChild(o);
+  });
+  b.appendChild(row);
+
+  const inc=p.images.filter(i=>i.include);
+  if(inc.length){
+    const raw=inc.reduce((a,im)=>a+shotPriors(im,p.direction).preferred,0);
+    b.appendChild(el(`<div style="margin-top:22px" class="stack">
+      <div class="h-sec">Konsekvens av valet</div>
+      <div class="panel"><dl class="kv">
+        <dt>Bilder i filmen</dt><dd>${inc.length}</dd>
+        <dt>Summa önskad längd</dt><dd>${fmt(raw)} s</dd>
+        <dt>Snitt per shot</dt><dd>${fmt(raw/inc.length)} s</dd>
+        <dt>Tröskel för klipp</dt><dd>${fmt(DIRECTIONS[p.direction].minEventStrength)} event-styrka</dd>
+        <dt>Kamerans intensitet</dt><dd>${fmt(DIRECTIONS[p.direction].motionIntensity,2)}×</dd>
+      </dl></div>
+      <div class="note">Detta är den <b>önskade</b> längden. Den slutliga längden bestäms först när
+      musiken analyserats — varje klipp flyttas till närmaste tillräckligt starka musikaliska händelse
+      inom sitt tillåtna intervall.</div></div>`));
+  }
+  return w;
+}
+
+/* ==========================================================================
+   16. STEP 3 — MUSIC
+   The library is real: tracks live in IndexedDB, their analysis is persisted,
+   and they are shared across every project. Style, energy and editability are
+   first-class metadata because a beautiful track can still be a bad cut track.
+   ========================================================================== */
+
+const STYLES = ["QUIET LUXURY","MODERN EDITORIAL","WARM SCANDINAVIAN","ARCHITECTURAL",
+  "CINEMATIC","UPBEAT PREMIUM","SOFT PIANO","AMBIENT ELECTRONIC"];
+
+App.data.tracks ||= [];
+
+function viewMusic(){
+  const p=App.project;
+  const w=work("Musik",
+    "Musiken väljs före timingen — aldrig efter. Vid uppladdning körs en riktig analys: spektralflöde för onsets, autokorrelation för tempo, energinovelty för sektioner. Resultatet blir en event-karta som klipp, övergångar och grafik alla läser.",
+    [nextBtn("Timing","timing", !!p.music?.analysis)]);
+  const b=w.querySelector(".workbody");
+
+  const dz=el(`<div class="dropzone" tabindex="0" role="button">
+    <div style="font-size:13px;color:var(--text-2)">Släpp ett spår här för att lägga till det i biblioteket</div>
+    <div style="margin-top:5px;font-size:11.5px">MP3, WAV, M4A · analysen körs lokalt i webbläsaren</div></div>`);
+  const input=el(`<input type="file" accept="audio/*" multiple hidden>`);
+  dz.onclick=()=>input.click();
+  dz.ondragover=e=>{e.preventDefault();dz.classList.add("hot");};
+  dz.ondragleave=()=>dz.classList.remove("hot");
+  dz.ondrop=e=>{e.preventDefault();dz.classList.remove("hot");addTracks([...e.dataTransfer.files]);};
+  input.onchange=()=>addTracks([...input.files]);
+  b.append(dz,input);
+
+  if(!App.data.tracks.length){
+    b.appendChild(el(`<div style="margin-top:18px" class="note info">
+      <b>Biblioteket är tomt.</b> Kvalitet slår kvantitet — 20–40 riktigt bra spår räcker.
+      Lägg till dem här en gång, så delas de mellan alla projekt. Varje spår analyseras
+      och får ett <i>editability</i>-värde: hur väl det faktiskt går att klippa på.
+    </div>`));
+    return w;
+  }
+
+  b.appendChild(el(`<div style="height:20px"></div>`));
+  b.appendChild(el(`<div class="trackhead">
+    <span></span><span class="eyebrow">Spår</span><span class="eyebrow">Stil</span>
+    <span class="eyebrow">BPM</span><span class="eyebrow">Editability</span><span class="eyebrow">Längd · Events</span></div>`));
+  const list=el(`<div class="tracklist"></div>`);
+  App.data.tracks.forEach(t=>list.appendChild(trackRow(t)));
+  b.appendChild(list);
+
+  if(p.music?.analysis) b.appendChild(musicDetail(p.music));
+  return w;
+}
+
+function trackRow(t){
+  const p=App.project, on=p.music?.trackId===t.id;
+  const a=t.analysis;
+  const bars=(v,n=5,cls="")=>`<span class="meter ${cls}">${Array.from({length:n},(_,i)=>
+    `<i class="${i<Math.round(v*n)?"on":""}"></i>`).join("")}</span>`;
+  const r=el(`<button class="track" ${on?'aria-pressed="true"':""}>
+    <span class="play" data-a="play">▶</span>
+    <span><span class="tt">${esc(t.title)}</span><span class="ts">${esc(t.instrumentation||"—")}</span></span>
+    <span><select data-f="style" style="font-size:11px;padding:3px 5px">${STYLES.map(s=>
+      `<option ${t.style===s?"selected":""}>${s}</option>`).join("")}</select></span>
+    <span class="mono" style="font-size:11.5px">${a?fmt(a.bpm,0):"—"}</span>
+    <span>${a?bars(a.editability):"—"}</span>
+    <span class="mono" style="font-size:11px;color:var(--muted)">${a?`${tc(a.duration)} · ${a.counts.strong}`:"analyserar…"}</span>
+  </button>`);
+  r.onclick=e=>{
+    if(e.target.closest("[data-a=play]")||e.target.closest("select")) return;
+    selectTrack(t);
+  };
+  r.querySelector("[data-a=play]").onclick=e=>{ e.stopPropagation(); previewTrack(t); };
+  r.querySelector("[data-f=style]").onchange=e=>{ t.style=e.target.value; Store.write(App.data); };
+  return r;
+}
+
+async function addTracks(files){
+  const auds=files.filter(f=>/^audio\//.test(f.type)||/\.(mp3|wav|m4a|aac|ogg)$/i.test(f.name));
+  if(!auds.length){ toast("Inga ljudfiler hittades."); return; }
+  for(const f of auds){
+    const id="trk_"+uid(), blobKey=`track/${id}`;
+    await Blobs.put(blobKey,f);
+    const t={id, blobKey, title:f.name.replace(/\.[a-z0-9]+$/i,""), style:STYLES[0],
+      instrumentation:"", analysis:null, addedAt:Date.now()};
+    App.data.tracks.push(t); Store.write(App.data);
+    render(); toast(`Analyserar ${t.title}…`);
+    try{
+      const buf=await decodeBlob(f);
+      t.analysis=analyseBuffer(buf);
+      t.instrumentation = t.analysis.bpm<95 ? "Långsam · få transienter"
+        : t.analysis.bpm<125 ? "Medeltempo · tydlig puls" : "Snabb · tät rytm";
+      Store.write(App.data); render();
+      toast(`${t.title}: ${fmt(t.analysis.bpm,0)} BPM · ${t.analysis.counts.strong} starka events`);
+    }catch(err){
+      toast(`Kunde inte avkoda ${t.title}. Filen kan vara skadad eller ett format webbläsaren inte stöder.`);
+      App.data.tracks=App.data.tracks.filter(x=>x.id!==t.id); Store.write(App.data); render();
+    }
+  }
+}
+async function decodeBlob(blob){
+  const ac=Playback.ac();
+  const ab=await blob.arrayBuffer();
+  return await ac.decodeAudioData(ab);
+}
+
+async function selectTrack(t){
+  const p=App.project;
+  if(!t.analysis){ toast("Spåret analyseras fortfarande."); return; }
+  App.snapshot("välj musik");
+  const blob=await Blobs.get(t.blobKey);
+  p.music={trackId:t.id, blobKey:t.blobKey, title:t.title, style:t.style, analysis:t.analysis,
+    url: blob?URL.createObjectURL(blob):null};
+  App.audio.buffer = blob ? await decodeBlob(blob) : null;
+  App.replan(); render();
+  toast(`${t.title} vald — ${p.plan.alignedCuts} av ${p.plan.shots.length-1} klipp låg på musiken`);
+}
+async function previewTrack(t){
+  const blob=await Blobs.get(t.blobKey); if(!blob) return;
+  const ac=Playback.ac(); if(ac.state==="suspended") ac.resume();
+  Playback.pause();
+  if(App.previewSrc){ try{App.previewSrc.stop();}catch{} App.previewSrc=null; toast("Stoppad"); return; }
+  const buf=await decodeBlob(blob);
+  const s=ac.createBufferSource(); s.buffer=buf; s.connect(ac.destination);
+  s.start(0, Math.min(buf.duration*0.18, 12));      // drop into the track, not the fade-in
+  App.previewSrc=s; s.onended=()=>{App.previewSrc=null;};
+  toast(`Spelar ${t.title}`);
+}
+
+function musicDetail(m){
+  const a=m.analysis;
+  const box=el(`<div class="stack" style="margin-top:24px">
+    <div class="row"><div class="h-sec">Music Event Map · ${esc(m.title)}</div><div class="sp"></div>
+      <span class="mono faint" style="font-size:11px">${a.counts.total} events totalt</span></div>
+    <div class="wavewrap"><canvas height="150"></canvas></div>
+    <div class="grid3">
+      <div class="panel"><div class="eyebrow">Tempo</div>
+        <div class="mono" style="font-size:22px">${fmt(a.bpm,1)}<span class="faint" style="font-size:11px"> BPM</span></div>
+        <div class="faint" style="font-size:11px">Taktlängd ${fmt(a.beatLen,3)} s</div></div>
+      <div class="panel"><div class="eyebrow">Struktur</div>
+        <div class="mono" style="font-size:22px">${a.counts.section}</div>
+        <div class="faint" style="font-size:11px">sektioner · ${a.counts.phrase} frasaccenter</div></div>
+      <div class="panel"><div class="eyebrow">Editability</div>
+        <div class="mono" style="font-size:22px;color:${a.editability>.6?"var(--ok)":a.editability>.38?"var(--warn)":"var(--crit)"}">${fmt(a.editability,2)}</div>
+        <div class="faint" style="font-size:11px">${a.editability>.6?"Klipper mycket bra":a.editability>.38?"Klippbar med omsorg":"Svår att klippa på"}</div></div>
+    </div>
+    <div class="panel"><div class="eyebrow" style="margin-bottom:4px">Första händelserna</div>
+      <div class="mono" style="font-size:11px;line-height:1.75;color:var(--text-2)">${
+        a.events.filter(e=>e.type!=="BEAT").slice(0,7).map(e=>
+        `${fmt(e.t,3).padStart(7," ")}&nbsp;&nbsp;${e.type.padEnd(16," ")}&nbsp;${fmt(e.strength,2)}`).join("<br>")}</div></div>
+  </div>`);
+  requestAnimationFrame(()=>drawWave(box.querySelector("canvas"), a, {events:true}));
+  return box;
+}
+
+/* Waveform + event markers. Beats are deliberately not drawn — a wall of
+   ticks is visual noise; only events strong enough to be cut on are shown. */
+function drawWave(cv, a, {events=true, cuts=null, playT=null}={}){
+  const dpr=Math.min(devicePixelRatio||1,2);
+  const w=cv.clientWidth||cv.parentElement.clientWidth||800, h=cv.height/ (cv._dpr||1) || 150;
+  cv.width=w*dpr; cv.height=(cv.getAttribute("height")||150)*dpr; cv._dpr=dpr;
+  const H=cv.height, W=cv.width, ctx=cv.getContext("2d");
+  ctx.clearRect(0,0,W,H);
+  const mid=H*.52;
+  ctx.fillStyle="#2C3438";
+  const n=a.peaks.length, bw=W/n;
+  for(let i=0;i<n;i++){ const p=a.peaks[i]*H*.40;
+    ctx.fillRect(i*bw, mid-p, Math.max(bw*.8,1), p*2); }
+  if(a.energyCurve?.length){
+    ctx.strokeStyle="rgba(147,183,206,.45)"; ctx.lineWidth=1*dpr; ctx.beginPath();
+    a.energyCurve.forEach((v,i)=>{ const x=i/(a.energyCurve.length-1)*W, y=H-6*dpr-v*H*.2;
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y); });
+    ctx.stroke();
+  }
+  if(events){
+    for(const e of a.events){
+      if(e.type==="BEAT") continue;
+      const x=e.t/a.duration*W;
+      const strong=e.type==="SECTION_START", phrase=e.type==="PHRASE_ACCENT";
+      ctx.fillStyle = strong?"#C2A25E" : phrase?"#93B7CE" : "rgba(139,149,153,.5)";
+      const hh = strong?H*.9 : phrase?H*.46 : H*.2;
+      ctx.fillRect(x, mid-hh/2, (strong?1.6:1)*dpr, hh);
+    }
+  }
+  if(cuts){
+    ctx.strokeStyle="#E9EBE7"; ctx.lineWidth=1*dpr; ctx.setLineDash([3*dpr,3*dpr]);
+    for(const c of cuts){ const x=c/a.duration*W; ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    ctx.setLineDash([]);
+  }
+  if(playT!=null){ const x=playT/a.duration*W;
+    ctx.fillStyle="#93B7CE"; ctx.fillRect(x-dpr/2,0,dpr,H); }
+}
+
+/* ==========================================================================
+   17. STEP 4 — TIMING  (animatic before a single credit is spent)
+   ========================================================================== */
+
+function previewSize(aspect, cap=720){
+  const [w,h]=ASPECTS[aspect]||ASPECTS["9:16"];
+  const s=cap/Math.max(w,h);
+  return [Math.round(w*s), Math.round(h*s)];
+}
+
+function viewTiming(){
+  const p=App.project;
+  if(!p.plan) App.replan();
+  const plan=p.plan;
+  const w=work("Timing",
+    "Detta är en animatic — stillbilder mot musiken, med de planerade klippen. Ingen AI-video har genererats än. Känns rytmen fel: ändra ordning, spår eller riktning nu, innan credits spenderas.",
+    [nextBtn("Kamera","camera", !!plan)], "pad0");
+  const body=w.querySelector(".workbody");
+  if(!plan){ body.appendChild(el(`<div class="empty" style="padding:40px">Inga bilder valda ännu.</div>`)); return w; }
+
+  const [cw,ch]=previewSize(p.output.aspect);
+  const layout=el(`<div style="display:flex;height:100%;min-height:0">
+    <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+      <div class="stage"><canvas width="${cw}" height="${ch}"></canvas></div>
+      <div class="transport">
+        <button class="pbtn big" data-a="play">▶</button>
+        <span class="tc" data-r="tc">00:00.00</span>
+        <span class="faint">/</span>
+        <span class="tc faint">${tc(plan.total)}</span>
+        <div class="sp"></div>
+        <label class="row faint" style="font-size:11px;gap:6px"><input type="checkbox" data-a="gfx"> Visa grafik</label>
+        <span class="chip"><span class="dot ${plan.endsOnResolution?"ok":"warn"}"></span>${
+          plan.endsOnResolution?"Slutar musikaliskt":"Slutar utan upplösning"}</span>
+      </div>
+      <div style="padding:12px var(--pad) var(--pad);border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px">
+        <div class="shotstrip"></div>
+        <div class="wavewrap" style="cursor:pointer"><canvas height="86"></canvas>
+          <div class="playhead" style="left:0"></div></div>
+      </div>
+    </div>
+    <aside class="inspector"></aside>
+  </div>`);
+  body.appendChild(layout);
+
+  const cv=layout.querySelector(".stage canvas");
+  const wave=layout.querySelector(".wavewrap canvas");
+  const ph=layout.querySelector(".playhead");
+  const tcEl=layout.querySelector("[data-r=tc]");
+  const playBtn=layout.querySelector("[data-a=play]");
+  const strip=layout.querySelector(".shotstrip");
+
+  plan.shots.forEach((s,i)=>{
+    const im=p.images.find(x=>x.id===s.imageId);
+    const cell=el(`<div class="shotcell" style="flex:${s.duration}" data-sel="${App.sel.shot===s.shotId}">
+      ${im?.url?`<img src="${im.url}" alt="">`:""}
+      <span class="num">${String(i+1).padStart(2,"0")}</span>
+      <span class="lab"><span>${fmt(s.duration)}s</span>${s.aligned?`<span style="color:var(--sel)">♪</span>`:`<span class="faint">·</span>`}</span></div>`);
+    cell.onclick=()=>{ App.sel.shot=s.shotId; Playback.seek(s.start); render(); };
+    strip.appendChild(cell);
+  });
+
+  Playback.showGraphics=false;
+  Playback.attach(cv,{showGraphics:false,onFrame:t=>{
+    tcEl.textContent=tc(t);
+    ph.style.left=(t/plan.total*100)+"%";
+    playBtn.textContent=Playback.playing?"❚❚":"▶";
+  }});
+  playBtn.onclick=()=>Playback.toggle();
+  layout.querySelector("[data-a=gfx]").onchange=e=>{ Playback.showGraphics=e.target.checked; Playback.draw(); };
+
+  const a=p.music?.analysis;
+  const cuts=plan.shots.slice(1).map(s=>s.start);
+  if(a){
+    requestAnimationFrame(()=>drawWave(wave,a,{events:true,cuts}));
+    layout.querySelector(".wavewrap").onclick=e=>{
+      const r=e.currentTarget.getBoundingClientRect();
+      Playback.seek((e.clientX-r.left)/r.width*a.duration);
+    };
+  }
+  layout.querySelector(".inspector").appendChild(timingInspector());
+  return w;
+}
+
+function timingInspector(){
+  const p=App.project, plan=p.plan;
+  const box=el(`<div class="stack lg"></div>`);
+  box.appendChild(el(`<div class="igroup">
+    <div class="h-sec">Resultat</div>
+    <div class="irow"><span class="k">Bilder</span><span class="v">${plan.shots.length}</span></div>
+    <div class="irow"><span class="k">Önskad summa</span><span class="v">${fmt(plan.rawPreferred)} s</span></div>
+    <div class="irow"><span class="k">Musikjusterad</span><span class="v" style="color:var(--sel)">${fmt(plan.total)} s</span></div>
+    <div class="irow"><span class="k">Klipp på musik</span><span class="v">${plan.alignedCuts} / ${Math.max(plan.shots.length-1,0)}</span></div>
+    <div class="irow"><span class="k">Avslut</span><span class="v">${plan.shots[plan.shots.length-1]?.cutEvent?.type||"—"}</span></div>
+  </div>`));
+
+  const s = plan.shots.find(x=>x.shotId===App.sel.shot);
+  if(s){
+    const im=p.images.find(x=>x.id===s.imageId);
+    const g=el(`<div class="igroup">
+      <div class="h-sec">Shot ${String(s.index+1).padStart(2,"0")} · ${esc(im?.name||"")}</div>
+      <div class="irow"><span class="k">Rum</span><span class="v">${ROOMS[im?.room]?.sv||"—"}</span></div>
+      <div class="irow"><span class="k">Vikt</span><span class="v">${IMPORTANCE[im?.importance]?.label||"—"}</span></div>
+      <div class="irow"><span class="k">Önskad</span><span class="v">${fmt(s.preferred)} s</span></div>
+      <div class="irow"><span class="k">Tillåtet</span><span class="v">${fmt(s.min,1)}–${fmt(s.max,1)} s</span></div>
+      <div class="irow"><span class="k">Vald</span><span class="v" style="color:var(--sel)">${fmt(s.duration)} s</span></div>
+      <div class="irow"><span class="k">Klippt på</span><span class="v">${s.cutEvent?`${s.cutEvent.type} ${fmt(s.cutEvent.strength,2)}`:"ingen träff"}</span></div>
+      <div class="irow"><span class="k">Genereras</span><span class="v">${billedSeconds(p.output.model,s.duration)} s heltal</span></div>
+      <label class="row" style="font-size:11.5px;gap:7px;color:var(--muted);margin-top:2px">
+        <input type="checkbox" data-a="lock" ${im?.lockDuration?"checked":""}> Lås denna längd</label>
+    </div>`);
+    g.querySelector("[data-a=lock]").onchange=e=>{
+      App.snapshot("lås längd");
+      im.lockDuration=e.target.checked; im.duration=s.duration; App.replan(); render();
+    };
+    box.appendChild(g);
+  } else {
+    box.appendChild(el(`<div class="empty">Välj ett shot i remsan för att se hur dess längd bestämdes.</div>`));
+  }
+
+  box.appendChild(el(`<div class="note info">
+    Kling debiterar hela sekunder. En planerad längd på ${plan.shots[0]?fmt(plan.shots[0].duration):"3.72"} s
+    genereras som ${plan.shots[0]?billedSeconds(p.output.model,plan.shots[0].duration):4} s och trimmas exakt
+    på musikeventet i editorn. Överskottet blir handles.</div>`));
+  return box;
+}
+
+/* ==========================================================================
+   18. STEP 5 — CAMERA
+   Chosen after the duration is known, because the move has to fit the shot.
+   Prompts stay minimal: the image already describes the room.
+   ========================================================================== */
+
+function viewCamera(){
+  const p=App.project, plan=p.plan;
+  const w=work("Kamerarörelse",
+    "Rörelsen väljs efter att längden är känd. Prompten beskriver bara kameran — bilden definierar redan rummet, och långa scenprompts försämrar geometrin i praktiken.",
+    [nextBtn("Brand","brand", true)]);
+  const b=w.querySelector(".workbody");
+  if(!plan){ b.appendChild(el(`<div class="empty">Ingen plan ännu.</div>`)); return w; }
+
+  const grid=el(`<div class="imggrid"></div>`);
+  plan.shots.forEach(s=>{
+    const im=p.images.find(x=>x.id===s.imageId);
+    const m=MOTIONS[s.motion];
+    const c=el(`<div class="icard">
+      <div class="thumb" style="cursor:default">${im?.url?`<img src="${im.url}" alt="">`:""}
+        <span class="ord mono">${String(s.index+1).padStart(2,"0")}</span>
+        <span class="imp">${fmt(s.duration,1)}s → ${billedSeconds(p.output.model,s.duration)}s</span></div>
+      <div class="meta">
+        <select data-f="m">${MOTION_KEYS.map(k=>`<option value="${k}" ${s.motion===k?"selected":""}>${MOTIONS[k].label}</option>`).join("")}</select>
+        <div class="sugg mono" style="color:var(--sel)">"${esc(m.prompt)}"</div>
+        <div class="sugg">${ROOMS[im?.room]?.sv||"—"} · rörelsemängd skalas av längden</div>
+      </div></div>`);
+    c.querySelector("[data-f=m]").onchange=e=>{
+      App.snapshot("kamerarörelse");
+      s.motion=e.target.value; if(im) im.motion=e.target.value;
+      App.save(); render();
+    };
+    grid.appendChild(c);
+  });
+  b.appendChild(grid);
+
+  b.appendChild(el(`<div style="margin-top:22px" class="stack">
+    <div class="h-sec">Prompt-strategin</div>
+    <div class="note"><b>Kort vinner.</b> Kling 3.0 tar emot prompt och start_image. Eftersom bilden
+    redan bestämmer arkitektur, ljus och material lägger vi ingen scenbeskrivning i prompten —
+    bara rörelsen. Rörelsemängden styrs av shotlängden: samma <code>"Slow dolly forward."</code>
+    över 2,8 s ger mindre förflyttning än över 4,5 s, men samma upplevda hastighet.
+    Kling 3.0 exponerar inget separat camera-control-fält i MCP:n, så prompten är rätt kanal här.</div>
+  </div>`));
+  return w;
+}
+
+/* ==========================================================================
+   19. STEP 6 — BRAND
+   ========================================================================== */
+
+function viewBrand(){
+  const p=App.project;
+  const brand=currentBrand();
+  const w=work("Brand",
+    "Importera objekt- och brand-data från Viewly. Brandprofilen lagras per kontor och återanvänds mellan projekt — samma kontor ska aldrig få en ny profil varje gång.",
+    [nextBtn("Preflight","preflight", !!p.plan)]);
+  const b=w.querySelector(".workbody");
+
+  const acts=el(`<div class="row wrap" style="margin-bottom:18px">
+    <button class="btn primary" data-a="imp">Importera från Viewly</button>
+    <button class="btn" data-a="sample">Fyll i exempeldata</button>
+    <div class="sp"></div>
+    <label class="row" style="font-size:11.5px;gap:7px;color:var(--muted)">
+      <input type="checkbox" data-a="lock" ${p.brandLock?"checked":""}> Brand Lock</label>
+  </div>`);
+  acts.querySelector("[data-a=imp]").onclick=openImport;
+  acts.querySelector("[data-a=sample]").onclick=()=>applyImport(SAMPLE_IMPORT);
+  acts.querySelector("[data-a=lock]").onchange=e=>{ p.brandLock=e.target.checked; App.save(); render(); };
+  b.appendChild(acts);
+
+  const grid=el(`<div class="brandgrid"></div>`);
+
+  const pf=el(`<div class="panel"><div class="h-sec">Objekt</div>
+    <div class="field"><label>Adress</label><input type="text" data-p="address" value="${esc(p.property.address)}"></div>
+    <div class="field"><label>Ort</label><input type="text" data-p="city" value="${esc(p.property.city)}"></div>
+    <div class="grid2">
+      <div class="field"><label>Typ</label><input type="text" data-p="property_type" value="${esc(p.property.property_type)}"></div>
+      <div class="field"><label>Boarea m²</label><input type="text" data-p="living_area_m2" value="${p.property.living_area_m2??""}"></div>
+    </div>
+    <div class="note" style="font-size:11px">Pris och visningstid ingår inte i schemat och antas inte finnas.</div>
+  </div>`);
+  pf.querySelectorAll("[data-p]").forEach(i=>i.onchange=()=>{
+    const k=i.dataset.p; p.property[k] = k==="living_area_m2" ? (i.value?+i.value:null) : i.value;
+    syncGraphicContent(); App.save(); render();
+  });
+  grid.appendChild(pf);
+
+  const bf=el(`<div class="panel"><div class="h-sec">Mäklare</div>
+    <div class="field"><label>Namn</label><input type="text" data-b="name" value="${esc(p.broker.name)}"></div>
+    <div class="field"><label>Telefon</label><input type="text" data-b="phone" value="${esc(p.broker.phone)}"></div>
+    <div class="field"><label>Bild-URL</label><input type="text" data-b="image_url" value="${esc(p.broker.image_url)}"></div>
+  </div>`);
+  bf.querySelectorAll("[data-b]").forEach(i=>i.onchange=()=>{
+    p.broker[i.dataset.b]=i.value; loadBrandAssets(); syncGraphicContent(); App.save(); render(); });
+  grid.appendChild(bf);
+  b.appendChild(grid);
+
+  if(brand){
+    const c=brand.colors||{};
+    const bp=el(`<div style="margin-top:20px" class="panel">
+      <div class="row"><div class="h-sec">Brand Profile</div><div class="sp"></div>
+        <span class="mono faint" style="font-size:11px">${esc(brand.brand_id)}</span></div>
+      <div style="font:300 20px/1.2 var(--disp)">${esc(brand.office_name)}</div>
+      <div class="brandgrid" style="margin-top:6px">
+        <div class="stack" style="gap:8px"><div class="eyebrow">Logotyper</div>
+          <div class="grid3">
+            <div class="logobox">${brand.logos.primary?`<img src="${esc(brand.logos.primary)}" alt="">`:'<span class="faint" style="font-size:10px">Primary</span>'}</div>
+            <div class="logobox light">${brand.logos.light?`<img src="${esc(brand.logos.light)}" alt="">`:'<span style="font-size:10px;color:#8a8a85">Light</span>'}</div>
+            <div class="logobox dark">${brand.logos.dark?`<img src="${esc(brand.logos.dark)}" alt="">`:'<span class="faint" style="font-size:10px">Dark</span>'}</div>
+          </div></div>
+        <div class="stack" style="gap:8px"><div class="eyebrow">Färger</div>
+          <div class="grid3">${["primary","secondary","accent","light","dark"].filter(k=>c[k]).map(k=>
+            `<div><div class="swatch" style="background:${c[k]}"></div>
+             <div class="mono" style="font-size:9.5px;color:var(--faint);margin-top:4px">${k} ${c[k]}</div></div>`).join("")}</div></div>
+        <div class="stack" style="gap:8px"><div class="eyebrow">Typografi</div>
+          <div class="kv"><dt>Display</dt><dd>${esc(brand.typography.display_family||"—")}</dd>
+          <dt>Body</dt><dd>${esc(brand.typography.body_family||"—")}</dd>
+          <dt>Vikter</dt><dd>${brand.typography.allowed_weights.join(", ")||"—"}</dd></div>
+        </div>
+      </div>
+      <div class="note ${p.brandLock?"info":"warn"}" style="margin-top:4px">${p.brandLock
+        ? "<b>Brand Lock är på.</b> Motion-familjen får ändra konstruktion, timing och linjeföring — men aldrig typsnitt eller brandfärger. Editorial betyder inte serif."
+        : "<b>Brand Lock är av.</b> Motion-familjen får överskrida brandets typografi. Använd bara för experiment."}</div>
+    </div>`);
+    b.appendChild(bp);
+  } else {
+    b.appendChild(el(`<div style="margin-top:20px" class="note info">
+      Ingen brandprofil kopplad. Importera en payload med <code>brand_id</code> så skapas profilen
+      en gång och återanvänds för alla kommande objekt från samma kontor.</div>`));
+  }
+  return w;
+}
+
+function openImport(){
+  const m=el(`<div class="modal"><div class="modalbox">
+    <div><div class="h-page">Importera från Viewly</div>
+    <p class="sub dim" style="margin-top:6px;font-size:12px">Klistra in en versionerad payload. Den valideras och normaliseras — okända fält ignoreras, och du får se exakt vad som saknas.</p></div>
+    <textarea rows="13" class="mono" style="font-size:11px;line-height:1.5" placeholder='{"schema":"viewly.motion-import.v2", ...}'></textarea>
+    <div class="row"><button class="btn" data-a="fill">Klistra in exempel</button><div class="sp"></div>
+      <button class="btn ghost" data-a="close">Avbryt</button>
+      <button class="btn primary" data-a="go">Importera</button></div>
+  </div></div>`);
+  const ta=m.querySelector("textarea");
+  m.querySelector("[data-a=fill]").onclick=()=>ta.value=JSON.stringify(SAMPLE_IMPORT,null,2);
+  m.querySelector("[data-a=close]").onclick=()=>m.remove();
+  m.onclick=e=>{ if(e.target===m) m.remove(); };
+  m.querySelector("[data-a=go]").onclick=()=>{
+    let raw; try{ raw=JSON.parse(ta.value); }
+    catch(e){ toast("Ogiltig JSON: "+e.message); return; }
+    try{ applyImport(raw); m.remove(); }catch(e){ toast(e.message); }
+  };
+  document.body.appendChild(m); ta.focus();
+}
+
+function applyImport(raw){
+  const r=normaliseImport(raw);
+  const p=App.project;
+  App.snapshot("import");
+  p.property={...p.property,...r.property};
+  p.broker={...p.broker,...r.broker};
+  if(r.brand){
+    const ex=App.data.brands[r.brand.brand_id];
+    App.data.brands[r.brand.brand_id]= ex ? {...ex,...r.brand, importedAt:ex.importedAt} : r.brand;
+    p.brandId=r.brand.brand_id;
+  }
+  if(p.name==="Namnlöst objekt" && r.property.address) p.name=r.property.address;
+  syncGraphicContent(); loadBrandAssets(); App.save(); render();
+  toast(r.warnings.length ? `Importerad med ${r.warnings.length} anmärkning${r.warnings.length===1?"":"ar"}` : "Importerad");
+  if(r.warnings.length){
+    const m=el(`<div class="modal"><div class="modalbox">
+      <div class="h-page">Importen gick igenom</div>
+      <div class="stack" style="gap:8px">${r.warnings.map(x=>`<div class="note warn">${esc(x)}</div>`).join("")}</div>
+      <div class="row"><div class="sp"></div><button class="btn primary">Förstått</button></div></div></div>`);
+    m.querySelector("button").onclick=()=>m.remove(); m.onclick=e=>{if(e.target===m)m.remove();};
+    document.body.appendChild(m);
+  }
+}
+function syncGraphicContent(){
+  const p=App.project, b=currentBrand();
+  p.graphics.forEach(g=>{
+    const c=g.content;
+    c.address=p.property.address||c.address; c.city=p.property.city||c.city;
+    c.type=p.property.property_type||c.type; c.area=p.property.living_area_m2??c.area;
+    c.name=p.broker.name||c.name; c.phone=p.broker.phone||c.phone;
+    c.office=b?.office_name||c.office;
+    if(g.componentId==="icon_spec" && p.property.living_area_m2!=null) c.value=p.property.living_area_m2;
+  });
+}
+async function loadBrandAssets(){
+  const p=App.project, b=currentBrand();
+  App.logoImg = b?.logos?.light ? await loadImg(b.logos.light) : b?.logos?.primary ? await loadImg(b.logos.primary) : null;
+  App.brokerImg = p.broker.image_url ? await loadImg(p.broker.image_url) : null;
+}
+
+/* ==========================================================================
+   20. STEP 7 — PREFLIGHT
+   ========================================================================== */
+
+function viewPreflight(){
+  const p=App.project, plan=p.plan;
+  const w=work("Preflight",
+    "Allt som kommer att skickas, och exakt vad det kostar — innan en enda credit spenderas.",
+    []);
+  const b=w.querySelector(".workbody");
+  if(!plan){ b.appendChild(el(`<div class="empty">Ingen plan ännu.</div>`)); return w; }
+
+  const model=MODELS[p.output.model];
+  const out=el(`<div class="panel" style="margin-bottom:18px">
+    <div class="h-sec">Output</div>
+    <div class="brandgrid">
+      <div class="field"><label>Format</label><div class="seg" data-g="aspect">${model.aspectRatios.map(a=>
+        `<button ${p.output.aspect===a?'aria-pressed="true"':""} data-v="${a}">${a}</button>`).join("")}</div></div>
+      <div class="field"><label>Modell</label><select data-g="model">${Object.values(MODELS).map(m=>
+        `<option value="${m.id}" ${p.output.model===m.id?"selected":""}>${m.label}${m.recommended?" · rekommenderad":""}</option>`).join("")}</select>
+        <div class="faint" style="font-size:11px">${esc(model.blurb)}</div></div>
+      ${model.modes?`<div class="field"><label>Läge</label><div class="seg" data-g="mode">${model.modes.map(m=>
+        `<button ${p.output.mode===m.id?'aria-pressed="true"':""} data-v="${m.id}" title="${esc(m.note)}">${m.label}</button>`).join("")}</div></div>`:""}
+      ${model.resolutions?`<div class="field"><label>Upplösning</label><div class="seg" data-g="resolution">${model.resolutions.map(r=>
+        `<button ${p.output.resolution===r?'aria-pressed="true"':""} data-v="${r}">${r}</button>`).join("")}</div></div>`:""}
+      ${model.sound?`<div class="field"><label>Ljud från modellen</label><div class="seg" data-g="sound">
+        <button ${p.output.sound==="off"?'aria-pressed="true"':""} data-v="off">Av</button>
+        <button ${p.output.sound==="on"?'aria-pressed="true"':""} data-v="on">På</button></div>
+        <div class="faint" style="font-size:11px">Filmen har egen musik — ljud av sparar credits.</div></div>`:""}
+    </div></div>`);
+  out.querySelectorAll(".seg").forEach(sg=>sg.querySelectorAll("button").forEach(btn=>btn.onclick=()=>{
+    p.output[sg.dataset.g]=btn.dataset.v;
+    if(p.output.model==="kling3_0_turbo") p.output.sound="off";
+    App.save(); render();
+  }));
+  out.querySelector("[data-g=model]").onchange=e=>{
+    p.output.model=e.target.value;
+    const m=MODELS[p.output.model];
+    if(!m.aspectRatios.includes(p.output.aspect)) p.output.aspect=m.aspectRatios[0];
+    if(m.modes && !m.modes.some(x=>x.id===p.output.mode)) p.output.mode=m.modes[0].id;
+    if(m.resolutions && !m.resolutions.includes(p.output.resolution)) p.output.resolution=m.resolutions[0];
+    App.save(); render();
+  };
+  b.appendChild(out);
+
+  const spec=buildSpec();
+  const cost=localCost(spec);
+  const brand=currentBrand();
+
+  const sum=el(`<div class="brandgrid" style="margin-bottom:18px">
+    <div class="panel"><div class="h-sec">Material</div><dl class="kv">
+      <dt>Bilder</dt><dd>${plan.shots.length}</dd>
+      <dt>Riktning</dt><dd>${DIRECTIONS[p.direction].label}</dd>
+      <dt>Musik</dt><dd>${esc(p.music?.title||"—")}</dd>
+      <dt>Stil</dt><dd>${esc(p.music?.style||"—")}</dd></dl></div>
+    <div class="panel"><div class="h-sec">Film</div><dl class="kv">
+      <dt>Längd</dt><dd>${fmt(plan.total)} s</dd>
+      <dt>Format</dt><dd>${p.output.aspect} · ${ASPECTS[p.output.aspect].join("×")}</dd>
+      <dt>Klipp på musik</dt><dd>${plan.alignedCuts} / ${plan.shots.length-1}</dd>
+      <dt>Avslut</dt><dd>${plan.endsOnResolution?"på upplösning":"utan upplösning"}</dd></dl></div>
+    <div class="panel"><div class="h-sec">Brand</div><dl class="kv">
+      <dt>Kontor</dt><dd>${esc(brand?.office_name||"—")}</dd>
+      <dt>Adress</dt><dd>${esc(p.property.address||"—")}</dd>
+      <dt>Boarea</dt><dd>${p.property.living_area_m2!=null?p.property.living_area_m2+" m²":"—"}</dd>
+      <dt>Brand Lock</dt><dd>${p.brandLock?"på":"av"}</dd></dl></div>
+  </div>`);
+  b.appendChild(sum);
+
+  const unverified = cost.perShot.some(s=>!s.verified);
+  const costBox=el(`<div class="panel">
+    <div class="row"><div class="h-sec">Estimerad produktionskostnad</div><div class="sp"></div>
+      <span class="credits" style="font-size:26px">${fmt(cost.total,2)}</span>
+      <span class="eyebrow" style="color:var(--money-dim)">credits</span></div>
+    <table class="cost"><thead><tr>
+      <th>Shot</th><th>Rörelse</th><th class="num">Planerad</th><th class="num">Genereras</th>
+      <th class="num">Rate</th><th class="num">Credits</th></tr></thead><tbody>
+      ${plan.shots.map((s,i)=>{ const c=cost.perShot[i]; const im=p.images.find(x=>x.id===s.imageId);
+        return `<tr><td>${String(i+1).padStart(2,"0")} · ${esc((im?.name||"").slice(0,22))}</td>
+        <td>${MOTIONS[s.motion].label}</td>
+        <td class="num">${fmt(s.duration)} s</td>
+        <td class="num">${c.billedSeconds} s</td>
+        <td class="num">${c.rate!=null?fmt(c.rate,2):"—"}${c.verified?"":' <span style="color:var(--warn)">?</span>'}</td>
+        <td class="num" style="color:var(--money)">${c.credits!=null?fmt(c.credits,2):"okänd"}</td></tr>`;}).join("")}
+    </tbody></table>
+    <div class="note ${unverified?"warn":"info"}" style="font-size:11.5px">
+      ${unverified
+        ? "<b>En eller flera rader saknar verifierat pris.</b> Kombinationen preflightades aldrig mot providern, så den visas som okänd i stället för gissad. Byt läge, eller låt backend hämta priset live."
+        : `<b>Priserna kommer från riktiga preflights.</b> Varje rate nedan returnerades av Higgsfield <code>get_cost</code> ${PROVIDER_AUDIT_DATE}: ${esc(MODELS[p.output.model].rates[p.output.model==="kling3_0"?`${p.output.mode}/${p.output.sound}`:p.output.resolution]?.samples||"")}. Aspect ratio påverkar inte priset — verifierat på 16:9, 9:16 och 1:1.`}
+      När backend är inkopplad hämtas totalen live via <code>POST /api/motion/cost</code> och den blir facit.
+    </div>
+  </div>`);
+  b.appendChild(costBox);
+
+  const go=el(`<div class="row" style="margin-top:20px">
+    <div class="sp"></div>
+    <button class="btn" data-a="spec">Visa production spec</button>
+    <button class="btn primary" data-a="go" style="padding:10px 22px">Producera ${plan.shots.length} shots · ${fmt(cost.total,1)} credits</button>
+  </div>`);
+  go.querySelector("[data-a=spec]").onclick=()=>showSpec(spec);
+  go.querySelector("[data-a=go]").onclick=startProduction;
+  b.appendChild(go);
+  return w;
+}
+
+/* The semantic request. The adapter that turns this into an MCP call lives
+   server-side; nothing above this line knows a Higgsfield payload exists. */
+function buildSpec(){
+  const p=App.project, plan=p.plan;
+  return {
+    projectId:p.id, model:p.output.model, aspect:p.output.aspect,
+    mode:p.output.mode, sound:p.output.sound, resolution:p.output.resolution,
+    shots: plan.shots.map(s=>{
+      const im=p.images.find(x=>x.id===s.imageId);
+      return {
+        shotId:s.shotId, index:s.index,
+        imageRef:{ localId:im?.id, name:im?.name },   // server resolves to a media_id
+        cameraMotion:s.motion, prompt:MOTIONS[s.motion].prompt,
+        plannedDuration:s.duration, duration:billedSeconds(p.output.model,s.duration),
+        trimTo:s.duration
+      };
+    })
+  };
+}
+function showSpec(spec){
+  const m=el(`<div class="modal"><div class="modalbox">
+    <div class="h-page">Production spec</div>
+    <p class="dim" style="font-size:12px;margin:0">Detta skickas till <code style="font-family:var(--mono);color:var(--sel)">POST /api/motion/production</code>.
+    Servern laddar upp bilderna med <code style="font-family:var(--mono);color:var(--sel)">media_upload</code> och mappar varje shot till ett
+    <code style="font-family:var(--mono);color:var(--sel)">generate_video_batch</code>-request.</p>
+    <pre class="mono" style="font-size:10.5px;line-height:1.55;background:var(--sunken);padding:13px;border-radius:3px;overflow-x:auto;margin:0">${esc(JSON.stringify(spec,null,2))}</pre>
+    <div class="row"><div class="sp"></div><button class="btn primary">Stäng</button></div></div></div>`);
+  m.querySelector("button").onclick=()=>m.remove(); m.onclick=e=>{if(e.target===m)m.remove();};
+  document.body.appendChild(m);
+}
+
+/* ==========================================================================
+   21. STEP 8 — PRODUCTION
+   ========================================================================== */
+
+let pollTimer=null;
+
+async function startProduction(){
+  const p=App.project, spec=buildSpec();
+  const cost=await MotionAPI.cost(spec);
+  try{
+    const run=await MotionAPI.createProduction(spec);
+    p.production={ id:run.productionId, spec, estimate:cost, snapshot:run, startedAt:Date.now() };
+    App.save(); goto("produce"); pollProduction();
+    toast(`${spec.shots.length} jobb skapade`);
+  }catch(e){
+    toast("Kunde inte starta produktionen: "+e.message);
+  }
+}
+function pollProduction(){
+  clearInterval(pollTimer);
+  pollTimer=setInterval(async ()=>{
+    const p=App.project;
+    if(!p?.production){ clearInterval(pollTimer); return; }
+    try{
+      const run=await MotionAPI.getProduction(p.production.id);
+      p.production.snapshot=run; App.save();
+      if(App.project.step==="produce") renderJobs();
+      if(run.status!=="running"){ clearInterval(pollTimer); if(App.project.step==="produce") render(); }
+    }catch(e){ clearInterval(pollTimer); }
+  }, 900);
+}
+
+function viewProduce(){
+  const p=App.project;
+  const run=p.production?.snapshot;
+  const w=work("Produktion",
+    "Varje shot är ett eget jobb. Ett misslyckat jobb blockerar inte filmen — du kör om just det.",
+    [(()=>{ const b=el(`<button class="btn primary" ${run&&run.status!=="running"?"":"disabled"}>Öppna editorn →</button>`);
+      b.onclick=()=>goto("editor"); return b; })()]);
+  const b=w.querySelector(".workbody");
+  if(!run){ b.appendChild(el(`<div class="empty">Ingen produktion startad. Gå till Preflight.</div>`)); return w; }
+
+  const est=p.production.estimate;
+  const actual=run.jobs.filter(j=>j.status==="completed").reduce((a,j)=>a+(j.actualCredits||0),0);
+  b.appendChild(el(`<div class="brandgrid" style="margin-bottom:18px">
+    <div class="panel"><div class="eyebrow">Produktion</div>
+      <div class="mono" style="font-size:13px">${esc(run.productionId)}</div>
+      <div class="row" style="gap:7px;font-size:11.5px;color:var(--muted)">
+        <span class="dot ${run.status==="completed"?"ok":run.status==="partial"?"warn":"run"}"></span>
+        ${run.status==="running"?"Kör":run.status==="partial"?"Delvis klar":"Klar"}
+        · ${run.jobs.filter(j=>j.status==="completed").length}/${run.jobs.length}</div></div>
+    <div class="panel"><div class="eyebrow">Estimerat</div>
+      <div class="credits" style="font-size:22px">${fmt(est.total,2)}</div>
+      <div class="faint" style="font-size:11px">från auditerad prislista</div></div>
+    <div class="panel"><div class="eyebrow">Faktiskt debiterat</div>
+      <div class="credits" style="font-size:22px">${fmt(actual,2)}</div>
+      <div class="faint" style="font-size:11px">rapporterat per färdigt jobb</div></div>
+  </div>`));
+  b.appendChild(el(`<div class="joblist" id="joblist"></div>`));
+  b.appendChild(el(`<div class="note info" style="margin-top:16px">
+    <b>Vad som är mockat och vad som inte är det.</b> Jobbens livscykel, felfall, retry, kostnadsrapportering
+    och hela produktions-state är riktiga. Det enda som saknas är själva Kling-anropet — det kräver en
+    server-side nyckel. Backend implementerar <code>POST /api/motion/production</code> mot
+    <code>generate_video_batch</code> + <code>jobs_wait</code> och returnerar <code>resultUrl</code> per jobb.
+    Tills dess renderar editorn stillbilden med sin planerade kamerarörelse och märker varje shot SIMULERAD —
+    hellre det än en påhittad videofil.</div>`));
+  if(App.project.step==="produce") requestAnimationFrame(renderJobs);
+  return w;
+}
+
+function renderJobs(){
+  const host=document.getElementById("joblist"); if(!host) return;
+  const p=App.project, run=p.production.snapshot;
+  host.innerHTML="";
+  run.jobs.forEach(j=>{
+    const shot=p.production.spec.shots.find(s=>s.shotId===j.shotId);
+    const im=p.images.find(x=>x.id===shot?.imageRef.localId);
+    const st={queued:["","I kö"],generating:["run","Genererar"],completed:["ok","Klar"],failed:["crit","Misslyckades"]}[j.status];
+    const row=el(`<div class="job">
+      ${im?.url?`<img class="thumbmini" src="${im.url}" alt="">`:'<span class="thumbmini"></span>'}
+      <span><span class="jt"><span class="jn">${String(j.index+1).padStart(2,"0")}</span>
+        <b style="font-weight:500">${esc(im?.name||j.shotId)}</b></span>
+        ${j.status==="failed"?`<div style="color:var(--crit);font-size:11px;margin-top:3px">${esc(j.error||"Okänt fel")}</div>`:""}
+        ${j.status==="generating"?`<div class="prog" style="margin-top:6px"><i style="width:${Math.round((j.progress||0)*100)}%"></i></div>`:""}
+      </span>
+      <span class="row" style="gap:7px"><span class="dot ${st[0]}"></span><span style="color:var(--${
+        j.status==="failed"?"crit":j.status==="completed"?"text-2":"muted"})">${st[1]}</span>
+        ${j.retried?`<span class="faint" style="font-size:10.5px">(${j.retried}×)</span>`:""}</span>
+      <span class="mono faint" style="font-size:11px">${MOTIONS[shot?.cameraMotion]?.label||""}</span>
+      <span class="mono" style="font-size:11px">${shot?.duration||"—"} s</span>
+      <span class="row" style="gap:8px;justify-content:flex-end">
+        ${j.actualCredits!=null?`<span class="credits" style="font-size:11.5px">${fmt(j.actualCredits,2)}</span>`:'<span class="faint mono" style="font-size:11px">—</span>'}
+        ${j.status==="failed"?'<button class="btn xs" data-a="retry">Kör om</button>':""}
+        ${j.status==="completed"?'<button class="btn xs" data-a="view">Visa</button>':""}
+      </span></div>`);
+    row.querySelector("[data-a=retry]")?.addEventListener("click", async ()=>{
+      const run2=await MotionAPI.retryShot(p.production.id, j.shotId);
+      p.production.snapshot=run2; App.save(); renderJobs(); pollProduction();
+      toast(`Kör om shot ${j.index+1}`);
+    });
+    row.querySelector("[data-a=view]")?.addEventListener("click", ()=>showShot(j, shot, im));
+    host.appendChild(row);
+  });
+}
+
+/* Nothing is ever hidden: if a shot is completed, its output is inspectable. */
+function showShot(job, shot, im){
+  const p=App.project;
+  const [cw,ch]=previewSize(p.output.aspect, 560);
+  const m=el(`<div class="modal"><div class="modalbox" style="width:min(720px,100%)">
+    <div class="row"><div><div class="h-page">Shot ${String(job.index+1).padStart(2,"0")}</div>
+      <div class="dim" style="font-size:12px;margin-top:4px">${esc(im?.name||"")} · ${MOTIONS[shot.cameraMotion].label}</div></div>
+      <div class="sp"></div>${job.simulated?'<span class="chip" style="color:var(--warn);border-color:var(--warn)">Simulerad</span>':""}</div>
+    <div style="display:grid;place-items:center;background:var(--sunken);padding:14px;border-radius:3px">
+      ${job.resultUrl
+        ? `<video src="${esc(job.resultUrl)}" controls autoplay loop style="max-width:100%;max-height:52vh"></video>`
+        : `<canvas width="${cw}" height="${ch}" style="max-width:100%;max-height:52vh;border:1px solid var(--line)"></canvas>`}
+    </div>
+    <dl class="kv"><dt>Job</dt><dd>${esc(job.jobId)}</dd>
+      <dt>Prompt</dt><dd>"${esc(shot.prompt)}"</dd>
+      <dt>Planerad längd</dt><dd>${fmt(shot.plannedDuration)} s</dd>
+      <dt>Genererad längd</dt><dd>${shot.duration} s</dd>
+      <dt>Debiterat</dt><dd style="color:var(--money)">${job.actualCredits!=null?fmt(job.actualCredits,2)+" credits":"—"}</dd></dl>
+    ${job.resultUrl?"":'<div class="note warn" style="font-size:11.5px">Ingen videofil ännu — backend-routen är inte kopplad. Detta är stillbilden animerad med den planerade rörelsen, inte Kling-output.</div>'}
+    <div class="row"><div class="sp"></div><button class="btn primary" data-a="close">Stäng</button></div>
+  </div></div>`);
+  m.querySelector("[data-a=close]").onclick=()=>{ cancelAnimationFrame(raf); m.remove(); };
+  m.onclick=e=>{ if(e.target===m){ cancelAnimationFrame(raf); m.remove(); } };
+  document.body.appendChild(m);
+  let raf;
+  const cv=m.querySelector("canvas");
+  if(cv){
+    const ctx=cv.getContext("2d"); const t0=performance.now();
+    const loop=()=>{ const t=((performance.now()-t0)/1000 % shot.plannedDuration)/shot.plannedDuration;
+      drawShot(ctx,cv.width,cv.height,im?.el,shot.cameraMotion,t,
+        {intensity:DIRECTIONS[p.direction].motionIntensity});
+      raf=requestAnimationFrame(loop); };
+    loop();
+  }
+}
+
+/* ==========================================================================
+   22. STEP 9 — EDITOR
+   Video, graphics and music on one timeline, all reading the same Music
+   Event Map. The preview is the render: identical draw calls, identical
+   coordinates, identical easing.
+   ========================================================================== */
+
+const TL = {pxs:64, drag:null};
+
+function viewEditor(){
+  const p=App.project, plan=p.plan;
+  const w=work("Editor","",[], "pad0");
+  w.querySelector(".workhead").remove();
+  const b=w.querySelector(".workbody");
+  if(!plan){ b.appendChild(el(`<div class="empty">Ingen plan.</div>`)); return w; }
+
+  const [cw,ch]=previewSize(p.output.aspect, 620);
+  const layout=el(`<div style="display:flex;flex-direction:column;height:100%;min-height:0">
+    <div style="flex:1;display:flex;min-height:0">
+      <div style="width:246px;flex:none;border-right:1px solid var(--line);background:var(--surface);overflow-y:auto;padding:14px" class="lib"></div>
+      <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+        <div class="stage"><canvas width="${cw}" height="${ch}"></canvas></div>
+        <div class="transport">
+          <button class="pbtn big" data-a="play">▶</button>
+          <span class="tc" data-r="tc">00:00.00</span><span class="faint">/</span>
+          <span class="tc faint">${tc(plan.total)}</span>
+          <div class="sp"></div>
+          <label class="row faint" style="font-size:11px;gap:6px"><input type="checkbox" data-a="mute"> Tyst</label>
+          <div class="seg"><button data-z="-">−</button><button data-z="+">+</button></div>
+          <span class="eyebrow">Zoom</span>
+          <button class="btn sm" data-a="export">Exportera</button>
+        </div>
+      </div>
+      <aside class="inspector"></aside>
+    </div>
+    <div class="tlwrap">
+      <div class="tlhead">
+        <span class="h-sec">Timeline</span>
+        <span class="chip"><span class="dot ok"></span>${plan.alignedCuts} klipp på musik</span>
+        <div class="sp"></div>
+        <label class="row faint" style="font-size:11px;gap:6px"><input type="checkbox" data-a="snap" checked> Snap to music</label>
+        <button class="btn sm" data-a="compose">Auto-komponera grafik</button>
+        <button class="btn sm danger" data-a="clearg">Rensa grafik</button>
+      </div>
+      <div style="flex:1;display:flex;min-height:0">
+        <div class="tracklabels"><div class="sph"></div><div>Video</div><div>Grafik</div><div>Musik</div></div>
+        <div class="tlscroll"><div class="tlinner"></div></div>
+      </div>
+    </div>
+  </div>`);
+  b.appendChild(layout);
+
+  const cv=layout.querySelector(".stage canvas");
+  const tcEl=layout.querySelector("[data-r=tc]");
+  const playBtn=layout.querySelector("[data-a=play]");
+  Playback.showGraphics=true;
+  Playback.attach(cv,{showGraphics:true,onFrame:t=>{
+    tcEl.textContent=tc(t); playBtn.textContent=Playback.playing?"❚❚":"▶";
+    const ph=layout.querySelector(".tlplay"); if(ph) ph.style.left=(t*TL.pxs)+"px";
+  }});
+  playBtn.onclick=()=>Playback.toggle();
+  layout.querySelector("[data-a=mute]").onchange=e=>{ Playback.muted=e.target.checked;
+    if(Playback.playing){ Playback.pause(); Playback.play(); } };
+  layout.querySelectorAll("[data-z]").forEach(btn=>btn.onclick=()=>{
+    TL.pxs=clamp(TL.pxs*(btn.dataset.z==="+"?1.35:1/1.35),18,320); render(); });
+  layout.querySelector("[data-a=export]").onclick=exportRender;
+  layout.querySelector("[data-a=snap]").onchange=e=>App.snapOn=e.target.checked;
+  App.snapOn ??= true;
+  layout.querySelector("[data-a=compose]").onclick=()=>{
+    App.snapshot("auto-komponera");
+    p.graphics=composeGraphics(p,currentBrand()); App.save(); render();
+    toast(`${p.graphics.length} grafiker placerade på musikaliska händelser`);
+  };
+  layout.querySelector("[data-a=clearg]").onclick=()=>{
+    App.snapshot("rensa grafik"); p.graphics=[]; App.sel.graphic=null; App.save(); render(); };
+
+  layout.querySelector(".lib").appendChild(graphicLibrary());
+  layout.querySelector(".tlinner").appendChild(timeline());
+  layout.querySelector(".inspector").appendChild(editorInspector());
+  return w;
+}
+
+function graphicLibrary(){
+  const p=App.project;
+  const box=el(`<div class="stack">
+    <div class="h-sec">Motion family</div>
+    <select data-f="fam">${Object.entries(FAMILIES).map(([k,f])=>
+      `<option value="${k}" ${p.graphicFamily===k?"selected":""}>${f.label}</option>`).join("")}</select>
+    <div class="faint" style="font-size:11px;line-height:1.5">${esc(FAMILIES[p.graphicFamily].desc)}</div>
+    <div class="h-sec" style="margin-top:6px">Täthet</div>
+    <div class="seg" data-f="dens">${Object.entries(DENSITY).map(([k,d])=>
+      `<button ${p.graphicDensity===k?'aria-pressed="true"':""} data-v="${k}" title="${esc(d.desc)}">${d.label}</button>`).join("")}</div>
+    <hr class="rule" style="margin:6px 0">
+    <div class="h-sec">Bibliotek</div>
+    <div class="faint" style="font-size:11px;line-height:1.5;margin-top:-4px">Klicka för att lägga till vid spelhuvudet.</div>
+    <div class="gfxgrid" style="grid-template-columns:1fr 1fr"></div>
+  </div>`);
+  box.querySelector("[data-f=fam]").onchange=e=>{ p.graphicFamily=e.target.value; App.save(); render(); };
+  box.querySelectorAll("[data-f=dens] button").forEach(btn=>btn.onclick=()=>{
+    p.graphicDensity=btn.dataset.v; App.save(); render(); });
+
+  const grid=box.querySelector(".gfxgrid");
+  const groups={};
+  GFX_KEYS.forEach(k=>{ (groups[GFX[k].group] ||= []).push(k); });
+  Object.entries(groups).forEach(([g,keys])=>{
+    grid.appendChild(el(`<div class="eyebrow" style="grid-column:1/-1;margin-top:6px">${esc(g)}</div>`));
+    keys.forEach(k=>{
+      const c=GFX[k];
+      const card=el(`<button class="gfxcard" title="${esc(c.desc)}">
+        <canvas width="150" height="94"></canvas>
+        <span class="gm"><span class="gt">${esc(c.name)}</span></span></button>`);
+      card.onclick=()=>addGraphic(k);
+      grid.appendChild(card);
+      requestAnimationFrame(()=>drawGfxThumb(card.querySelector("canvas"), k));
+    });
+  });
+  return box;
+}
+
+function drawGfxThumb(cv, id){
+  const p=App.project, brand=currentBrand();
+  const ctx=cv.getContext("2d"), W=cv.width, H=cv.height;
+  const fake={...p, graphics:[{...newGraphic(id,0,p,brand), scale:0.42,
+    anchor:defaultAnchor(id)==="CENTER"?"CENTER":"MIDDLE_LEFT", dx:0, dy:0}]};
+  const anim=()=>{
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0A0D0F"; ctx.fillRect(0,0,W,H);
+    const t=(performance.now()/1000 % 4);
+    drawGraphics(ctx,W,H,clamp(t,0,3.2),fake,brand,{logo:App.logoImg,broker:App.brokerImg});
+    if(cv.isConnected) requestAnimationFrame(anim);
+  };
+  anim();
+}
+
+function addGraphic(componentId){
+  const p=App.project;
+  App.snapshot("lägg till grafik");
+  let t=Playback.t;
+  if(App.snapOn && p.music?.analysis) t=snapToEvent(t);
+  const g=newGraphic(componentId,clamp(t,0,Math.max(p.plan.total-0.5,0)),p,currentBrand());
+  g.duration=Math.min(g.duration, p.plan.total-g.start);
+  p.graphics.push(g); App.sel.graphic=g.id; App.sel.shot=null;
+  App.save(); render();
+}
+function snapToEvent(t, win=0.45){
+  const a=App.project.music?.analysis; if(!a) return t;
+  const c=a.events.filter(e=>Math.abs(e.t-t)<=win && e.strength>=.38);
+  if(!c.length) return t;
+  return c.reduce((x,y)=> Math.abs(y.t-t)<Math.abs(x.t-t)?y:x).t;
+}
+
+/* ---- timeline ------------------------------------------------------------ */
+function timeline(){
+  const p=App.project, plan=p.plan, a=p.music?.analysis;
+  const W=Math.max(plan.total*TL.pxs, 200);
+  const box=el(`<div style="width:${W}px;position:relative;height:100%">
+    <div class="tlruler"></div>
+    <div class="tltrack" data-t="video"></div>
+    <div class="tltrack" data-t="gfx"></div>
+    <div class="tltrack" data-t="music"></div>
+    <div class="tlplay" style="left:${Playback.t*TL.pxs}px"></div>
+  </div>`);
+
+  const ruler=box.querySelector(".tlruler");
+  const stepSec = TL.pxs>110?0.5 : TL.pxs>52?1 : TL.pxs>26?2 : 5;
+  for(let t=0;t<=plan.total;t+=stepSec)
+    ruler.appendChild(el(`<div class="tk" style="left:${t*TL.pxs}px">${t%1===0?t:fmt(t,1)}</div>`));
+  ruler.onclick=e=>{ const r=ruler.getBoundingClientRect(); Playback.seek((e.clientX-r.left)/TL.pxs); render(); };
+
+  // video track
+  const vt=box.querySelector('[data-t=video]');
+  plan.shots.forEach(s=>{
+    const im=p.images.find(x=>x.id===s.imageId);
+    const c=el(`<div class="clip" data-sel="${App.sel.shot===s.shotId}"
+      style="left:${s.start*TL.pxs}px;width:${Math.max(s.duration*TL.pxs-2,3)}px">
+      ${im?.url?`<img src="${im.url}" alt="">`:""}
+      <span class="cl"><span>${String(s.index+1).padStart(2,"0")}</span>
+      <span>${fmt(s.duration,2)}s</span></span>
+      <span class="hnd r"></span></div>`);
+    c.onclick=e=>{ if(e.target.classList.contains("hnd")) return;
+      App.sel.shot=s.shotId; App.sel.graphic=null; Playback.seek(s.start); render(); };
+    c.querySelector(".hnd.r").onpointerdown=e=>startShotTrim(e,s);
+    vt.appendChild(c);
+  });
+
+  // graphics track
+  const gt=box.querySelector('[data-t=gfx]');
+  p.graphics.forEach(g=>{
+    const comp=GFX[g.componentId];
+    const c=el(`<div class="clip gfx" data-sel="${App.sel.graphic===g.id}"
+      style="left:${g.start*TL.pxs}px;width:${Math.max(g.duration*TL.pxs-2,8)}px">
+      <span class="cl"><span>${esc(comp?.name||g.componentId)}</span><span>${fmt(g.duration,1)}s</span></span>
+      <span class="hnd l"></span><span class="hnd r"></span></div>`);
+    c.onpointerdown=e=>{
+      App.sel.graphic=g.id; App.sel.shot=null;
+      if(e.target.classList.contains("hnd")) startGfxTrim(e,g,e.target.classList.contains("l")?"l":"r");
+      else startGfxMove(e,g);
+    };
+    gt.appendChild(c);
+  });
+
+  // music track
+  const mt=box.querySelector('[data-t=music]');
+  if(a){
+    const cv=el(`<canvas style="position:absolute;inset:4px 0;width:${W}px;height:44px"></canvas>`);
+    mt.appendChild(cv);
+    requestAnimationFrame(()=>{
+      const dpr=Math.min(devicePixelRatio||1,2);
+      cv.width=W*dpr; cv.height=44*dpr;
+      const ctx=cv.getContext("2d"), H=cv.height;
+      ctx.fillStyle="#2C3438";
+      const n=Math.min(a.peaks.length, Math.round(W/1.5));
+      for(let i=0;i<n;i++){
+        const t=i/n*plan.total; if(t>a.duration) break;
+        const pk=a.peaks[Math.floor(t/a.duration*a.peaks.length)]||0;
+        const x=t*TL.pxs*dpr, hh=pk*H*.42;
+        ctx.fillRect(x,H/2-hh,Math.max(dpr,1),hh*2);
+      }
+      for(const e of a.events){
+        if(e.strength<.6||e.type==="BEAT") continue;
+        if(e.t>plan.total) break;
+        ctx.fillStyle = e.type==="SECTION_START"?"#C2A25E":"rgba(147,183,206,.7)";
+        ctx.fillRect(e.t*TL.pxs*dpr, H*.62, dpr, H*.38);
+      }
+    });
+  } else mt.appendChild(el(`<div class="empty" style="padding:14px 12px;text-align:left">Ingen musik vald.</div>`));
+  return box;
+}
+
+function startGfxMove(e,g){
+  e.preventDefault();
+  const p=App.project, x0=e.clientX, s0=g.start;
+  App.snapshot("flytta grafik");
+  const move=ev=>{
+    let t=s0+(ev.clientX-x0)/TL.pxs;
+    if(App.snapOn) t=snapToEvent(t,0.3);
+    g.start=clamp(+t.toFixed(3),0,Math.max(p.plan.total-g.duration,0));
+    const c=ev.target.closest(".clip")||document.querySelector('.clip.gfx[data-sel=true]');
+    if(c) c.style.left=(g.start*TL.pxs)+"px";
+    Playback.draw();
+  };
+  const up=()=>{ document.removeEventListener("pointermove",move); document.removeEventListener("pointerup",up);
+    App.save(); render(); };
+  document.addEventListener("pointermove",move); document.addEventListener("pointerup",up);
+}
+function startGfxTrim(e,g,side){
+  e.preventDefault(); e.stopPropagation();
+  const p=App.project, x0=e.clientX, s0=g.start, d0=g.duration;
+  App.snapshot("trimma grafik");
+  const move=ev=>{
+    const dx=(ev.clientX-x0)/TL.pxs;
+    if(side==="r") g.duration=clamp(+(d0+dx).toFixed(3), g.enter+g.exit+0.3, p.plan.total-g.start);
+    else { const ns=clamp(+(s0+dx).toFixed(3),0,s0+d0-(g.enter+g.exit+0.3));
+      g.duration=+(d0+(s0-ns)).toFixed(3); g.start=ns; }
+    Playback.draw();
+  };
+  const up=()=>{ document.removeEventListener("pointermove",move); document.removeEventListener("pointerup",up);
+    App.save(); render(); };
+  document.addEventListener("pointermove",move); document.addEventListener("pointerup",up);
+}
+/* Trimming a shot ripples the rest of the film — the timeline stays contiguous
+   and the graphics keep their absolute positions against the music. */
+function startShotTrim(e,s){
+  e.preventDefault(); e.stopPropagation();
+  const p=App.project, x0=e.clientX, d0=s.duration;
+  App.snapshot("trimma shot");
+  const move=ev=>{
+    let d=clamp(+(d0+(ev.clientX-x0)/TL.pxs).toFixed(3), 1.0, 15);
+    if(App.snapOn && p.music?.analysis){
+      const snapped=snapToEvent(s.start+d,0.35); d=+(snapped-s.start).toFixed(3);
+      d=clamp(d,1.0,15);
+    }
+    s.duration=d; rippleShots();
+    const c=document.querySelector(`.clip[data-sel="true"]`);
+    if(c) c.style.width=Math.max(d*TL.pxs-2,3)+"px";
+    Playback.draw();
+  };
+  const up=()=>{ document.removeEventListener("pointermove",move); document.removeEventListener("pointerup",up);
+    App.save(); render(); };
+  document.addEventListener("pointermove",move); document.addEventListener("pointerup",up);
+}
+function rippleShots(){
+  const plan=App.project.plan; let t=0;
+  plan.shots.forEach(s=>{ s.start=+t.toFixed(3); s.end=+(t+s.duration).toFixed(3); t=s.end; });
+  plan.total=+t.toFixed(3);
+}
+
+/* ---- inspector ----------------------------------------------------------- */
+function editorInspector(){
+  const p=App.project;
+  const g=p.graphics.find(x=>x.id===App.sel.graphic);
+  if(g) return graphicInspector(g);
+  const s=p.plan.shots.find(x=>x.shotId===App.sel.shot);
+  if(s) return shotInspector(s);
+  return el(`<div class="empty">Välj ett klipp eller en grafik i timelinen.</div>`);
+}
+
+function shotInspector(s){
+  const p=App.project, im=p.images.find(x=>x.id===s.imageId);
+  const job=p.production?.snapshot?.jobs.find(j=>j.shotId===s.shotId);
+  const box=el(`<div class="stack lg">
+    <div class="igroup"><div class="h-sec">Shot ${String(s.index+1).padStart(2,"0")}</div>
+      <div class="irow"><span class="k">Bild</span><span class="v">${esc((im?.name||"").slice(0,18))}</span></div>
+      <div class="irow"><span class="k">Rum</span><span class="v">${ROOMS[im?.room]?.sv||"—"}</span></div>
+      <div class="irow"><span class="k">Start</span><span class="v">${fmt(s.start)} s</span></div>
+      <div class="irow"><span class="k">Längd</span><span class="v" style="color:var(--sel)">${fmt(s.duration)} s</span></div>
+      <div class="irow"><span class="k">Genererad</span><span class="v">${billedSeconds(p.output.model,s.duration)} s</span></div>
+      <div class="irow"><span class="k">Status</span><span class="v">${job?job.status:"—"}</span></div>
+    </div>
+    <div class="igroup"><div class="h-sec">Kamera</div>
+      <select data-f="m">${MOTION_KEYS.map(k=>`<option value="${k}" ${s.motion===k?"selected":""}>${MOTIONS[k].label}</option>`).join("")}</select>
+      <div class="faint mono" style="font-size:11px">"${esc(MOTIONS[s.motion].prompt)}"</div>
+    </div>
+    <div class="igroup"><div class="h-sec">Längd</div>
+      <input type="range" data-f="dur" min="${fmt(s.min,2)}" max="${fmt(Math.max(s.max,s.duration),2)}" step="0.01" value="${s.duration}">
+      <div class="row"><span class="faint mono" style="font-size:10.5px">${fmt(s.min,1)}s</span><div class="sp"></div>
+        <button class="btn xs" data-a="snap">Snap till musik</button></div>
+    </div>
+    <div class="row" style="gap:8px">
+      <button class="btn sm" data-a="regen" style="flex:1">Regenerera shot</button>
+      <button class="btn sm" data-a="view">Visa</button>
+    </div>
+  </div>`);
+  box.querySelector("[data-f=m]").onchange=e=>{
+    App.snapshot("kamera"); s.motion=e.target.value; if(im) im.motion=e.target.value; App.save(); render(); };
+  box.querySelector("[data-f=dur]").oninput=e=>{ s.duration=+e.target.value; rippleShots(); Playback.draw(); };
+  box.querySelector("[data-f=dur]").onchange=()=>{ App.save(); render(); };
+  box.querySelector("[data-a=snap]").onclick=()=>{
+    App.snapshot("snap"); const t=snapToEvent(s.start+s.duration,0.6);
+    s.duration=clamp(+(t-s.start).toFixed(3),1,15); rippleShots(); App.save(); render(); };
+  box.querySelector("[data-a=regen]").onclick=async ()=>{
+    if(!p.production){ toast("Ingen produktion att köra om i."); return; }
+    const run=await MotionAPI.retryShot(p.production.id,s.shotId);
+    p.production.snapshot=run; App.save(); pollProduction(); toast(`Regenererar shot ${s.index+1}`); };
+  box.querySelector("[data-a=view]").onclick=()=>{
+    const shot=p.production?.spec.shots.find(x=>x.shotId===s.shotId);
+    if(shot&&job) showShot(job,shot,im); else toast("Ingen output ännu."); };
+  return box;
+}
+
+function graphicInspector(g){
+  const p=App.project, comp=GFX[g.componentId];
+  const box=el(`<div class="stack lg">
+    <div class="igroup"><div class="row"><div class="h-sec">${esc(comp.name)}</div><div class="sp"></div>
+      <button class="btn xs danger" data-a="del">Ta bort</button></div>
+      <div class="faint" style="font-size:11px;line-height:1.5">${esc(comp.desc)}</div></div>
+
+    <div class="igroup"><div class="h-sec">Innehåll</div>${comp.fields.map(f=>`
+      <div class="field"><label>${f}</label><input type="text" data-c="${f}" value="${esc(g.content[f]??"")}"></div>`).join("")
+      || '<div class="faint" style="font-size:11px">Denna grafik hämtar allt från brandprofilen.</div>'}</div>
+
+    <div class="igroup"><div class="h-sec">Placering</div>
+      <div class="grid3" style="gap:3px">${ANCHOR_KEYS.map(k=>
+        `<button class="btn xs" data-anchor="${k}" style="${g.anchor===k?"border-color:var(--sel);color:var(--sel)":""};padding:7px 0" title="${k}"></button>`).join("")}</div>
+      <div class="grid2">
+        <div class="field"><label>X-offset %</label><input type="number" data-n="dx" value="${g.dx}" step="1"></div>
+        <div class="field"><label>Y-offset %</label><input type="number" data-n="dy" value="${g.dy}" step="1"></div>
+      </div>
+      <div class="field"><label>Skala ${Math.round(g.scale*100)} %</label>
+        <input type="range" data-n="scale" min="0.5" max="1.6" step="0.05" value="${g.scale}"></div>
+      <div class="seg">${[0.5,0.75,1,1.25,1.5].map(v=>
+        `<button data-scale="${v}" ${Math.abs(g.scale-v)<.01?'aria-pressed="true"':""}>${v*100}%</button>`).join("")}</div>
+    </div>
+
+    <div class="igroup"><div class="h-sec">Timing</div>
+      <div class="irow"><span class="k">Start</span><span class="v">${fmt(g.start)} s</span></div>
+      <div class="field"><label>Total ${fmt(g.duration,2)} s</label>
+        <input type="range" data-n="duration" min="1" max="${fmt(Math.max(p.plan.total-g.start,1.2),2)}" step="0.05" value="${g.duration}"></div>
+      <div class="grid2">
+        <div class="field"><label>Enter ${fmt(g.enter,2)}s</label><input type="range" data-n="enter" min="0.2" max="2.5" step="0.05" value="${g.enter}"></div>
+        <div class="field"><label>Exit ${fmt(g.exit,2)}s</label><input type="range" data-n="exit" min="0.15" max="2" step="0.05" value="${g.exit}"></div>
+      </div>
+      <div class="irow"><span class="k">Hold</span><span class="v">${fmt(Math.max(g.duration-g.enter-g.exit,0))} s</span></div>
+      <button class="btn xs" data-a="snapg">Snap start till musik</button>
+    </div>
+
+    <div class="igroup"><div class="h-sec">Avancerat</div>
+      <div class="field"><label>Opacitet ${Math.round(g.opacity*100)} %</label>
+        <input type="range" data-n="opacity" min="0.15" max="1" step="0.05" value="${g.opacity}"></div>
+      <div class="note" style="font-size:11px">Typsnitt och färg styrs av brandprofilen${p.brandLock?" och är låsta":""}.
+        Motion-familjen <b>${esc(FAMILIES[p.graphicFamily].label)}</b> styr konstruktion, linjevikt och easing.</div>
+    </div>
+  </div>`);
+
+  box.querySelectorAll("[data-c]").forEach(i=>i.onchange=()=>{
+    App.snapshot("grafikinnehåll"); g.content[i.dataset.c]=i.value; App.save(); Playback.draw(); });
+  box.querySelectorAll("[data-anchor]").forEach(btn=>btn.onclick=()=>{
+    App.snapshot("placering"); g.anchor=btn.dataset.anchor; App.save(); render(); });
+  box.querySelectorAll("[data-scale]").forEach(btn=>btn.onclick=()=>{
+    App.snapshot("skala"); g.scale=+btn.dataset.scale; App.save(); render(); });
+  box.querySelectorAll("[data-n]").forEach(i=>{
+    i.oninput=()=>{ g[i.dataset.n]=+i.value;
+      if(g.enter+g.exit>g.duration-0.2){ g.enter=Math.min(g.enter,(g.duration-0.2)*.6); g.exit=Math.min(g.exit,(g.duration-0.2)*.4); }
+      Playback.draw(); };
+    i.onchange=()=>{ App.save(); render(); };
+  });
+  box.querySelector("[data-a=snapg]").onclick=()=>{
+    App.snapshot("snap grafik"); g.start=+snapToEvent(g.start,0.9).toFixed(3); App.save(); render(); };
+  box.querySelector("[data-a=del]").onclick=()=>{
+    App.snapshot("ta bort grafik");
+    p.graphics=p.graphics.filter(x=>x.id!==g.id); App.sel.graphic=null; App.save(); render(); };
+  return box;
+}
+
+/* ==========================================================================
+   23. RENDER / EXPORT
+   The render spec is the durable artefact — a server-side renderer replays
+   exactly these draw calls. In the browser we also record the real canvas,
+   so what you export is literally what you previewed.
+   ========================================================================== */
+
+function buildRenderSpec(){
+  const p=App.project, plan=p.plan;
+  const [W,H]=ASPECTS[p.output.aspect];
+  return {
+    schema:"viewly.motion.render.v1", projectId:p.id,
+    output:{width:W,height:H,fps:30,duration:plan.total,aspect:p.output.aspect},
+    audio: p.music ? {trackId:p.music.trackId, title:p.music.title, offset:0} : null,
+    video: plan.shots.map(s=>({shotId:s.shotId, start:s.start, duration:s.duration,
+      source:{kind: p.production?.snapshot?.jobs.find(j=>j.shotId===s.shotId)?.resultUrl ? "generated":"still",
+        url: p.production?.snapshot?.jobs.find(j=>j.shotId===s.shotId)?.resultUrl || null,
+        imageId:s.imageId},
+      cameraMotion:s.motion, trimIn:s.trimIn||0})),
+    graphics: p.graphics.map(g=>({...g})),
+    brand:{brandId:p.brandId, lock:p.brandLock, family:p.graphicFamily, density:p.graphicDensity}
+  };
+}
+
+async function exportRender(){
+  const p=App.project, spec=buildRenderSpec();
+  const m=el(`<div class="modal"><div class="modalbox">
+    <div class="h-page">Exportera</div>
+    <div class="row" style="gap:8px">
+      <button class="btn primary" data-a="rec">Rendera i webbläsaren</button>
+      <button class="btn" data-a="spec">Visa render spec</button>
+    </div>
+    <div class="note info" style="font-size:11.5px">Renderingen ritar exakt samma anrop som previewen —
+    samma koordinater, typsnitt, easing och radbrytningar — och spelar in canvasen plus musiken till en WebM-fil.
+    För leverans i H.264 kör samma <code>render spec</code> server-side.
+    Nedladdningslänken fungerar på en egen domän; i en sandboxad förhandsvisning blockerar
+    webbläsaren nedladdningar, men filen går att spela upp direkt här.</div>
+    <div data-r="status" class="mono" style="font-size:11.5px;color:var(--muted)"></div>
+    <div class="row"><div class="sp"></div><button class="btn ghost" data-a="close">Stäng</button></div>
+  </div></div>`);
+  m.querySelector("[data-a=close]").onclick=()=>m.remove();
+  m.onclick=e=>{if(e.target===m)m.remove();};
+  m.querySelector("[data-a=spec]").onclick=()=>{ m.remove(); showSpec(spec); };
+  m.querySelector("[data-a=rec]").onclick=()=>recordFilm(m.querySelector("[data-r=status]"));
+  document.body.appendChild(m);
+}
+
+async function recordFilm(status){
+  const p=App.project, plan=p.plan;
+  const [W,H]=previewSize(p.output.aspect, 1080);
+  const cv=document.createElement("canvas"); cv.width=W; cv.height=H;
+  const ctx=cv.getContext("2d");
+  const fps=30, brand=currentBrand();
+  const stream=cv.captureStream(fps);
+  const ac=Playback.ac();
+  let srcNode=null;
+  if(App.audio.buffer){
+    const dest=ac.createMediaStreamDestination();
+    srcNode=ac.createBufferSource(); srcNode.buffer=App.audio.buffer;
+    srcNode.connect(dest); srcNode.connect(ac.destination);
+    dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));
+  }
+  const mime=["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm"]
+    .find(t=>MediaRecorder.isTypeSupported(t));
+  if(!mime){ status.textContent="Webbläsaren stöder inte MediaRecorder."; return; }
+  const rec=new MediaRecorder(stream,{mimeType:mime, videoBitsPerSecond:9_000_000});
+  const chunks=[];
+  rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+  rec.onstop=()=>{
+    const blob=new Blob(chunks,{type:mime});
+    const url=URL.createObjectURL(blob);
+    status.innerHTML=`Klar · ${(blob.size/1e6).toFixed(1)} MB`;
+    const a=document.createElement("a");
+    a.href=url; a.download=`${(p.property.address||p.name).replace(/\s+/g,"-").toLowerCase()}-motion.webm`;
+    a.textContent="Ladda ner filmen"; a.className="btn primary"; a.style.marginTop="8px";
+    a.style.display="inline-flex"; a.style.textDecoration="none";
+    status.appendChild(document.createElement("br")); status.appendChild(a);
+    const v=document.createElement("video"); v.src=url; v.controls=true;
+    v.style.cssText="width:100%;margin-top:10px;border:1px solid var(--line);border-radius:3px";
+    status.appendChild(v);
+  };
+
+  status.textContent="Renderar…";
+  rec.start();
+  try{ srcNode?.start(); }catch{}
+  const t0=performance.now();
+  const frame=()=>{
+    const t=(performance.now()-t0)/1000;
+    if(t>=plan.total){ rec.stop(); try{srcNode?.stop();}catch{} return; }
+    const s=plan.shots.find(x=>t>=x.start&&t<x.end) || plan.shots[plan.shots.length-1];
+    const im=p.images.find(i=>i.id===s.imageId);
+    drawShot(ctx,W,H,im?.el,s.motion,clamp((t-s.start)/s.duration,0,1),
+      {intensity:DIRECTIONS[p.direction].motionIntensity});
+    drawGraphics(ctx,W,H,t,p,brand,{logo:App.logoImg,broker:App.brokerImg});
+    status.textContent=`Renderar… ${Math.round(t/plan.total*100)} %`;
+    requestAnimationFrame(frame);
+  };
+  frame();
+}
+
+/* ==========================================================================
+   24. BOOT
+   ========================================================================== */
+
+document.addEventListener("keydown",e=>{
+  if(/input|select|textarea/i.test(e.target.tagName)) return;
+  if(e.code==="Space" && App.project && ["timing","editor"].includes(App.project.step)){
+    e.preventDefault(); Playback.toggle(); }
+  if((e.metaKey||e.ctrlKey) && e.key==="z"){ e.preventDefault();
+    e.shiftKey ? App.restore(App.redo,App.undo) : App.restore(App.undo,App.redo); }
+});
+window.addEventListener("resize",()=>{ if(App.view!=="projects") render(); });
+
+(async function boot(){
+  App.data.tracks ||= [];
+  App.data.brands ||= {};
+  render();
+})();
+</script>
