@@ -3276,6 +3276,52 @@ window.addEventListener("resize",()=>{ if(App.view!=="projects") render(); });
 (async function boot(){
   App.data.tracks ||= [];
   App.data.brands ||= {};
+
+  // Auto-discover and load music files from /music/ folder
+  try {
+    const manifest = [
+      { name: "Luxury Real Estate 1", file: "f38fa16a-andriihluxuryrealestatemusic575826.mp3" },
+      { name: "Luxury Real Estate 2", file: "1a938918-andriihluxuryrealestatemusic580081.mp3" },
+      { name: "Real Estate Beats", file: "e888a811-apalonbeatsrealestateluxurymusic540589.mp3" },
+      { name: "Piano Luxe 1", file: "d0713554-leberchpiano580522.mp3" },
+      { name: "Piano Luxe 2", file: "9171c754-maksymmalkopianopianomusic594917.mp3" }
+    ];
+
+    for (const meta of manifest) {
+      const exists = App.data.tracks.some(t => t.title === meta.name);
+      if (!exists) {
+        try {
+          const resp = await fetch(`./music/${meta.file}`);
+          if (resp.ok) {
+            const blob = await resp.blob();
+            const id = "trk_" + uid();
+            const blobKey = `track/${id}`;
+            await Blobs.put(blobKey, blob);
+
+            const t = {
+              id, blobKey, title: meta.name, style: STYLES[0],
+              instrumentation: "", analysis: null, addedAt: Date.now()
+            };
+            App.data.tracks.push(t);
+
+            // Analyze in background
+            decodeBlob(blob).then(buf => {
+              t.analysis = analyseBuffer(buf);
+              t.instrumentation = t.analysis.bpm < 95 ? "Långsam · få transienter"
+                : t.analysis.bpm < 125 ? "Medeltempo · tydlig puls" : "Snabb · tät rytm";
+              Store.write(App.data);
+            }).catch(err => console.error("Music analysis failed:", meta.name, err));
+          }
+        } catch (err) {
+          console.error("Music load error:", meta.name, err);
+        }
+      }
+    }
+    Store.write(App.data);
+  } catch (err) {
+    console.error("Music discovery error:", err);
+  }
+
   render();
 })();
 </script>
