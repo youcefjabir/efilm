@@ -147,22 +147,32 @@ var HL = [
   ]},
 
  /* 08 — MOTION. Egen sida på viewly.se, eget kapitel här.
-    Poängen är att ingen extra filmning sker — det måste ramas tydligt. */
+    Poängen är att ingen extra filmning sker — det måste ramas tydligt.
+    Statistiken och de tre skälen är hämtade direkt från viewly.se/bostadsfilm,
+    inte uppskattade — de är sidans egna påståenden om effekt. */
  {glyph:"motion", id:"motion", num:"08", name:"MOTION", label:"Motion", cover:"dining",
-  q:"Vad kan jag skapa?", why:"Bostadsfilm byggd av fotograferingen. Säljer resultatet — aldrig tekniken bakom.",
+  q:"Vad kan jag skapa?", why:"Bostadsfilm byggd av fotograferingen. Säljer resultatet — aldrig tekniken bakom. Utökad med sidans egna siffror och tre konkreta skäl.",
   st:[
    {p:"mark", m:"dining", k:"MOTION", h:"Bostadsfilm", s:"utan en separat filmning.",
     need:"Nyckelbildruta ur faktisk Motion-film."},
-   {p:"quiet", h:"Bilderna finns redan.", em:"Filmen är nästa steg.", k:"08 — Motion"},
+   {p:"quiet", h:"En annons som spekulanter sparar,", em:"delar och kommer tillbaka till.",
+    s:"Bilderna finns redan — filmen är nästa steg.", k:"08 — Motion"},
    {p:"split", m:["living","dining"], la:"Stillbild", lb:"Rörligt", k:"Samma material", h:"Ny puls",
     need:"Motion-frame som B-sida, inte en andra stillbild."},
    {p:"system", k:"Så byggs filmen", h:"Fyra steg.", s:"Naturliga kamerarörelser, genomtänkt klippning och musik som lyfter helheten.",
     items:["Bilderna","Rörelsen","Redigeringen","Filmen"]},
+   {p:"system", k:"Effekten, mätt", h:"Rörlig bild presterar.",
+    items:["31% fler sparningar","44% mer visningsintresse","76% fler delningar","350%+ fler videoöppningar i galleriet"],
+    s:"Branschdata för videoannonserade bostäder."},
    {p:"matrix", m:"dining2", k:"Format", h:"En film, tre format.",
     fmts:[["9:16","Story",9,16],["1:1","Kvadrat",1,1],["4:5","Inlägg",4,5]],
     s:"Samma klipp genom hela kanalen.",
     need:"Faktisk motion-frame med synlig rörelseoskärpa."},
-   {p:"quiet", h:"Kostar ingen extra fotografering.", em:"Syns i flödet.", s:"Ger bostaden sammanhang.", k:"08 — Motion"},
+   {p:"chain", k:"Varför Motion gör skillnad", h:"Tre skäl, inte bara ett.", now:2,
+    items:[["Syns i flödet","Rörlig bild prioriteras i sociala kanaler och stannar blicken längre än en stillbild."],
+           ["Ger sammanhang","Filmen visar hur rummen hänger ihop, i vilken ordning man rör sig och hur ljuset faller."],
+           ["Kostnadseffektiv","Bygger på befintligt material — ingen extra fotografering."]],
+    s:"Samma fotografering. En ny yta att synas på."},
    {p:"cta", h:"Låt bostaden ta plats i rörelse.", s:"Beställ Motion", k:"08 — Motion"}
   ]},
 

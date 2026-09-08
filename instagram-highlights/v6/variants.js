@@ -267,17 +267,23 @@ ALTS = {
  {p:"product", m:"dining", k:"Så byggs filmen", h:"Bilderna blir en berättelse.",
   s:"Rörelse, klippning och musik — i den ordningen."}],
 "motion-4":[
+ {p:"quiet", h:"Rörligt vinner uppmärksamheten.", em:"Mätt, inte antaget.",
+  s:"31–350 procent bättre utfall i varje mått som räknas."},
+ {p:"chain", k:"Effekten, mätt", h:"Fyra siffror.", now:3,
+  items:[["31%","fler sparningar"],["44%","mer visningsintresse"],["76%","fler delningar"],["350%+","fler videoöppningar i galleriet"]],
+  s:"Branschdata för videoannonserade bostäder."}],
+"motion-5":[
  {p:"system", k:"Format", h:"En film, tre format.", s:"Samma klipp genom hela kanalen.",
   items:["9:16 — Story och Reel","1:1 — Kvadrat i flödet","4:5 — Inlägg"]},
  {p:"matrix", m:"living", k:"Format", h:"Ett klipp, alla ytor.",
   fmts:[["9:16","Reel",9,16],["4:5","Inlägg",4,5],["1:1","Kvadrat",1,1]],
   s:"Instagram, Facebook och LinkedIn ur samma film."}],
-"motion-5":[
+"motion-6":[
  {p:"system", k:"Varför", h:"Tre skäl.", s:"Utan en extra produktionsdag.",
   items:["Syns i flödet","Ger bostaden sammanhang","Kostar ingen extra fotografering"]},
  {p:"editorial", m:"dining", k:"Varför", h:"Kostar ingen extra fotografering.",
   s:"Rörligt syns i flödet där stillbilden scrollas förbi — och bostaden får sammanhang."}],
-"motion-6":[
+"motion-7":[
  {p:"cta", k:"08 — Motion", h:"Beställ Motion", s:"Byggs av fotograferingen"},
  {p:"quiet", k:"08 — Motion", h:"Låt bostaden ta plats.", em:"I rörelse.", s:"viewly.se/motion"}],
 
