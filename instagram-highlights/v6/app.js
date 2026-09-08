@@ -66,34 +66,29 @@ function xhtml(html, w, h, bgc){
   return new XMLSerializer().serializeToString(d);
 }
 /* ---------------------------------------------------------------------
-   TYPSNITTEN LADDAS EN GANG, INTE PER BILDRUTA
+   TYPSNITTEN MASTE LIGGA SOM BASE64, INTE BLOB-URL
 
-   VFONTS ar 127 kB base64 och bakades in i VARJE bildrutas SVG. En video
-   pa 8,4 sekunder i 30 rutor per sekund lat alltsa webblasaren avkoda och
-   tolka samma tva typsnitt 252 ganger. Uppmatt kostade det omkring en
-   tredjedel av tiden per ruta.
+   Detta var tidigare en blob-URL, cachad en gang för att slippa avkoda
+   127 kB base64 i varje bildrutas SVG. Det sänkte SVG-strängen från
+   221 kB till 95 kB — mätt, inte antaget.
 
-   Som blob-URL laddas typsnittet en gang och cachas over alla
-   SVG-dokument, eftersom URL:en ar identisk varje gang. SVG-strangen
-   krymper samtidigt fran 221 kB till 95 kB, vilket ocksa kapar
-   serialiseringen.
+   Men optimeringen var trasig: SVG:n laddas som en data-URL i en <img>,
+   och den bilden får ett eget opakt origin. Ett @font-face som pekar på
+   en blob-URL (som hör till dokumentets eget origin) går då inte att
+   läsa, och typsnittet tystnar tillbaka till webbläsarens fallback-serif
+   — synligt tjockare än Cormorant Garamond. Studion (som ritar text
+   direkt i DOM:en, inget <img>-steg) visade rätt typsnitt hela tiden,
+   så felet syntes bara i nedladdningar. Bekräftat genom att rendera
+   samma SVG med båda varianterna och jämföra pixlarna.
 
-   Sjalva SVG:n maste daremot ligga kvar som data-URL. Med blob-URL aven
-   dar smittas canvasen och gar inte langre att exportera — mätt, inte
-   antaget.
+   En data-URL för hela SVG:n måste den vara — med blob-URL där också
+   smittas canvasen och exporten går inte längre att göra alls. Så
+   base64 för typsnittet är det enda korrekta valet i den här kedjan.
    --------------------------------------------------------------------- */
 var VFONT_CSS = null;
 function fontCSS(){
   if(VFONT_CSS != null) return VFONT_CSS;
-  var raw = window.VFONTS || "";
-  try {
-    VFONT_CSS = raw.replace(/url\(data:([^;]+);base64,([A-Za-z0-9+/=]+)\)/g,
-      function(m, mime, b64){
-        var bin = atob(b64), n = bin.length, u8 = new Uint8Array(n);
-        for(var i = 0; i < n; i++) u8[i] = bin.charCodeAt(i);
-        return "url(" + URL.createObjectURL(new Blob([u8], {type:mime})) + ")";
-      });
-  } catch(e){ VFONT_CSS = raw }     /* faller tillbaka pa base64 */
+  VFONT_CSS = window.VFONTS || "";
   return VFONT_CSS;
 }
 function svgDoc(w, h, body, extraCSS){
