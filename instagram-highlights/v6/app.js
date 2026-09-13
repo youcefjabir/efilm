@@ -96,16 +96,41 @@ function svgDoc(w, h, body, extraCSS){
    +'<style type="text/css">/*<![CDATA[*/'+fontCSS()+FRAMECSS+CSS+(extraCSS||"")+'/*]]>*/</style>'
    + body +'</svg>';
 }
+/* ---------------------------------------------------------------------
+   img.onload RÄCKER INTE FÖR EN SVG MED INBÄDDAT TYPSNITT
+
+   WebKit (Safaris motor, alltså iPhone) kan avfyra onload för en
+   data-URL-SVG innan det inbäddade @font-face hunnit läsas in, eftersom
+   onload bara kräver att bildens mått är kända — inte att allt inuti är
+   färdigrenderat. drawImage() hinner då rita av en ruta där texten
+   fortfarande visas i webbläsarens fallback-typsnitt, och den fela
+   ktiga bilden fryses permanent i den exporterade PNG:n. Chromium (där
+   det här testats) råkar inte visa buggen alls, vilket gjorde den osynlig
+   här — men syntes direkt i riktiga nedladdningar på iPhone: rätt
+   typsnitt i studion, tjockare typsnitt i den sparade filen.
+
+   img.decode() är till för exakt det här — löftet går inte igenom
+   förrän bilden är helt avkodad och säker att rita, inklusive det den
+   själv beror på. Onload finns kvar som reserv för webbläsare utan
+   decode(). */
 function rasterize(svg, w, h){
   return new Promise(function(res, rej){
     var img = new Image();
-    img.onload = function(){
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    var draw = function(){
       var c = document.createElement("canvas"); c.width = w; c.height = h;
       c.getContext("2d").drawImage(img, 0, 0, w, h);
       c.toBlob(function(b){ b ? res(b) : rej(new Error("toBlob")) }, "image/png");
     };
-    img.onerror = function(){ rej(new Error("rasterize")) };
-    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+    if(img.decode){
+      img.decode().then(draw, function(){
+        img.onload = draw;
+        img.onerror = function(){ rej(new Error("rasterize")) };
+      });
+    } else {
+      img.onload = draw;
+      img.onerror = function(){ rej(new Error("rasterize")) };
+    }
   });
 }
 /* en ram i full Story-upplösning */
