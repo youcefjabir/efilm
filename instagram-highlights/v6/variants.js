@@ -273,17 +273,18 @@ ALTS = {
   items:[["31%","fler sparningar"],["44%","mer visningsintresse"],["76%","fler delningar"],["350%+","fler videoöppningar i galleriet"]],
   s:"Branschdata för videoannonserade bostäder."}],
 "motion-5":[
- {p:"system", k:"Format", h:"En film, tre format.", s:"Samma klipp genom hela kanalen.",
-  items:["9:16 — Story och Reel","1:1 — Kvadrat i flödet","4:5 — Inlägg"]},
- {p:"matrix", m:"living", k:"Format", h:"Ett klipp, alla ytor.",
-  fmts:[["9:16","Reel",9,16],["4:5","Inlägg",4,5],["1:1","Kvadrat",1,1]],
-  s:"Instagram, Facebook och LinkedIn ur samma film."}],
+ {p:"system", k:"Format", h:"En film, alla ytor.", s:"Samma klipp, tre proportioner.",
+  items:["9:16 — Story","16:9 — Liggande","3:4 — Inlägg"]},
+ {p:"quiet", h:"Ett klipp.", em:"Tre format, redo direkt.", s:"Story, liggande och inlägg — inget klipps om i efterhand."}],
 "motion-6":[
+ {p:"quiet", h:"Inte Viewlys avsändare.", em:"Ert.", s:"Logotyp, färger och typsnitt är kontorets och mäklarens — på varje film."},
+ {p:"editorial", m:"dining", k:"Varumärket", h:"Samma avsändare som resten.", s:"Filmen ser ut som er, inte som en leverantörs."}],
+"motion-7":[
  {p:"system", k:"Varför", h:"Tre skäl.", s:"Utan en extra produktionsdag.",
   items:["Syns i flödet","Ger bostaden sammanhang","Kostar ingen extra fotografering"]},
  {p:"editorial", m:"dining", k:"Varför", h:"Kostar ingen extra fotografering.",
   s:"Rörligt syns i flödet där stillbilden scrollas förbi — och bostaden får sammanhang."}],
-"motion-7":[
+"motion-8":[
  {p:"cta", k:"08 — Motion", h:"Beställ Motion", s:"Byggs av fotograferingen"},
  {p:"quiet", k:"08 — Motion", h:"Låt bostaden ta plats.", em:"I rörelse.", s:"viewly.se/motion"}],
 

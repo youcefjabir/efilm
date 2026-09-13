@@ -1215,9 +1215,23 @@ A.flow = function(s,i,n){
    +'</div></div>');
 };
 
+/* Höjden får inte vara fast: tre smala format (9:16/1:1/4:5) och tre
+   där ett är liggande (9:16/16:9/3:4) tar helt olika bredd i rad. Ett
+   fast H=33 lät ett liggande kort gå utanför ramen, obemärkt tills
+   man faktiskt exporterade rutan och mätte pixlarna. Höjden räknas nu
+   ut från formatens sammanlagda breddbehov, och krymper bara när
+   formaten kräver det — annars samma 33cqw som förut. */
+function matrixH(fmts, gap, maxH){
+  maxH = maxH || 33;
+  var sum = fmts.reduce(function(a,f){ return a + f[2]/f[3] }, 0);
+  var budget = 90 - gap*(fmts.length-1);        /* 90, inte 100 — lämnar samma
+    sidmarginal som resten av ramen i stället för att gå ut i kant */
+  return Math.min(maxH, budget/sum);
+}
+
 /* 11 · MATRIX — samma objekt i sanna formatproportioner */
 A.matrix = function(s,i,n){
-  var H = 33;                                   /* gemensam höjd — bredden blir formatet */
+  var H = matrixH(s.fmts, 2.6);                 /* gemensam höjd — bredden blir formatet */
   var cells = s.fmts.map(function(f){
     var w = (H*f[2]/f[3]).toFixed(1);
     return '<div style="display:flex;flex-direction:column;gap:1.5cqw;flex:0 0 auto">'
@@ -1284,7 +1298,7 @@ B.flow = function(s,i,n){
 };
 
 B.matrix = function(s,i,n){
-  var H = 33;
+  var H = matrixH(s.fmts, 2.4);
   var cells = s.fmts.map(function(f){
     var w = (H*f[2]/f[3]).toFixed(1);
     return '<div style="display:flex;flex-direction:column;gap:1.4cqw;flex:0 0 auto">'

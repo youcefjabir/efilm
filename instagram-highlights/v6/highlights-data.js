@@ -11,9 +11,11 @@
    ligger som egna kapitel efter dem. Kapitel 01 är index, 11–14 är
    kontext: systemet, beviset, människorna och bostadsägaren.
 
-   Två tjänster levereras i KUNDENS varumärke — 3D-visningssidan och
-   områdeskartan. Det står uttryckligen på båda sidorna och är därför
-   ritat, inte påstått: primitivet whitelabel.
+   Tre tjänster levereras i KUNDENS varumärke — 3D-visningssidan,
+   områdeskartan och Motion. De två förstnämnda står uttryckligen på sina
+   sidor och är därför ritade, inte påstådda. Motion-brandingen står INTE
+   på viewly.se/bostadsfilm — den är bekräftad direkt av uppdragsgivaren,
+   inte verifierad mot sidan. Alla tre använder primitivet whitelabel.
 
    Alla rubriker och texter är förslag och riktning, inte låsta krav.
    `need` markerar var biblioteket saknar bild — inte var designen brister.
@@ -149,31 +151,41 @@ var HL = [
  /* 08 — MOTION. Egen sida på viewly.se, eget kapitel här.
     Poängen är att ingen extra filmning sker — det måste ramas tydligt.
     Statistiken och de tre skälen är hämtade direkt från viewly.se/bostadsfilm,
-    inte uppskattade — de är sidans egna påståenden om effekt. */
+    inte uppskattade — de är sidans egna påståenden om effekt.
+
+    Format och varumärke är INTE hämtade från viewly.se/bostadsfilm — sidan
+    nämner varken bildformat eller branding. Båda är bekräftade direkt av
+    uppdragsgivaren: filmen levereras i tre format (9:16 story, 16:9 liggande,
+    3:4 inlägg — alla tre ingår, inte ett urval) och i kontorets och
+    mäklarens eget varumärke, som 3D-visningen och områdeskartan. Motion är
+    därför en tredje tjänst i whitelabel, inte bara två — se filhuvudet ovan. */
  {glyph:"motion", id:"motion", num:"08", name:"MOTION", label:"Motion", cover:"dining",
-  q:"Vad kan jag skapa?", why:"Bostadsfilm byggd av fotograferingen. Säljer resultatet — aldrig tekniken bakom. Utökad med sidans egna siffror och tre konkreta skäl.",
+  q:"Vad kan jag skapa?", why:"Bostadsfilm byggd av fotograferingen. Säljer resultatet — aldrig tekniken bakom. Skärpt för mer pondus, med rätt format (alla tre, inte ett urval) och den brandade leveransen, som tidigare saknades helt.",
   st:[
-   {p:"mark", m:"dining", k:"MOTION", h:"Bostadsfilm", s:"utan en separat filmning.",
+   {p:"mark", m:"dining", k:"MOTION", h:"Bostaden i rörelse.", s:"Ingen extra fotografering. En starkare annons.",
     need:"Nyckelbildruta ur faktisk Motion-film."},
    {p:"quiet", h:"En annons som spekulanter sparar,", em:"delar och kommer tillbaka till.",
     s:"Bilderna finns redan — filmen är nästa steg.", k:"08 — Motion"},
-   {p:"split", m:["living","dining"], la:"Stillbild", lb:"Rörligt", k:"Samma material", h:"Ny puls",
+   {p:"split", m:["dining","dining"], la:"Stillbild", lb:"I rörelse", k:"Samma fotografering", h:"Stillbilden blir film.",
     need:"Motion-frame som B-sida, inte en andra stillbild."},
-   {p:"system", k:"Så byggs filmen", h:"Fyra steg.", s:"Naturliga kamerarörelser, genomtänkt klippning och musik som lyfter helheten.",
+   {p:"system", k:"Så byggs filmen", h:"Fyra steg, inte fyrtio.", s:"Naturliga kamerarörelser, skarp klippning och musik som binder ihop helheten.",
     items:["Bilderna","Rörelsen","Redigeringen","Filmen"]},
    {p:"system", k:"Effekten, mätt", h:"Rörlig bild presterar.",
     items:["31% fler sparningar","44% mer visningsintresse","76% fler delningar","350%+ fler videoöppningar i galleriet"],
     s:"Branschdata för videoannonserade bostäder."},
-   {p:"matrix", m:"dining2", k:"Format", h:"En film, tre format.",
-    fmts:[["9:16","Story",9,16],["1:1","Kvadrat",1,1],["4:5","Inlägg",4,5]],
-    s:"Samma klipp genom hela kanalen.",
-    need:"Faktisk motion-frame med synlig rörelseoskärpa."},
+   {p:"matrix", m:"dining2", k:"Format", h:"Tre format. Alla ingår.",
+    fmts:[["9:16","Story",9,16],["16:9","Liggande",16,9],["3:4","Inlägg",3,4]],
+    s:"Story, liggande och inlägg — från samma klipp, redo för varje yta.",
+    need:"Faktisk motion-frame med synlig rörelseoskärpa, i alla tre format."},
+   {p:"whitelabel", m:"dining", k:"Levereras i ert varumärke", h:"Er logotyp. Inte vår.",
+    s:"Kontorets och mäklarens varumärke på varje film — samma leverans, oavsett format.",
+    brands:[["Nordvik","#1F3A2E","Se filmen"],["Alvhem","#7A3B2E","Se filmen","'Cormorant Garamond',Georgia,serif",999]]},
    {p:"chain", k:"Varför Motion gör skillnad", h:"Tre skäl, inte bara ett.", now:2,
     items:[["Syns i flödet","Rörlig bild prioriteras i sociala kanaler och stannar blicken längre än en stillbild."],
            ["Ger sammanhang","Filmen visar hur rummen hänger ihop, i vilken ordning man rör sig och hur ljuset faller."],
            ["Kostnadseffektiv","Bygger på befintligt material — ingen extra fotografering."]],
     s:"Samma fotografering. En ny yta att synas på."},
-   {p:"cta", h:"Låt bostaden ta plats i rörelse.", s:"Beställ Motion", k:"08 — Motion"}
+   {p:"cta", h:"Sätt bostaden i rörelse.", s:"Beställ Motion", k:"08 — Motion"}
   ]},
 
  /* 09 — ANNONSSKRIVAREN. App, inte tjänst. Eget kapitel: texten.
