@@ -273,9 +273,11 @@ ALTS = {
   items:[["31%","fler sparningar"],["44%","mer visningsintresse"],["76%","fler delningar"],["350%+","fler videoöppningar i galleriet"]],
   s:"Branschdata för videoannonserade bostäder."}],
 "motion-5":[
- {p:"system", k:"Format", h:"En film, alla ytor.", s:"Samma klipp, tre proportioner.",
-  items:["9:16 — Story","16:9 — Liggande","3:4 — Inlägg"]},
- {p:"quiet", h:"Ett klipp.", em:"Tre format, redo direkt.", s:"Story, liggande och inlägg — inget klipps om i efterhand."}],
+ {p:"system", k:"Format", h:"Alla tre. Alltid.", s:"Inget tillval — ingår i varje beställning.",
+  items:["9:16 Story — för sociala medier","16:9 Liggande — för bostadsannonsen","3:4 Inlägg — för sociala medier"]},
+ {p:"matrix", m:"dining2", k:"Format", h:"Samma film, tre proportioner.",
+  fmts:[["9:16","Story",9,16],["16:9","Liggande",16,9],["3:4","Inlägg",3,4]],
+  s:"Bostadsannonsen och sociala medier — samtidigt, ur samma klipp."}],
 "motion-6":[
  {p:"quiet", h:"Inte Viewlys avsändare.", em:"Ert.", s:"Logotyp, färger och typsnitt är kontorets och mäklarens — på varje film."},
  {p:"editorial", m:"dining", k:"Varumärket", h:"Samma avsändare som resten.", s:"Filmen ser ut som er, inte som en leverantörs."}],

@@ -160,9 +160,9 @@ var HL = [
     mäklarens eget varumärke, som 3D-visningen och områdeskartan. Motion är
     därför en tredje tjänst i whitelabel, inte bara två — se filhuvudet ovan. */
  {glyph:"motion", id:"motion", num:"08", name:"MOTION", label:"Motion", cover:"dining",
-  q:"Vad kan jag skapa?", why:"Bostadsfilm byggd av fotograferingen. Säljer resultatet — aldrig tekniken bakom. Skärpt för mer pondus, med rätt format (alla tre, inte ett urval) och den brandade leveransen, som tidigare saknades helt.",
+  q:"Vad kan jag skapa?", why:"Bostadsfilm byggd av fotograferingen. Säljer resultatet — aldrig tekniken bakom. Två budskap som tidigare inte gick fram alls: att det är EN film, byggd av bilderna (inte en separat inspelning), och att alla tre format ingår samtidigt i varje beställning — redo för både bostadsannonsen och sociala medier, inte ett urval eller ett tillval.",
   st:[
-   {p:"mark", m:"dining", k:"MOTION", h:"Bostaden i rörelse.", s:"Ingen extra fotografering. En starkare annons.",
+   {p:"mark", m:"dining", k:"MOTION", h:"En film. Byggd av era bilder.", s:"Ingen extra fotografering — bilderna blir video.",
     need:"Nyckelbildruta ur faktisk Motion-film."},
    {p:"quiet", h:"En annons som spekulanter sparar,", em:"delar och kommer tillbaka till.",
     s:"Bilderna finns redan — filmen är nästa steg.", k:"08 — Motion"},
@@ -173,10 +173,11 @@ var HL = [
    {p:"system", k:"Effekten, mätt", h:"Rörlig bild presterar.",
     items:["31% fler sparningar","44% mer visningsintresse","76% fler delningar","350%+ fler videoöppningar i galleriet"],
     s:"Branschdata för videoannonserade bostäder."},
-   {p:"matrix", m:"dining2", k:"Format", h:"Tre format. Alla ingår.",
-    fmts:[["9:16","Story",9,16],["16:9","Liggande",16,9],["3:4","Inlägg",3,4]],
-    s:"Story, liggande och inlägg — från samma klipp, redo för varje yta.",
-    need:"Faktisk motion-frame med synlig rörelseoskärpa, i alla tre format."},
+   {p:"chain", k:"Format", h:"En film. Tre format. Samtidigt.", now:2,
+    items:[["9:16 — Story","Instagram och Facebook Stories — och som vertikal annons i flödet."],
+           ["16:9 — Liggande","Bostadsannonsen och hemsidan — samma format som portalens bilder."],
+           ["3:4 — Inlägg","Flödet på Instagram och Facebook."]],
+    s:"Inget tillval — alla tre ingår i varje beställning, redo för både bostadsannonsen och sociala medier."},
    {p:"whitelabel", m:"dining", k:"Levereras i ert varumärke", h:"Er logotyp. Inte vår.",
     s:"Kontorets och mäklarens varumärke på varje film — samma leverans, oavsett format.",
     brands:[["Nordvik","#1F3A2E","Se filmen"],["Alvhem","#7A3B2E","Se filmen","'Cormorant Garamond',Georgia,serif",999]]},
