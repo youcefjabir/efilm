@@ -1,28 +1,23 @@
 /* =====================================================================
    ADS 3 — del B: scener, kompositioner, statiska annonser
 
-   Berättelsen, i den ordning en mäklare tar in den:
-     1. Fotona är bra.                          (foto först)
-     2. De är levererade. I Mäklarportalen:
-          Välj bild.  Välj mall.  Uppgifterna hämtas automatiskt.
-     3. Inlägget är klart, i kontorets egen profil.
-     4. Klart i alla format. Mer tid över.       (budskapet, inte ordagrant)
-     5. Varumärket, en egen sekund.              (slutkort)
+   Berättelsen: fotona är bra → de levereras → i Mäklarportalen ligger
+   bostadens uppgifter redan på leveranssidan, man väljer bild och mall →
+   inlägget fylls med uppgifterna, i kontorets egen profil → varumärket.
 
-   Färgerna är Viewlys egna: papper, ink, oliv, och varmt svart. Inget
-   blått och inget guld. Kontorets färger (exempelkontoret Nordvik) syns
-   bara i inlägget, där de hör hemma.
+   Färgerna är Viewlys egna: papper, ink, oliv och varmt svart. Kontorets
+   färger (exempelkontoret Nordvik) syns bara i inlägget.
 
-   Allt som ritas ligger innanför bilden och, i 9:16, innanför ytan som
-   Instagrams eget gränssnitt inte täcker.
+   Allt ligger innanför bilden och, i 9:16, innanför Instagrams säkra yta.
    ===================================================================== */
 
 function v3Geo(fmt){
   var is9 = fmt === "916", H = is9 ? 177.78 : 125, top = is9 ? 26 : 8, bot = is9 ? 31.5 : 8;
   var g = {is9:is9, H:H, top:top, bot:bot, cy:(top + H - bot)/2, fmt:fmt};
   g.CW = is9 ? 78 : 68; g.CH = g.CW*1.25; g.CX = (100 - g.CW)/2; g.CY = g.cy - g.CH/2;
-  g.labY = top + (is9 ? 13.4 : 10.6); g.headY = g.labY + (is9 ? 10.6 : 9.2); g.stepY = g.headY + (is9 ? 8 : 6.6);
-  g.gridY = g.stepY + (is9 ? 7.4 : 5.6); g.tw = 26.4; g.th = is9 ? 33 : 30;
+  /* leveranssidan */
+  g.titleY = top + (is9 ? 22 : 19.5); g.subY = g.titleY + (is9 ? 5.4 : 4.8); g.dataY = g.subY + (is9 ? 7.6 : 6.6);
+  g.sectY = g.dataY + (is9 ? 14.4 : 12.4); g.gridY = g.sectY + (is9 ? 4.6 : 4.2); g.tw = 26.4; g.th = is9 ? 28 : 25;
   return g;
 }
 function v3Mix(a, b, p){ return [lerp(a[0], b[0], p), lerp(a[1], b[1], p), lerp(a[2], b[2], p), lerp(a[3], b[3], p)] }
@@ -30,10 +25,10 @@ function v3Shadow(c, r, a, blur){
   c.save(); c.shadowColor = "rgba(0,0,0," + a + ")"; c.shadowBlur = blur; c.shadowOffsetY = blur*.3;
   c.fillStyle = "#000"; c.fillRect(r[0], r[1], r[2], r[3]); c.restore();
 }
-/* Mörk scen: samma foto, mjukt och varmt svart. Ingen blå ton. */
+/* Mörk scen: samma foto, mjukt och varmt svart. */
 function v3DarkBg(c, G, a, t){
   c.save(); c.globalAlpha = a;
-  v3Photo(c, "blur", 0, 0, 100, G.H, {scale:1.3 + .02*Math.sin((t || 0)*.25), pos:[.5 + .02*Math.sin((t || 0)*.2), .5]});
+  v3Photo(c, "blur", 0, 0, 100, G.H, {alpha:a, scale:1.3 + .02*Math.sin((t || 0)*.25), pos:[.5 + .02*Math.sin((t || 0)*.2), .5]});
   c.fillStyle = "rgba(14,14,13,.78)"; c.fillRect(0, 0, 100, G.H);
   v3Grad(c, 0, 0, 100, G.H, [[0, "rgba(6,6,5,.35)"], [.5, "rgba(6,6,5,0)"], [1, "rgba(6,6,5,.4)"]]);
   c.restore();
@@ -47,174 +42,144 @@ function v3Cursor(c, x, y, press, a){
 function v3Tap(c, x, y, p){
   if(p <= 0 || p >= 1) return;
   var rp = oQ(p);
-  c.save(); c.globalAlpha = (1 - rp)*.7; c.strokeStyle = C3.oli; c.lineWidth = .4; c.beginPath(); c.arc(x, y, 1.2 + rp*6.5, 0, Math.PI*2); c.stroke(); c.restore();
+  c.save(); c.globalAlpha = (1 - rp)*.6; c.strokeStyle = C3.oli; c.lineWidth = .35; c.beginPath(); c.arc(x, y, 1.2 + rp*5, 0, Math.PI*2); c.stroke(); c.restore();
 }
 function v3Tick(c, x, y, r, p, col){
   if(p <= 0) return;
-  var s = oBack(mclamp(p));
-  c.save(); c.translate(x, y); c.scale(s, s);
+  var s = .6 + .4*oQ(mclamp(p));
+  c.save(); c.translate(x, y); c.scale(s, s); c.globalAlpha = oQ(mclamp(p*2));
   c.fillStyle = col || C3.oli; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
   c.strokeStyle = "#fff"; c.lineWidth = r*.2; c.lineCap = "round"; c.lineJoin = "round";
   c.beginPath(); c.moveTo(-r*.42, r*.04); c.lineTo(-r*.1, r*.36); c.lineTo(r*.46, -r*.32); c.stroke(); c.restore();
 }
 
-/* —— Mäklarportalen: tre steg ———————————————————————————————————— */
+/* —— Mäklarportalen: leveranssidan med uppgifterna, sedan mallen ————————— */
 var V3_ALL = ["home", "dining", "beige", "bedroom", "terrace", "house"];
 function v3Tiles(sel){ return [sel].concat(V3_ALL.filter(function(n){ return n !== sel })).slice(0, 6) }
 var V3_STYLES = ["overlay", "editorial", "badge"], V3_STYLE_N = ["OVERLAY", "EDITORIAL", "BADGE"];
-function v3Fields(){
-  return [["ADRESS", V3_OBJ.addr + ", " + V3_OBJ.city], ["BOSTAD", V3_OBJ.rum + " rum · " + V3_OBJ.yta + " m²"], ["PRIS", "Utgångspris " + V3_OBJ.pris + " kr"],
-          ["VISNING", V3_OBJ.visning], ["MÄKLARE", V3_OBJ.maklare], ["PROFIL", OFF.name.charAt(0) + OFF.name.slice(1).toLowerCase() + " · logga, färger"]];
-}
-/* tider (råtid) för portalen */
-var V3T = {ui:[4.0, 5.0], sel:[7.5, 7.65], m12:[8.3, 9.0], tp:[10.45, 10.6], m23:[11.3, 12.0], chk:12.2, chkStep:.5, uiOut:[15.6, 16.3]};
+/* tider (råtid). Två lägen: med mallväljare, och direkt (utan). */
+var V3T_FULL = {ui:[4.0, 5.0], hdr:4.4, title:4.8, data:5.4, tiles:5.9, curIn:[6.6, 7.8], tap1:7.9, m12:[8.9, 9.6], cards:9.5, curTp:[10.0, 10.9], tap2:11.0,
+                uiOut:[11.9, 12.5], dark:[11.9, 12.55], exp:[12.0, 13.2], build:[13.7, 16.6], hold:17.4};
+var V3T_DIRECT = {ui:[4.0, 5.0], hdr:4.4, title:4.8, data:5.4, tiles:5.9, curIn:[6.4, 7.4], tap1:7.5, m12:[99, 100], cards:99, curTp:[99, 100], tap2:99,
+                  uiOut:[8.2, 8.7], dark:[8.2, 8.75], exp:[8.3, 9.5], build:[10.0, 12.9], hold:13.8, direct:true};
 function v3Portal(c, G, t, ua, o){
-  var ink = C3.ink, mut = C3.mut, m = 8, tl = v3Tiles(o.photo), sidx = V3_STYLES.indexOf(o.tpl);
-  var m12 = ioC(k3(t, V3T.m12[0], V3T.m12[1])), m23 = ioC(k3(t, V3T.m23[0], V3T.m23[1]));
-  var step = m23 > .5 ? 3 : m12 > .5 ? 2 : 1;
-  /* sidhuvud */
-  var q = oQ(k3(t, 4.4, 5.3));
+  var T = o.T || V3T_FULL, ink = C3.ink, mut = C3.mut, m = 8, tl = v3Tiles(o.photo), sidx = V3_STYLES.indexOf(o.tpl);
+  var m12 = ioC(k3(t, T.m12[0], T.m12[1]));
+  var q = oQ(k3(t, T.hdr, T.hdr + .9));
   c.save(); c.globalAlpha = ua*q;
   v3Lock(c, 0, G.top + 2.2, 2.4, ink, C3.oli, {left:m});
   v3Text(c, "MÄKLARPORTALEN", 100 - m, G.top + 3, {size:1.8, weight:500, f:"sans", sp:.24, color:mut, align:"r"});
   c.restore();
-  v3Line(c, m, 100 - m, G.top + 7.4, C3.uil, .2, oQ(k3(t, 4.5, 5.6)), ua);
-  v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city + " · 12 bilder levererade").toUpperCase(), m, G.labY, {size:1.85, weight:500, f:"sans", sp:.22, color:mut, alpha:ua, p:oQ(k3(t, 4.8, 5.8))});
-  /* rubrik per steg */
-  var hs = G.is9 ? 9.4 : 7.8, hq = oQ(k3(t, 5.1, 6.2));
-  v3Text(c, "Välj bild.", m, G.headY, {size:hs, color:ink, alpha:ua*(1 - m12), p:hq, rise:1.6});
-  v3Text(c, "Välj mall.", m, G.headY, {size:hs, color:ink, alpha:ua*m12*(1 - m23), p:m12, rise:1.6});
-  v3Text(c, "Uppgifterna hämtas.", m, G.headY, {size:hs, color:ink, alpha:ua*m23, p:m23, rise:1.6});
-  /* stegindikator */
-  var sq = oQ(k3(t, 5.4, 6.3)), labels = ["VÄLJ BILD", "VÄLJ MALL", "UPPGIFTER"], sx = [m, m + 29, m + 58];
-  labels.forEach(function(lb, i){
-    var done = step > i + 1, act = step === i + 1, x = sx[i];
-    c.save(); c.globalAlpha = ua*sq;
-    if(done) v3Tick(c, x + 1.7, G.stepY - .7, 1.7, 1, C3.oli);
-    else { c.fillStyle = act ? ink : "rgba(28,28,30,.12)"; c.beginPath(); c.arc(x + 1.7, G.stepY - .7, 1.7, 0, Math.PI*2); c.fill(); v3Text(c, String(i + 1), x + 1.7, G.stepY - .05, {size:1.7, weight:600, f:"sans", color:act ? "#fff" : mut, align:"c"}) }
-    v3Text(c, lb, x + 4.4, G.stepY, {size:1.75, weight:act ? 600 : 500, f:"sans", sp:.2, color:act ? ink : mut});
-    if(act) v3Fill(c, x + 4.4, G.stepY + 1.7, 22, .3, C3.oli);
-    c.restore();
+  v3Line(c, m, 100 - m, G.top + 7.4, C3.uil, .2, oQ(k3(t, T.hdr + .1, T.hdr + 1.1)), ua);
+  /* leveransen: adress, ort, och uppgifterna som följer med till mallen */
+  var tq = oQ(k3(t, T.title, T.title + 1.0)), hs = G.is9 ? 9.6 : 7.6;
+  v3Text(c, V3_OBJ.addr, m, G.titleY, {size:hs, color:ink, alpha:ua, p:tq, rise:1.4});
+  v3Text(c, (V3_OBJ.city + " · 12 bilder levererade idag").toUpperCase(), m, G.subY, {size:1.85, weight:500, f:"sans", sp:.22, color:mut, alpha:ua*tq});
+  var dq = oQ(k3(t, T.data, T.data + 1.0));
+  var cols = [[8, "BOSTAD", V3_OBJ.rum + " rum · " + V3_OBJ.yta + " m²"], [38, "ANSVARIG MÄKLARE", V3_OBJ.maklare], [68, "KONTOR", OFF.name.charAt(0) + OFF.name.slice(1).toLowerCase()]];
+  v3Line(c, m, 100 - m, G.dataY - 3.4, C3.uil, .15, dq, ua);
+  cols.forEach(function(cl){
+    v3Text(c, cl[1], cl[0], G.dataY, {size:1.4, weight:600, f:"sans", sp:.2, color:mut, alpha:ua*dq});
+    v3Text(c, cl[2], cl[0], G.dataY + 4.6, {size:G.is9 ? 3.7 : 3.3, color:ink, alpha:ua, p:dq});
   });
-  /* steg 1: bildrutor (nr 0 ritas av fotot som morfar in) */
+  v3Line(c, m, 100 - m, G.dataY + 8.2, C3.uil, .15, dq, ua);
+  /* uppgifterna följer med: en oliv linje under raden när mallen visas */
+  v3Fill(c, m, G.dataY + 8.2 - .18, 84*m12, .36, C3.oli, ua);
+  /* sektionsrubrik */
+  var sq = oQ(k3(t, T.tiles - .1, T.tiles + .7));
+  v3Text(c, "VÄLJ BILD", m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*sq*(1 - m12)});
+  v3Text(c, "VÄLJ MALL", m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*m12});
+  v3Text(c, "12 BILDER", 100 - m, G.sectY, {size:1.5, weight:500, f:"sans", sp:.2, color:mut, align:"r", alpha:ua*sq*(1 - m12)});
+  /* bildrutorna */
   var a1 = 1 - m12;
   if(a1 > 0) tl.forEach(function(nm, i){
-    if(i === 0) return;
+    if(i === 0 && !o.noMorph) return;
     var col = i % 3, row = Math.floor(i/3), x = m + col*(G.tw + 2.4), y = G.gridY + row*(G.th + 2.4);
-    var qi = oQ(k3(t, 5.5 + i*.15, 6.3 + i*.15)), dim = lerp(1, .3, ioC(k3(t, 7.7, 8.1)));
+    var qi = oQ(k3(t, T.tiles + i*.1, T.tiles + .8 + i*.1)), dim = i === 0 ? 1 : lerp(1, .32, ioC(k3(t, T.tap1 + .2, T.tap1 + .6)));
     c.save(); c.globalAlpha = ua*qi*dim*a1;
-    v3Photo(c, nm, x, y + (1 - qi)*3, G.tw, G.th);
-    if(i === 5){ v3Fill(c, x, y + (1 - qi)*3, G.tw, G.th, "#0e0e0d", .55); v3Text(c, "+7", x + G.tw/2, y + (1 - qi)*3 + G.th/2 + 2.4, {size:7, color:"#fff", align:"c"}) }
+    v3Photo(c, nm, x, y + (1 - qi)*2.4, G.tw, G.th);
+    if(i === 5){ v3Fill(c, x, y + (1 - qi)*2.4, G.tw, G.th, "#0e0e0d", .55); v3Text(c, "+7", x + G.tw/2, y + (1 - qi)*2.4 + G.th/2 + 2.4, {size:7, color:"#fff", align:"c"}) }
     c.restore();
   });
-  /* steg 2: mallarna */
-  if(m12 > 0 && m23 < 1) V3_STYLES.forEach(function(st, i){
-    var x = m + i*(G.tw + 2.4), y = G.gridY, qi = oQ(k3(t, 8.8 + i*.2, 9.6 + i*.2)), dim = i === sidx ? 1 : lerp(1, .32, ioC(k3(t, 10.65, 11.1)));
-    var a = ua*qi*dim*(1 - m23);
-    if(a <= 0) return;
+  /* mallarna: layouten med grå staplar där uppgifterna ska stå */
+  if(m12 > 0) V3_STYLES.forEach(function(st, i){
+    var x = m + i*(G.tw + 2.4), y = G.gridY, qi = oQ(k3(t, T.cards + i*.12, T.cards + .8 + i*.12)), dim = i === sidx ? 1 : lerp(1, .32, ioC(k3(t, T.tap2 + .2, T.tap2 + .7)));
+    var a = ua*qi*dim; if(a <= 0) return;
     c.save(); c.globalAlpha = a;
-    v3Shadow(c, [x, y + (1 - qi)*3, G.tw, G.th], .22, 2);
-    v3Post(c, st, o.phase, o.photo, x, y + (1 - qi)*3, G.tw, 1.25, 1);
+    v3Shadow(c, [x, y + (1 - qi)*2.4, G.tw, G.tw*1.25], .2, 2);
+    v3Post(c, st, o.phase, o.photo, x, y + (1 - qi)*2.4, G.tw, 1.25, 0, {skel:1});
     c.restore();
     c.save(); c.globalAlpha = a;
-    v3Text(c, V3_STYLE_N[i], x + G.tw/2, y + G.th + 5, {size:1.7, weight:i === sidx && t > V3T.tp[0] ? 600 : 500, f:"sans", sp:.26, color:ink, align:"c"});
-    if(i === sidx){ var rk = k3(t, V3T.tp[0], V3T.tp[1]); if(rk > 0){ c.globalAlpha = a*Math.min(1, rk*2); c.strokeStyle = ink; c.lineWidth = .5; c.strokeRect(x - .9, y - .9 + (1 - qi)*3, G.tw + 1.8, G.th + 1.8); v3Tick(c, x + G.tw - .4, y - .4, 2.2, oQ(k3(t, V3T.tp[0] + .05, V3T.tp[0] + .35)), C3.oli) } }
+    v3Text(c, V3_STYLE_N[i], x + G.tw/2, y + G.tw*1.25 + 5, {size:1.7, weight:i === sidx && t > T.tap2 ? 600 : 500, f:"sans", sp:.26, color:ink, align:"c"});
+    if(i === sidx && t > T.tap2){
+      var rk = k3(t, T.tap2, T.tap2 + .3); c.globalAlpha = a*rk; c.strokeStyle = ink; c.lineWidth = .45; c.strokeRect(x - .9, y - .9 + (1 - qi)*2.4, G.tw + 1.8, G.tw*1.25 + 1.8);
+    }
     c.restore();
+    if(i === sidx && t > T.tap2) v3Tick(c, x + G.tw - .4, y - .4, 2.1, k3(t, T.tap2 + .05, T.tap2 + .4), C3.oli);
   });
-  if(m12 > 0 && m23 < 1){
-    var na = ua*oQ(k3(t, 9.8, 10.6))*(1 - m23);
-    v3Text(c, "Mallen följer kontorets profil:", m, G.gridY + G.th + 15, {size:3.9, italic:true, color:mut, alpha:na});
-    v3Text(c, "logga, färger och typsnitt.", m, G.gridY + G.th + 20.2, {size:3.9, italic:true, color:mut, alpha:na});
-  }
-  /* steg 3: uppgifterna hämtas automatiskt */
-  if(m23 > 0){
-    var sx0 = m + G.tw + 5, y0 = G.gridY + 5, rowH = G.is9 ? 9.4 : 7.0;
-    v3Text(c, "HÄMTAS FRÅN LEVERANSEN", sx0, G.gridY + .4, {size:1.7, weight:600, f:"sans", sp:.24, color:C3.oli, alpha:ua*m23});
-    v3Fields().forEach(function(f, i){
-      var rs = V3T.chk + i*V3T.chkStep, rq = oQ(k3(t, rs, rs + .5)), tq = k3(t, rs + .35, rs + .65), y = y0 + i*rowH + 3.4;
-      v3Line(c, sx0, 100 - m, y + 2.2, C3.uil, .15, rq, ua*m23);
-      v3Text(c, f[0], sx0, y - 2.4, {size:1.35, weight:600, f:"sans", sp:.22, color:mut, alpha:ua*m23*rq});
-      v3Text(c, f[1], sx0, y + 1.4, {size:G.is9 ? 4.1 : 3.5, color:ink, alpha:ua*m23, p:rq});
-      c.save(); c.globalAlpha = ua*m23; v3Tick(c, 100 - m - 1.9, y - .4, 1.9, tq, C3.oli); c.restore();
-    });
-    var done = k3(t, V3T.chk + 5*V3T.chkStep + .6, V3T.chk + 5*V3T.chkStep + 1.1);
-    v3Text(c, "Klart.", m, G.gridY + G.tw*1.25 + (G.is9 ? 12 : 10), {size:G.is9 ? 8 : 6.6, italic:true, color:C3.oli, alpha:ua*m23, p:oQ(done), rise:1.6});
-  }
 }
 
-/* —— Hook + portal + montering (flödet) ——————————————————————————— */
-var V3_FLOW_END = 22.2;
+/* —— hook + portal + mall som fylls (flödet) ———————————————————————— */
 function v3Flow(c, G, t, o){
-  var H = G.H, FULL = [0, 0, 100, H], sidx = V3_STYLES.indexOf(o.tpl);
-  var TILE = [8, G.gridY, G.tw, G.th], PREV = [8, G.gridY, G.tw, G.tw*1.25], CARD = [G.CX, G.CY, G.CW, G.CH];
-  var tcol = [8 + sidx*(G.tw + 2.4), G.gridY, G.tw, G.tw*1.25];
-  v3Fill(c, 0, 0, 100, H, C3.dark);
-  var nb = ioC(k3(t, 15.8, 16.8));
-  if(nb > 0) v3DarkBg(c, G, nb, t);
-  var ub = ioC(k3(t, V3T.ui[0], V3T.ui[1]))*(1 - ioC(k3(t, V3T.uiOut[0], V3T.uiOut[1])));
+  var T = o.T || V3T_FULL, H = G.H, FULL = [0, 0, 100, H], sidx = V3_STYLES.indexOf(o.tpl), dir = !!T.direct;
+  var TILE = [8, G.gridY, G.tw, G.th], CARD = [G.CX, G.CY, G.CW, G.CH];
+  var TC = dir ? TILE : [8 + sidx*(G.tw + 2.4), G.gridY, G.tw, G.tw*1.25];
+  v3Fill(c, 0, 0, 100, H, o.skipHook ? C3.ui : C3.dark);
+  var nb = ioC(k3(t, T.dark[0], T.dark[1])); if(nb > 0) v3DarkBg(c, G, nb, t);
+  var ub = ioC(k3(t, T.ui[0], T.ui[1]))*(1 - ioC(k3(t, T.uiOut[0], T.uiOut[1])));
   if(ub > 0){ v3Fill(c, 0, 0, 100, H, C3.ui, ub); v3Portal(c, G, t, ub, o) }
 
-  var q1 = ioQ(k3(t, 4.0, 5.4)), q3 = ioQ(k3(t, 15.8, 17.0));
-  var sc = lerp(1.14, 1.02, ioC(k3(t, 0, 5)));
-  if(t < 17.0){
-    /* fotot: helbild → bildruta 1 → (steg 2/3) mallkort → kort */
-    if(t < 8.3){
+  var q1 = ioQ(k3(t, 4.0, 5.4)), sc = lerp(1.14, 1.02, ioC(k3(t, 0, 5)));
+  var cardEnd = T.hold;
+  if(t < T.exp[0]){
+    /* fotot: helbild → bildruta 1 (om ingen hook: bildrutan ritas av portalen) */
+    if(!o.noMorph){
       var r = t >= 4.0 ? v3Mix(FULL, TILE, q1) : FULL, s2 = t >= 4.0 ? lerp(sc, 1, q1) : sc;
-      if(t >= 4.2) v3Shadow(c, r, .16*k3(t, 4.2, 5.4), 2);
-      v3Photo(c, o.photo, r[0], r[1], r[2], r[3], {scale:s2});
-      var rk = k3(t, V3T.sel[0], V3T.sel[1] + .3)*(1 - k3(t, 8.2, 8.6));
-      if(rk > 0){ c.save(); c.globalAlpha = rk; c.strokeStyle = C3.ink; c.lineWidth = .5; c.strokeRect(TILE[0] - .9, TILE[1] - .9, TILE[2] + 1.8, TILE[3] + 1.8); c.restore(); v3Tick(c, TILE[0] + TILE[2] - .4, TILE[1] - .4, 2.2, oQ(k3(t, V3T.sel[0] + .05, V3T.sel[0] + .4)), C3.oli) }
-    } else if(t < 11.3){
-      /* valda fotot bleknar bort när mallkorten tar över */
-      var fa = 1 - ioC(k3(t, 8.4, 8.9));
-      if(fa > 0){ c.save(); c.globalAlpha = fa; v3Photo(c, o.photo, TILE[0], TILE[1], TILE[2], TILE[3]); c.restore() }
+      var fa = dir ? 1 : 1 - ioC(k3(t, T.m12[0] - .2, T.m12[0] + .4));
+      if(fa > 0){
+        c.save(); c.globalAlpha = fa;
+        if(t >= 4.2) v3Shadow(c, r, .14*k3(t, 4.2, 5.4), 2);
+        v3Photo(c, o.photo, r[0], r[1], r[2], r[3], {scale:s2}); c.restore();
+      }
     }
-    /* steg 3: valda mallen står kvar till vänster */
-    if(t >= 11.3 && t < 15.8){
-      var mv = ioQ(k3(t, V3T.m23[0], V3T.m23[1] + .3)), pr = v3Mix(tcol, PREV, mv);
-      c.save(); c.globalAlpha = ioC(k3(t, 11.3, 11.7)) > 0 ? 1 : 0; v3Shadow(c, pr, .22, 2);
-      v3Post(c, o.tpl, o.phase, o.photo, pr[0], pr[1], pr[2], 1.25, 0); c.restore();
-    }
-    if(t >= 15.8){
-      var rr = v3Mix(PREV, CARD, q3);
-      v3Shadow(c, rr, .5*q3, 5);
-      v3Post(c, o.tpl, o.phase, o.photo, rr[0], rr[1], rr[2], 1.25, 0);
-    }
-    /* markören */
-    if(t >= 6.1 && t < 11.0){
-      var tx = TILE[0] + TILE[2]*.58, ty = TILE[1] + TILE[3]*.62, px = tcol[0] + tcol[2]*.6, py = tcol[1] + tcol[3]*.6, cx, cy;
-      var mA = ioC(k3(t, 6.1, 7.4)), mB = ioC(k3(t, 9.3, 10.35));
-      if(t < 9.3){ cx = lerp(96, tx, mA); cy = lerp(G.H - 18, ty, mA) - Math.sin(mA*Math.PI)*4 }
-      else { cx = lerp(tx, px, mB); cy = lerp(ty, py, mB) - Math.sin(mB*Math.PI)*3 }
-      var prs = Math.max(k3(t, V3T.sel[0] - .15, V3T.sel[0]) * (1 - k3(t, V3T.sel[1], V3T.sel[1] + .15)), k3(t, V3T.tp[0] - .15, V3T.tp[0]) * (1 - k3(t, V3T.tp[1], V3T.tp[1] + .15)));
-      v3Cursor(c, cx, cy, prs, k3(t, 6.1, 6.5)*(1 - k3(t, 10.8, 11.2)));
-      v3Tap(c, tx, ty, k3(t, V3T.sel[0], V3T.sel[0] + .7)); v3Tap(c, px, py, k3(t, V3T.tp[0], V3T.tp[0] + .7));
-    }
-  } else if(t < 21.8){
-    var prog = k3(t, 17.4, 20.6), zoom = 1 + .025*k3(t, 17.0, 22.2);
-    v3Shadow(c, CARD, .5, 5);
-    v3Post(c, o.tpl, o.phase, o.photo, CARD[0], CARD[1], CARD[2], 1.25, prog, {zoom:zoom});
+    var rk = k3(t, T.tap1 + .05, T.tap1 + .3)*(dir ? 1 - k3(t, T.exp[0] - .3, T.exp[0]) : 1 - k3(t, T.m12[0] - .3, T.m12[0] + .1));
+    if(rk > 0){ c.save(); c.globalAlpha = rk; c.strokeStyle = C3.ink; c.lineWidth = .45; c.strokeRect(TILE[0] - .9, TILE[1] - .9, TILE[2] + 1.8, TILE[3] + 1.8); c.restore(); v3Tick(c, TILE[0] + TILE[2] - .4, TILE[1] - .4, 2.1, k3(t, T.tap1 + .1, T.tap1 + .4), C3.oli) }
   }
-
+  if(t >= T.exp[0] && t < cardEnd){
+    var eq = ioQ(k3(t, T.exp[0], T.exp[1])), rr = v3Mix(TC, CARD, eq), prog = k3(t, T.build[0], T.build[1]);
+    v3Shadow(c, rr, .45*eq, 5);
+    v3Post(c, o.tpl, o.phase, o.photo, rr[0], rr[1], rr[2], rr[3]/rr[2], prog, {skel:"auto", zoom:1 + .02*k3(t, T.exp[1], T.hold)});
+  }
+  /* markören */
+  var ce = dir ? T.exp[0] - .1 : T.tap2 + .5;
+  if(t >= T.curIn[0] && t < ce + .5){
+    var tx = TILE[0] + TILE[2]*.58, ty = TILE[1] + TILE[3]*.62, px = TC[0] + TC[2]*.6, py = TC[1] + TC[3]*.6, cx, cy;
+    var mA = ioC(k3(t, T.curIn[0], T.curIn[1])), mB = ioC(k3(t, T.curTp[0], T.curTp[1]));
+    if(t < T.curTp[0]){ cx = lerp(96, tx, mA); cy = lerp(H - 18, ty, mA) - Math.sin(mA*Math.PI)*4 }
+    else { cx = lerp(tx, px, mB); cy = lerp(ty, py, mB) - Math.sin(mB*Math.PI)*3 }
+    var prs = Math.max(k3(t, T.tap1 - .15, T.tap1)*(1 - k3(t, T.tap1 + .05, T.tap1 + .2)), dir ? 0 : k3(t, T.tap2 - .15, T.tap2)*(1 - k3(t, T.tap2 + .05, T.tap2 + .2)));
+    v3Cursor(c, cx, cy, prs, k3(t, T.curIn[0], T.curIn[0] + .4)*(1 - k3(t, ce, ce + .5)));
+    v3Tap(c, tx, ty, k3(t, T.tap1, T.tap1 + .7)); if(!dir) v3Tap(c, px, py, k3(t, T.tap2, T.tap2 + .7));
+  }
   /* hooken */
-  if(t < 4.8){
-    var out = 1 - ioC(k3(t, 3.9, 4.5)), top = G.top, yb = H - G.bot - 28;
+  if(!o.skipHook && t < 4.8){
+    var out = 1 - ioC(k3(t, 3.9, 4.5)), top = G.top, yb = H - G.bot - 28, hk = o.hook;
     v3Grad(c, 0, H*.42, 100, H*.58, [[0, "rgba(14,11,11,0)"], [1, "rgba(14,11,11,.78)"]], out);
     v3Grad(c, 0, 0, 100, H*.24, [[0, "rgba(14,11,11,.5)"], [1, "rgba(14,11,11,0)"]], out);
     v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5*out);
     v3Text(c, "VIEWLY · BOSTADSFOTOGRAFERING", 50, top + 4, {size:2, weight:500, f:"sans", sp:.3, color:"#fff", align:"c", alpha:.92*out, p:oQ(k3(t, .5, 1.7))});
-    v3Text(c, o.hook[0], 50, yb, {size:11.2, color:"#fff", align:"c", alpha:out, p:oQ(k3(t, 1.0, 2.5)), rise:2, shadow:true});
-    v3Text(c, o.hook[1], 50, yb + 13.6, {size:10.4, italic:true, color:C3.cream, align:"c", alpha:out, p:oQ(k3(t, 2.2, 3.7)), rise:2, shadow:true});
+    v3Text(c, hk[0], 50, yb, {size:11.2, color:"#fff", align:"c", alpha:out, p:oQ(k3(t, 1.0, 2.5)), rise:2, shadow:true});
+    v3Text(c, hk[1], 50, yb + 13.6, {size:10.4, italic:true, color:C3.cream, align:"c", alpha:out, p:oQ(k3(t, 2.2, 3.7)), rise:2, shadow:true});
   }
 }
 
-/* —— Klart i alla format. Mer tid över. ——————————————————————————— */
+/* —— Klart i alla format. Ingen text — formaten visar sig själva. ———————— */
 function v3Trio(c, G, t, t0, o){
-  var is9 = G.is9, a = ioC(k3(t, t0, t0 + .5))*(o.exit ? 1 - ioC(k3(t, t0 + 5.2, t0 + 5.8)) : 1);
+  var is9 = G.is9, a = ioC(k3(t, t0, t0 + .5))*(o.exit ? 1 - ioC(k3(t, t0 + 2.6, t0 + 3.2)) : 1);
   var sw = is9 ? 23 : 21, mw = is9 ? 34 : 31, qw = is9 ? 28 : 25, gap = 3;
-  var total = sw + mw + qw + 2*gap, x0 = (100 - total)/2, base = is9 ? G.top + 62 : G.top + 49;
+  var total = sw + mw + qw + 2*gap, x0 = (100 - total)/2, base = G.cy + (is9 ? 24 : 18);
   var main = [G.CX, G.CY, G.CW, G.CH], fin = [x0 + sw + gap, base - mw*1.25, mw, mw*1.25];
-  var qm = ioQ(k3(t, t0, t0 + 1.4)), qs = ioQ(k3(t, t0 + .6, t0 + 2.0)), r = v3Mix(main, fin, qm), cx = r[0] + r[2]/2;
+  var qm = ioQ(k3(t, t0, t0 + 1.2)), qs = ioQ(k3(t, t0 + .5, t0 + 1.7)), r = v3Mix(main, fin, qm), cx = r[0] + r[2]/2;
   var left = [x0, base - sw*1.7778, sw, sw*1.7778], right = [x0 + sw + gap + mw + gap, base - qw, qw, qw];
   var lr = v3Mix([cx - sw/2, left[1], sw, left[3]], left, qs), rr = v3Mix([cx - qw/2, right[1], qw, right[3]], right, qs);
   var P = [o.tpl, o.phase, o.photo];
@@ -223,14 +188,44 @@ function v3Trio(c, G, t, t0, o){
   c.save(); c.globalAlpha = a*qs; v3Shadow(c, rr, .4, 4); v3Post(c, P[0], P[1], P[2], rr[0], rr[1], rr[2], 1, 1); c.restore();
   v3Shadow(c, r, .5, 5); v3Post(c, P[0], P[1], P[2], r[0], r[1], r[2], 1.25, 1);
   c.restore();
-  var la = oQ(k3(t, t0 + 1.8, t0 + 2.6));
-  [[left, "STORY 9:16"], [r, "INLÄGG 4:5"], [right, "KVADRAT 1:1"]].forEach(function(f){
-    v3Text(c, f[1], f[0][0] + f[0][2]/2, base + 4.6, {size:1.7, weight:500, f:"sans", sp:.22, color:"#fff", align:"c", alpha:.75*la*a});
-  });
-  var ty = base + (is9 ? 27 : 20), s1 = is9 ? 14.4 : 11.4;
-  v3Text(c, o.msg[0], 50, ty, {size:s1, color:"#fff", align:"c", p:oQ(k3(t, t0 + 1.6, t0 + 3.0)), rise:2.4, alpha:a});
-  v3Text(c, o.msg[1], 50, ty + s1*1.0, {size:s1, italic:true, color:C3.olil, align:"c", p:oQ(k3(t, t0 + 2.6, t0 + 4.0)), rise:2.4, alpha:a});
-  v3Text(c, "FRÅN LEVERANS TILL FÄRDIG KAMPANJ", 50, ty + s1 + (is9 ? 11 : 8.6), {size:1.9, weight:500, f:"sans", sp:.28, color:"#fff", align:"c", alpha:.8*oQ(k3(t, t0 + 3.6, t0 + 4.6))*a});
+}
+
+/* —— hook som bara är text: Välj bild. Välj mall. ————————————————————— */
+function v3TypoHook(c, G, t, lines){
+  var a = 1 - ioC(k3(t, 1.9, 2.5));
+  v3Fill(c, 0, 0, 100, G.H, C3.paper, a);
+  v3Text(c, "VIEWLY · MÄKLARPORTALEN", 50, G.top + 4, {size:2, weight:500, f:"sans", sp:.3, color:C3.mut, align:"c", alpha:a, p:oQ(k3(t, .2, 1.2))});
+  v3Text(c, lines[0], 50, G.cy - 2, {size:G.is9 ? 17 : 14, color:C3.ink, align:"c", alpha:a, p:oQ(k3(t, .3, 1.4)), rise:2.4});
+  v3Text(c, lines[1], 50, G.cy + (G.is9 ? 16 : 13), {size:G.is9 ? 17 : 14, italic:true, color:C3.oli, align:"c", alpha:a, p:oQ(k3(t, 1.0, 2.1)), rise:2.4});
+}
+
+/* —— före / efter: reglaget som visar vad som hände med bilden ————————— */
+function v3Fore(c, G, t, o){
+  var H = G.H, ar = H/100, sc = lerp(1.12, 1.0, ioC(k3(t, 0, 3.4))), hs = ioQ(k3(t, 3.6, 6.0)), hx = 100 - 100*hs;
+  v3Photo(c, o.photo, 0, 0, 100, H, {scale:sc});
+  var cap = 1 - ioC(k3(t, 3.2, 3.7));
+  v3Grad(c, 0, H*.42, 100, H*.58, [[0, "rgba(14,11,11,0)"], [1, "rgba(14,11,11,.78)"]], cap);
+  v3Grad(c, 0, 0, 100, H*.24, [[0, "rgba(14,11,11,.5)"], [1, "rgba(14,11,11,0)"]], cap*.9 + .1);
+  if(cap > 0){
+    v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5*cap);
+    var yb = H - G.bot - 28;
+    v3Text(c, o.fore[0], 50, yb, {size:11.2, color:"#fff", align:"c", alpha:cap, p:oQ(k3(t, 1.0, 2.5)), rise:2, shadow:true});
+    v3Text(c, o.fore[1], 50, yb + 13.6, {size:10.4, italic:true, color:C3.cream, align:"c", alpha:cap, p:oQ(k3(t, 2.2, 3.7)), rise:2, shadow:true});
+  }
+  if(hs > 0){
+    c.save(); c.beginPath(); c.rect(hx, 0, 100 - hx, H); c.clip();
+    v3Post(c, o.tpl, o.phase, o.photo, 0, 0, 100, ar, 1);
+    c.restore();
+    var ha = k3(t, 3.6, 3.9)*(1 - k3(t, 6.1, 6.6));
+    c.save(); c.globalAlpha = ha; v3Fill(c, hx - .15, 0, .3, H, "#fff"); c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 8;
+    c.fillStyle = "#fff"; c.beginPath(); c.arc(hx, G.cy, 3.4, 0, Math.PI*2); c.fill(); c.shadowColor = "transparent";
+    c.strokeStyle = C3.ink; c.lineWidth = .35; c.lineCap = "round"; c.lineJoin = "round";
+    c.beginPath(); c.moveTo(hx - .6, G.cy - 1.2); c.lineTo(hx - 1.8, G.cy); c.lineTo(hx - .6, G.cy + 1.2); c.moveTo(hx + .6, G.cy - 1.2); c.lineTo(hx + 1.8, G.cy); c.lineTo(hx + .6, G.cy + 1.2); c.stroke();
+    c.restore();
+    var la = k3(t, 3.7, 4.1)*(1 - k3(t, 6.0, 6.5));
+    v3Text(c, "LEVERERAT", 8, G.top + 3, {size:1.9, weight:600, f:"sans", sp:.3, color:"#fff", alpha:la*(hx > 24 ? 1 : 0)*.9});
+    v3Text(c, "KLART", 92, G.top + 3, {size:1.9, weight:600, f:"sans", sp:.3, color:"#fff", align:"r", alpha:la*(hx < 76 ? 1 : 0)*.9});
+  }
 }
 
 /* —— Slutkort: en egen sekund för varumärket ———————————————————————— */
@@ -316,33 +311,74 @@ function v3Outro(c, G, id, t, o){
 }
 
 /* ---------------------------------------------------------------------
-   KOMPOSITIONER — videor i samma stil som "två klick kort": en berättelse,
-   fem varianter med olika foto, mall och fas. Råtiden skalas med WARP.
+   KOMPOSITIONER — fem videor med olika uppbyggnad, samma bildspråk.
+     1  Till salu · Overlay   hook på fotot → leveranssidan → mall → formaten → logga
+     2  Såld · Editorial       samma resa, slutar på Såld, utan formatbilden
+     3  Före / efter           ett reglage visar vad som hände med bilden
+     4  Välj bild. Välj mall.  börjar i portalen, hooken är bara text
+     5  Direkt                 kortversion: bild vald, mallen fylls, logga
+   Råtiden skalas med WARP (utom nr 3). Varje sekund är räknad.
    --------------------------------------------------------------------- */
-var V3_WARP = 1.1;
+var V3_WARP = 1.15;
+function v3W(list, w){ return list.map(function(x){ return Array.isArray(x) ? x.map(function(y, i){ return i < 2 && typeof y === "number" ? y/w : y }) : x/w }) }
+function v3Cues(w, d){
+  var o = {chords:d.chords.map(function(k){ return [k[0]/w, k[1]/w, k[2]] }), whoosh:d.whoosh.map(function(x){ return x/w }), tap:d.tap.map(function(x){ return x/w }),
+           pop:d.pop.map(function(x){ return x/w }), chime:d.chime.map(function(x){ return x/w }), riser:d.riser.map(function(r){ return [r[0]/w, r[1]/w] }), sub:d.sub/w, tail:d.tail/w};
+  return o;
+}
 var V3_VARS = [
-  {id:"salu",     n:"Till salu · Overlay",    d:"Poster-detaljen. Overlay-mallen, Till salu.",       photo:"home",    tpl:"overlay",   phase:"tillsalu"},
-  {id:"salu2",    n:"Till salu · Editorial",  d:"Matsalen. Editorial-mallen, Till salu.",            photo:"dining",  tpl:"editorial", phase:"tillsalu"},
-  {id:"visning",  n:"Visning · Badge",        d:"Hallen. Badge-mallen, Visning.",                    photo:"beige",   tpl:"badge",     phase:"visning"},
-  {id:"kommande", n:"Kommande · Overlay",     d:"Skymningshuset. Overlay-mallen, Kommande.",         photo:"house",   tpl:"overlay",   phase:"kommande"},
-  {id:"sald",     n:"Såld · Editorial",       d:"Sovrummet. Editorial-mallen, Såld.",                photo:"bedroom", tpl:"editorial", phase:"sald"}
+  {id:"salu",   n:"Till salu · Overlay",   d:"Poster-detaljen. Hook, leveranssida, mall, formaten, logga.",   photo:"home",    tpl:"overlay",   phase:"tillsalu", kind:"flow",   trio:true},
+  {id:"sald",   n:"Såld · Editorial",      d:"Sovrummet. Samma resa, slutar på Såld.",                          photo:"bedroom", tpl:"editorial", phase:"sald",     kind:"flow",   trio:false},
+  {id:"fore",   n:"Före / efter",          d:"Matsalen. Ett reglage visar vad som hände med bilden.",          photo:"dining",  tpl:"badge",     phase:"tillsalu", kind:"fore"},
+  {id:"portal", n:"Välj bild. Välj mall.", d:"Hallen. Börjar i portalen, hooken är bara text.",                photo:"beige",   tpl:"editorial", phase:"kommande", kind:"portal"},
+  {id:"direkt", n:"Direkt",                d:"Terrassen. Kortversion: bild vald, mallen fylls, logga.",        photo:"terrace", tpl:"editorial", phase:"tillsalu", kind:"direkt"}
 ];
-var V3_RAW = 30.4;
 var V3_COMPS = {};
-V3_VARS.forEach(function(v){
-  V3_COMPS[v.id] = {n:v.n, d:v.d, v:v, dur:V3_RAW/V3_WARP, thumb:3.2,
-    draw:function(c, G, t, o){
-      var tt = t*V3_WARP, op = {photo:v.photo, tpl:v.tpl, phase:v.phase, hook:o.hook, msg:o.msg};
-      if(tt < 26.2) v3Flow(c, G, tt, op);
-      if(tt >= 21.8 && tt < 26.6) v3Trio(c, G, tt, 21.8, op);
-      if(tt >= 25.8) v3Outro(c, G, o.outro, tt - 25.8);
-    },
-    audio:{chords:[[0, 4, 0], [4, 11.2, 1], [11.2, 22, 2], [22, 26, 3], [26, 30.4, 0]].map(function(w){ return [w[0]/V3_WARP, w[1]/V3_WARP, w[2]] }),
-      whoosh:[3.9, 8.3, 11.3, 15.7, 21.8, 25.8].map(function(x){ return x/V3_WARP }),
-      tap:[7.5, 10.45].map(function(x){ return x/V3_WARP }),
-      pop:[5.5, 5.7, 5.9, 6.1, 6.3, 8.8, 9.0, 9.2, 12.55, 13.05, 13.55, 14.05, 14.55, 15.05].map(function(x){ return x/V3_WARP }),
-      chime:[20.7/V3_WARP], riser:[[24.1/V3_WARP, 1.7/V3_WARP]], sub:26.0/V3_WARP, tail:V3_RAW/V3_WARP}};
-});
+(function(){
+  var FLOW = {whoosh:[3.9, 8.9, 11.9], tap:[7.9, 11.0], pop:[5.9, 6.2, 6.5, 9.5, 9.7, 9.9, 13.9, 14.7, 15.6]};
+  var DIR = {whoosh:[3.9, 8.3], tap:[7.5], pop:[5.9, 6.2, 6.5, 10.2, 10.9, 11.8]};
+  V3_VARS.forEach(function(v){
+    var comp = {n:v.n, d:v.d, v:v, thumb:3.4}, mk = function(extra){ return {photo:v.photo, tpl:v.tpl, phase:v.phase, hook:extra.hook, fore:extra.fore, typo:extra.typo} };
+    if(v.kind === "flow"){
+      var w = V3_WARP, outroAt = v.trio ? 19.6 : 17.0, raw = outroAt + 4.4; comp.dur = raw/w;
+      comp.draw = function(c, G, t, o){
+        var tt = t*w, op = mk(o);
+        if(tt < outroAt + .6) v3Flow(c, G, tt, op);
+        if(v.trio && tt >= 17.0 && tt < outroAt + .8)v3Trio(c, G, tt, 17.0, op);
+        if(tt >= outroAt) v3Outro(c, G, o.outro, tt - outroAt);
+      };
+      comp.audio = v3Cues(w, {chords:v.trio ? [[0, 4, 0], [4, 12, 1], [12, 17, 2], [17, 19.6, 3], [19.6, raw, 0]] : [[0, 4, 0], [4, 12, 1], [12, 17, 2], [17, raw, 0]],
+        whoosh:FLOW.whoosh.concat(v.trio ? [17.0, 19.5] : [16.9]), tap:FLOW.tap, pop:FLOW.pop, chime:[16.6], riser:[[outroAt - 1.6, 1.5]], sub:outroAt + .1, tail:raw});
+    } else if(v.kind === "fore"){
+      var rawF = 7.6 + 4.4; comp.dur = rawF; comp.thumb = 3.0;
+      comp.draw = function(c, G, t, o){
+        var op = mk(o);
+        if(t < 8.2) v3Fore(c, G, t, op);
+        if(t >= 7.6) v3Outro(c, G, o.outro, t - 7.6);
+      };
+      comp.audio = v3Cues(1, {chords:[[0, 3.6, 0], [3.6, 7.6, 2], [7.6, rawF, 0]], whoosh:[3.5, 7.5], tap:[], pop:[], chime:[6.0], riser:[[6.0, 1.5]], sub:7.7, tail:rawF});
+    } else if(v.kind === "portal"){
+      var w2 = V3_WARP, outroAt2 = 15.2, raw2 = outroAt2 + 4.4; comp.dur = raw2/w2; comp.thumb = 1.0;
+      comp.draw = function(c, G, t, o){
+        var tt = t*w2, op = mk(o); op.skipHook = true; op.noMorph = true;
+        if(tt >= 1.7 && tt < outroAt2 + .6) v3Flow(c, G, tt + 1.8, op);
+        if(tt < 2.6) v3TypoHook(c, G, tt, o.typo);
+        if(tt >= outroAt2) v3Outro(c, G, o.outro, tt - outroAt2);
+      };
+      comp.audio = v3Cues(w2, {chords:[[0, 2.2, 0], [2.2, 10, 1], [10, 15.2, 2], [15.2, raw2, 0]],
+        whoosh:[2.1, 7.1, 10.1, 15.1], tap:[6.1, 9.2], pop:[4.1, 4.4, 4.7, 7.7, 7.9, 8.1, 12.1, 12.9, 13.8], chime:[14.8], riser:[[13.6, 1.5]], sub:15.3, tail:raw2});
+    } else {
+      var w3 = V3_WARP, outroAt3 = 13.4, raw3 = outroAt3 + 4.4; comp.dur = raw3/w3;
+      comp.draw = function(c, G, t, o){
+        var tt = t*w3, op = mk(o); op.hook = o.fore; op.T = V3T_DIRECT;
+        if(tt < outroAt3 + .6) v3Flow(c, G, tt, op);
+        if(tt >= outroAt3) v3Outro(c, G, o.outro, tt - outroAt3);
+      };
+      comp.audio = v3Cues(w3, {chords:[[0, 4, 0], [4, 8.3, 1], [8.3, 13.4, 2], [13.4, raw3, 0]], whoosh:DIR.whoosh.concat([13.3]), tap:DIR.tap, pop:DIR.pop, chime:[12.9], riser:[[11.8, 1.5]], sub:13.5, tail:raw3});
+    }
+    V3_COMPS[v.id] = comp;
+  });
+})();
 
 /* ---------------------------------------------------------------------
    STATISKA ANNONSER OCH KARUSELL (4:5). Samma kod som videon, fruset.
@@ -360,20 +396,22 @@ function v3PhotoFrame(c, G, name, scrimTop){
   v3Grad(c, 0, 0, 100, G.H*.18, [[0, "rgba(14,14,13,.45)"], [1, "rgba(14,14,13,0)"]]);
   v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
 }
-function v3Opts(){ return {photo:V3S_PHOTO(), tpl:"overlay", phase:"tillsalu", hook:V3_CFG.hook, msg:V3_CFG.msg} }
-function V3S_PHOTO(){ return "home" }
+function v3Opts(){ return {photo:"home", tpl:"overlay", phase:"tillsalu", noMorph:true, T:V3T_FULL, hook:V3_CFG.hook, fore:V3_CFG.fore, typo:V3_CFG.typo} }
 var V3_STATIC = [
-  {id:"p1", n:"Välj bild. Välj mall.", d:"Portalen, steg 2. Markören på mallen.", draw:function(c, G){
-      v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 10.4, 1, v3Opts());
-      v3Photo(c, "home", 8, G.gridY, G.tw, G.th); /* täcks av mallkorten i steg 2 */
+  {id:"p1", n:"Välj bild. Välj mall.", d:"Text och det färdiga inlägget.", draw:function(c, G){
+      v3Fill(c, 0, 0, 100, G.H, C3.paper);
+      v3Small(c, "VIEWLY · MÄKLARPORTALEN", 50, 11, C3.mut, "c", 1);
+      v3Text(c, V3_CFG.typo[0], 50, 31, {size:14, color:C3.ink, align:"c"});
+      v3Text(c, V3_CFG.typo[1], 50, 45, {size:14, italic:true, color:C3.oli, align:"c"});
+      var w = 50, x = 25, y = 53; v3Shadow(c, [x, y, w, w*1.25], .35, 4); v3Post(c, "overlay", "tillsalu", "home", x, y, w, 1.25, 1);
   }},
-  {id:"p2", n:"Uppgifterna hämtas automatiskt", d:"Portalen, steg 3. Allt bockas av.", draw:function(c, G){
-      v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 15.2, 1, v3Opts());
-      v3Post(c, "overlay", "tillsalu", "home", 8, G.gridY, G.tw, 1.25, 0);
+  {id:"p2", n:"Leveranssidan", d:"Uppgifterna ligger redan där. Markören på bilden.", draw:function(c, G){
+      var o = v3Opts(); v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 7.2, 1, o);
+      var tx = 8 + G.tw*.58, ty = G.gridY + G.th*.62; v3Tap(c, tx, ty, .3); v3Cursor(c, tx, ty, 0, 1);
   }},
   {id:"p3", n:"Klart i alla format", d:"Samma inlägg som story, inlägg och kvadrat.", draw:function(c, G){
       v3Fill(c, 0, 0, 100, G.H, C3.dark); v3DarkBg(c, G, 1, 0);
-      v3Trio(c, G, 26, 21.8, {photo:"home", tpl:"overlay", phase:"tillsalu", msg:V3_CFG.msg});
+      v3Trio(c, G, 20, 17.0, {photo:"home", tpl:"overlay", phase:"tillsalu"});
       v3Lock(c, 50, G.H - 11, 2.2, "#fff", C3.olil);
   }},
   {id:"p4", n:"Fotona levereras. Kampanjen är klar.", d:"Foto först, ett påstående.", draw:function(c, G){
@@ -391,21 +429,19 @@ var V3_STATIC = [
   {id:"p6", n:"Varumärket · skymning", d:"Stor logga över foto.", draw:function(c, G){ v3Outro(c, G, "foto", 5, {noFade:true}) }}
 ];
 var V3_CAR = {
-  b:{n:"Så fungerar det", d:"Sju bilder: frågan, tre steg i portalen, resultatet, formaten och Viewly.", slides:[
+  b:{n:"Så fungerar det", d:"Sex bilder: frågan, leveranssidan, mallen, resultatet, formaten och Viewly.", slides:[
     function(c, G){
       v3PhotoFrame(c, G, "dining", .34);
       v3Small(c, "VIEWLY · EFTER LEVERANSEN", 50, 11, "#fff", "c", .9);
       v3Headline(c, [["Dina bilder", false], ["är levererade.", false], ["Nu då?", true, C3.cream]], G.H - 44, 12, {shadow:true});
     },
-    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 7.0, 1, v3Opts()); v3Photo(c, "home", 8, G.gridY, G.tw, G.th) },
-    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 10.5, 1, v3Opts()) },
-    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 15.2, 1, v3Opts()); v3Post(c, "overlay", "tillsalu", "home", 8, G.gridY, G.tw, 1.25, 0) },
+    function(c, G){ var o = v3Opts(); v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 7.2, 1, o); var tx = 8 + G.tw*.58, ty = G.gridY + G.th*.62; v3Tap(c, tx, ty, .3); v3Cursor(c, tx, ty, 0, 1) },
+    function(c, G){ var o = v3Opts(); v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 11.4, 1, o) },
     function(c, G){
       v3Fill(c, 0, 0, 100, G.H, C3.dark); v3DarkBg(c, G, 1, 0);
-      v3Shadow(c, [G.CX, G.CY - 3, G.CW, G.CH], .5, 5); v3Post(c, "overlay", "tillsalu", "home", G.CX, G.CY - 3, G.CW, 1.25, 1);
-      v3Text(c, "Klart.", 50, G.H - 7.4, {size:7.4, italic:true, color:"#fff", align:"c"});
+      v3Shadow(c, [G.CX, G.CY, G.CW, G.CH], .5, 5); v3Post(c, "overlay", "tillsalu", "home", G.CX, G.CY, G.CW, 1.25, 1);
     },
-    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.dark); v3DarkBg(c, G, 1, 0); v3Trio(c, G, 26, 21.8, {photo:"home", tpl:"overlay", phase:"tillsalu", msg:V3_CFG.msg}) },
+    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.dark); v3DarkBg(c, G, 1, 0); v3Trio(c, G, 20, 17.0, {photo:"home", tpl:"overlay", phase:"tillsalu"}) },
     function(c, G){ v3Outro(c, G, "papper", 5, {noFade:true}) }
   ]}
 };
