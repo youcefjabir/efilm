@@ -28,6 +28,7 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 | 09 | Ads | Viewlys första annonskampanj: översikt, Annons A (Reel 9:16, med MP4-export), skisser för B och C. Källa: `ads.js`, `ads.css`, bild i `assets/` |
 | 10 | Ads (ny) | Annonserna i ny form: Annons A som video i 9:16 och 4:5, B och C som karuseller i 4:5. Källa: `ads2.js`, `ads2.css` |
+| 11 | Ads | Annonserna, tredje omgången: Mäklarportalen, två klick, Viewly-tjänsterna och en egen sekund för varumärket. Fyra videor (9:16 och 4:5, med ljud), två karuseller, sex statiska, nya inläggsmallar och sju slutkort. Allt ritas i canvas (`ads3a.js`, `ads3b.js`, `ads3c.js`, `ads3.css`) |
 
 I Studio öppnar du ett kapitel och får filmremsa, live-scen och inspektör. `▶ Spela
 sekvensen` startar uppspelningen; `←` `→` bläddrar · `Esc` stänger.

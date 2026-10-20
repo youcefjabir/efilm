@@ -688,6 +688,68 @@ tr:last-child td{border-bottom:0}
 .a2fc em{font-style:normal;font-weight:600;font-size:12px;background:#E4E6EB;color:#111;padding:7px 12px;border-radius:5px;white-space:nowrap}
 .a2fp{padding:10px 12px 14px;font-size:12px;line-height:1.5}
 .a2scrubw input{accent-color:var(--ink)}
+/* ============ ADS · 11 ============ */
+.a3page{max-width:1280px}
+.a3head{margin-bottom:24px}.a3head h2{font-size:30px;margin:7px 0 0}
+.a3head p{color:var(--mut);font-size:14px;margin:10px 0 0;max-width:74ch;line-height:1.6}
+.a3cv{display:block;width:100%;height:auto;background:#141211}
+.a3tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 28px}
+.a3tab{background:none;border:1px solid var(--line2);color:var(--mut);font:inherit;font-size:12.5px;padding:9px 16px;cursor:pointer;border-radius:3px}
+.a3tab:hover{color:var(--ink);border-color:var(--acc)}
+.a3tab[aria-current="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.a3cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:34px}
+.a3card{display:flex;gap:14px;text-align:left;font:inherit;background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:12px;cursor:pointer;color:var(--ink);align-items:stretch}
+.a3card:hover{border-color:var(--mut)}
+.a3card[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.a3cth{flex:0 0 66px;border-radius:3px;overflow:hidden;box-shadow:0 6px 16px -8px rgba(0,0,0,.45);align-self:flex-start}
+.a3ctl{display:flex;flex-direction:column;gap:5px;min-width:0}
+.a3ctl i{font-style:normal;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);font-weight:600}
+.a3ctl b{font-family:"Cormorant Garamond",Georgia,serif;font-size:20px;font-weight:500;line-height:1.2}
+.a3ctl span{font-size:11.5px;color:var(--mut);line-height:1.5}
+.a3work{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:34px;align-items:start}
+@media(max-width:900px){.a3work{grid-template-columns:1fr}}
+.a3stagewrap{margin:0 auto;width:100%}
+.a3stagewrap.w916{max-width:390px}.a3stagewrap.w45{max-width:540px}
+.a3stage{box-shadow:0 18px 50px -20px rgba(0,0,0,.55);border-radius:3px}
+.a3ctl2{display:flex;align-items:center;gap:14px;margin-top:16px}
+.a3play{width:42px;height:42px;border-radius:50%;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.a3scrubw{flex:1}.a3scrubw input{width:100%;margin:0;accent-color:var(--ink)}
+.a3panel{position:sticky;top:18px;display:flex;flex-direction:column;gap:7px}
+.a3h{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);font-weight:600;margin-top:14px}.a3h:first-child{margin-top:0}
+.a3segs{display:flex;gap:6px;flex-wrap:wrap}.a3segs.col{flex-direction:column}
+.a3segs.row{margin:0 0 20px;align-items:center}
+.a3gap{flex:0 0 14px}
+.a3seg{font:inherit;font-size:12px;text-align:left;background:var(--raise);border:1px solid var(--line2);color:var(--ink2);padding:9px 12px;border-radius:4px;cursor:pointer}
+.a3seg:hover{border-color:var(--acc)}
+.a3seg.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.a3seg.dl{background:var(--accS);border-color:var(--acc);color:var(--ink);font-weight:600}
+.a3segs:not(.col):not(.row) .a3seg{flex:1;text-align:center}
+.a3sub{font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;margin:50px 0 12px;display:flex;align-items:center;gap:14px}
+.a3sub::after{content:"";flex:1;height:1px;background:var(--line)}
+.a3lede{color:var(--mut);font-size:13.5px;line-height:1.65;max-width:76ch;margin:0 0 20px}
+.a3gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:24px}
+.a3gi{min-width:0}
+.a3gth{border-radius:3px;overflow:hidden;box-shadow:0 12px 30px -14px rgba(0,0,0,.5)}
+.a3gm{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-top:12px}
+.a3gm b{font-size:13.5px;display:block}.a3gm span{font-size:11.5px;color:var(--mut);line-height:1.5;display:block;margin-top:2px}
+.a3gm .mono{font-size:11px;color:var(--acc)}
+.a3mini{font:inherit;font-size:11px;background:none;border:1px solid var(--line2);color:var(--ink2);padding:6px 11px;border-radius:4px;cursor:pointer;flex:0 0 auto}
+.a3mini:hover{border-color:var(--acc);color:var(--ink)}
+.a3slides{display:flex;gap:20px;overflow-x:auto;padding:4px 2px 18px}
+.a3sl{flex:0 0 min(330px,78vw)}
+.a3pick{display:block;width:100%;padding:0;border:2px solid transparent;border-radius:4px;background:none;cursor:pointer}
+.a3pick[aria-current="true"]{border-color:var(--ink)}
+.a3out{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.a3copy{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:20px}
+.a3copy>div{background:var(--raise);border:1px solid var(--line);border-radius:6px;padding:18px 20px}
+.a3copy b{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-top:12px;font-weight:600}.a3copy b:first-child{margin-top:0}
+.a3copy p{margin:5px 0 0;font-size:13.5px;line-height:1.6;color:var(--ink)}
+.a3det{margin-top:56px;border-top:1px solid var(--line);padding-top:18px}
+.a3det summary{cursor:pointer;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);font-weight:600}
+.a3und{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-top:18px;font-size:13px;line-height:1.65;color:var(--ink2)}
+.a3und b:first-child{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}.a3und p{margin:0 0 10px}
+#v3toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,16px);max-width:min(560px,90vw);background:#161616;color:#fff;font-size:13px;line-height:1.5;padding:12px 18px;border-radius:6px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9999;box-shadow:0 14px 40px -12px rgba(0,0,0,.5)}
+#v3toast[data-on]{opacity:1;transform:translate(-50%,0)}
 
 </style>
 
@@ -9403,6 +9465,1324 @@ document.addEventListener("input", function(e){
   a2Paint();
 });
 
+/* =====================================================================
+   ADS 3 — del A: verktygslådan
+
+   Allt ritas i en <canvas> i enheten "cqw": 100 är bildens bredd, så en
+   enhet är 10,8 px i en 1080-bred bild. Samma kod ritar förhandsvisningen
+   (60 bilder i sekunden), storyboarden, PNG:erna och videon. Ingen SVG,
+   ingen foreignObject, inga DOM-träd som byggs om varje bildruta. Det är
+   därför uppspelning och export går mjukt.
+
+   Allt innehåll är DEMODATA: Storgatan 13, priset, tiderna och kontoret
+   Nordvik Mäklarbyrå, som är ett exempel och inte deras riktiga profil.
+   ===================================================================== */
+
+var V3 = {img:{}, ready:false, loading:null};
+var V3_KEYS = {home:"adHome", dining:"adDining", beige:"adBeige", bedroom:"adBedroom", house:"adHouse",
+               terrace:"adTerrace", porch:"adPorch", blur:"adHomeBlur"};
+var V3_POS = {home:[.5,.45], dining:[.46,.5], beige:[.56,.5], bedroom:[.5,.52], house:[.5,.72], terrace:[.4,.5], porch:[.3,.5]};
+var C3 = {paper:"#ECE8E5", ink:"#161616", oli:"#6E7266", mut:"#8C8782", line:"#CFC8C6", dark:"#141211", ui:"#F3F0ED", uil:"#E3DED9",
+          navy:"#13293D", navyD:"#0E1F2F", sand:"#C8B79B", cream:"#EADFCF", green:"#6E9A6B"};
+var V3F = {serif:"'Cormorant Garamond',Georgia,serif", sans:"Montserrat,sans-serif"};
+var V3_OBJ = {addr:"Storgatan 13", city:"Landskrona"};
+
+function v3Load(){
+  if(V3.loading) return V3.loading;
+  var names = Object.keys(V3_KEYS);
+  V3.loading = Promise.all(names.map(function(n){
+    return new Promise(function(res){
+      var im = new Image(); V3.img[n] = im;
+      im.onload = function(){ res() }; im.onerror = function(){ res() };
+      im.src = pick(V3_KEYS[n]);
+      if(im.decode) im.decode().then(res, res);
+    });
+  })).then(function(){
+    return Promise.all([
+      document.fonts.load('300 40px "Cormorant Garamond"'), document.fonts.load('italic 300 40px "Cormorant Garamond"'),
+      document.fonts.load('400 40px "Cormorant Garamond"'), document.fonts.load('500 20px Montserrat'), document.fonts.load('600 20px Montserrat')
+    ]);
+  }).then(function(){ V3.ready = true }, function(){ V3.ready = true });
+  return V3.loading;
+}
+
+/* ---------- lättnader ---------- */
+function oQ(t){ return 1 - Math.pow(1 - t, 5) }
+function ioQ(t){ return t < .5 ? 16*t*t*t*t*t : 1 - Math.pow(-2*t + 2, 5)/2 }
+function ioC(t){ return t < .5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2 }
+function oBack(t){ var c1 = 1.2, c3 = c1 + 1; return Math.max(0, 1 + c3*Math.pow(t - 1, 3) + c1*Math.pow(t - 1, 2)) }
+function k3(t, a, b){ return mclamp((t - a)/(b - a)) }
+
+/* ---------- ritprimitiver (c är redan skalad till cqw) ---------- */
+function v3Begin(canvas, wpx, hpx){
+  if(canvas.width !== wpx) canvas.width = wpx;
+  if(canvas.height !== hpx) canvas.height = hpx;
+  var c = canvas.getContext("2d");
+  c.setTransform(wpx/100, 0, 0, wpx/100, 0, 0);
+  c.globalAlpha = 1; c.globalCompositeOperation = "source-over";
+  return c;
+}
+function v3Fill(c, x, y, w, h, col, a){ c.globalAlpha = a == null ? 1 : a; c.fillStyle = col; c.fillRect(x, y, w, h); c.globalAlpha = 1 }
+function v3Photo(c, name, x, y, w, h, o){
+  o = o || {};
+  var im = V3.img[name]; if(!im || !im.naturalWidth) return;
+  var pos = o.pos || V3_POS[name] || [.5, .5], sc = o.scale || 1, iw = im.naturalWidth, ih = im.naturalHeight;
+  var s = Math.max(w/iw, h/ih)*sc, dw = iw*s, dh = ih*s;
+  var dx = x - (dw - w)*pos[0], dy = y - (dh - h)*pos[1];
+  c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha;
+  c.beginPath(); c.rect(x, y, w, h); c.clip(); c.drawImage(im, dx, dy, dw, dh); c.restore();
+}
+function v3Grad(c, x, y, w, h, stops, a){
+  var g = c.createLinearGradient(0, y, 0, y + h);
+  stops.forEach(function(s){ g.addColorStop(s[0], s[1]) });
+  c.globalAlpha = a == null ? 1 : a; c.fillStyle = g; c.fillRect(x, y, w, h); c.globalAlpha = 1;
+}
+function v3Font(o){ return (o.italic ? "italic " : "") + (o.weight || 300) + " " + o.size + "px " + V3F[o.f || "serif"] }
+function v3Measure(c, s, o){
+  c.font = v3Font(o);
+  var sp = (o.sp || 0)*o.size;
+  if(!sp) return c.measureText(s).width;
+  var w = 0, i; for(i = 0; i < s.length; i++) w += c.measureText(s[i]).width + sp;
+  return w - sp;
+}
+/* Text. y är baslinjen. p 0→1 avslöjar från vänster med en liten höjning;
+   skuggan ger läsbarhet över foto. */
+function v3Text(c, s, x, y, o){
+  var w = v3Measure(c, s, o), al = o.align || "l";
+  var x0 = al === "c" ? x - w/2 : al === "r" ? x - w : x;
+  var p = o.p == null ? 1 : o.p; if(p <= 0) return w;
+  c.save();
+  c.globalAlpha = (o.alpha == null ? 1 : o.alpha)*Math.min(1, p*4);
+  if(o.rise) c.translate(0, (1 - p)*o.rise);
+  if(p < 1){ c.beginPath(); c.rect(x0 - 2, y - o.size*1.2, (w + 4)*p, o.size*1.9); c.clip() }
+  if(o.shadow){ c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = o.size*.5; c.shadowOffsetY = o.size*.05 }
+  c.fillStyle = o.color || "#fff"; c.font = v3Font(o); c.textBaseline = "alphabetic"; c.textAlign = "left";
+  var sp = (o.sp || 0)*o.size;
+  if(!sp) c.fillText(s, x0, y);
+  else { var cx = x0, i; for(i = 0; i < s.length; i++){ c.fillText(s[i], cx, y); cx += c.measureText(s[i]).width + sp } }
+  c.restore();
+  return w;
+}
+function v3Line(c, x1, x2, y, col, th, p, a){
+  if(p <= 0) return;
+  var cx = (x1 + x2)/2, hw = (x2 - x1)/2*p;
+  c.globalAlpha = a == null ? 1 : a; c.fillStyle = col; c.fillRect(cx - hw, y - th/2, hw*2, th); c.globalAlpha = 1;
+}
+function v3VLine(c, x, y1, y2, col, th, p, a){
+  if(p <= 0) return;
+  c.globalAlpha = a == null ? 1 : a; c.fillStyle = col; c.fillRect(x - th/2, y1, th, (y2 - y1)*p); c.globalAlpha = 1;
+}
+/* ram som ritas runt kanten, med start uppe i mitten */
+function v3Frame(c, x, y, w, h, col, th, p, a){
+  if(p <= 0) return;
+  var per = 2*(w + h), len = per*p;
+  c.save(); c.globalAlpha = a == null ? 1 : a; c.strokeStyle = col; c.lineWidth = th; c.setLineDash([len, per]); c.lineDashOffset = 0;
+  c.beginPath(); c.moveTo(x + w/2, y); c.lineTo(x + w, y); c.lineTo(x + w, y + h); c.lineTo(x, y + h); c.lineTo(x, y); c.lineTo(x + w/2, y); c.stroke(); c.restore();
+}
+var V3_PATH = null;
+function v3Mark(c, x, y, h, ink, dot, o){
+  if(!V3_PATH) V3_PATH = new Path2D(GEO.limb);
+  o = o || {};
+  var s = h/756.3;
+  c.save(); c.globalAlpha = (o.alpha == null ? 1 : o.alpha);
+  c.translate(x, y); c.scale(s, s);
+  var rp = o.reveal == null ? 1 : o.reveal;
+  if(rp < 1){ c.beginPath(); c.rect(-5, 756.3*(1 - rp) - 5, 900, 756.3*rp + 10); c.clip() }
+  c.fillStyle = ink; c.fill(V3_PATH);
+  c.restore();
+  var dp = o.dot == null ? 1 : o.dot;
+  if(dp > 0){
+    c.save(); c.globalAlpha = (o.alpha == null ? 1 : o.alpha); c.translate(x, y); c.scale(s, s);
+    c.fillStyle = dot; c.beginPath(); c.arc(GEO.dot.cx, GEO.dot.cy, GEO.dot.r*oBack(mclamp(dp)), 0, Math.PI*2); c.fill(); c.restore();
+  }
+}
+/* Viewlys märke och ordbild. capH är ordbildens versalhöjd; märket görs
+   mk gånger högre. Proportionen är vald så att det tunga märket och den
+   luftiga ordbilden väger lika. Returnerar bredden. */
+function v3Lock(c, cx, cy, capH, ink, dot, o){
+  o = o || {};
+  var mk = o.mk || 1.55, mh = capH*mk, mw = mh*858.6/756.3, fs = capH/0.7, gap = capH*.95;
+  var wo = {size:fs, weight:500, f:"sans", sp:.2, color:ink};
+  var ww = v3Measure(c, "VIEWLY", wo), tot = mw + gap + ww, x0 = o.left != null ? o.left : cx - tot/2;
+  v3Mark(c, x0, cy - mh/2, mh, ink, dot, {reveal:o.pm, dot:o.pd, alpha:o.alpha});
+  /* ordbilden: bokstav för bokstav om o.letters, annars en mask */
+  var by = cy + capH/2 + capH*.02, wx = x0 + mw + gap;
+  if(o.letters != null){
+    var s = "VIEWLY", i, x = wx;
+    for(i = 0; i < s.length; i++){
+      var lp = oQ(k3(o.letters, i*.11, i*.11 + .5));
+      v3Text(c, s[i], x, by, {size:fs, weight:500, f:"sans", color:ink, p:lp, rise:capH*.5, alpha:o.alpha});
+      x += c.measureText(s[i]).width + .2*fs;
+    }
+  } else {
+    v3Text(c, "VIEWLY", wx, by, {size:fs, weight:500, f:"sans", sp:.2, color:ink, p:o.pw == null ? 1 : o.pw, alpha:o.alpha});
+  }
+  return tot;
+}
+/* Kontorets logga (exempel): monogram + ordbild */
+var V3_B = {name:"NORDVIK", sub:"MÄKLARBYRÅ"};
+function v3NLogo(c, x, y, sz, col, al, p){
+  p = p == null ? 1 : p; if(p <= 0) return;
+  var bw = 4.8*sz, nw = 0, w1, w2;
+  var o1 = {size:2.3*sz, weight:600, f:"sans", sp:.34}, o2 = {size:1.2*sz, weight:500, f:"sans", sp:.44};
+  w1 = v3Measure(c, V3_B.name, o1); w2 = v3Measure(c, V3_B.sub, o2);
+  var tw = Math.max(w1, w2), tot = bw + 1.8*sz + tw;
+  var x0 = al === "c" ? x - tot/2 : al === "r" ? x - tot : x;
+  c.save(); c.globalAlpha = p;
+  c.strokeStyle = col; c.lineWidth = .3*sz; c.strokeRect(x0, y, bw, bw);
+  v3Text(c, "N", x0 + bw/2, y + bw*.72, {size:3.5*sz, weight:400, color:col, align:"c"});
+  v3Text(c, V3_B.name, x0 + bw + 1.8*sz, y + bw*.46, {size:2.3*sz, weight:600, f:"sans", sp:.34, color:col});
+  v3Text(c, V3_B.sub, x0 + bw + 1.8*sz, y + bw*.9, {size:1.2*sz, weight:500, f:"sans", sp:.44, color:col, alpha:.8});
+  c.restore();
+  return tot;
+}
+
+/* ---------------------------------------------------------------------
+   INLÄGGSMALLAR (förslag). Tre stilar, fyra faser, valfritt format.
+   Kortet ritas i en egen 100-bred koordinat; ar = höjd/bredd.
+   prog 0→1 bygger upp overlayen i lugna steg.
+   --------------------------------------------------------------------- */
+var V3_PHOTO = {kommande:"dining", tillsalu:"home", visning:"beige", sald:"bedroom"};
+function v3Step(prog, a, b){ return oQ(k3(prog, a, b)) }
+function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
+  o = o || {};
+  var H = 100*ar, p = prog == null ? 1 : prog, tall = ar > 1.5;
+  c.save(); c.translate(x, y); c.scale(w/100, w/100);
+  c.beginPath(); c.rect(0, 0, 100, H); c.clip();
+  v3Photo(c, name || V3_PHOTO[phase], 0, 0, 100, H, {scale:o.zoom || 1});
+  var main = phase === "tillsalu";
+  /* ljusbehandling: bilden får vara bild, bara texten får stöd */
+  var sa = k3(p, 0, .3);
+  if(!main) v3Fill(c, 0, 0, 100, H, "#0c0a0a", (style === "badge" ? .12 : .26)*sa);
+  if(main) v3Grad(c, 0, H*.24, 100, H*.76, [[0, "rgba(12,10,10,0)"], [.3, "rgba(12,10,10,.34)"], [.62, "rgba(12,10,10,.72)"], [1, "rgba(12,10,10,.93)"]], sa);
+  else v3Grad(c, 0, H*.34, 100, H*.66, [[0, "rgba(12,10,10,0)"], [.45, "rgba(12,10,10,.16)"], [1, "rgba(12,10,10,.55)"]], sa);
+  v3Grad(c, 0, 0, 100, H*.15, [[0, "rgba(12,10,10,.32)"], [1, "rgba(12,10,10,0)"]], sa);
+  var m = tall ? 16 : 0;           /* extra luft nertill i 9:16 */
+  var S = c; var W = "#fff", sand = C3.sand, cream = C3.cream;
+  if(style === "overlay"){
+    v3Frame(c, 3.5, 3.5, 93, H - 7, "#fff", .26, v3Step(p, 0, .35), .55);
+    v3NLogo(c, 50, 8.5, 1.05, W, "c", v3Step(p, .08, .3));
+    if(phase === "tillsalu"){
+      var b = H - 9.5 - m;
+      v3Text(c, "Visning söndag 13–14", 50, b, {size:3.8, italic:true, color:cream, align:"c", p:v3Step(p, .86, 1), rise:1.6});
+      var fy = b - 13.5;
+      [["4", "RUM"], ["112", "M²"], ["3 450 000", "KR"]].forEach(function(f, i){
+        var cx = [22, 50, 78][i], q = v3Step(p, .68 + i*.05, .84 + i*.05);
+        v3Text(c, f[0], cx, fy, {size:f[0].length > 3 ? 5.2 : 6.6, weight:400, color:W, align:"c", p:1, alpha:q, rise:1.6});
+        v3Text(c, f[1], cx, fy + 5, {size:1.7, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:q*.8});
+      });
+      v3VLine(c, 36, fy - 6, fy + 6, "#fff", .2, v3Step(p, .74, .9), .45);
+      v3VLine(c, 64, fy - 6, fy + 6, "#fff", .2, v3Step(p, .78, .94), .45);
+      v3Line(c, 43, 57, fy - 12, sand, .3, v3Step(p, .6, .76));
+      v3Text(c, V3_OBJ.city.toUpperCase(), 50, fy - 17.5, {size:2.3, weight:500, f:"sans", sp:.38, color:W, align:"c", p:v3Step(p, .5, .66), rise:1.4});
+      v3Text(c, V3_OBJ.addr, 50, fy - 26.5, {size:13, color:W, align:"c", p:v3Step(p, .36, .56), shadow:true});
+      var lw = v3Measure(c, "TILL SALU", {size:2.2, weight:600, f:"sans", sp:.42});
+      var q0 = v3Step(p, .26, .42), ly = fy - 41;
+      v3Line(c, 50 - lw/2 - 12, 50 - lw/2 - 3, ly - .8, sand, .3, q0);
+      v3Line(c, 50 + lw/2 + 3, 50 + lw/2 + 12, ly - .8, sand, .3, q0);
+      v3Text(c, "TILL SALU", 50, ly, {size:2.2, weight:600, f:"sans", sp:.42, color:sand, align:"c", alpha:q0});
+    } else if(phase === "kommande"){
+      var cy = H/2 + 4;
+      var lw2 = v3Measure(c, "KOMMANDE", {size:2.2, weight:600, f:"sans", sp:.42}), q1 = v3Step(p, .22, .4);
+      v3Line(c, 50 - lw2/2 - 12, 50 - lw2/2 - 3, cy - 18.8, sand, .3, q1); v3Line(c, 50 + lw2/2 + 3, 50 + lw2/2 + 12, cy - 18.8, sand, .3, q1);
+      v3Text(c, "KOMMANDE", 50, cy - 18, {size:2.2, weight:600, f:"sans", sp:.42, color:sand, align:"c", alpha:q1});
+      v3Text(c, V3_OBJ.addr, 50, cy, {size:15.5, color:W, align:"c", p:v3Step(p, .34, .6), shadow:true});
+      v3Line(c, 43, 57, cy + 8, sand, .3, v3Step(p, .58, .74));
+      v3Text(c, "Släpps vecka 12", 50, cy + 17, {size:5.2, italic:true, color:cream, align:"c", p:v3Step(p, .7, .92), rise:1.6});
+    } else if(phase === "visning"){
+      var cy2 = H/2 + 2, lw3 = v3Measure(c, "VISNING", {size:2.2, weight:600, f:"sans", sp:.42}), q2 = v3Step(p, .22, .4);
+      v3Line(c, 50 - lw3/2 - 12, 50 - lw3/2 - 3, cy2 - 22.8, sand, .3, q2); v3Line(c, 50 + lw3/2 + 3, 50 + lw3/2 + 12, cy2 - 22.8, sand, .3, q2);
+      v3Text(c, "VISNING", 50, cy2 - 22, {size:2.2, weight:600, f:"sans", sp:.42, color:sand, align:"c", alpha:q2});
+      v3Text(c, "Sön 13–14", 50, cy2 + 2, {size:20, color:W, align:"c", p:v3Step(p, .34, .62), shadow:true});
+      v3Line(c, 43, 57, cy2 + 11, sand, .3, v3Step(p, .6, .76));
+      v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy2 + 19, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", p:v3Step(p, .68, .86)});
+      v3Text(c, "Anmälan via mäklaren", 50, cy2 + 26, {size:3.8, italic:true, color:cream, align:"c", p:v3Step(p, .82, 1), rise:1.4});
+    } else {
+      var cy3 = H/2 + 4;
+      v3Text(c, "Såld", 50, cy3 + 8, {size:42, italic:true, color:W, align:"c", p:v3Step(p, .3, .62), shadow:true});
+      v3Line(c, 40, 60, cy3 + 18, sand, .3, v3Step(p, .6, .76));
+      v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy3 + 27, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", p:v3Step(p, .7, .88)});
+      v3Text(c, "Tack för förtroendet", 50, cy3 + 34, {size:3.8, italic:true, color:cream, align:"c", p:v3Step(p, .84, 1), rise:1.4});
+    }
+  } else if(style === "editorial"){
+    v3NLogo(c, 9, 9, .95, W, "l", v3Step(p, .08, .3));
+    v3Line(c, 9, 91, H - 9.5 - m - 31, "#fff", .2, v3Step(p, .2, .5), .5);
+    var bb = H - 9.5 - m;
+    var lab = {kommande:"KOMMANDE", tillsalu:"TILL SALU", visning:"VISNING", sald:"SÅLD"}[phase];
+    var big = phase === "sald" ? 24 : 15, labY = bb - 11.5 - big*.74 - 4.2;
+    v3Line(c, 9, 91, labY - 6.4, "#fff", .2, v3Step(p, .2, .5), .5);
+    v3Fill(c, 9, labY - .8, 5*v3Step(p, .3, .45), .3, sand);
+    v3Text(c, lab, 16, labY, {size:2.2, weight:600, f:"sans", sp:.4, color:sand, alpha:v3Step(p, .3, .45)});
+    v3Text(c, phase === "sald" ? "Såld." : phase === "visning" ? "Sön 13–14" : V3_OBJ.addr, 9, bb - 11.5, {size:big, italic:phase === "sald", color:W, p:v3Step(p, .4, .68), shadow:true});
+    var sub = phase === "tillsalu" ? "4 rum  ·  112 m²  ·  3 450 000 kr" : phase === "kommande" ? "Släpps vecka 12" : V3_OBJ.addr + " · " + V3_OBJ.city;
+    v3Text(c, sub.toUpperCase(), 9, bb - 2.5, {size:2.2, weight:500, f:"sans", sp:.28, color:W, p:v3Step(p, .66, .88), alpha:.95});
+    v3Text(c, V3_OBJ.city.toUpperCase(), 91, 12.4, {size:1.9, weight:500, f:"sans", sp:.34, color:W, align:"r", alpha:v3Step(p, .1, .3)*.85});
+  } else {   /* badge */
+    v3NLogo(c, 9, 9, .95, W, "l", v3Step(p, .08, .3));
+    var bq = oBack(k3(p, .18, .5)), r = 12.5;
+    if(bq > 0){
+      c.save(); c.translate(80, 24); c.rotate(-.12); c.scale(bq, bq);
+      c.fillStyle = sand; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
+      var bl = phase === "tillsalu" ? ["TILL", "SALU"] : phase === "kommande" ? ["KOM-", "MANDE"] : phase === "visning" ? ["VIS-", "NING"] : ["SÅLD", ""];
+      v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:C3.navy, align:"c"});
+      if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:C3.navy, align:"c"});
+      c.restore();
+    }
+    var b2 = H - 11 - m;
+    v3Text(c, phase === "visning" ? "Sön 13–14" : phase === "sald" ? "Såld" : V3_OBJ.addr, 9, b2 - 8, {size:phase === "sald" ? 26 : 14.5, italic:phase === "sald", color:W, p:v3Step(p, .34, .62), shadow:true});
+    v3Fill(c, 9, b2 - 3.8, 11*v3Step(p, .56, .72), .35, sand);
+    var s2 = phase === "tillsalu" ? "4 rum  ·  112 m²  ·  3 450 000 kr" : phase === "kommande" ? "Släpps vecka 12" : phase === "visning" ? V3_OBJ.addr + " · " + V3_OBJ.city : "Tack för förtroendet";
+    v3Text(c, s2.toUpperCase(), 9, b2 + 1.8, {size:2.2, weight:500, f:"sans", sp:.28, color:W, p:v3Step(p, .62, .86)});
+  }
+  c.restore();
+}
+
+/* =====================================================================
+   ADS 3 — del B: scener, kompositioner, statiska annonser
+
+   Budskapet, i den ordning en mäklare tar in det:
+     1. Fotona är bra.                    (foto först)
+     2. De är levererade, och portalen    (Mäklarportalen: Skapa kampanj,
+        gör kampanjen åt dig.              välj bild — två klick)
+     3. Två klick. Inte två timmar.       (inlägget i alla format)
+     4. Och det är bara en del av Viewly. (tjänsterna, verifierade på siten)
+     5. Varumärket, en egen sekund.       (slutkort, flera varianter)
+
+   Tempot är avsiktligt lugnt: varje rad avslöjas under ungefär en sekund
+   och står kvar minst lika länge innan den lämnar bilden.
+   ===================================================================== */
+
+function v3Geo(fmt){
+  var is9 = fmt === "916", H = is9 ? 177.78 : 125, top = is9 ? 26 : 8, bot = is9 ? 31.5 : 8;
+  var g = {is9:is9, H:H, top:top, bot:bot, cy:(top + H - bot)/2, fmt:fmt};
+  g.CW = is9 ? 78 : 70; g.CH = g.CW*1.25; g.CX = (100 - g.CW)/2; g.CY = g.cy - g.CH/2;
+  g.labY = top + (is9 ? 13 : 10.5); g.headY = g.labY + (is9 ? 10.5 : 9.5); g.statY = g.headY + (is9 ? 6.2 : 5.4);
+  g.gridY = g.statY + (is9 ? 8 : 6.4); g.th = is9 ? 32 : 24; g.tw = 26.4;
+  g.btnY = g.gridY + 2*g.th + 2.4 + (is9 ? 7 : 5.4); g.btnH = is9 ? 10.5 : 9;
+  return g;
+}
+function v3Mix(a, b, p){ return [lerp(a[0], b[0], p), lerp(a[1], b[1], p), lerp(a[2], b[2], p), lerp(a[3], b[3], p)] }
+function v3Shadow(c, r, a, blur){
+  c.save(); c.shadowColor = "rgba(0,0,0," + a + ")"; c.shadowBlur = blur; c.shadowOffsetY = blur*.3;
+  c.fillStyle = "#000"; c.fillRect(r[0], r[1], r[2], r[3]); c.restore();
+}
+function v3NavyBg(c, G, a, t){
+  c.save(); c.globalAlpha = a;
+  v3Photo(c, "blur", 0, 0, 100, G.H, {scale:1.3 + .02*Math.sin((t || 0)*.25), pos:[.5 + .02*Math.sin((t || 0)*.2), .5]});
+  c.fillStyle = "rgba(15,32,48,.7)"; c.fillRect(0, 0, 100, G.H);
+  v3Grad(c, 0, 0, 100, G.H, [[0, "rgba(8,18,28,.35)"], [.5, "rgba(8,18,28,0)"], [1, "rgba(8,18,28,.4)"]]);
+  c.restore();
+}
+function v3Cursor(c, x, y, press, a){
+  c.save(); c.globalAlpha = a == null ? 1 : a; c.translate(x, y); var s = (1 - press*.14)*.26; c.scale(s, s);
+  c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 6; c.shadowOffsetY = 2;
+  c.beginPath(); c.moveTo(2, 2); c.lineTo(2, 28); c.lineTo(9, 21.4); c.lineTo(13.6, 31.8); c.lineTo(17.8, 29.9); c.lineTo(13.2, 19.7); c.lineTo(23, 19.4); c.closePath();
+  c.fillStyle = "#161616"; c.fill(); c.shadowColor = "transparent"; c.lineWidth = 1.8; c.strokeStyle = "#fff"; c.lineJoin = "round"; c.stroke(); c.restore();
+}
+function v3Click(c, x, y, label, p){
+  if(p <= 0 || p >= 1) return;
+  var a = k3(p, 0, .15)*(1 - k3(p, .75, 1)), ry = (1 - oQ(k3(p, 0, .5)))*3;
+  /* ring */
+  var rp = oQ(k3(p, 0, .6));
+  c.save(); c.globalAlpha = (1 - rp)*.8; c.strokeStyle = C3.sand; c.lineWidth = .35; c.beginPath(); c.arc(x, y, 1.2 + rp*6, 0, Math.PI*2); c.stroke(); c.restore();
+  var o = {size:1.75, weight:600, f:"sans", sp:.3}, w = v3Measure(c, label, o) + 5.6, px = x + 4, py = y - 10 + ry;
+  c.save(); c.globalAlpha = a; c.fillStyle = C3.navy; c.beginPath();
+  var h = 4.6, r = h/2; c.moveTo(px + r, py); c.arcTo(px + w, py, px + w, py + h, r); c.arcTo(px + w, py + h, px, py + h, r); c.arcTo(px, py + h, px, py, r); c.arcTo(px, py, px + w, py, r); c.fill();
+  c.restore();
+  v3Text(c, label, px + w/2, py + 3.1, {size:1.75, weight:600, f:"sans", sp:.3, color:"#fff", align:"c", alpha:a});
+}
+
+/* —— Mäklarportalen ————————————————————————————————————————————— */
+function v3Portal(c, G, t, ua){
+  var ink = C3.ink, mut = C3.mut, m = 8;
+  var mode = ioC(k3(t, 8.0, 8.7));
+  var sel = k3(t, 9.7, 9.95);
+  var tl = ["home", "dining", "beige", "bedroom", "terrace", "house"];
+  /* sidhuvud */
+  var q = oQ(k3(t, 4.4, 5.3));
+  c.save(); c.globalAlpha = ua*q;
+  v3Lock(c, 0, G.top + 2.2, 2.4, ink, C3.oli, {left:m});
+  v3Text(c, "MÄKLARPORTALEN", 100 - m, G.top + 3, {size:1.8, weight:500, f:"sans", sp:.24, color:mut, align:"r"});
+  c.restore();
+  v3Line(c, m, 100 - m, G.top + 7.4, C3.uil, .2, oQ(k3(t, 4.5, 5.6)), ua);
+  /* rubriker */
+  var q2 = oQ(k3(t, 4.8, 5.8));
+  v3Text(c, "STORGATAN 13 · LANDSKRONA", m, G.labY, {size:1.95, weight:500, f:"sans", sp:.24, color:mut, alpha:ua, p:q2});
+  var hs = G.is9 ? 9.2 : 7.8, q3 = oQ(k3(t, 5.1, 6.2));
+  v3Text(c, "12 bilder levererade", m, G.headY, {size:hs, color:ink, alpha:ua*(1 - mode), p:q3, rise:1.6});
+  v3Text(c, "Välj en bild.", m, G.headY, {size:hs, color:ink, alpha:ua*mode, p:mode, rise:1.6});
+  c.save(); c.globalAlpha = ua*oQ(k3(t, 5.6, 6.4)); c.fillStyle = C3.green; c.beginPath(); c.arc(m + .95, G.statY - .75, .95, 0, Math.PI*2); c.fill(); c.restore();
+  v3Text(c, "Levererad idag 09:41", m + 3.2, G.statY, {size:2.3, weight:400, f:"sans", color:mut, alpha:ua*(1 - mode)*oQ(k3(t, 5.6, 6.4))});
+  v3Text(c, "Bilden blir kampanjens motiv", m + 3.2, G.statY, {size:2.3, weight:400, f:"sans", color:mut, alpha:ua*mode});
+  /* bildrutor */
+  tl.forEach(function(nm, i){
+    var col = i % 3, row = Math.floor(i/3), x = m + col*(G.tw + 2.4), y = G.gridY + row*(G.th + 2.4);
+    if(i === 0) return;
+    var qi = oQ(k3(t, 5.4 + i*.15, 6.2 + i*.15)), dim = lerp(1, .3, ioC(k3(t, 9.9, 10.3)));
+    var yy = y + (1 - qi)*3;
+    c.save(); c.globalAlpha = ua*qi*dim;
+    v3Photo(c, nm, x, yy, G.tw, G.th);
+    if(i === 5){ v3Fill(c, x, yy, G.tw, G.th, "#120f10", .55); v3Text(c, "+7", x + G.tw/2, yy + G.th/2 + 2.4, {size:7, color:"#fff", align:"c"}) }
+    if(mode > 0){ c.globalAlpha = ua*qi*dim*mode*.5; c.strokeStyle = ink; c.lineWidth = .22; c.strokeRect(x, yy, G.tw, G.th) }
+    c.restore();
+  });
+  /* knappen */
+  var bq = oQ(k3(t, 6.0, 6.9)), hover = ioC(k3(t, 7.35, 7.7)), press = k3(t, 7.8, 7.9)*(1 - k3(t, 7.95, 8.1)), bout = ioC(k3(t, 8.1, 8.7));
+  if(bout < 1){
+    var by = G.btnY + (1 - bq)*3 + bout*5, ba = ua*bq*(1 - bout);
+    c.save(); c.globalAlpha = ba; c.fillStyle = hover > 0 ? "#2d302b" : ink;
+    var sc = 1 - press*.02, bw = 100 - 2*m; c.translate(50, by + G.btnH/2); c.scale(sc, sc); c.fillRect(-bw/2, -G.btnH/2, bw, G.btnH); c.restore();
+    v3Text(c, "SKAPA KAMPANJ", 50 + 1.8, by + G.btnH/2 + 1, {size:2.6, weight:500, f:"sans", sp:.26, color:"#fff", align:"c", alpha:ba});
+    v3Text(c, "+", 50 - 17, by + G.btnH/2 + 1.3, {size:4, weight:300, f:"sans", color:"#fff", align:"c", alpha:ba});
+  }
+}
+
+/* —— Hook + portal + montering (flödet) ——————————————————————————— */
+var V3_FLOW_END = 16.6;
+function v3Flow(c, G, t, o){
+  o = o || {};
+  var H = G.H, FULL = [0, 0, 100, H], TILE = [8, G.gridY, G.tw, G.th], CARD = [G.CX, G.CY, G.CW, G.CH];
+  var hook = o.hook || ["En fotografering.", "Mer att arbeta med."];
+  v3Fill(c, 0, 0, 100, H, C3.dark);
+  var nb = ioC(k3(t, 10.2, 11.2));
+  if(nb > 0) v3NavyBg(c, G, nb, t);
+  var ub = ioC(k3(t, 4.0, 5.0))*(1 - ioC(k3(t, 10.2, 11.0)));
+  if(ub > 0){ v3Fill(c, 0, 0, 100, H, C3.ui, ub); v3Portal(c, G, t, ub) }
+
+  /* fotot */
+  var q1 = ioQ(k3(t, 4.0, 5.4)), q3 = ioQ(k3(t, 10.4, 11.8));
+  var sc = lerp(1.14, 1.02, ioC(k3(t, 0, 5)));
+  if(t < 11.8){
+    var r = FULL;
+    if(t >= 4.0) r = v3Mix(FULL, TILE, q1);
+    if(t >= 10.4) r = v3Mix(TILE, CARD, q3);
+    var s2 = t >= 4.0 ? lerp(sc, 1, q1) : sc;
+    if(t >= 4.2) v3Shadow(c, r, (t >= 10.4 ? .55*q3 + .12*(1 - q3) : .16*k3(t, 4.2, 5.4)), t >= 10.4 ? 5 : 2);
+    v3Photo(c, "home", r[0], r[1], r[2], r[3], {scale:s2});
+    /* markering av vald bild */
+    var rk = k3(t, 9.7, 10.0)*(1 - k3(t, 10.4, 10.9));
+    if(rk > 0){
+      c.save(); c.globalAlpha = rk; c.strokeStyle = C3.ink; c.lineWidth = .5; c.strokeRect(TILE[0] - .9, TILE[1] - .9, TILE[2] + 1.8, TILE[3] + 1.8);
+      c.fillStyle = C3.oli; c.beginPath(); c.arc(TILE[0] + TILE[2] - .4, TILE[1] - .4, 2.4*oBack(k3(t, 9.75, 10.05)), 0, Math.PI*2); c.fill();
+      c.strokeStyle = "#fff"; c.lineWidth = .4; c.beginPath(); c.moveTo(TILE[0] + TILE[2] - 1.5, TILE[1] - .3); c.lineTo(TILE[0] + TILE[2] - .6, TILE[1] + .6); c.lineTo(TILE[0] + TILE[2] + .9, TILE[1] - 1.3); c.stroke(); c.restore();
+    }
+  } else if(t < 16.4){
+    var prog = k3(t, 12.2, 15.4), lift = 0;
+    var zoom = 1 + .025*k3(t, 11.8, 16.6);
+    v3Shadow(c, [CARD[0], CARD[1], CARD[2], CARD[3]], .55, 5);
+    v3Post(c, o.tpl || "overlay", "tillsalu", "home", CARD[0], CARD[1], CARD[2], 1.25, prog, {zoom:zoom});
+  }
+
+  /* markör och klick */
+  if(t >= 6.5 && t < 11.2){
+    var bx = 50 + 6, by = G.btnY + G.btnH*.55, tx = TILE[0] + TILE[2]*.58, ty = TILE[1] + TILE[3]*.62;
+    var mA = ioC(k3(t, 6.5, 7.8)), mB = ioC(k3(t, 8.7, 9.6)), cx, cy;
+    if(t < 8.7){ cx = lerp(96, bx, mA); cy = lerp(G.H - 16, by, mA) - Math.sin(mA*Math.PI)*4 }
+    else { cx = lerp(bx, tx, mB); cy = lerp(by, ty, mB) - Math.sin(mB*Math.PI)*3 }
+    var pr = Math.max(k3(t, 7.8, 7.9)*(1 - k3(t, 7.95, 8.1)), k3(t, 9.7, 9.8)*(1 - k3(t, 9.85, 10.0)));
+    v3Cursor(c, cx, cy, pr, k3(t, 6.5, 6.9)*(1 - k3(t, 10.5, 10.9)));
+    v3Click(c, bx, by, "KLICK 1", k3(t, 7.8, 9.2));
+    v3Click(c, tx, ty, "KLICK 2", k3(t, 9.7, 11.0));
+  }
+
+  /* hooken */
+  if(t < 4.8){
+    var out = 1 - ioC(k3(t, 3.9, 4.5)), top = G.top, yb = H - G.bot - 28;
+    v3Grad(c, 0, H*.42, 100, H*.58, [[0, "rgba(14,11,11,0)"], [1, "rgba(14,11,11,.78)"]], out);
+    v3Grad(c, 0, 0, 100, H*.24, [[0, "rgba(14,11,11,.5)"], [1, "rgba(14,11,11,0)"]], out);
+    v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5*out);
+    v3Text(c, "VIEWLY · BOSTADSFOTOGRAFERING", 50, top + 4, {size:2, weight:500, f:"sans", sp:.3, color:"#fff", align:"c", alpha:.92*out, p:oQ(k3(t, .5, 1.7))});
+    v3Text(c, hook[0], 50, yb, {size:11.2, color:"#fff", align:"c", alpha:out, p:oQ(k3(t, 1.0, 2.5)), rise:2, shadow:true});
+    v3Text(c, hook[1], 50, yb + 13.6, {size:10.4, italic:true, color:C3.cream, align:"c", alpha:out, p:oQ(k3(t, 2.2, 3.7)), rise:2, shadow:true});
+  }
+}
+
+/* —— Två klick. Inte två timmar. ————————————————————————————————— */
+function v3Trio(c, G, t, t0, o){
+  o = o || {};
+  var is9 = G.is9, H = G.H, a = ioC(k3(t, t0, t0 + .5))*(o.exit ? 1 - ioC(k3(t, t0 + 4.6, t0 + 5.2)) : 1);
+  var sw = is9 ? 23 : 21, mw = is9 ? 34 : 31, qw = is9 ? 28 : 25, gap = 3;
+  var total = sw + mw + qw + 2*gap, x0 = (100 - total)/2, base = is9 ? G.top + 62 : G.top + 49;
+  var main = [G.CX, G.CY, G.CW, G.CH];
+  var final = [x0 + sw + gap, base - mw*1.25, mw, mw*1.25];
+  var qm = ioQ(k3(t, t0, t0 + 1.4)), qs = ioQ(k3(t, t0 + .6, t0 + 2.0));
+  var r = v3Mix(main, final, qm);
+  var cx = r[0] + r[2]/2;
+  var left = [x0, base - sw*1.7778, sw, sw*1.7778], right = [x0 + sw + gap + mw + gap, base - qw, qw, qw];
+  var lr = v3Mix([cx - sw/2, left[1], sw, left[3]], left, qs), rr = v3Mix([cx - qw/2, right[1], qw, right[3]], right, qs);
+  c.save(); c.globalAlpha = a;
+  c.save(); c.globalAlpha = a*qs; v3Shadow(c, lr, .4, 4); v3Post(c, "overlay", "tillsalu", "home", lr[0], lr[1], lr[2], 1.7778, 1); c.restore();
+  c.save(); c.globalAlpha = a*qs; v3Shadow(c, rr, .4, 4); v3Post(c, "overlay", "tillsalu", "home", rr[0], rr[1], rr[2], 1, 1); c.restore();
+  v3Shadow(c, r, .5, 5); v3Post(c, "overlay", "tillsalu", "home", r[0], r[1], r[2], 1.25, 1);
+  c.restore();
+  /* format-etiketter */
+  var ly = base + 4.4, la = oQ(k3(t, t0 + 1.8, t0 + 2.6));
+  [[left, "9:16"], [r, "4:5"], [right, "1:1"]].forEach(function(f){
+    v3Text(c, f[1], f[0][0] + f[0][2]/2, ly, {size:1.9, weight:500, f:"sans", sp:.3, color:"#fff", align:"c", alpha:.75*la});
+  });
+  /* texten */
+  var ty = base + (is9 ? 27 : 20), s1 = is9 ? 16 : 12.4;
+  v3Text(c, "Två klick.", 50, ty, {size:s1, color:"#fff", align:"c", p:oQ(k3(t, t0 + 1.6, t0 + 3.0)), rise:2.4, alpha:a});
+  v3Text(c, "Inte två timmar.", 50, ty + s1*.98, {size:s1, italic:true, color:C3.sand, align:"c", p:oQ(k3(t, t0 + 2.6, t0 + 4.0)), rise:2.4, alpha:a});
+  v3Text(c, "FRÅN LEVERANS TILL FÄRDIGA INLÄGG", 50, ty + s1*.98 + (is9 ? 12 : 9.4), {size:2, weight:500, f:"sans", sp:.28, color:"#fff", align:"c", alpha:.8*oQ(k3(t, t0 + 3.6, t0 + 4.6))*a});
+}
+
+/* —— Och det är bara en del av Viewly ——————————————————————————————— */
+function v3Statement(c, G, t, t0){
+  var a = (1 - ioC(k3(t, t0 + 3.2, t0 + 3.8)));
+  var y = G.cy - 2;
+  v3Text(c, "Och det är bara", 50, y, {size:G.is9 ? 12 : 10, color:"#fff", align:"c", p:oQ(k3(t, t0 + .3, t0 + 1.6)), rise:2.4, alpha:a});
+  v3Text(c, "en del av Viewly.", 50, y + (G.is9 ? 14 : 11.6), {size:G.is9 ? 12 : 10, italic:true, color:C3.sand, align:"c", p:oQ(k3(t, t0 + 1.2, t0 + 2.6)), rise:2.4, alpha:a});
+  v3Line(c, 42, 58, y + (G.is9 ? 24 : 19), C3.sand, .3, oQ(k3(t, t0 + 2.2, t0 + 3.0)), a);
+}
+var V3_SERV = ["Fotografering", "Skymning", "3D-visning", "E-styling", "Drönare", "Områdeskartor", "Verktyg för mäklare"];
+function v3Services(c, G, t, t0){
+  var H = G.H, a = ioC(k3(t, t0, t0 + .8))*(1 - ioC(k3(t, t0 + 4.3, t0 + 4.9)));
+  var ph = H*(G.is9 ? .44 : .36);
+  c.save(); c.globalAlpha = a;
+  v3Photo(c, "house", 0, 0, 100, ph + 12, {scale:1.04 + .03*k3(t, t0, t0 + 5), pos:[.5, .74]});
+  v3Grad(c, 0, ph - 24, 100, 36, [[0, "rgba(15,32,48,0)"], [1, C3.navy]]);
+  v3Fill(c, 0, ph + 12, 100, H - ph - 12, C3.navy);
+  c.restore();
+  v3Text(c, "VIEWLY GÖR MER ÄN BARA FOTOGRAFERING", 50, G.top + 4, {size:1.95, weight:500, f:"sans", sp:.28, color:"#fff", align:"c", alpha:.9*a, p:oQ(k3(t, t0 + .4, t0 + 1.4))});
+  var y0 = ph + (G.is9 ? 8 : 5), step = G.is9 ? 10.8 : 8.6, fs = G.is9 ? 7.6 : 6.4;
+  V3_SERV.forEach(function(s, i){
+    var q = oQ(k3(t, t0 + 1.0 + i*.38, t0 + 1.9 + i*.38)), y = y0 + i*step;
+    v3Text(c, String(i + 1).padStart(2, "0"), 10, y - fs*.22, {size:1.9, weight:500, f:"sans", sp:.2, color:C3.sand, alpha:a*q});
+    v3Text(c, s, 19, y, {size:fs, color:"#fff", alpha:a, p:q, rise:1.6});
+    v3Line(c, 19, 90, y + 2.8, "#fff", .15, q, .18*a);
+  });
+}
+
+/* —— Slutkort: en egen sekund för varumärket ———————————————————————— */
+var V3_OUT = [
+  {id:"marin",   n:"Marin · stor logga"},
+  {id:"papper",  n:"Papper · stor logga"},
+  {id:"stapel",  n:"Stapel · märke över ordbild"},
+  {id:"foto",    n:"Över foto · skymning"},
+  {id:"bokstav", n:"Bokstav för bokstav"},
+  {id:"marke",   n:"Märket först, ordbilden glider ut"},
+  {id:"ordbild", n:"Foto i ordbilden"}
+];
+var V3_TAG = ["En bostadsfotograf som gör", "mer än bara fotografering."];
+function v3Outro(c, G, id, t, o){
+  o = o || {}; var H = G.H, cy = G.cy, dark = id === "marin" || id === "bokstav" || id === "ordbild";
+  var ink = dark || id === "foto" ? "#fff" : C3.ink, dot = dark || id === "foto" ? C3.sand : C3.oli, bgc = dark ? C3.navy : C3.paper;
+  var a = o.noFade ? 1 : ioC(k3(t, 0, .6));
+  c.save(); c.globalAlpha = a;
+  if(id === "foto"){
+    v3Photo(c, "terrace", 0, 0, 100, H, {scale:1.08 - .04*k3(t, 0, 4.6)});
+    v3Fill(c, 0, 0, 100, H, "#0c1824", .62);
+    v3Grad(c, 0, 0, 100, H, [[0, "rgba(10,20,32,.4)"], [.5, "rgba(10,20,32,.1)"], [1, "rgba(10,20,32,.55)"]]);
+  } else if(id === "ordbild"){
+    v3Fill(c, 0, 0, 100, H, C3.navyD);
+  } else v3Fill(c, 0, 0, 100, H, bgc);
+  c.restore();
+  var A = a;
+  var capH = G.is9 ? 7.3 : 6.8;
+  if(id === "marin" || id === "papper" || id === "foto"){
+    var lp = oQ(k3(t, .5, 1.7)), y = cy - (G.is9 ? 14 : 12);
+    v3Lock(c, 50, y, capH, ink, dot, {pm:lp, pd:oQ(k3(t, 1.2, 2.0)), pw:oQ(k3(t, .8, 2.0)), alpha:A});
+    v3Line(c, 42, 58, y + capH*1.9, dot, .3, oQ(k3(t, 1.8, 2.6)), A);
+    v3Text(c, V3_TAG[0], 50, y + capH*1.9 + 10, {size:G.is9 ? 6 : 5.2, color:ink, align:"c", p:oQ(k3(t, 2.0, 3.0)), rise:1.6, alpha:A});
+    v3Text(c, V3_TAG[1], 50, y + capH*1.9 + 10 + (G.is9 ? 7.4 : 6.4), {size:G.is9 ? 6 : 5.2, italic:true, color:id === "papper" ? C3.oli : C3.sand, align:"c", p:oQ(k3(t, 2.5, 3.5)), rise:1.6, alpha:A});
+    v3Text(c, "FÖR FASTIGHETSMÄKLARE I SKÅNE", 50, H - G.bot - 8, {size:1.95, weight:500, f:"sans", sp:.28, color:ink, align:"c", alpha:.75*A*oQ(k3(t, 3.0, 3.8))});
+    v3Text(c, "VIEWLY.SE/MAKLARE", 50, H - G.bot - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:ink, align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
+  } else if(id === "stapel"){
+    var mh = G.is9 ? 26 : 21, y2 = cy - (G.is9 ? 24 : 20);
+    v3Mark(c, 50 - mh*858.6/756.3/2, y2, mh, ink, dot, {reveal:oQ(k3(t, .4, 1.6)), dot:oQ(k3(t, 1.2, 2.0)), alpha:A});
+    var fs = G.is9 ? 12 : 10.4;
+    v3Text(c, "VIEWLY", 50, y2 + mh + fs*1.35, {size:fs, weight:500, f:"sans", sp:.3, color:ink, align:"c", p:oQ(k3(t, 1.3, 2.5)), rise:2, alpha:A});
+    v3Line(c, 42, 58, y2 + mh + fs*1.35 + 7, dot, .3, oQ(k3(t, 2.2, 3.0)), A);
+    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y2 + mh + fs*1.35 + 16, {size:G.is9 ? 3.6 : 3.2, italic:true, color:C3.oli, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
+    v3Text(c, "FÖR FASTIGHETSMÄKLARE I SKÅNE", 50, H - G.bot - 8, {size:1.95, weight:500, f:"sans", sp:.28, color:C3.mut, align:"c", alpha:A*oQ(k3(t, 3.0, 3.8))});
+    v3Text(c, "VIEWLY.SE/MAKLARE", 50, H - G.bot - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:C3.ink, align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
+  } else if(id === "bokstav"){
+    var y3 = cy - (G.is9 ? 12 : 10);
+    v3Lock(c, 50, y3, capH, "#fff", C3.sand, {pm:oQ(k3(t, .4, 1.4)), pd:oQ(k3(t, 1.0, 1.8)), letters:k3(t, .9, 2.8), alpha:A});
+    v3Line(c, 42, 58, y3 + capH*1.9, C3.sand, .3, oQ(k3(t, 2.6, 3.3)), A);
+    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y3 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
+    v3Text(c, "VIEWLY.SE/MAKLARE", 50, H - G.bot - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
+  } else if(id === "marke"){
+    var y4 = cy - (G.is9 ? 12 : 10), mh2 = capH*1.55, mw2 = mh2*858.6/756.3;
+    var fs2 = capH/.7, wo = {size:fs2, weight:500, f:"sans", sp:.2}, ww = v3Measure(c, "VIEWLY", wo), gap = capH*.95, tot = mw2 + gap + ww;
+    var slide = ioQ(k3(t, 1.5, 2.8)), ms = lerp(2.6, 1, ioQ(k3(t, .3, 1.5)));
+    var xC = 50 - mw2*ms/2, xL = 50 - tot/2, mx = lerp(xC, xL, slide);
+    v3Mark(c, mx - (mh2*ms - mh2)*.5*(1 - slide)*0, y4 - mh2*ms/2, mh2*ms, C3.ink, C3.oli, {alpha:A*oQ(k3(t, .2, .8)), dot:oQ(k3(t, 1.0, 1.7))});
+    var wx = xL + mw2 + gap;
+    c.save(); c.beginPath(); c.rect(xL + mw2 + 1, y4 - capH*2, ww + gap + 3, capH*4); c.clip();
+    v3Text(c, "VIEWLY", wx - (1 - slide)*(ww + gap), y4 + capH/2 + capH*.02, {size:fs2, weight:500, f:"sans", sp:.2, color:C3.ink, alpha:A*slide});
+    c.restore();
+    v3Line(c, 42, 58, y4 + capH*1.9, C3.oli, .3, oQ(k3(t, 2.6, 3.3)), A);
+    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y4 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.oli, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
+    v3Text(c, "VIEWLY.SE/MAKLARE", 50, H - G.bot - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:C3.ink, align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
+  } else {   /* ordbild: foto i bokstäverna */
+    var w20 = v3Measure(c, "VIEWLY", {size:20, weight:700, f:"sans", sp:.06}), fs3 = 20*80/w20, y5 = cy + 4, wo3 = {size:fs3, weight:700, f:"sans", sp:.06};
+    var w3 = v3Measure(c, "VIEWLY", wo3), reveal = oQ(k3(t, .6, 2.2));
+    var off = V3.off || (V3.off = document.createElement("canvas")), cw = c.canvas.width, ch = c.canvas.height;
+    if(off.width !== cw || off.height !== ch){ off.width = cw; off.height = ch }
+    var oc = off.getContext("2d"), kk = cw/100; oc.setTransform(1, 0, 0, 1, 0, 0); oc.clearRect(0, 0, cw, ch); oc.setTransform(kk, 0, 0, kk, 0, 0);
+    oc.globalCompositeOperation = "source-over";
+    v3Text(oc, "VIEWLY", 50, y5, {size:fs3, weight:700, f:"sans", sp:.06, color:"#fff", align:"c"});
+    oc.globalCompositeOperation = "source-in";
+    v3Photo(oc, "house", 50 - w3/2 - 4, y5 - fs3*.9, w3 + 8, fs3*1.2, {scale:1.3 - .08*k3(t, 0, 4.6), pos:[.5, .16]});
+    oc.globalCompositeOperation = "source-over";
+    c.save(); c.globalAlpha = A*reveal; c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(off, 0, 0); c.restore();
+    var mh3 = G.is9 ? 14 : 11.5;
+    v3Mark(c, 50 - mh3*858.6/756.3/2, y5 - fs3 - mh3 - 5, mh3, "#fff", C3.sand, {reveal:oQ(k3(t, .3, 1.4)), dot:oQ(k3(t, 1.0, 1.8)), alpha:A});
+    v3Line(c, 42, 58, y5 + 8, C3.sand, .3, oQ(k3(t, 2.2, 3.0)), A);
+    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y5 + 17, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
+    v3Text(c, "VIEWLY.SE/MAKLARE", 50, H - G.bot - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
+  }
+}
+
+/* —— Förr / Nu (video D) ———————————————————————————————————————— */
+function v3ForrNu(c, G, t){
+  var H = G.H, cy = G.cy, a1 = 1 - ioC(k3(t, 3.4, 4.0));
+  v3Fill(c, 0, 0, 100, H, C3.paper);
+  /* förr */
+  if(t < 4.2){
+    v3Text(c, "FÖRR", 10, cy - 20, {size:2.2, weight:600, f:"sans", sp:.4, color:C3.mut, alpha:a1, p:oQ(k3(t, .2, 1.0))});
+    v3Text(c, "Timmar.", 10, cy - 2, {size:G.is9 ? 24 : 21, color:C3.ink, alpha:a1, p:oQ(k3(t, .5, 2.0)), rise:2.4});
+    v3Fill(c, 10, cy + 12, 80, .5, C3.line, a1*oQ(k3(t, 1.2, 1.8)));
+    v3Fill(c, 10, cy + 12, 80*.18*ioC(k3(t, 1.4, 3.8)), .5, C3.ink, a1);
+    v3Text(c, "ETT INLÄGG, FRÅN BÖRJAN", 10, cy + 20, {size:1.9, weight:500, f:"sans", sp:.28, color:C3.mut, alpha:a1*oQ(k3(t, 1.6, 2.4))});
+  }
+  /* nu */
+  if(t >= 3.6 && t < 7.2){
+    var q = t - 3.6, a2 = ioC(k3(q, 0, .7))*(1 - ioC(k3(q, 3.0, 3.6)));
+    v3Text(c, "NU", 10, cy - 20, {size:2.2, weight:600, f:"sans", sp:.4, color:C3.oli, alpha:a2, p:oQ(k3(q, .2, 1.0))});
+    v3Text(c, "Två klick.", 10, cy - 2, {size:G.is9 ? 24 : 21, color:C3.ink, alpha:a2, p:oQ(k3(q, .5, 1.9)), rise:2.4});
+    [["1", "Skapa kampanj"], ["2", "Välj bild"]].forEach(function(s, i){
+      var qq = oQ(k3(q, 1.5 + i*.7, 2.3 + i*.7)), y = cy + 14 + i*10;
+      c.save(); c.globalAlpha = a2*qq; c.fillStyle = C3.navy; c.beginPath(); c.arc(12.5, y - 1, 2.8, 0, Math.PI*2); c.fill(); c.restore();
+      v3Text(c, s[0], 12.5, y + .3, {size:2.8, weight:600, f:"sans", color:"#fff", align:"c", alpha:a2*qq});
+      v3Text(c, s[1].toUpperCase(), 19, y + .1, {size:2.3, weight:500, f:"sans", sp:.26, color:C3.ink, alpha:a2*qq, p:qq});
+    });
+  }
+  /* resultat */
+  if(t >= 6.6){
+    var r = t - 6.6, ra = ioC(k3(r, 0, .8));
+    v3NavyBg(c, G, ra, t);
+    var prog = k3(r, .9, 3.3), cw = G.CW, cxx = G.CX, cyy = G.CY;
+    c.save(); c.globalAlpha = ra; v3Shadow(c, [cxx, cyy, cw, G.CH], .55, 5); c.restore();
+    c.save(); c.globalAlpha = ra; v3Post(c, "overlay", "tillsalu", "home", cxx, cyy, cw, 1.25, prog, {zoom:1 + .025*k3(r, 0, 4)}); c.restore();
+  }
+}
+
+/* ---------------------------------------------------------------------
+   KOMPOSITIONER — video. Varje har en längd, en draw(c,G,t) och ljudcuer.
+   --------------------------------------------------------------------- */
+function v3Warp(c, G, t, w, fn){ fn(c, G, t*w) }
+var V3_COMPS = {
+  lang: {n:"A · Två klick (lång)", dur:33.8, d:"Hook, portal, två klick, formaten, Viewly-tjänsterna och en egen sekund för varumärket.",
+    draw:function(c, G, t, o){
+      var ol = o.outro, hk = o.hook;
+      if(t < 25.2) v3Flow(c, G, t, {hook:hk});
+      if(t >= 16.2 && t < 21.6) v3Trio(c, G, t, 16.2, {exit:true});
+      if(t >= 21.2 && t < 25.2) v3Statement(c, G, t, 21.2);
+      if(t >= 24.4 && t < 29.6){ v3Services(c, G, t, 24.4) }
+      if(t >= 29.0){ v3Outro(c, G, ol, t - 29.0) }
+    },
+    audio:{chords:[[0, 4.4, 0], [4.4, 10.4, 1], [10.4, 16.6, 2], [16.6, 24.4, 3], [24.4, 29.0, 0], [29.0, 33.8, 3]],
+      whoosh:[4.0, 10.4, 16.2, 21.0, 24.4, 28.9], tap:[7.84, 9.74], pop:[5.6, 5.75, 5.9, 6.05, 6.2, 12.9, 13.6, 14.2, 14.7, 15.1, 17.6, 18.0],
+      chime:[15.4, 19.0], riser:[[27.0, 2.0]], sub:29.1, tail:33.8}},
+  kort: {n:"A · Två klick (kort)", dur:21.2, d:"Samma berättelse, tajtare: hook, portal, två klick, formaten och varumärket.",
+    draw:function(c, G, t, o){
+      var w = 1.22, tt = t*w;
+      if(tt < 16.6) v3Flow(c, G, tt, {hook:o.hook});
+      if(tt >= 16.2 && tt < 21.4){
+        v3NavyBg(c, G, ioC(k3(tt, 16.2, 16.9))*(1 - ioC(k3(t, 17.0, 17.8))), tt);
+        v3Trio(c, G, tt, 16.2);
+      }
+      if(t >= 17.3) v3Outro(c, G, o.outro, t - 17.3);
+    },
+    audio:{chords:[[0, 3.6, 0], [3.6, 8.5, 1], [8.5, 13.6, 2], [13.6, 17.4, 3], [17.4, 21.2, 0]],
+      whoosh:[3.3, 8.5, 13.2, 17.2], tap:[6.4, 7.95], pop:[4.6, 4.7, 4.8, 4.9, 10.5, 11.1, 11.7, 12.1, 12.5], chime:[12.7], riser:[[15.2, 1.8]], sub:17.4, tail:21.2}},
+  mer: {n:"C · Mer än fotografering", dur:15.4, d:"Varumärkesvideo: vad Viewly är, utan verktygen. Tjänsterna som ett index.",
+    draw:function(c, G, t, o){
+      v3Fill(c, 0, 0, 100, G.H, C3.navy);
+      var ha = 1 - ioC(k3(t, 3.6, 4.3)), hp = 1.5 + 0*t;
+      if(t < 4.6){
+        v3Photo(c, "dining", 0, 0, 100, G.H, {scale:lerp(1.14, 1.02, ioC(k3(t, 0, 4.4)))});
+        v3Grad(c, 0, G.H*.4, 100, G.H*.6, [[0, "rgba(12,10,10,0)"], [1, "rgba(12,10,10,.8)"]], ha);
+        v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5*ha);
+        var yb = G.H - G.bot - 26;
+        v3Text(c, "En bostadsfotograf som gör", 50, yb, {size:G.is9 ? 7.4 : 6.4, color:"#fff", align:"c", alpha:ha, p:oQ(k3(t, .8, 2.2)), rise:2, shadow:true});
+        v3Text(c, "mer än bara fotografering.", 50, yb + (G.is9 ? 9.2 : 8), {size:G.is9 ? 7.4 : 6.4, italic:true, color:C3.cream, alpha:ha, p:oQ(k3(t, 1.8, 3.2)), rise:2, shadow:true});
+        v3Text(c, "VIEWLY · BOSTADSFOTOGRAFERING", 50, G.top + 4, {size:2, weight:500, f:"sans", sp:.3, color:"#fff", align:"c", alpha:.9*ha, p:oQ(k3(t, .5, 1.6))});
+      }
+      if(t >= 4.0 && t < 10.4) v3Services(c, G, t, 4.0);
+      if(t >= 9.8) v3Outro(c, G, o.outro, t - 9.8);
+    },
+    audio:{chords:[[0, 4.2, 0], [4.2, 9.8, 1], [9.8, 15.4, 3]], whoosh:[3.9, 9.7], tap:[], pop:[5.0, 5.4, 5.8, 6.2, 6.6, 7.0, 7.4], chime:[], riser:[[8.0, 1.7]], sub:9.9, tail:15.4}},
+  forrnu: {n:"D · Förr / Nu", dur:13.6, d:"Typografisk jämförelse: timmar mot två klick, sedan resultatet och varumärket.",
+    draw:function(c, G, t, o){
+      if(t < 9.6) v3ForrNu(c, G, t);
+      if(t >= 9.4) v3Outro(c, G, o.outro, t - 9.4);
+    },
+    audio:{chords:[[0, 3.6, 0], [3.6, 6.8, 1], [6.8, 9.6, 2], [9.6, 13.6, 3]], whoosh:[3.4, 6.5, 9.3], tap:[5.1, 5.8], pop:[8.0, 8.5, 9.0], chime:[8.8], riser:[], sub:9.5, tail:13.6}}
+};
+
+/* ---------------------------------------------------------------------
+   STATISKA ANNONSER OCH KARUSELLER (4:5). Samma kod som videon, fruset.
+   --------------------------------------------------------------------- */
+function v3Headline(c, lines, y, size, o){
+  o = o || {};
+  lines.forEach(function(l, i){
+    v3Text(c, l[0], o.x == null ? 50 : o.x, y + i*size*1.02, {size:size, italic:l[1], color:l[2] || "#fff", align:o.align || "c", shadow:o.shadow});
+  });
+}
+function v3Small(c, s, x, y, col, al, a, sz){ v3Text(c, s, x, y, {size:sz || 2, weight:500, f:"sans", sp:.28, color:col || "#fff", align:al || "c", alpha:a == null ? .85 : a}) }
+var V3_STATIC = [
+  {id:"p1", n:"Två klick. Inte två timmar.", d:"Formaten som bevis. Marin bakgrund.", draw:function(c, G){
+      v3Fill(c, 0, 0, 100, G.H, C3.navy); v3NavyBg(c, G, 1, 0);
+      v3Trio(c, G, 20, 0);
+      v3Lock(c, 50, G.H - 14, 2.2, "#fff", C3.sand);
+  }},
+  {id:"p2", n:"Mer än fotografering", d:"Tjänsterna som ett index över ett skymningsfoto.", draw:function(c, G){
+      v3Services(c, G, 4.2, 0);
+      v3Lock(c, 50, G.H - 11, 2.2, "#fff", C3.sand);
+  }},
+  {id:"p3", n:"Varumärke · skymning", d:"Stor logga över foto.", draw:function(c, G){ v3Outro(c, G, "foto", 5, {noFade:true}) }},
+  {id:"p4", n:"Skapa kampanj", d:"Portalen med markören på knappen.", draw:function(c, G){
+      v3Fill(c, 0, 0, 100, G.H, C3.ui);
+      v3Portal(c, G, 7.7, 1);
+      var tile = [8, G.gridY, G.tw, G.th]; v3Photo(c, "home", tile[0], tile[1], tile[2], tile[3]);
+      var bx = 56, by = G.btnY + G.btnH*.55; v3Cursor(c, bx, by, 0, 1); v3Click(c, bx, by, "KLICK 1", .25);
+  }},
+  {id:"p5", n:"Leveransen är bara början", d:"Foto först, ett påstående.", draw:function(c, G){
+      v3Photo(c, "home", 0, 0, 100, G.H); v3Grad(c, 0, G.H*.4, 100, G.H*.6, [[0, "rgba(12,10,10,0)"], [1, "rgba(12,10,10,.82)"]]);
+      v3Grad(c, 0, 0, 100, G.H*.2, [[0, "rgba(12,10,10,.45)"], [1, "rgba(12,10,10,0)"]]);
+      v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
+      v3Small(c, "VIEWLY · BOSTADSFOTOGRAFERING", 50, 11, "#fff", "c", .9);
+      v3Headline(c, [["Leveransen", false], ["är bara början.", true, C3.cream]], G.H - 33, 10.6, {shadow:true});
+      v3Lock(c, 50, G.H - 11, 2.1, "#fff", C3.sand);
+  }},
+  {id:"p6", n:"Du bokar. Vi sköter resten.", d:"Slogan ur viewly.se/maklare.", draw:function(c, G){
+      v3Photo(c, "dining", 0, 0, 100, G.H); v3Grad(c, 0, G.H*.4, 100, G.H*.6, [[0, "rgba(12,10,10,0)"], [1, "rgba(12,10,10,.84)"]]);
+      v3Grad(c, 0, 0, 100, G.H*.2, [[0, "rgba(12,10,10,.45)"], [1, "rgba(12,10,10,0)"]]);
+      v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
+      v3Small(c, "FÖR FASTIGHETSMÄKLARE I SKÅNE", 50, 11, "#fff", "c", .9);
+      v3Headline(c, [["Du bokar.", false], ["Vi sköter resten.", true, C3.cream]], G.H - 33, 10.6, {shadow:true});
+      v3Lock(c, 50, G.H - 11, 2.1, "#fff", C3.sand);
+  }}
+];
+/* Karusell B: så fungerar det */
+var V3_CAR = {
+  b:{n:"B · Så fungerar det", d:"Sex bilder: frågan, leveransen, två klick, resultatet, och Viewly.", slides:[
+    function(c, G){
+      v3Photo(c, "dining", 0, 0, 100, G.H); v3Grad(c, 0, G.H*.34, 100, G.H*.66, [[0, "rgba(12,10,10,0)"], [1, "rgba(12,10,10,.86)"]]);
+      v3Grad(c, 0, 0, 100, G.H*.2, [[0, "rgba(12,10,10,.45)"], [1, "rgba(12,10,10,0)"]]);
+      v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
+      v3Small(c, "VIEWLY · EFTER LEVERANSEN", 50, 11, "#fff", "c", .9);
+      v3Headline(c, [["Dina bilder", false], ["är levererade.", false], ["Nu då?", true, C3.cream]], G.H - 44, 12, {shadow:true});
+    },
+    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 6.6, 1); v3Photo(c, "home", 8, G.gridY, G.tw, G.th) },
+    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 7.78, 1); v3Photo(c, "home", 8, G.gridY, G.tw, G.th);
+      var bx = 56, by = G.btnY + G.btnH*.55; v3Cursor(c, bx, by, .6, 1); v3Click(c, bx, by, "KLICK 1", .22) },
+    function(c, G){ v3Fill(c, 0, 0, 100, G.H, C3.ui); v3Portal(c, G, 9.8, 1); v3Photo(c, "home", 8, G.gridY, G.tw, G.th);
+      var tx = 8 + G.tw*.58, ty = G.gridY + G.th*.62; v3Cursor(c, tx, ty, .5, 1); v3Click(c, tx, ty, "KLICK 2", .22) },
+    function(c, G){
+      v3Fill(c, 0, 0, 100, G.H, C3.dark); v3NavyBg(c, G, 1, 0);
+      v3Shadow(c, [G.CX, G.CY - 3, G.CW, G.CH], .55, 5); v3Post(c, "overlay", "tillsalu", "home", G.CX, G.CY - 3, G.CW, 1.25, 1);
+      v3Text(c, "Klart.", 50, G.H - 7.4, {size:7.4, italic:true, color:"#fff", align:"c"});
+    },
+    function(c, G){ v3Outro(c, G, "marin", 5, {noFade:true}) }
+  ]},
+  c:{n:"C · Mer än fotografering", d:"Fem bilder: vad Viewly är, två tjänster som foto, indexet och varumärket.", slides:[
+    function(c, G){
+      v3Photo(c, "house", 0, 0, 100, G.H); v3Grad(c, 0, G.H*.34, 100, G.H*.66, [[0, "rgba(10,20,32,0)"], [1, "rgba(10,20,32,.88)"]]);
+      v3Grad(c, 0, 0, 100, G.H*.2, [[0, "rgba(10,20,32,.5)"], [1, "rgba(10,20,32,0)"]]);
+      v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
+      v3Small(c, "VIEWLY · BOSTADSFOTOGRAFERING", 50, 11, "#fff", "c", .9);
+      v3Headline(c, [["En bostadsfotograf", false], ["som gör mer än", false], ["bara fotografering.", true, C3.cream]], G.H - 44, 9.4, {shadow:true});
+    },
+    function(c, G){
+      v3Photo(c, "dining", 0, 0, 100, G.H); v3Grad(c, 0, G.H*.62, 100, G.H*.38, [[0, "rgba(12,10,10,0)"], [1, "rgba(12,10,10,.7)"]]);
+      v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
+      v3Small(c, "01", 11, 12, C3.sand, "l", 1); v3Text(c, "Fotografering", 50, G.H - 16, {size:12, color:"#fff", align:"c", shadow:true});
+      v3Small(c, "INTERIÖR · EXTERIÖR · DETALJER", 50, G.H - 9, "#fff", "c", .85);
+    },
+    function(c, G){
+      v3Photo(c, "terrace", 0, 0, 100, G.H); v3Grad(c, 0, G.H*.62, 100, G.H*.38, [[0, "rgba(12,10,10,0)"], [1, "rgba(12,10,10,.7)"]]);
+      v3Frame(c, 4, 4, 92, G.H - 8, "#fff", .26, 1, .5);
+      v3Small(c, "02", 11, 12, C3.sand, "l", 1); v3Text(c, "Skymning", 50, G.H - 16, {size:12, color:"#fff", align:"c", shadow:true});
+      v3Small(c, "BILDERNA SOM STOPPAR SCROLLEN", 50, G.H - 9, "#fff", "c", .85);
+    },
+    function(c, G){ v3Services(c, G, 4.2, 0) },
+    function(c, G){ v3Outro(c, G, "papper", 5, {noFade:true}) }
+  ]}
+};
+
+/* =====================================================================
+   ADS 3 — del C: ljud, export och sidan
+   ===================================================================== */
+
+var V3S = {tab:"video", comp:"kort", fmt:"916", t:2.4, playing:false, raf:0, tick:0, hook:0, outro:"marin", sound:true,
+           tplStyle:"overlay", tplFmt:"45", outroPreviewFmt:"916", ctxA:null, src:null, startT:0, startCtx:0};
+var V3_HOOKS = [["En fotografering.", "Mer att arbeta med."], ["Fotona är klara.", "Inläggen också."], ["Dina bilder.", "Din kampanj."]];
+var V3_FPS = 30;
+
+/* ---------- ritar en komposition i en given canvas ---------- */
+function v3DrawComp(canvas, wpx, compId, fmt, t){
+  var G = v3Geo(fmt), hpx = Math.round(wpx*G.H/100), c = v3Begin(canvas, wpx, hpx);
+  c.clearRect(0, 0, 100, G.H);
+  V3_COMPS[compId].draw(c, G, t, {outro:V3S.outro, hook:V3_HOOKS[V3S.hook]});
+}
+function v3Dims(fmt){ return fmt === "916" ? [1080, 1920] : [1080, 1350] }
+
+/* ---------------------------------------------------------------------
+   LJUD — ett litet piano och diskreta ljudeffekter, syntetiserat i
+   webbläsaren. Samma partitur spelas i förhandsvisningen och går in i
+   MP4:n. Jag har skrivit det men inte hört det; lyssna innan ni använder
+   det.
+   --------------------------------------------------------------------- */
+var V3_CHORDS = [[38,50,57,61,64,66], [35,47,54,57,62,66], [43,50,55,59,62,66], [45,52,57,61,64,71]];
+var V3_ARP = [0, 2, 3, 4, 5, 4, 3, 2];
+function v3Noise(ctx, len){
+  var b = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate*len)), ctx.sampleRate), d = b.getChannelData(0);
+  for(var i = 0; i < d.length; i++) d[i] = Math.random()*2 - 1;
+  return b;
+}
+function v3Score(ctx, comp){
+  var A = comp.audio, dur = comp.dur;
+  var master = ctx.createGain(); master.gain.setValueAtTime(.62, 0); master.gain.setValueAtTime(.62, Math.max(0, dur - 1.2)); master.gain.linearRampToValueAtTime(0, dur);
+  var cmp = ctx.createDynamicsCompressor(); cmp.threshold.value = -20; cmp.ratio.value = 3; cmp.attack.value = .01; cmp.release.value = .25;
+  var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = 9000;
+  master.connect(cmp); cmp.connect(lp); lp.connect(ctx.destination);
+  var rl = Math.floor(ctx.sampleRate*2.4), ir = ctx.createBuffer(2, rl, ctx.sampleRate), ch, i;
+  for(ch = 0; ch < 2; ch++){ var d = ir.getChannelData(ch); for(i = 0; i < rl; i++) d[i] = (Math.random()*2 - 1)*Math.pow(1 - i/rl, 2.6) }
+  var conv = ctx.createConvolver(); conv.buffer = ir;
+  var wet = ctx.createGain(); wet.gain.value = .3; conv.connect(wet); wet.connect(master);
+  var dry = ctx.createGain(); dry.gain.value = .85; dry.connect(master);
+  var out = function(node, g){ var a = ctx.createGain(); a.gain.value = g == null ? 1 : g; node.connect(a); a.connect(dry); a.connect(conv); return a };
+
+  var piano = function(t, midi, vel, dur2){
+    var f = 440*Math.pow(2, (midi - 69)/12), amps = [1, .5, .26, .13, .07, .04], bus = ctx.createGain(), k;
+    bus.gain.value = vel*.34;
+    var tone = ctx.createBiquadFilter(); tone.type = "lowpass"; tone.frequency.value = Math.min(7000, 1400 + f*5); bus.connect(tone); out(tone);
+    for(k = 0; k < amps.length; k++){
+      var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = f*(k + 1)*(1 + .0003*(k + 1)*(k + 1));
+      var g = ctx.createGain(), tau = dur2/(1 + k*.9);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(amps[k], t + .007); g.gain.setTargetAtTime(0, t + .01, tau/3.2);
+      o.connect(g); g.connect(bus); o.start(t); o.stop(t + dur2 + .3);
+    }
+    var o2 = ctx.createOscillator(); o2.type = "sine"; o2.frequency.value = f*1.004;
+    var g2 = ctx.createGain(); g2.gain.setValueAtTime(0, t); g2.gain.linearRampToValueAtTime(.4, t + .008); g2.gain.setTargetAtTime(0, t + .01, dur2/3.4);
+    o2.connect(g2); g2.connect(bus); o2.start(t); o2.stop(t + dur2 + .3);
+    var n = ctx.createBufferSource(); n.buffer = v3Noise(ctx, .06);
+    var nf = ctx.createBiquadFilter(); nf.type = "bandpass"; nf.frequency.value = 1500 + f; nf.Q.value = .8;
+    var ng = ctx.createGain(); ng.gain.setValueAtTime(vel*.05, t); ng.gain.exponentialRampToValueAtTime(.0001, t + .05);
+    n.connect(nf); nf.connect(ng); out(ng); n.start(t); n.stop(t + .06);
+  };
+  var whoosh = function(t, d2, vol){
+    var n = ctx.createBufferSource(); n.buffer = v3Noise(ctx, d2 + .1);
+    var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.Q.value = .7; f.frequency.setValueAtTime(350, t); f.frequency.exponentialRampToValueAtTime(2600, t + d2);
+    var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + d2*.45); g.gain.linearRampToValueAtTime(0, t + d2);
+    n.connect(f); f.connect(g); out(g); n.start(t); n.stop(t + d2 + .1);
+  };
+  var tap = function(t, vol){
+    var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(1150, t); o.frequency.exponentialRampToValueAtTime(620, t + .07);
+    var g = ctx.createGain(); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+    o.connect(g); out(g); o.start(t); o.stop(t + .12);
+    var n = ctx.createBufferSource(); n.buffer = v3Noise(ctx, .02);
+    var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 3000;
+    var ng = ctx.createGain(); ng.gain.setValueAtTime(vol*.5, t); ng.gain.exponentialRampToValueAtTime(.0001, t + .015);
+    n.connect(hp); hp.connect(ng); out(ng); n.start(t); n.stop(t + .025);
+  };
+  var pop = function(t, vol, fr){
+    var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(fr*.8, t); o.frequency.exponentialRampToValueAtTime(fr, t + .05);
+    var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .008); g.gain.exponentialRampToValueAtTime(.0001, t + .16);
+    o.connect(g); out(g); o.start(t); o.stop(t + .2);
+  };
+  var chime = function(t, vol){
+    [1320, 1980, 2640, 3960].forEach(function(fr, k){
+      var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr*(1 + k*.0012);
+      var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol/(1 + k*.8), t + .004); g.gain.setTargetAtTime(0, t + .01, .5/(1 + k*.35));
+      o.connect(g); out(g); o.start(t); o.stop(t + 2.4);
+    });
+  };
+  var riser = function(t, d2, vol){
+    var n = ctx.createBufferSource(); n.buffer = v3Noise(ctx, d2 + .1);
+    var f = ctx.createBiquadFilter(); f.type = "highpass"; f.frequency.setValueAtTime(900, t); f.frequency.exponentialRampToValueAtTime(7000, t + d2);
+    var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.exponentialRampToValueAtTime(vol, t + d2*.96); g.gain.linearRampToValueAtTime(0, t + d2);
+    n.connect(f); f.connect(g); out(g); n.start(t); n.stop(t + d2 + .1);
+  };
+  var sub = function(t, vol){
+    var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = 73.4;
+    var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + .9); g.gain.setTargetAtTime(0, t + 1, 1.1);
+    o.connect(g); out(g, .8); o.start(t); o.stop(t + 4.5);
+  };
+
+  /* pianot: ett ackord per fönster, arpeggio i lugn takt */
+  A.chords.forEach(function(w){
+    var ch2 = V3_CHORDS[w[2]], t0 = w[0], t1 = w[1], step = .66, n2 = 0;
+    piano(t0 + .1, ch2[0], .5, 3.6);
+    for(var tt = t0 + .5; tt < t1 - .35; tt += step, n2++){
+      var note = ch2[V3_ARP[n2 % V3_ARP.length]] + (n2 % 8 === 4 ? 12 : 0);
+      piano(tt, note, .26 + .08*((n2 % 4) === 0), 2.6);
+    }
+  });
+  (A.whoosh || []).forEach(function(t){ whoosh(t, .55, .05) });
+  (A.tap || []).forEach(function(t){ tap(t, .15) });
+  (A.pop || []).forEach(function(t, k){ pop(t, .042, 560 + (k % 5)*60) });
+  (A.chime || []).forEach(function(t){ chime(t, .065) });
+  (A.riser || []).forEach(function(r){ riser(r[0], r[1], .04) });
+  if(A.sub != null){
+    sub(A.sub, .1);
+    [38, 50, 54, 57, 61, 64].forEach(function(m, k){ piano(A.sub + .15 + k*.04, m, k ? .3 : .55, 5) });
+    piano(A.sub + 1.2, 74, .24, 3);
+  }
+}
+var V3_AUD = {};
+function v3Audio(compId, sr){
+  var key = compId + "@" + sr;
+  if(V3_AUD[key]) return V3_AUD[key];
+  var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  if(!OAC) return Promise.resolve(null);
+  var comp = V3_COMPS[compId], ctx = new OAC(2, Math.ceil(sr*(comp.dur + .3)), sr);
+  v3Score(ctx, comp);
+  V3_AUD[key] = ctx.startRendering();
+  return V3_AUD[key];
+}
+function v3Wav(buf){
+  var n = buf.length, ch = buf.numberOfChannels, sr = buf.sampleRate, bytes = n*ch*2, ab = new ArrayBuffer(44 + bytes), v = new DataView(ab), i, c2, o = 44;
+  var w = function(off, s){ for(var k = 0; k < s.length; k++) v.setUint8(off + k, s.charCodeAt(k)) };
+  w(0, "RIFF"); v.setUint32(4, 36 + bytes, true); w(8, "WAVE"); w(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
+  v.setUint16(22, ch, true); v.setUint32(24, sr, true); v.setUint32(28, sr*ch*2, true); v.setUint16(32, ch*2, true); v.setUint16(34, 16, true);
+  w(36, "data"); v.setUint32(40, bytes, true);
+  var data = []; for(c2 = 0; c2 < ch; c2++) data.push(buf.getChannelData(c2));
+  for(i = 0; i < n; i++) for(c2 = 0; c2 < ch; c2++){ var s = Math.max(-1, Math.min(1, data[c2][i])); v.setInt16(o, s < 0 ? s*32768 : s*32767, true); o += 2 }
+  return new Blob([ab], {type:"audio/wav"});
+}
+
+/* ---------------------------------------------------------------------
+   MP4 MED LJUD
+
+   Den befintliga muxern (mp4.js) bygger en videospår. Här läggs ett
+   ljudspår till: AAC om webbläsaren kan koda det, annars Opus, annars
+   ingen ljud. Videon kodas direkt ur canvasen — ingen SVG-rastrering —
+   så exporten går i en bråkdel av tiden.
+   --------------------------------------------------------------------- */
+function _v3VideoTrak(W, H, fps, kod, samples, id, off, durMv){
+  var N = samples.length, MDTS = fps*1000, DELTA = 1000, maxCts = 0, i;
+  for(i = 0; i < N; i++) if(samples[i].cts > maxCts) maxCts = samples[i].cts;
+  var durMd = (maxCts + 1)*DELTA;
+  var sizes = new Array(N), keys = [];
+  for(i = 0; i < N; i++){ sizes[i] = samples[i].data.length; if(samples[i].key) keys.push(i + 1) }
+  var offs = new Array(N), behov = false, neg = false;
+  for(i = 0; i < N; i++){ offs[i] = (samples[i].cts - i)*DELTA; if(offs[i] !== 0) behov = true; if(offs[i] < 0) neg = true }
+  var stts = _fbox("stts", 0, 0, _u32(1), _u32(N), _u32(DELTA));
+  var stss = keys.length === N ? null : _fbox("stss", 0, 0, _u32(keys.length), _cat(keys.map(_u32)));
+  var ctts = null;
+  if(behov){ var r = _runs(offs); ctts = _fbox("ctts", neg ? 1 : 0, 0, _u32(r.length), _cat(r.map(function(x){ return _cat([_u32(x[0]), _u32(x[1] < 0 ? (x[1] >>> 0) : x[1])]) }))) }
+  var stsc = _fbox("stsc", 0, 0, _u32(1), _u32(1), _u32(N), _u32(1));
+  var stsz = _fbox("stsz", 0, 0, _u32(0), _u32(N), _cat(sizes.map(_u32)));
+  var typ, konf;
+  if(kod.kind === "vp9"){
+    typ = "vp09";
+    konf = _fbox("vpcC", 1, 0, _u8([kod.profile & 255, kod.level & 255, ((kod.depth & 15) << 4) | (1 << 1), 1, 1, 1]), _u16(0));
+  } else { typ = "avc1"; konf = _box("avcC", kod.desc) }
+  var vse = _box(typ, _u8([0,0,0,0,0,0]), _u16(1), _u16(0), _u16(0), _u32(0), _u32(0), _u32(0), _u16(W), _u16(H),
+    _u32(0x00480000), _u32(0x00480000), _u32(0), _u16(1), new Uint8Array(32), _u16(0x0018), _u16(0xFFFF), konf, _box("pasp", _u32(1), _u32(1)));
+  var stsd = _fbox("stsd", 0, 0, _u32(1), vse);
+  var stbl = _box.apply(null, ["stbl", stsd, stts].concat(ctts ? [ctts] : []).concat(stss ? [stss] : []).concat([stsc, stsz, _fbox("stco", 0, 0, _u32(1), _u32(off))]));
+  var minf = _box("minf", _fbox("vmhd", 0, 1, _u16(0), _u16(0), _u16(0), _u16(0)), _box("dinf", _fbox("dref", 0, 0, _u32(1), _fbox("url ", 0, 1))), stbl);
+  var mdia = _box("mdia", _fbox("mdhd", 0, 0, _u32(0), _u32(0), _u32(MDTS), _u32(durMd), _u16(0x55C4), _u16(0)),
+    _fbox("hdlr", 0, 0, _u32(0), _str("vide"), _u32(0), _u32(0), _u32(0), _str("VideoHandler\0")), minf);
+  return _box("trak", _fbox("tkhd", 0, 3, _u32(0), _u32(0), _u32(id), _u32(0), _u32(durMv), _u32(0), _u32(0), _u16(0), _u16(0), _u16(0), _u16(0),
+    _MTX9, _u32(W*65536), _u32(H*65536)), mdia);
+}
+function _v3AudioTrak(au, id, off, durMv){
+  var N = au.samples.length, sr = au.sampleRate, i, tot = 0, sizes = [], durs = [];
+  for(i = 0; i < N; i++){ sizes.push(au.samples[i].data.length); durs.push(au.samples[i].dur); tot += au.samples[i].dur }
+  var runs = _runs(durs);
+  var stts = _fbox("stts", 0, 0, _u32(runs.length), _cat(runs.map(function(x){ return _cat([_u32(x[0]), _u32(x[1])]) })));
+  var stsc = _fbox("stsc", 0, 0, _u32(1), _u32(1), _u32(N), _u32(1));
+  var stsz = _fbox("stsz", 0, 0, _u32(0), _u32(N), _cat(sizes.map(_u32)));
+  var head = [_u8([0,0,0,0,0,0]), _u16(1), _u16(0), _u16(0), _u32(0), _u16(au.channels), _u16(16), _u16(0), _u16(0), _u32(sr*65536)];
+  var entry;
+  if(au.kind === "aac"){
+    var asc = au.desc, L = asc.length;
+    var esds = _fbox("esds", 0, 0, _u8([0x03, L + 23, 0, 2, 0, 0x04, L + 15, 0x40, 0x15, 0, 0, 0]), _u32(0), _u32(au.bitrate || 128000), _u8([0x05, L]), asc, _u8([0x06, 1, 2]));
+    entry = _box.apply(null, ["mp4a"].concat(head).concat([esds]));
+  } else {
+    var dops = _box("dOps", _u8([0, au.channels]), _u16(312), _u32(sr), _u16(0), _u8([0]));
+    entry = _box.apply(null, ["Opus"].concat(head).concat([dops]));
+  }
+  var stsd = _fbox("stsd", 0, 0, _u32(1), entry);
+  var stbl = _box("stbl", stsd, stts, stsc, stsz, _fbox("stco", 0, 0, _u32(1), _u32(off)));
+  var minf = _box("minf", _fbox("smhd", 0, 0, _u16(0), _u16(0)), _box("dinf", _fbox("dref", 0, 0, _u32(1), _fbox("url ", 0, 1))), stbl);
+  var mdia = _box("mdia", _fbox("mdhd", 0, 0, _u32(0), _u32(0), _u32(sr), _u32(tot), _u16(0x55C4), _u16(0)),
+    _fbox("hdlr", 0, 0, _u32(0), _str("soun"), _u32(0), _u32(0), _u32(0), _str("SoundHandler\0")), minf);
+  return _box("trak", _fbox("tkhd", 0, 3, _u32(0), _u32(0), _u32(id), _u32(0), _u32(durMv), _u32(0), _u32(0), _u16(0), _u16(1), _u16(0x0100), _u16(0),
+    _MTX9, _u32(0), _u32(0)), mdia);
+}
+function v3MuxAV(W, H, fps, kod, vs, au){
+  var vTotal = 0, aTotal = 0, i;
+  for(i = 0; i < vs.length; i++) vTotal += vs[i].data.length;
+  if(au) for(i = 0; i < au.samples.length; i++) aTotal += au.samples[i].data.length;
+  var maxCts = 0; for(i = 0; i < vs.length; i++) if(vs[i].cts > maxCts) maxCts = vs[i].cts;
+  var durMv = Math.round((maxCts + 1)/fps*1000);
+  if(au){ var ad = 0; for(i = 0; i < au.samples.length; i++) ad += au.samples[i].dur; durMv = Math.max(durMv, Math.round(ad/au.sampleRate*1000)) }
+  var mvhd = _fbox("mvhd", 0, 0, _u32(0), _u32(0), _u32(1000), _u32(durMv), _u32(0x00010000), _u16(0x0100), _u16(0), _u32(0), _u32(0),
+    _MTX9, _cat([_u32(0), _u32(0), _u32(0), _u32(0), _u32(0), _u32(0)]), _u32(au ? 3 : 2));
+  var ftyp = _box("ftyp", _str("isom"), _u32(512), _str("isom"), _str("iso2"), _str("mp41"), _str("mp42"), _str(kod.kind === "vp9" ? "iso6" : "avc1"));
+  var build = function(offV, offA){
+    var parts = ["moov", mvhd, _v3VideoTrak(W, H, fps, kod, vs, 1, offV, durMv)];
+    if(au) parts.push(_v3AudioTrak(au, 2, offA, durMv));
+    return _box.apply(null, parts);
+  };
+  var moov = build(0, 0), dataOff = ftyp.length + moov.length + 8;
+  moov = build(dataOff, dataOff + vTotal);
+  var bits = [ftyp, moov, _cat([_u32(vTotal + aTotal + 8), _str("mdat")])];
+  for(i = 0; i < vs.length; i++) bits.push(vs[i].data);
+  if(au) for(i = 0; i < au.samples.length; i++) bits.push(au.samples[i].data);
+  return new Blob(bits, {type:"video/mp4"});
+}
+/* ljudkodning: AAC först, Opus som reserv */
+async function v3EncodeAudio(buf){
+  if(typeof AudioEncoder === "undefined" || typeof AudioData === "undefined") return null;
+  var sr = buf.sampleRate, nch = buf.numberOfChannels, tries = [
+    {kind:"aac", cfg:{codec:"mp4a.40.2", sampleRate:sr, numberOfChannels:nch, bitrate:160000, aac:{format:"aac"}}},
+    {kind:"opus", cfg:{codec:"opus", sampleRate:sr, numberOfChannels:nch, bitrate:128000}}], pick2 = null, i;
+  for(i = 0; i < tries.length && !pick2; i++){
+    try { var r = await AudioEncoder.isConfigSupported(tries[i].cfg); if(r && r.supported) pick2 = {kind:tries[i].kind, cfg:r.config || tries[i].cfg} } catch(e){}
+  }
+  if(!pick2) return null;
+  var samples = [], desc = null, fel = null;
+  var enc = new AudioEncoder({
+    output:function(chunk, meta){
+      if(meta && meta.decoderConfig && meta.decoderConfig.description && !desc){
+        var d = meta.decoderConfig.description; desc = new Uint8Array(d.buffer ? d.buffer.slice(d.byteOffset, d.byteOffset + d.byteLength) : d);
+      }
+      var b = new Uint8Array(chunk.byteLength); chunk.copyTo(b);
+      samples.push({data:b, dur:Math.round(chunk.duration*sr/1000000)});
+    },
+    error:function(e){ fel = e }
+  });
+  enc.configure(pick2.cfg);
+  var FR = 1024*4, n = buf.length, ch = [], k;
+  for(k = 0; k < nch; k++) ch.push(buf.getChannelData(k));
+  for(var s = 0; s < n; s += FR){
+    var len = Math.min(FR, n - s), data = new Float32Array(len*nch);
+    for(k = 0; k < nch; k++) data.set(ch[k].subarray(s, s + len), k*len);
+    var ad = new AudioData({format:"f32-planar", sampleRate:sr, numberOfFrames:len, numberOfChannels:nch, timestamp:Math.round(s/sr*1000000), data:data});
+    enc.encode(ad); ad.close();
+    if(fel) break;
+  }
+  try { await enc.flush() } catch(e){ fel = e }
+  try { if(enc.state !== "closed") enc.close() } catch(e){}
+  if(fel || !samples.length) return null;
+  if(pick2.kind === "aac" && !desc) return null;
+  return {kind:pick2.kind, sampleRate:sr, channels:nch, desc:desc, samples:samples, bitrate:pick2.cfg.bitrate};
+}
+async function v3EncodeVideo(canvas, W, H, fps, N, draw, onp){
+  var val = await mp4codec(W, H, fps, 12000000);
+  if(!val) return null;
+  var samples = [], desc = null, fel = null;
+  var enc = new VideoEncoder({
+    output:function(chunk, meta){
+      if(meta && meta.decoderConfig && meta.decoderConfig.description && !desc){
+        var d = meta.decoderConfig.description; desc = new Uint8Array(d.buffer ? d.buffer.slice(d.byteOffset, d.byteOffset + d.byteLength) : d);
+      }
+      var b = new Uint8Array(chunk.byteLength); chunk.copyTo(b);
+      samples.push({data:b, key:chunk.type === "key", cts:Math.round(chunk.timestamp*fps/1000000)});
+    },
+    error:function(e){ fel = e }
+  });
+  enc.configure(val.config);
+  var USEC = 1000000/fps, KEY = Math.round(fps*2);
+  try {
+    for(var i = 0; i < N; i++){
+      if(fel) throw fel;
+      draw(i);
+      var vf = new VideoFrame(canvas, {timestamp:Math.round(i*USEC), duration:Math.round(USEC)});
+      enc.encode(vf, {keyFrame:(i % KEY) === 0}); vf.close();
+      while(enc.encodeQueueSize > 8 && !fel) await new Promise(function(r){ setTimeout(r, 1) });
+      if(onp && (i & 7) === 0){ onp(i + 1, N); await new Promise(function(r){ setTimeout(r, 0) }) }
+    }
+    await enc.flush();
+  } finally { try { if(enc.state !== "closed") enc.close() } catch(e){} }
+  if(fel) throw fel;
+  if(!samples.length || (val.kind === "avc" && !desc)) return null;
+  return {samples:samples, kod:val.kind === "vp9" ? mp4vp9(val.config.codec || val.codec) : {kind:"avc", desc:desc}, kind:val.kind};
+}
+
+/* ---------- spara: webbläsarens egen väg om Studions saknas ---------- */
+function v3Say(msg, ms){
+  var el = document.getElementById("v3toast");
+  if(!el){ el = document.createElement("div"); el.id = "v3toast"; document.body.appendChild(el) }
+  el.textContent = msg; el.setAttribute("data-on", "");
+  clearTimeout(v3Say.t); if(ms !== 0) v3Say.t = setTimeout(function(){ el.removeAttribute("data-on") }, ms || 4200);
+}
+async function v3Save(blob, filename){
+  try {
+    var dl = await downloads();
+    if(dl){ await dl.save({filename:filename, data:blob}); return true }
+  } catch(e){}
+  try {
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url) }, 20000);
+    return true;
+  } catch(e){ return false }
+}
+var V3_BUSY = false;
+async function v3ExportVideo(btn){
+  if(V3_BUSY) return; V3_BUSY = true;
+  var lbl = btn.textContent, comp = V3_COMPS[V3S.comp], fmt = V3S.fmt, d = v3Dims(fmt), W = d[0], H = d[1];
+  btn.disabled = true;
+  try {
+    if(typeof VideoEncoder === "undefined") throw new Error("Den här webbläsaren saknar videokodare. Använd Chrome, Edge eller Safari.");
+    await v3Load(); V3S.playing = false; v3StopSound();
+    v3Say("Förbereder ljud…", 0); btn.textContent = "Förbereder…";
+    var buf = await v3Audio(V3S.comp, 48000), au = null;
+    try { au = buf ? await v3EncodeAudio(buf) : null } catch(e){ au = null }
+    var cv = document.createElement("canvas"), N = Math.round(comp.dur*V3_FPS), t0 = performance.now();
+    var r = await v3EncodeVideo(cv, W, H, V3_FPS, N, function(i){ v3DrawComp(cv, W, V3S.comp, fmt, i/V3_FPS) }, function(i, n){
+      var kv = i > 8 ? Math.round((performance.now() - t0)/i*(n - i)/1000) : 0;
+      btn.textContent = "Renderar " + Math.round(i/n*100) + " %" + (kv ? " · " + kv + " s kvar" : ""); v3Say("Renderar videon… " + Math.round(i/n*100) + " %" + (kv ? " · " + kv + " s kvar" : ""), 0);
+    });
+    if(!r) throw new Error("Webbläsaren kunde inte koda videon.");
+    var blob = v3MuxAV(W, H, V3_FPS, r.kod, r.samples, au);
+    if(!(await verifyClip(blob, comp.dur))) throw new Error("Filen gick inte att läsa tillbaka, så ingen fil lämnas ut.");
+    var name = "viewly-" + V3S.comp + "-" + (fmt === "916" ? "9x16" : "4x5") + ".mp4";
+    btn.textContent = "Sparar…"; v3Say("Sparar " + name + "…", 0);
+    var ok = await v3Save(blob, name);
+    v3Say(ok ? "Klart: " + name + " · " + comp.dur.toFixed(0) + " s · " + (blob.size/1048576).toFixed(1).replace(".", ",") + " MB · "
+        + (au ? "med ljud (" + (au.kind === "aac" ? "AAC" : "Opus") + ")" : "utan ljud — webbläsaren kan inte koda ljud, ladda ner WAV separat")
+        + (r.kind === "avc" ? "" : " · VP9, spelas inte på iPhone") : "Kunde inte spara filen.", 9000);
+  } catch(e){ v3Say("Export misslyckades: " + (e && e.message || e), 9000) }
+  btn.disabled = false; btn.textContent = lbl; V3_BUSY = false;
+}
+async function v3ExportWav(btn){
+  if(V3_BUSY) return; V3_BUSY = true; var lbl = btn.textContent; btn.disabled = true; btn.textContent = "Renderar ljud…";
+  try {
+    var buf = await v3Audio(V3S.comp, 44100); if(!buf) throw new Error("Webbläsaren saknar ljudmotor.");
+    var ok = await v3Save(v3Wav(buf), "viewly-" + V3S.comp + "-ljud.wav");
+    v3Say(ok ? "Ljudet sparades som WAV." : "Kunde inte spara filen.");
+  } catch(e){ v3Say("Ljudet gick inte att rendera: " + (e && e.message || e), 7000) }
+  btn.disabled = false; btn.textContent = lbl; V3_BUSY = false;
+}
+function v3PngBlob(painter, ar){
+  var cv = document.createElement("canvas"), W = 1080, H = Math.round(W*ar);
+  var c = v3Begin(cv, W, H); painter(c);
+  return new Promise(function(res){ cv.toBlob(res, "image/png") });
+}
+async function v3ExportPng(btn, spec){
+  var lbl = btn.textContent; btn.disabled = true; btn.textContent = "Renderar…";
+  try {
+    await v3Load();
+    var p = v3Painter(spec), blob = await v3PngBlob(p.fn, p.ar);
+    var ok = await v3Save(blob, "viewly-" + spec.replace(/[:|]/g, "-") + ".png");
+    v3Say(ok ? "Sparade " + spec.replace(/[:|]/g, "-") + ".png" : "Kunde inte spara filen.");
+  } catch(e){ v3Say("Export misslyckades: " + (e && e.message || e), 7000) }
+  btn.disabled = false; btn.textContent = lbl;
+}
+
+/* ---------- vad som ritas i en canvas med data-spec ---------- */
+/* spec: "static:p1" · "slide:b:0" · "post:overlay:tillsalu:45" · "outro:marin:916" · "comp:kort:916:3.2" */
+function v3Painter(spec){
+  var p = spec.split(":"), k = p[0];
+  if(k === "static"){
+    var s = V3_STATIC.filter(function(x){ return x.id === p[1] })[0], G = v3Geo("45");
+    return {ar:1.25, fn:function(c){ s.draw(c, G) }};
+  }
+  if(k === "slide"){
+    var G2 = v3Geo("45");
+    return {ar:1.25, fn:function(c){ V3_CAR[p[1]].slides[+p[2]](c, G2) }};
+  }
+  if(k === "post"){
+    var ar = p[3] === "916" ? 1.7778 : p[3] === "11" ? 1 : 1.25;
+    return {ar:ar, fn:function(c){ v3Fill(c, 0, 0, 100, 100*ar, "#000"); v3Post(c, p[1], p[2], null, 0, 0, 100, ar, 1) }};
+  }
+  if(k === "outro"){
+    var G3 = v3Geo(p[2]), t = p[3] ? +p[3] : 5;
+    return {ar:G3.H/100, fn:function(c){ v3Outro(c, G3, p[1], t, {noFade:true}) }};
+  }
+  var G4 = v3Geo(p[2]);
+  return {ar:G4.H/100, fn:function(c){ V3_COMPS[p[1]].draw(c, G4, +p[3], {outro:V3S.outro, hook:V3_HOOKS[V3S.hook]}) }};
+}
+function v3Mount(){
+  var cvs = document.querySelectorAll("canvas[data-v3]");
+  if(!cvs.length) return;
+  v3Load().then(function(){
+    cvs.forEach(function(cv){
+      var p = v3Painter(cv.dataset.v3), wpx = +(cv.dataset.w || 540), c = v3Begin(cv, wpx, Math.round(wpx*p.ar));
+      p.fn(c);
+    });
+    v3Stage(0);
+  });
+}
+
+/* ---------- scenen: spelar den valda kompositionen ---------- */
+function v3Stage(t){
+  var cv = document.getElementById("v3stage"); if(!cv || !V3.ready) return;
+  var comp = V3_COMPS[V3S.comp], d = v3Dims(V3S.fmt), W = Math.min(d[0], Math.round(cv.clientWidth*(window.devicePixelRatio || 1)) || 720);
+  if(t != null) V3S.t = Math.max(0, Math.min(comp.dur, t));
+  v3DrawComp(cv, W, V3S.comp, V3S.fmt, V3S.t);
+  var sc = document.getElementById("v3scrub"); if(sc && document.activeElement !== sc) sc.value = Math.round(V3S.t/comp.dur*1000);
+  var tm = document.getElementById("v3time"); if(tm) tm.textContent = V3S.t.toFixed(1).replace(".", ",") + " / " + comp.dur.toFixed(1).replace(".", ",") + " s";
+}
+function v3StopSound(){ if(V3S.src){ try{ V3S.src.stop() }catch(e){} V3S.src = null } }
+function v3Loop(now){
+  if(!V3S.playing) return;
+  var comp = V3_COMPS[V3S.comp], t = V3S.src && V3S.ctxA ? V3S.startT + (V3S.ctxA.currentTime - V3S.startCtx) : V3S.startT + (now - V3S.startNow)/1000;
+  if(t >= comp.dur){ V3S.playing = false; v3StopSound(); v3Stage(comp.dur); var b = document.getElementById("v3play"); if(b) b.textContent = "▶"; return }
+  v3Stage(t);
+  V3S.raf = requestAnimationFrame(v3Loop);
+}
+async function v3Play(){
+  var b = document.getElementById("v3play");
+  if(V3S.playing){ V3S.playing = false; v3StopSound(); if(b) b.textContent = "▶"; return }
+  await v3Load();
+  var comp = V3_COMPS[V3S.comp];
+  if(V3S.t >= comp.dur - .05) V3S.t = 0;
+  V3S.playing = true; if(b) b.textContent = "❚❚";
+  V3S.startT = V3S.t; V3S.startNow = performance.now();
+  if(V3S.sound){
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(!V3S.ctxA) V3S.ctxA = new AC();
+      if(V3S.ctxA.state === "suspended") await V3S.ctxA.resume();
+      var buf = await v3Audio(V3S.comp, 44100);
+      if(buf && V3S.playing){
+        var s = V3S.ctxA.createBufferSource(); s.buffer = buf; s.connect(V3S.ctxA.destination);
+        V3S.startCtx = V3S.ctxA.currentTime + .05; s.start(V3S.startCtx, V3S.startT); V3S.src = s;
+      }
+    } catch(e){ V3S.src = null }
+  }
+  V3S.startNow = performance.now();
+  V3S.raf = requestAnimationFrame(v3Loop);
+}
+
+/* ---------------------------------------------------------------------
+   SIDAN
+   --------------------------------------------------------------------- */
+function v3Seg(kind, val, label, on){
+  return '<button type="button" class="a3seg' + (on ? " on" : "") + '" data-a3="' + kind + '" data-v="' + val + '">' + esc(label) + '</button>';
+}
+function v3Canvas(spec, w, cls){ return '<canvas class="a3cv ' + (cls || "") + '" data-v3="' + spec + '" data-w="' + (w || 540) + '"></canvas>' }
+function v3Tabs(){
+  var T = [["video", "Videor"], ["kar", "Karuseller"], ["stat", "Statiska"], ["inl", "Inlägg"], ["out", "Slutkort"]];
+  return '<div class="a3tabs">' + T.map(function(x){
+    return '<button type="button" class="a3tab" data-a3="tab" data-v="' + x[0] + '" aria-current="' + (V3S.tab === x[0]) + '">' + x[1] + '</button>';
+  }).join("") + '</div>';
+}
+var V3_COPY = {
+  lang:["Dina bilder är levererade. Din kampanj är två klick bort.", "Med Viewly skapar du sociala medier-inlägg direkt när fotona levereras — i alla format, i ditt kontors egen profil. Och det är bara en del av Viewly."],
+  kort:["Två klick. Inte två timmar.", "När fotona är levererade skapar du kampanjen direkt i Mäklarportalen. Bostadsfotografering för mäklare i Skåne."],
+  mer:["Mer än bara fotografering.", "Fotografering, skymning, 3D-visning, e-styling, drönare, områdeskartor och verktyg för mäklare. Du bokar, vi sköter resten."],
+  forrnu:["Förr: timmar. Nu: två klick.", "Inläggen skapas i Mäklarportalen direkt efter leveransen. Viewly — bostadsfotografering för mäklare i Skåne."]
+};
+function v3VideoTab(){
+  var comp = V3_COMPS[V3S.comp], cp = V3_COPY[V3S.comp];
+  var cards = Object.keys(V3_COMPS).map(function(id){
+    var c2 = V3_COMPS[id], tpos = {lang:3.0, kort:2.8, mer:2.4, forrnu:1.8}[id];
+    return '<button type="button" class="a3card" data-a3="comp" data-v="' + id + '" aria-current="' + (V3S.comp === id) + '">'
+      + '<div class="a3cth">' + v3Canvas("comp:" + id + ":916:" + tpos, 270) + '</div>'
+      + '<div class="a3ctl"><i>' + c2.dur.toFixed(0) + ' s · 9:16 och 4:5 · ljud</i><b>' + esc(c2.n) + '</b><span>' + esc(c2.d) + '</span></div></button>';
+  }).join("");
+  var hooks = V3_HOOKS.map(function(h, i){ return v3Seg("hook", i, h[0] + " " + h[1], V3S.hook === i) }).join("");
+  var outs = V3_OUT.map(function(o){ return v3Seg("outro", o.id, o.n, V3S.outro === o.id) }).join("");
+  return '<div class="a3cards">' + cards + '</div>'
+    + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
+    + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
+    + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
+    + '<div class="a3scrubw"><input type="range" id="v3scrub" min="0" max="1000" value="' + Math.round(V3S.t/comp.dur*1000) + '"></div>'
+    + '<span class="mono" id="v3time"></span></div></div>'
+    + '<div class="a3panel"><div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel · 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde · 4:5", V3S.fmt === "45") + '</div>'
+    + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
+    + '<div class="a3h">Hook</div><div class="a3segs col">' + hooks + '</div>'
+    + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
+    + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
+    + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div>'
+    + '</div></div>'
+    + '<div class="a3sub">Text till Meta</div><div class="a3copy"><div><b>Rubrik</b><p>' + esc(cp[0]) + '</p><b>Primärtext</b><p>' + esc(cp[1]) + '</p></div>'
+    + '<div><b>Knapp och länk</b><p>Läs mer · viewly.se/maklare</p><b>Mål</b><p>Trafik till /maklare och bokning av provfotografering.</p></div></div>';
+}
+function v3Gallery(items, ar, w){
+  return '<div class="a3gal">' + items.map(function(it){
+    return '<div class="a3gi"><div class="a3gth">' + v3Canvas(it.spec, w || 540) + '</div><div class="a3gm"><div><b>' + esc(it.n) + '</b>' + (it.d ? '<span>' + esc(it.d) + '</span>' : '') + '</div>'
+      + '<button type="button" class="a3mini" data-a3="png" data-v="' + it.spec + '">PNG</button></div></div>';
+  }).join("") + '</div>';
+}
+function v3KarTab(){
+  var out = "";
+  ["b", "c"].forEach(function(k){
+    var set = V3_CAR[k];
+    out += '<div class="a3sub">' + esc(set.n) + '</div><p class="a3lede">' + esc(set.d) + '</p><div class="a3slides">'
+      + set.slides.map(function(s, i){
+        return '<div class="a3sl"><div class="a3gth">' + v3Canvas("slide:" + k + ":" + i, 540) + '</div><div class="a3gm"><span class="mono">' + (i + 1) + ' / ' + set.slides.length + '</span><button type="button" class="a3mini" data-a3="png" data-v="slide:' + k + ':' + i + '">PNG</button></div></div>';
+      }).join("") + '</div>';
+  });
+  out += '<div class="a3copy"><div><b>B · Rubrik</b><p>Dina bilder är levererade. Nu då?</p><b>B · Primärtext</b><p>Två klick i Mäklarportalen, så är kampanjen klar — i alla format, i ert eget kontors profil.</p></div>'
+    + '<div><b>C · Rubrik</b><p>En bostadsfotograf som gör mer än bara fotografering.</p><b>C · Primärtext</b><p>Fotografering, skymning, 3D-visning, e-styling, drönare, områdeskartor och verktyg för mäklare. Du bokar, vi sköter resten.</p></div></div>';
+  return out;
+}
+function v3StatTab(){
+  return '<p class="a3lede">Enkelbilder i 4:5 för flödet. Samma bildspråk som videon, ett påstående per bild.</p>'
+    + v3Gallery(V3_STATIC.map(function(s){ return {spec:"static:" + s.id, n:s.n, d:s.d} }), 1.25);
+}
+function v3InlTab(){
+  var styles = [["overlay", "Overlay"], ["editorial", "Editorial"], ["badge", "Badge"]];
+  var ph = [["tillsalu", "Till salu"], ["kommande", "Kommande"], ["visning", "Visning"], ["sald", "Såld"]];
+  var seg = '<div class="a3segs row">' + styles.map(function(s){ return v3Seg("tpl", s[0], s[1], V3S.tplStyle === s[0]) }).join("") + '<span class="a3gap"></span>'
+    + [["45", "Inlägg 4:5"], ["916", "Story 9:16"], ["11", "Kvadrat 1:1"]].map(function(f){ return v3Seg("tplfmt", f[0], f[1], V3S.tplFmt === f[0]) }).join("") + '</div>';
+  return '<p class="a3lede">Förslag på nya mallar för Kommande, Till salu, Visning och Såld: helbild med overlay, centrerade eller redaktionella. Kontoret är Nordvik Mäklarbyrå som exempel. Studions nuvarande mallar är inte ändrade.</p>'
+    + seg + v3Gallery(ph.map(function(f){ return {spec:"post:" + V3S.tplStyle + ":" + f[0] + ":" + V3S.tplFmt, n:f[1], d:""} }), 1.25, 540);
+}
+function v3OutTab(){
+  var items = V3_OUT.map(function(o){ return {spec:"outro:" + o.id + ":" + V3S.outroPreviewFmt, n:o.n, d:""} });
+  return '<p class="a3lede">Slutkort för varumärket: en egen sekund, och därefter ett par till för tagline och adress. Klicka på ett kort för att använda det i videorna. Märket och ordbilden är samma höjd, med märket något högre så att de väger lika.</p>'
+    + '<div class="a3segs row">' + v3Seg("ofmt", "916", "9:16", V3S.outroPreviewFmt === "916") + v3Seg("ofmt", "45", "4:5", V3S.outroPreviewFmt === "45") + '</div>'
+    + '<div class="a3gal a3out">' + V3_OUT.map(function(o){
+      return '<div class="a3gi"><button type="button" class="a3pick" data-a3="outro" data-v="' + o.id + '" aria-current="' + (V3S.outro === o.id) + '"><div class="a3gth">' + v3Canvas("outro:" + o.id + ":" + V3S.outroPreviewFmt, 400) + '</div></button>'
+        + '<div class="a3gm"><div><b>' + esc(o.n) + '</b></div><button type="button" class="a3mini" data-a3="png" data-v="outro:' + o.id + ':' + V3S.outroPreviewFmt + '">PNG</button></div></div>';
+    }).join("") + '</div>';
+}
+function v3Underlag(){
+  return '<details class="a3det"><summary>Vad annonserna säger, och vad som är verifierat</summary><div class="a3und">'
+    + '<div><b>Budskapet</b><p>Verktygen är dörren in. När fotona är levererade skapar mäklaren sociala medier-inlägg direkt, i alla format och i kontorets egen profil — med två klick. Det som tog timmar. Och det är bara en del av Viewly. Därför slutar varje annons i varumärket.</p>'
+    + '<p><b>Att bekräfta före publicering:</b> "två klick" och "timmar" är en uppgift från er, inte något jag har mätt. Mäklarportalens riktiga flöde för Skapa kampanj ska jämföras med skärmarna i annonsen, som är en förenklad återgivning.</p></div>'
+    + '<div><b>Verifierat på viewly.se</b><p>Social Media Studio hämtar levererade bilder, adress, rum, boarea, pris, ansvarig mäklare och visningsuppgifter. Kontoret ställer in logga, färger, typsnitt och layout per fas en gång. Faserna är Kommande, Till salu, Visning och Såld. Format: 4:5, 1:1, 9:16, 16:9 och A4. Hör till ViewlyPro, 30 dagar gratis, ingen bindningstid.</p>'
+    + '<p>Tjänster (portfolio och tjänstesidor): fotografering, skymning, 3D-visning, e-styling, drönare, områdeskartor, Atmosphere, Annonsskrivaren. Rubriken på /maklare: "En bostadsfotograf som gör mer än bara fotografering." Sloganen: "Du bokar, vi sköter resten."</p></div>'
+    + '<div><b>Demodata och förslag</b><p>Storgatan 13, Landskrona, priset, tiderna och kontoret Nordvik Mäklarbyrå är demodata. Nordviks riktiga profil är inte använd. Inläggsmallarna är ett förslag.</p>'
+    + '<p><b>Meta.</b> Annonsen säljer en tjänst till företag och bör inte falla under Bostäder — kontrollera i annonshanteraren. Affischerna i det första fotot är andras konstverk. Hypotes att testa: att annonser som visar verktyget ger fler förfrågningar än rena fotoannonser.</p></div></div></details>';
+}
+function secAds3(){
+  var body = V3S.tab === "video" ? v3VideoTab() : V3S.tab === "kar" ? v3KarTab() : V3S.tab === "stat" ? v3StatTab() : V3S.tab === "inl" ? v3InlTab() : v3OutTab();
+  setTimeout(v3Mount, 0);
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 11</div><h2>Viewlys annonser</h2>'
+    + '<p>Verktygen är dörren in till Viewly: när fotona är levererade skapas inläggen med två klick. Video i 9:16, allt annat i 4:5. Förslag, inte låsta krav. Inget publicerat.</p></div>'
+    + v3Tabs() + body + v3Underlag() + '</div>';
+}
+document.addEventListener("click", function(e){
+  var b = e.target.closest("[data-a3]"); if(!b) return;
+  var k = b.dataset.a3, v = b.dataset.v;
+  if(k === "tab"){ V3S.tab = v; V3S.playing = false; v3StopSound(); render({top:true}); return }
+  if(k === "comp"){ V3S.comp = v; V3S.t = {lang:3.0, kort:2.4, mer:2.8, forrnu:1.9}[v] || 0; V3S.playing = false; v3StopSound(); render(); return }
+  if(k === "fmt"){ V3S.fmt = v; render(); return }
+  if(k === "sound"){ V3S.sound = v === "1"; if(!V3S.sound) v3StopSound(); render(); return }
+  if(k === "hook"){ V3S.hook = +v; render(); return }
+  if(k === "outro"){ V3S.outro = v; render(); return }
+  if(k === "tpl"){ V3S.tplStyle = v; render(); return }
+  if(k === "tplfmt"){ V3S.tplFmt = v; render(); return }
+  if(k === "ofmt"){ V3S.outroPreviewFmt = v; render(); return }
+  if(k === "play"){ v3Play(); return }
+  if(k === "mp4"){ v3ExportVideo(b); return }
+  if(k === "wav"){ v3ExportWav(b); return }
+  if(k === "png"){ v3ExportPng(b, v); return }
+});
+document.addEventListener("input", function(e){
+  if(e.target.id !== "v3scrub") return;
+  V3S.playing = false; v3StopSound(); var pb = document.getElementById("v3play"); if(pb) pb.textContent = "▶";
+  v3Stage(e.target.value/1000*V3_COMPS[V3S.comp].dur);
+});
+window.__v3 = {load:v3Load, begin:v3Begin, post:v3Post, comps:V3_COMPS, drawComp:v3DrawComp, painter:v3Painter, S:V3S, geo:v3Geo, outro:v3Outro, audio:v3Audio, wav:v3Wav, encA:v3EncodeAudio, encV:v3EncodeVideo, mux:v3MuxAV};
+
 
 var SECTIONS=[
  {id:"riktning", n:"Riktning",     num:"01", f:secRiktning},
@@ -9414,7 +10794,8 @@ var SECTIONS=[
  {id:"motion",   n:"Motion",       num:"07", f:secMotion},
  {id:"export",   n:"Export",       num:"08", f:secExport},
  {id:"ads",      n:"Ads · utkast 1",num:"09", f:secAds},
- {id:"ads2",     n:"Ads",          num:"10", f:secAds2}
+ {id:"ads2",     n:"Ads · utkast 2",num:"10", f:secAds2},
+ {id:"ads3",     n:"Ads",          num:"11", f:secAds3}
 ];
 
 /* =====================================================================
