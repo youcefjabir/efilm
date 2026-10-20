@@ -8124,7 +8124,7 @@ function adImg(inline){
     + (inline ? 'background-image:url('+pick("adHome")+');background-size:cover;' : '');
 }
 function adClip(inner, p){
-  return '<div style="position:absolute;inset:0;clip-path:inset(0 '+((1-mclamp(p))*100).toFixed(2)+'% 0 0)">'+inner+'</div>';
+  return '<div style="position:absolute;inset:0;clip-path:inset(-12% '+((1-mclamp(p))*100).toFixed(2)+'% -30% 0)">'+inner+'</div>';
 }
 function adText(x, y, w, size, txt, st){
   return '<div style="position:absolute;left:'+x+'cqw;top:'+y+'cqw;width:'+w+'cqw;font-size:'+size+'cqw;line-height:1.08;'
@@ -8180,15 +8180,15 @@ function adStudio(t){
   body += '<div style="position:absolute;left:4cqw;right:4cqw;top:62.2cqw;height:24cqw;opacity:'+(pp>0?1:0)+'">'
     +'<div style="position:absolute;left:0;top:0;width:34cqw;height:24cqw;background:#FFFFFF;border:1px solid '+AD_LINE+';'
       +'display:flex;align-items:center;justify-content:center;'+AD_SAN+'font-weight:600;font-size:4cqw;letter-spacing:.34em;'
-      +'color:'+AD_INK+';clip-path:inset(0 '+((1-pp)*100).toFixed(1)+'% 0 0)">'+AD_OBJ.kontor+'</div>'
+      +'color:'+AD_INK+';clip-path:inset(-12% '+((1-pp)*100).toFixed(1)+'% -30% 0)">'+AD_OBJ.kontor+'</div>'
     +'<div style="position:absolute;left:38cqw;top:0;right:0">'
-      +'<div style="display:flex;gap:2cqw;clip-path:inset(0 '+((1-seg(t,7.95,8.6))*100).toFixed(1)+'% 0 0)">'
+      +'<div style="display:flex;gap:2cqw;clip-path:inset(-12% '+((1-seg(t,7.95,8.6))*100).toFixed(1)+'% -30% 0)">'
       +['#1C1C1E','#6E7266','#E8E3E3','#B9A99B'].map(function(c){
          return '<span style="width:6.5cqw;height:6.5cqw;background:'+c+';border:1px solid '+AD_LINE+'"></span>'}).join('')+'</div>'
-      +'<div style="margin-top:2.4cqw;display:flex;align-items:baseline;gap:3cqw;clip-path:inset(0 '+((1-seg(t,8.1,8.7))*100).toFixed(1)+'% 0 0)">'
+      +'<div style="margin-top:2.4cqw;display:flex;align-items:baseline;gap:3cqw;clip-path:inset(-12% '+((1-seg(t,8.1,8.7))*100).toFixed(1)+'% -30% 0)">'
         +'<span style="'+AD_SER+'font-size:7cqw;line-height:1;color:'+AD_INK+'">Aa</span>'
         +'<span style="'+AD_SAN+'font-weight:500;font-size:2.2cqw;letter-spacing:.14em;color:'+AD_MUT+'">Typsnitt · Layout</span></div>'
-      +'<div style="margin-top:2.4cqw;'+AD_SER+'font-size:4cqw;color:'+AD_INK+';clip-path:inset(0 '+((1-seg(t,8.3,8.9))*100).toFixed(1)+'% 0 0)">'
+      +'<div style="margin-top:2.4cqw;'+AD_SER+'font-size:4cqw;color:'+AD_INK+';clip-path:inset(-12% '+((1-seg(t,8.3,8.9))*100).toFixed(1)+'% -30% 0)">'
         +esc(AD_OBJ.maklare)+'<span style="display:block;'+AD_SAN+'font-weight:500;font-size:1.85cqw;letter-spacing:.24em;'
         +'text-transform:uppercase;color:'+AD_MUT+';margin-top:.8cqw">Ansvarig mäklare</span></div>'
     +'</div></div>';
@@ -8229,11 +8229,11 @@ function adFrame(t, inline){
     if(hOut > 0){
       var k = seg(t, 1.9, 2.5);
       out += '<div style="opacity:'+hOut.toFixed(3)+'">'
-        + (k>0 ? adKick(6.4, 27.4, "Viewly · Bostadsfotografering", 'clip-path:inset(0 '+((1-k)*100).toFixed(1)+'% 0 0)') : '')
+        + (k>0 ? adKick(6.4, 27.4, "Viewly · Bostadsfotografering", 'clip-path:inset(-12% '+((1-k)*100).toFixed(1)+'% -30% 0)') : '')
         + '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:118.4cqw;height:12cqw;'+AD_SER+'color:'+AD_INK
-          +';font-size:9cqw;line-height:1.05;clip-path:inset(0 '+((1-eOut(seg(t,2.05,3.2)))*100).toFixed(1)+'% 0 0)">'+esc(H[0])+'</div>'
+          +';font-size:9cqw;line-height:1.05;clip-path:inset(-12% '+((1-eOut(seg(t,2.05,3.2)))*100).toFixed(1)+'% -30% 0)">'+esc(H[0])+'</div>'
         + '<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:129.2cqw;height:12cqw;'+AD_SER+'font-style:italic;color:'+AD_OLI
-          +';font-size:9cqw;line-height:1.05;clip-path:inset(0 '+((1-eOut(seg(t,3.5,4.6)))*100).toFixed(1)+'% 0 0)">'+esc(H[1])+'</div>'
+          +';font-size:9cqw;line-height:1.05;clip-path:inset(-12% '+((1-eOut(seg(t,3.5,4.6)))*100).toFixed(1)+'% -30% 0)">'+esc(H[1])+'</div>'
         + '</div>';
     }
     if(t >= 4.9) out += adStudio(t);
@@ -8255,7 +8255,7 @@ function adFrame(t, inline){
   var wp = eInOut(seg(t, 9.2, 10.3));
   if(t >= 9.2 && t < 13.0){
     var leave = seg(t, 12.45, 13.0);
-    out += '<div style="position:absolute;inset:0;clip-path:inset(0 '+((1-wp)*100).toFixed(2)+'% 0 0)">'
+    out += '<div style="position:absolute;inset:0;clip-path:inset(-12% '+((1-wp)*100).toFixed(2)+'% -30% 0)">'
       +'<div style="position:absolute;inset:0;background:'+AD_PAPER+'"></div>'
       + adKick(6.4, 27.4, "Klart", 'color:'+AD_OLI)
       +'<div style="position:absolute;left:10cqw;top:33cqw;width:80cqw;height:100cqw;overflow:hidden;container-type:inline-size;'
@@ -8276,9 +8276,9 @@ function adFrame(t, inline){
       +'<div style="position:absolute;left:25cqw;top:62.4cqw;'+AD_SAN+'font-weight:500;font-size:4.2cqw;letter-spacing:.42em;color:'+AD_INK+'">VIEWLY</div>'
       +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:81cqw;height:1px;background:'+AD_LINE+'"></div>'
       +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:86cqw;'+AD_SER+'font-size:'+(AD.end===0?9.2:12)+'cqw;line-height:1.04;color:'+AD_INK
-        +';clip-path:inset(0 '+((1-eOut(seg(t,13.0,13.9)))*100).toFixed(1)+'% 0 0)">'+esc(E[0])+'</div>'
+        +';clip-path:inset(-12% '+((1-eOut(seg(t,13.0,13.9)))*100).toFixed(1)+'% -30% 0)">'+esc(E[0])+'</div>'
       +'<div style="position:absolute;left:6.4cqw;right:6.4cqw;top:'+(AD.end===0?112:104)+'cqw;'+AD_SER+'font-style:italic;font-size:'+(AD.end===0?9.2:12)+'cqw;line-height:1.04;color:'+AD_OLI
-        +';clip-path:inset(0 '+((1-eOut(seg(t,13.35,14.2)))*100).toFixed(1)+'% 0 0)">'+esc(E[1])+'</div>'
+        +';clip-path:inset(-12% '+((1-eOut(seg(t,13.35,14.2)))*100).toFixed(1)+'% -30% 0)">'+esc(E[1])+'</div>'
       +'<div style="position:absolute;left:6.4cqw;top:134cqw;'+AD_SAN+'font-weight:500;font-size:2.2cqw;letter-spacing:.26em;text-transform:uppercase;color:'+AD_MUT
         +';opacity:'+seg(t,13.9,14.5).toFixed(2)+'">För fastighetsmäklare i Skåne</div>'
       +'</div>';
@@ -8842,11 +8842,11 @@ function a2Frame(t, fmt, inline){
       +';background:linear-gradient(180deg,rgba(14,11,11,0),rgba(14,11,11,.78))"></div>';
     o += '<div style="position:absolute;left:0;right:0;top:0;height:30%;opacity:'+sc1.toFixed(3)+';background:linear-gradient(180deg,rgba(14,11,11,.5),rgba(14,11,11,0))"></div>';
     o += '<div style="opacity:'+sc1.toFixed(3)+';transform:translateY('+(-seg(t,2.8,3.4)*3).toFixed(2)+'cqw)">'
-      + a2Cap(8, top, "Viewly · Bostadsfotografering", 'color:rgba(255,255,255,.85);clip-path:inset(0 '+((1-eOut(seg(t,.2,1.0)))*100).toFixed(1)+'% 0 0)')
+      + a2Cap(8, top, "Viewly · Bostadsfotografering", 'color:rgba(255,255,255,.85);clip-path:inset(-12% '+((1-eOut(seg(t,.2,1.0)))*100).toFixed(1)+'% -30% 0)')
       + '<div style="position:absolute;left:8cqw;right:6cqw;top:'+yb.toFixed(2)+'cqw;'+A2_SER+'font-size:11cqw;line-height:1.04;color:#fff;white-space:nowrap;clip-path:inset(0 '
-        +((1-eOut(seg(t,.45,1.35)))*100).toFixed(1)+'% 0 0)">'+esc(hk[0])+'</div>'
+        +((1-eOut(seg(t,.45,1.35)))*100).toFixed(1)+'% -30% 0)">'+esc(hk[0])+'</div>'
       + '<div style="position:absolute;left:8cqw;right:6cqw;top:'+(yb+12.6).toFixed(2)+'cqw;'+A2_SER+'font-style:italic;font-size:10.2cqw;line-height:1.04;color:#E6DCCF;white-space:nowrap;clip-path:inset(0 '
-        +((1-eOut(seg(t,1.35,2.35)))*100).toFixed(1)+'% 0 0)">'+esc(hk[1])+'</div></div>';
+        +((1-eOut(seg(t,1.35,2.35)))*100).toFixed(1)+'% -30% 0)">'+esc(hk[1])+'</div></div>';
   }
 
   /* —— scen 4: samma bild, fyra faser — mallarna i ett rutnät —— */
@@ -8878,8 +8878,8 @@ function a2Frame(t, fmt, inline){
       +'<div style="position:absolute;left:8cqw;top:'+y0.toFixed(2)+'cqw;width:13cqw;height:13cqw">'+vmark(A2C.ink, A2C.oli, 'width="100%" height="100%"')+'</div>'
       +'<div style="position:absolute;left:24.6cqw;top:'+(y0+4.2).toFixed(2)+'cqw;'+A2_SAN+'font-weight:500;font-size:3.9cqw;letter-spacing:.44em;color:'+A2C.ink+'">VIEWLY</div>'
       +'<div style="position:absolute;left:8cqw;right:8cqw;top:'+(y0+22).toFixed(2)+'cqw">'
-        +'<div style="'+A2_SER+'font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.ink+';clip-path:inset(0 '+((1-eOut(seg(t,13.4,14.2)))*100).toFixed(1)+'% 0 0)">'+esc(en[0])+'</div>'
-        +'<div style="'+A2_SER+'font-style:italic;font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.oli+';margin-top:1.6cqw;clip-path:inset(0 '+((1-eOut(seg(t,13.8,14.6)))*100).toFixed(1)+'% 0 0)">'+esc(en[1])+'</div></div>'
+        +'<div style="'+A2_SER+'font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.ink+';clip-path:inset(-12% '+((1-eOut(seg(t,13.4,14.2)))*100).toFixed(1)+'% -30% 0)">'+esc(en[0])+'</div>'
+        +'<div style="'+A2_SER+'font-style:italic;font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.oli+';margin-top:1.6cqw;clip-path:inset(-12% '+((1-eOut(seg(t,13.8,14.6)))*100).toFixed(1)+'% -30% 0)">'+esc(en[1])+'</div></div>'
       + a2Cap(8, H - bot - 11, "För fastighetsmäklare i Skåne", 'color:'+A2C.mut+';opacity:'+seg(t,14.2,14.8).toFixed(2))
       + a2Cap(8, H - bot - 6.4, "viewly.se/maklare", 'color:'+A2C.ink+';opacity:'+seg(t,14.4,14.9).toFixed(2))
       +'</div>';

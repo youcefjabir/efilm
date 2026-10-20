@@ -151,11 +151,11 @@ function a2Frame(t, fmt, inline){
       +';background:linear-gradient(180deg,rgba(14,11,11,0),rgba(14,11,11,.78))"></div>';
     o += '<div style="position:absolute;left:0;right:0;top:0;height:30%;opacity:'+sc1.toFixed(3)+';background:linear-gradient(180deg,rgba(14,11,11,.5),rgba(14,11,11,0))"></div>';
     o += '<div style="opacity:'+sc1.toFixed(3)+';transform:translateY('+(-seg(t,2.8,3.4)*3).toFixed(2)+'cqw)">'
-      + a2Cap(8, top, "Viewly · Bostadsfotografering", 'color:rgba(255,255,255,.85);clip-path:inset(0 '+((1-eOut(seg(t,.2,1.0)))*100).toFixed(1)+'% 0 0)')
+      + a2Cap(8, top, "Viewly · Bostadsfotografering", 'color:rgba(255,255,255,.85);clip-path:inset(-12% '+((1-eOut(seg(t,.2,1.0)))*100).toFixed(1)+'% -30% 0)')
       + '<div style="position:absolute;left:8cqw;right:6cqw;top:'+yb.toFixed(2)+'cqw;'+A2_SER+'font-size:11cqw;line-height:1.04;color:#fff;white-space:nowrap;clip-path:inset(0 '
-        +((1-eOut(seg(t,.45,1.35)))*100).toFixed(1)+'% 0 0)">'+esc(hk[0])+'</div>'
+        +((1-eOut(seg(t,.45,1.35)))*100).toFixed(1)+'% -30% 0)">'+esc(hk[0])+'</div>'
       + '<div style="position:absolute;left:8cqw;right:6cqw;top:'+(yb+12.6).toFixed(2)+'cqw;'+A2_SER+'font-style:italic;font-size:10.2cqw;line-height:1.04;color:#E6DCCF;white-space:nowrap;clip-path:inset(0 '
-        +((1-eOut(seg(t,1.35,2.35)))*100).toFixed(1)+'% 0 0)">'+esc(hk[1])+'</div></div>';
+        +((1-eOut(seg(t,1.35,2.35)))*100).toFixed(1)+'% -30% 0)">'+esc(hk[1])+'</div></div>';
   }
 
   /* —— scen 4: samma bild, fyra faser — mallarna i ett rutnät —— */
@@ -187,8 +187,8 @@ function a2Frame(t, fmt, inline){
       +'<div style="position:absolute;left:8cqw;top:'+y0.toFixed(2)+'cqw;width:13cqw;height:13cqw">'+vmark(A2C.ink, A2C.oli, 'width="100%" height="100%"')+'</div>'
       +'<div style="position:absolute;left:24.6cqw;top:'+(y0+4.2).toFixed(2)+'cqw;'+A2_SAN+'font-weight:500;font-size:3.9cqw;letter-spacing:.44em;color:'+A2C.ink+'">VIEWLY</div>'
       +'<div style="position:absolute;left:8cqw;right:8cqw;top:'+(y0+22).toFixed(2)+'cqw">'
-        +'<div style="'+A2_SER+'font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.ink+';clip-path:inset(0 '+((1-eOut(seg(t,13.4,14.2)))*100).toFixed(1)+'% 0 0)">'+esc(en[0])+'</div>'
-        +'<div style="'+A2_SER+'font-style:italic;font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.oli+';margin-top:1.6cqw;clip-path:inset(0 '+((1-eOut(seg(t,13.8,14.6)))*100).toFixed(1)+'% 0 0)">'+esc(en[1])+'</div></div>'
+        +'<div style="'+A2_SER+'font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.ink+';clip-path:inset(-12% '+((1-eOut(seg(t,13.4,14.2)))*100).toFixed(1)+'% -30% 0)">'+esc(en[0])+'</div>'
+        +'<div style="'+A2_SER+'font-style:italic;font-size:'+(A2.end === 0 ? 10 : 13.4)+'cqw;line-height:1.02;color:'+A2C.oli+';margin-top:1.6cqw;clip-path:inset(-12% '+((1-eOut(seg(t,13.8,14.6)))*100).toFixed(1)+'% -30% 0)">'+esc(en[1])+'</div></div>'
       + a2Cap(8, H - bot - 11, "För fastighetsmäklare i Skåne", 'color:'+A2C.mut+';opacity:'+seg(t,14.2,14.8).toFixed(2))
       + a2Cap(8, H - bot - 6.4, "viewly.se/maklare", 'color:'+A2C.ink+';opacity:'+seg(t,14.4,14.9).toFixed(2))
       +'</div>';
