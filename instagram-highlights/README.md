@@ -26,6 +26,7 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | 04 | Format | Fyra kampanjmallar och tre artboards: 9:16, 4:5, 1:1 — plus profilrutnätet |
 | 05 | Studio | Redigera: välj bland tre förslag per bildruta, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
+| 09 | Ads | Viewlys första annonskampanj: översikt, Annons A (Reel 9:16, med MP4-export), skisser för B och C. Källa: `ads.js`, `ads.css`, bild i `assets/` |
 
 I Studio öppnar du ett kapitel och får filmremsa, live-scen och inspektör. `▶ Spela
 sekvensen` startar uppspelningen; `←` `→` bläddrar · `Esc` stänger.

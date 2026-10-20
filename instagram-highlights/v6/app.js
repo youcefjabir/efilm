@@ -2087,6 +2087,8 @@ function sechead(eb,t,l){
 }
 /*__MOTION__*/
 
+/*__ADS__*/
+
 var SECTIONS=[
  {id:"riktning", n:"Riktning",     num:"01", f:secRiktning},
  {id:"komp",     n:"Kompositioner",num:"02", f:secKomp},
@@ -2095,7 +2097,8 @@ var SECTIONS=[
  {id:"studio",   n:"Studio",       num:"05", f:secStudio},
  {id:"lager",    n:"Lager & media",num:"06", f:secLager},
  {id:"motion",   n:"Motion",       num:"07", f:secMotion},
- {id:"export",   n:"Export",       num:"08", f:secExport}
+ {id:"export",   n:"Export",       num:"08", f:secExport},
+ {id:"ads",      n:"Ads",          num:"09", f:secAds}
 ];
 
 /* =====================================================================
