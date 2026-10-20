@@ -15,10 +15,15 @@ var V3 = {img:{}, ready:false, loading:null};
 var V3_KEYS = {home:"adHome", dining:"adDining", beige:"adBeige", bedroom:"adBedroom", house:"adHouse",
                terrace:"adTerrace", porch:"adPorch", blur:"adHomeBlur"};
 var V3_POS = {home:[.5,.45], dining:[.46,.5], beige:[.56,.5], bedroom:[.5,.52], house:[.5,.72], terrace:[.4,.5], porch:[.3,.5]};
-var C3 = {paper:"#ECE8E5", ink:"#161616", oli:"#6E7266", mut:"#8C8782", line:"#CFC8C6", dark:"#141211", ui:"#F3F0ED", uil:"#E3DED9",
-          navy:"#13293D", navyD:"#0E1F2F", sand:"#C8B79B", cream:"#EADFCF", green:"#6E9A6B"};
+/* Viewlys egen palett, hämtad ur Highlights-systemet: ARKIV (papper, ink, oliv)
+   och SKUGGA (varmt svart, oliv lyft). Ingen blå, inget guld. */
+var C3 = {paper:"#ECE8E5", ink:"#1C1C1E", oli:"#6E7266", olil:"#98A088", dark:"#0E0E0D", ui:"#F3F0ED", uil:"#E3DED9",
+          mut:"#8C8782", line:"#D8D2CF", cream:"#EFEDE7", green:"#6E9A6B"};
+/* Kontorets profil (exempel). Ändras i panelen Anpassa. */
+var OFF = {name:"NORDVIK", sub:"MÄKLARBYRÅ", accent:"#2F6F6B", accentL:"#9CC7C0"};
 var V3F = {serif:"'Cormorant Garamond',Georgia,serif", sans:"Montserrat,sans-serif"};
-var V3_OBJ = {addr:"Storgatan 13", city:"Landskrona"};
+var V3_OBJ = {addr:"Storgatan 13", city:"Landskrona", rum:"4", yta:"112", pris:"3 450 000", visning:"Sön 13–14", kommande:"Släpps vecka 12", maklare:"Anna Lindqvist"};
+function v3Facts(){ return V3_OBJ.rum + " rum  ·  " + V3_OBJ.yta + " m²  ·  " + V3_OBJ.pris + " kr" }
 
 function v3Load(){
   if(V3.loading) return V3.loading;
@@ -153,19 +158,18 @@ function v3Lock(c, cx, cy, capH, ink, dot, o){
   return tot;
 }
 /* Kontorets logga (exempel): monogram + ordbild */
-var V3_B = {name:"NORDVIK", sub:"MÄKLARBYRÅ"};
 function v3NLogo(c, x, y, sz, col, al, p){
   p = p == null ? 1 : p; if(p <= 0) return;
   var bw = 4.8*sz, nw = 0, w1, w2;
   var o1 = {size:2.3*sz, weight:600, f:"sans", sp:.34}, o2 = {size:1.2*sz, weight:500, f:"sans", sp:.44};
-  w1 = v3Measure(c, V3_B.name, o1); w2 = v3Measure(c, V3_B.sub, o2);
+  w1 = v3Measure(c, OFF.name, o1); w2 = v3Measure(c, OFF.sub, o2);
   var tw = Math.max(w1, w2), tot = bw + 1.8*sz + tw;
   var x0 = al === "c" ? x - tot/2 : al === "r" ? x - tot : x;
   c.save(); c.globalAlpha = p;
   c.strokeStyle = col; c.lineWidth = .3*sz; c.strokeRect(x0, y, bw, bw);
   v3Text(c, "N", x0 + bw/2, y + bw*.72, {size:3.5*sz, weight:400, color:col, align:"c"});
-  v3Text(c, V3_B.name, x0 + bw + 1.8*sz, y + bw*.46, {size:2.3*sz, weight:600, f:"sans", sp:.34, color:col});
-  v3Text(c, V3_B.sub, x0 + bw + 1.8*sz, y + bw*.9, {size:1.2*sz, weight:500, f:"sans", sp:.44, color:col, alpha:.8});
+  v3Text(c, OFF.name, x0 + bw + 1.8*sz, y + bw*.46, {size:2.3*sz, weight:600, f:"sans", sp:.34, color:col});
+  v3Text(c, OFF.sub, x0 + bw + 1.8*sz, y + bw*.9, {size:1.2*sz, weight:500, f:"sans", sp:.44, color:col, alpha:.8});
   c.restore();
   return tot;
 }
@@ -191,15 +195,15 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
   else v3Grad(c, 0, H*.34, 100, H*.66, [[0, "rgba(12,10,10,0)"], [.45, "rgba(12,10,10,.16)"], [1, "rgba(12,10,10,.55)"]], sa);
   v3Grad(c, 0, 0, 100, H*.15, [[0, "rgba(12,10,10,.32)"], [1, "rgba(12,10,10,0)"]], sa);
   var m = tall ? 16 : 0;           /* extra luft nertill i 9:16 */
-  var S = c; var W = "#fff", sand = C3.sand, cream = C3.cream;
+  var S = c; var W = "#fff", sand = OFF.accentL, cream = C3.cream;
   if(style === "overlay"){
     v3Frame(c, 3.5, 3.5, 93, H - 7, "#fff", .26, v3Step(p, 0, .35), .55);
     v3NLogo(c, 50, 8.5, 1.05, W, "c", v3Step(p, .08, .3));
     if(phase === "tillsalu"){
       var b = H - 9.5 - m;
-      v3Text(c, "Visning söndag 13–14", 50, b, {size:3.8, italic:true, color:cream, align:"c", p:v3Step(p, .86, 1), rise:1.6});
+      v3Text(c, "Visning " + V3_OBJ.visning.toLowerCase(), 50, b, {size:3.8, italic:true, color:cream, align:"c", p:v3Step(p, .86, 1), rise:1.6});
       var fy = b - 13.5;
-      [["4", "RUM"], ["112", "M²"], ["3 450 000", "KR"]].forEach(function(f, i){
+      [[V3_OBJ.rum, "RUM"], [V3_OBJ.yta, "M²"], [V3_OBJ.pris, "KR"]].forEach(function(f, i){
         var cx = [22, 50, 78][i], q = v3Step(p, .68 + i*.05, .84 + i*.05);
         v3Text(c, f[0], cx, fy, {size:f[0].length > 3 ? 5.2 : 6.6, weight:400, color:W, align:"c", p:1, alpha:q, rise:1.6});
         v3Text(c, f[1], cx, fy + 5, {size:1.7, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:q*.8});
@@ -221,12 +225,12 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
       v3Text(c, "KOMMANDE", 50, cy - 18, {size:2.2, weight:600, f:"sans", sp:.42, color:sand, align:"c", alpha:q1});
       v3Text(c, V3_OBJ.addr, 50, cy, {size:15.5, color:W, align:"c", p:v3Step(p, .34, .6), shadow:true});
       v3Line(c, 43, 57, cy + 8, sand, .3, v3Step(p, .58, .74));
-      v3Text(c, "Släpps vecka 12", 50, cy + 17, {size:5.2, italic:true, color:cream, align:"c", p:v3Step(p, .7, .92), rise:1.6});
+      v3Text(c, V3_OBJ.kommande, 50, cy + 17, {size:5.2, italic:true, color:cream, align:"c", p:v3Step(p, .7, .92), rise:1.6});
     } else if(phase === "visning"){
       var cy2 = H/2 + 2, lw3 = v3Measure(c, "VISNING", {size:2.2, weight:600, f:"sans", sp:.42}), q2 = v3Step(p, .22, .4);
       v3Line(c, 50 - lw3/2 - 12, 50 - lw3/2 - 3, cy2 - 22.8, sand, .3, q2); v3Line(c, 50 + lw3/2 + 3, 50 + lw3/2 + 12, cy2 - 22.8, sand, .3, q2);
       v3Text(c, "VISNING", 50, cy2 - 22, {size:2.2, weight:600, f:"sans", sp:.42, color:sand, align:"c", alpha:q2});
-      v3Text(c, "Sön 13–14", 50, cy2 + 2, {size:20, color:W, align:"c", p:v3Step(p, .34, .62), shadow:true});
+      v3Text(c, V3_OBJ.visning, 50, cy2 + 2, {size:20, color:W, align:"c", p:v3Step(p, .34, .62), shadow:true});
       v3Line(c, 43, 57, cy2 + 11, sand, .3, v3Step(p, .6, .76));
       v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy2 + 19, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", p:v3Step(p, .68, .86)});
       v3Text(c, "Anmälan via mäklaren", 50, cy2 + 26, {size:3.8, italic:true, color:cream, align:"c", p:v3Step(p, .82, 1), rise:1.4});
@@ -246,8 +250,8 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
     v3Line(c, 9, 91, labY - 6.4, "#fff", .2, v3Step(p, .2, .5), .5);
     v3Fill(c, 9, labY - .8, 5*v3Step(p, .3, .45), .3, sand);
     v3Text(c, lab, 16, labY, {size:2.2, weight:600, f:"sans", sp:.4, color:sand, alpha:v3Step(p, .3, .45)});
-    v3Text(c, phase === "sald" ? "Såld." : phase === "visning" ? "Sön 13–14" : V3_OBJ.addr, 9, bb - 11.5, {size:big, italic:phase === "sald", color:W, p:v3Step(p, .4, .68), shadow:true});
-    var sub = phase === "tillsalu" ? "4 rum  ·  112 m²  ·  3 450 000 kr" : phase === "kommande" ? "Släpps vecka 12" : V3_OBJ.addr + " · " + V3_OBJ.city;
+    v3Text(c, phase === "sald" ? "Såld." : phase === "visning" ? V3_OBJ.visning : V3_OBJ.addr, 9, bb - 11.5, {size:big, italic:phase === "sald", color:W, p:v3Step(p, .4, .68), shadow:true});
+    var sub = phase === "tillsalu" ? v3Facts() : phase === "kommande" ? V3_OBJ.kommande : V3_OBJ.addr + " · " + V3_OBJ.city;
     v3Text(c, sub.toUpperCase(), 9, bb - 2.5, {size:2.2, weight:500, f:"sans", sp:.28, color:W, p:v3Step(p, .66, .88), alpha:.95});
     v3Text(c, V3_OBJ.city.toUpperCase(), 91, 12.4, {size:1.9, weight:500, f:"sans", sp:.34, color:W, align:"r", alpha:v3Step(p, .1, .3)*.85});
   } else {   /* badge */
@@ -255,16 +259,16 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
     var bq = oBack(k3(p, .18, .5)), r = 12.5;
     if(bq > 0){
       c.save(); c.translate(80, 24); c.rotate(-.12); c.scale(bq, bq);
-      c.fillStyle = sand; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
+      c.fillStyle = OFF.accent; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
       var bl = phase === "tillsalu" ? ["TILL", "SALU"] : phase === "kommande" ? ["KOM-", "MANDE"] : phase === "visning" ? ["VIS-", "NING"] : ["SÅLD", ""];
-      v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:C3.navy, align:"c"});
-      if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:C3.navy, align:"c"});
+      v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"});
+      if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"});
       c.restore();
     }
     var b2 = H - 11 - m;
-    v3Text(c, phase === "visning" ? "Sön 13–14" : phase === "sald" ? "Såld" : V3_OBJ.addr, 9, b2 - 8, {size:phase === "sald" ? 26 : 14.5, italic:phase === "sald", color:W, p:v3Step(p, .34, .62), shadow:true});
+    v3Text(c, phase === "visning" ? V3_OBJ.visning : phase === "sald" ? "Såld" : V3_OBJ.addr, 9, b2 - 8, {size:phase === "sald" ? 26 : 14.5, italic:phase === "sald", color:W, p:v3Step(p, .34, .62), shadow:true});
     v3Fill(c, 9, b2 - 3.8, 11*v3Step(p, .56, .72), .35, sand);
-    var s2 = phase === "tillsalu" ? "4 rum  ·  112 m²  ·  3 450 000 kr" : phase === "kommande" ? "Släpps vecka 12" : phase === "visning" ? V3_OBJ.addr + " · " + V3_OBJ.city : "Tack för förtroendet";
+    var s2 = phase === "tillsalu" ? v3Facts() : phase === "kommande" ? V3_OBJ.kommande : phase === "visning" ? V3_OBJ.addr + " · " + V3_OBJ.city : "Tack för förtroendet";
     v3Text(c, s2.toUpperCase(), 9, b2 + 1.8, {size:2.2, weight:500, f:"sans", sp:.28, color:W, p:v3Step(p, .62, .86)});
   }
   c.restore();

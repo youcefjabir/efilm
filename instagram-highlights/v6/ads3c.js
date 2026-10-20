@@ -1,17 +1,44 @@
 /* =====================================================================
-   ADS 3 — del C: ljud, export och sidan
+   ADS 3 — del C: inställningar, ljud, export och sidan
    ===================================================================== */
 
-var V3S = {tab:"video", comp:"kort", fmt:"916", t:2.4, playing:false, raf:0, tick:0, hook:0, outro:"marin", sound:true,
-           tplStyle:"overlay", tplFmt:"45", outroPreviewFmt:"916", ctxA:null, src:null, startT:0, startCtx:0};
+/* Allt som går att ändra: färger, texter, objektuppgifter, kontorsprofil.
+   Sparas i webbläsaren och används av alla annonser. */
+var V3_DEF = {
+  hook:["En fotografering.", "Mer att arbeta med."], msg:["Mer tid över", "för det som säljer."],
+  obj:{addr:"Storgatan 13", city:"Landskrona", rum:"4", yta:"112", pris:"3 450 000", visning:"Sön 13–14", kommande:"Släpps vecka 12", maklare:"Anna Lindqvist"},
+  off:{name:"NORDVIK", sub:"MÄKLARBYRÅ", accent:"#2F6F6B", accentL:"#9CC7C0"},
+  col:{dark:"#0E0E0D", paper:"#ECE8E5", ink:"#1C1C1E", oli:"#6E7266", olil:"#98A088"}
+};
+var V3_CFG = JSON.parse(JSON.stringify(V3_DEF));
 var V3_HOOKS = [["En fotografering.", "Mer att arbeta med."], ["Fotona är klara.", "Inläggen också."], ["Dina bilder.", "Din kampanj."]];
+var V3_MSGS = [["Mer tid över", "för det som säljer."], ["Kampanjen är klar", "redan när fotona levereras."], ["Välj bild. Välj mall.", "Resten sköter vi."]];
+function v3Apply(){
+  var k;
+  for(k in V3_CFG.obj) V3_OBJ[k] = V3_CFG.obj[k];
+  for(k in V3_CFG.off) OFF[k] = V3_CFG.off[k];
+  C3.dark = V3_CFG.col.dark; C3.paper = V3_CFG.col.paper; C3.ink = V3_CFG.col.ink; C3.oli = V3_CFG.col.oli; C3.olil = V3_CFG.col.olil;
+}
+function v3LoadCfg(){
+  try {
+    var raw = localStorage.getItem("viewly.ads3.cfg");
+    if(raw){ var o = JSON.parse(raw); ["hook", "msg"].forEach(function(k){ if(o[k]) V3_CFG[k] = o[k] }); ["obj", "off", "col"].forEach(function(g){ if(o[g]) for(var k in o[g]) V3_CFG[g][k] = o[g][k] }) }
+  } catch(e){}
+  v3Apply();
+}
+function v3SaveCfg(){ try { localStorage.setItem("viewly.ads3.cfg", JSON.stringify(V3_CFG)) } catch(e){} }
+v3LoadCfg();
+
+var V3S = {tab:"video", comp:"salu", fmt:"916", t:3.2, playing:false, raf:0, outro:"papper", sound:true,
+           tplStyle:"overlay", tplFmt:"45", outroPreviewFmt:"916", ctxA:null, src:null, startT:0, startCtx:0};
 var V3_FPS = 30;
+function v3O(){ return {outro:V3S.outro, hook:V3_CFG.hook, msg:V3_CFG.msg} }
 
 /* ---------- ritar en komposition i en given canvas ---------- */
 function v3DrawComp(canvas, wpx, compId, fmt, t){
   var G = v3Geo(fmt), hpx = Math.round(wpx*G.H/100), c = v3Begin(canvas, wpx, hpx);
   c.clearRect(0, 0, 100, G.H);
-  V3_COMPS[compId].draw(c, G, t, {outro:V3S.outro, hook:V3_HOOKS[V3S.hook]});
+  V3_COMPS[compId].draw(c, G, t, v3O());
 }
 function v3Dims(fmt){ return fmt === "916" ? [1080, 1920] : [1080, 1350] }
 
@@ -386,7 +413,7 @@ function v3Painter(spec){
     return {ar:G3.H/100, fn:function(c){ v3Outro(c, G3, p[1], t, {noFade:true}) }};
   }
   var G4 = v3Geo(p[2]);
-  return {ar:G4.H/100, fn:function(c){ V3_COMPS[p[1]].draw(c, G4, +p[3], {outro:V3S.outro, hook:V3_HOOKS[V3S.hook]}) }};
+  return {ar:G4.H/100, fn:function(c){ V3_COMPS[p[1]].draw(c, G4, +p[3], v3O()) }};
 }
 function v3Mount(){
   var cvs = document.querySelectorAll("canvas[data-v3]");
@@ -396,7 +423,7 @@ function v3Mount(){
       var p = v3Painter(cv.dataset.v3), wpx = +(cv.dataset.w || 540), c = v3Begin(cv, wpx, Math.round(wpx*p.ar));
       p.fn(c);
     });
-    v3Stage(0);
+    v3Stage();
   });
 }
 
@@ -449,26 +476,36 @@ function v3Seg(kind, val, label, on){
 }
 function v3Canvas(spec, w, cls){ return '<canvas class="a3cv ' + (cls || "") + '" data-v3="' + spec + '" data-w="' + (w || 540) + '"></canvas>' }
 function v3Tabs(){
-  var T = [["video", "Videor"], ["kar", "Karuseller"], ["stat", "Statiska"], ["inl", "Inlägg"], ["out", "Slutkort"]];
+  var T = [["video", "Videor"], ["kar", "Karusell"], ["stat", "Statiska"], ["inl", "Inlägg"], ["out", "Slutkort"]];
   return '<div class="a3tabs">' + T.map(function(x){
     return '<button type="button" class="a3tab" data-a3="tab" data-v="' + x[0] + '" aria-current="' + (V3S.tab === x[0]) + '">' + x[1] + '</button>';
   }).join("") + '</div>';
 }
-var V3_COPY = {
-  lang:["Dina bilder är levererade. Din kampanj är två klick bort.", "Med Viewly skapar du sociala medier-inlägg direkt när fotona levereras — i alla format, i ditt kontors egen profil. Och det är bara en del av Viewly."],
-  kort:["Två klick. Inte två timmar.", "När fotona är levererade skapar du kampanjen direkt i Mäklarportalen. Bostadsfotografering för mäklare i Skåne."],
-  mer:["Mer än bara fotografering.", "Fotografering, skymning, 3D-visning, e-styling, drönare, områdeskartor och verktyg för mäklare. Du bokar, vi sköter resten."],
-  forrnu:["Förr: timmar. Nu: två klick.", "Inläggen skapas i Mäklarportalen direkt efter leveransen. Viewly — bostadsfotografering för mäklare i Skåne."]
-};
+function v3Field(path, label, type){
+  var p = path.split("."), v = V3_CFG[p[0]]; if(p[1]) v = v[p[1]]; else v = V3_CFG[p[0]];
+  if(p[0] === "hook" || p[0] === "msg") v = V3_CFG[p[0]][+p[1]];
+  return '<label class="a3f"><span>' + esc(label) + '</span><input type="' + (type || "text") + '" value="' + esc(String(v)) + '" data-a3cfg="' + path + '"></label>';
+}
+function v3Customizer(){
+  var f = v3Field;
+  return '<details class="a3det a3cust"><summary>Anpassa texter, färger och objektuppgifter</summary><div class="a3custg">'
+    + '<div><b>Texter</b>' + f("hook.0", "Hook, rad 1") + f("hook.1", "Hook, rad 2") + f("msg.0", "Budskap, rad 1") + f("msg.1", "Budskap, rad 2") + '</div>'
+    + '<div><b>Objekt (demodata)</b>' + f("obj.addr", "Adress") + f("obj.city", "Ort") + f("obj.rum", "Rum") + f("obj.yta", "Boarea (m²)") + f("obj.pris", "Pris (kr)") + f("obj.visning", "Visning") + f("obj.kommande", "Kommande-text") + f("obj.maklare", "Ansvarig mäklare") + '</div>'
+    + '<div><b>Kontorsprofil (exempel)</b>' + f("off.name", "Kontorsnamn") + f("off.sub", "Underrad") + f("off.accent", "Kontorets färg", "color") + f("off.accentL", "Kontorets ljusa färg", "color") + '</div>'
+    + '<div><b>Viewlys färger</b>' + f("col.dark", "Mörk bakgrund", "color") + f("col.paper", "Papper", "color") + f("col.ink", "Text och logga (ljus bakgrund)", "color") + f("col.oli", "Oliv (ljus bakgrund)", "color") + f("col.olil", "Oliv lyft (mörk bakgrund)", "color")
+    + '<button type="button" class="a3mini" data-a3="reset" style="margin-top:12px">Återställ allt</button></div>'
+    + '</div></details>';
+}
 function v3VideoTab(){
-  var comp = V3_COMPS[V3S.comp], cp = V3_COPY[V3S.comp];
+  var comp = V3_COMPS[V3S.comp];
   var cards = Object.keys(V3_COMPS).map(function(id){
-    var c2 = V3_COMPS[id], tpos = {lang:3.0, kort:2.8, mer:2.4, forrnu:1.8}[id];
+    var c2 = V3_COMPS[id];
     return '<button type="button" class="a3card" data-a3="comp" data-v="' + id + '" aria-current="' + (V3S.comp === id) + '">'
-      + '<div class="a3cth">' + v3Canvas("comp:" + id + ":916:" + tpos, 270) + '</div>'
+      + '<div class="a3cth">' + v3Canvas("comp:" + id + ":916:" + c2.thumb, 270) + '</div>'
       + '<div class="a3ctl"><i>' + c2.dur.toFixed(0) + ' s · 9:16 och 4:5 · ljud</i><b>' + esc(c2.n) + '</b><span>' + esc(c2.d) + '</span></div></button>';
   }).join("");
-  var hooks = V3_HOOKS.map(function(h, i){ return v3Seg("hook", i, h[0] + " " + h[1], V3S.hook === i) }).join("");
+  var hooks = V3_HOOKS.map(function(h, i){ return v3Seg("hook", i, h[0] + " " + h[1], V3_CFG.hook[0] === h[0] && V3_CFG.hook[1] === h[1]) }).join("");
+  var msgs = V3_MSGS.map(function(h, i){ return v3Seg("msg", i, h[0] + " " + h[1], V3_CFG.msg[0] === h[0] && V3_CFG.msg[1] === h[1]) }).join("");
   var outs = V3_OUT.map(function(o){ return v3Seg("outro", o.id, o.n, V3S.outro === o.id) }).join("");
   return '<div class="a3cards">' + cards + '</div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
@@ -479,77 +516,76 @@ function v3VideoTab(){
     + '<div class="a3panel"><div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel · 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde · 4:5", V3S.fmt === "45") + '</div>'
     + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
     + '<div class="a3h">Hook</div><div class="a3segs col">' + hooks + '</div>'
+    + '<div class="a3h">Budskap efter inlägget</div><div class="a3segs col">' + msgs + '</div>'
     + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
     + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div>'
-    + '</div></div>'
-    + '<div class="a3sub">Text till Meta</div><div class="a3copy"><div><b>Rubrik</b><p>' + esc(cp[0]) + '</p><b>Primärtext</b><p>' + esc(cp[1]) + '</p></div>'
+    + '</div></div>' + v3Customizer()
+    + '<div class="a3sub">Text till Meta</div><div class="a3copy"><div><b>Rubrik</b><p>Dina bilder är levererade. Kampanjen är redan klar.</p><b>Primärtext</b><p>Välj bild. Välj mall. Bostadsuppgifterna hämtas automatiskt, och inlägget är klart i ditt kontors egen profil — i alla format. Det är bara en del av Viewly: bostadsfotografering för mäklare i Skåne.</p></div>'
     + '<div><b>Knapp och länk</b><p>Läs mer · viewly.se/maklare</p><b>Mål</b><p>Trafik till /maklare och bokning av provfotografering.</p></div></div>';
 }
-function v3Gallery(items, ar, w){
+function v3Gallery(items, w){
   return '<div class="a3gal">' + items.map(function(it){
     return '<div class="a3gi"><div class="a3gth">' + v3Canvas(it.spec, w || 540) + '</div><div class="a3gm"><div><b>' + esc(it.n) + '</b>' + (it.d ? '<span>' + esc(it.d) + '</span>' : '') + '</div>'
       + '<button type="button" class="a3mini" data-a3="png" data-v="' + it.spec + '">PNG</button></div></div>';
   }).join("") + '</div>';
 }
 function v3KarTab(){
-  var out = "";
-  ["b", "c"].forEach(function(k){
-    var set = V3_CAR[k];
-    out += '<div class="a3sub">' + esc(set.n) + '</div><p class="a3lede">' + esc(set.d) + '</p><div class="a3slides">'
-      + set.slides.map(function(s, i){
-        return '<div class="a3sl"><div class="a3gth">' + v3Canvas("slide:" + k + ":" + i, 540) + '</div><div class="a3gm"><span class="mono">' + (i + 1) + ' / ' + set.slides.length + '</span><button type="button" class="a3mini" data-a3="png" data-v="slide:' + k + ':' + i + '">PNG</button></div></div>';
-      }).join("") + '</div>';
-  });
-  out += '<div class="a3copy"><div><b>B · Rubrik</b><p>Dina bilder är levererade. Nu då?</p><b>B · Primärtext</b><p>Två klick i Mäklarportalen, så är kampanjen klar — i alla format, i ert eget kontors profil.</p></div>'
-    + '<div><b>C · Rubrik</b><p>En bostadsfotograf som gör mer än bara fotografering.</p><b>C · Primärtext</b><p>Fotografering, skymning, 3D-visning, e-styling, drönare, områdeskartor och verktyg för mäklare. Du bokar, vi sköter resten.</p></div></div>';
-  return out;
+  var set = V3_CAR.b;
+  return '<div class="a3sub">' + esc(set.n) + '</div><p class="a3lede">' + esc(set.d) + '</p><div class="a3slides">'
+    + set.slides.map(function(s, i){
+      return '<div class="a3sl"><div class="a3gth">' + v3Canvas("slide:b:" + i, 540) + '</div><div class="a3gm"><span class="mono">' + (i + 1) + ' / ' + set.slides.length + '</span><button type="button" class="a3mini" data-a3="png" data-v="slide:b:' + i + '">PNG</button></div></div>';
+    }).join("") + '</div>' + v3Customizer()
+    + '<div class="a3copy"><div><b>Rubrik</b><p>Dina bilder är levererade. Nu då?</p><b>Primärtext</b><p>Välj bild. Välj mall. Bostadsuppgifterna hämtas automatiskt — och inlägget är klart i ditt kontors egen profil.</p></div></div>';
 }
 function v3StatTab(){
   return '<p class="a3lede">Enkelbilder i 4:5 för flödet. Samma bildspråk som videon, ett påstående per bild.</p>'
-    + v3Gallery(V3_STATIC.map(function(s){ return {spec:"static:" + s.id, n:s.n, d:s.d} }), 1.25);
+    + v3Gallery(V3_STATIC.map(function(s){ return {spec:"static:" + s.id, n:s.n, d:s.d} })) + v3Customizer();
 }
 function v3InlTab(){
   var styles = [["overlay", "Overlay"], ["editorial", "Editorial"], ["badge", "Badge"]];
   var ph = [["tillsalu", "Till salu"], ["kommande", "Kommande"], ["visning", "Visning"], ["sald", "Såld"]];
   var seg = '<div class="a3segs row">' + styles.map(function(s){ return v3Seg("tpl", s[0], s[1], V3S.tplStyle === s[0]) }).join("") + '<span class="a3gap"></span>'
     + [["45", "Inlägg 4:5"], ["916", "Story 9:16"], ["11", "Kvadrat 1:1"]].map(function(f){ return v3Seg("tplfmt", f[0], f[1], V3S.tplFmt === f[0]) }).join("") + '</div>';
-  return '<p class="a3lede">Förslag på nya mallar för Kommande, Till salu, Visning och Såld: helbild med overlay, centrerade eller redaktionella. Kontoret är Nordvik Mäklarbyrå som exempel. Studions nuvarande mallar är inte ändrade.</p>'
-    + seg + v3Gallery(ph.map(function(f){ return {spec:"post:" + V3S.tplStyle + ":" + f[0] + ":" + V3S.tplFmt, n:f[1], d:""} }), 1.25, 540);
+  return '<p class="a3lede">Förslag på mallar för Kommande, Till salu, Visning och Såld: helbild med overlay, centrerade eller redaktionella. Kontoret är Nordvik Mäklarbyrå som exempel, och kontorets färger ändras under Anpassa. Studions nuvarande mallar är inte ändrade.</p>'
+    + seg + v3Gallery(ph.map(function(f){ return {spec:"post:" + V3S.tplStyle + ":" + f[0] + ":" + V3S.tplFmt, n:f[1], d:""} }), 540) + v3Customizer();
 }
 function v3OutTab(){
-  var items = V3_OUT.map(function(o){ return {spec:"outro:" + o.id + ":" + V3S.outroPreviewFmt, n:o.n, d:""} });
-  return '<p class="a3lede">Slutkort för varumärket: en egen sekund, och därefter ett par till för tagline och adress. Klicka på ett kort för att använda det i videorna. Märket och ordbilden är samma höjd, med märket något högre så att de väger lika.</p>'
+  return '<p class="a3lede">Slutkort för varumärket: en egen sekund, och därefter ett par till för tagline och adress. Klicka på ett kort för att använda det i videorna. Märket och ordbilden har samma höjd, med märket något högre så att de väger lika. Färgerna är Viewlys egna.</p>'
     + '<div class="a3segs row">' + v3Seg("ofmt", "916", "9:16", V3S.outroPreviewFmt === "916") + v3Seg("ofmt", "45", "4:5", V3S.outroPreviewFmt === "45") + '</div>'
     + '<div class="a3gal a3out">' + V3_OUT.map(function(o){
       return '<div class="a3gi"><button type="button" class="a3pick" data-a3="outro" data-v="' + o.id + '" aria-current="' + (V3S.outro === o.id) + '"><div class="a3gth">' + v3Canvas("outro:" + o.id + ":" + V3S.outroPreviewFmt, 400) + '</div></button>'
         + '<div class="a3gm"><div><b>' + esc(o.n) + '</b></div><button type="button" class="a3mini" data-a3="png" data-v="outro:' + o.id + ':' + V3S.outroPreviewFmt + '">PNG</button></div></div>';
-    }).join("") + '</div>';
+    }).join("") + '</div>' + v3Customizer();
 }
 function v3Underlag(){
   return '<details class="a3det"><summary>Vad annonserna säger, och vad som är verifierat</summary><div class="a3und">'
-    + '<div><b>Budskapet</b><p>Verktygen är dörren in. När fotona är levererade skapar mäklaren sociala medier-inlägg direkt, i alla format och i kontorets egen profil — med två klick. Det som tog timmar. Och det är bara en del av Viewly. Därför slutar varje annons i varumärket.</p>'
-    + '<p><b>Att bekräfta före publicering:</b> "två klick" och "timmar" är en uppgift från er, inte något jag har mätt. Mäklarportalens riktiga flöde för Skapa kampanj ska jämföras med skärmarna i annonsen, som är en förenklad återgivning.</p></div>'
+    + '<div><b>Budskapet</b><p>Verktygen är dörren in. När fotona är levererade väljer mäklaren bild och mall, och bostadsuppgifterna hämtas automatiskt. Inlägget är klart i kontorets profil, i alla format. Det sparar tid — men det står inte ordagrant, det syns: allt som annars görs för hand bockas av av sig självt. Och det är bara en del av Viewly, därför slutar varje annons i varumärket.</p>'
+    + '<p><b>Att bekräfta före publicering:</b> Mäklarportalens riktiga flöde (bild, mall, uppgifter) ska jämföras med skärmarna i annonsen, som är en förenklad återgivning.</p></div>'
     + '<div><b>Verifierat på viewly.se</b><p>Social Media Studio hämtar levererade bilder, adress, rum, boarea, pris, ansvarig mäklare och visningsuppgifter. Kontoret ställer in logga, färger, typsnitt och layout per fas en gång. Faserna är Kommande, Till salu, Visning och Såld. Format: 4:5, 1:1, 9:16, 16:9 och A4. Hör till ViewlyPro, 30 dagar gratis, ingen bindningstid.</p>'
-    + '<p>Tjänster (portfolio och tjänstesidor): fotografering, skymning, 3D-visning, e-styling, drönare, områdeskartor, Atmosphere, Annonsskrivaren. Rubriken på /maklare: "En bostadsfotograf som gör mer än bara fotografering." Sloganen: "Du bokar, vi sköter resten."</p></div>'
-    + '<div><b>Demodata och förslag</b><p>Storgatan 13, Landskrona, priset, tiderna och kontoret Nordvik Mäklarbyrå är demodata. Nordviks riktiga profil är inte använd. Inläggsmallarna är ett förslag.</p>'
-    + '<p><b>Meta.</b> Annonsen säljer en tjänst till företag och bör inte falla under Bostäder — kontrollera i annonshanteraren. Affischerna i det första fotot är andras konstverk. Hypotes att testa: att annonser som visar verktyget ger fler förfrågningar än rena fotoannonser.</p></div></div></details>';
+    + '<p>Rubriken på /maklare: "En bostadsfotograf som gör mer än bara fotografering." Sloganen: "Du bokar, vi sköter resten."</p></div>'
+    + '<div><b>Demodata och förslag</b><p>Storgatan 13, priset, tiderna och kontoret Nordvik Mäklarbyrå är demodata. Nordviks riktiga profil är inte använd. Inläggsmallarna är ett förslag.</p>'
+    + '<p><b>Meta.</b> Annonsen säljer en tjänst till företag och bör inte falla under Bostäder — kontrollera i annonshanteraren. Affischerna i det första fotot är andras konstverk.</p></div></div></details>';
 }
 function secAds3(){
   var body = V3S.tab === "video" ? v3VideoTab() : V3S.tab === "kar" ? v3KarTab() : V3S.tab === "stat" ? v3StatTab() : V3S.tab === "inl" ? v3InlTab() : v3OutTab();
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 11</div><h2>Viewlys annonser</h2>'
-    + '<p>Verktygen är dörren in till Viewly: när fotona är levererade skapas inläggen med två klick. Video i 9:16, allt annat i 4:5. Förslag, inte låsta krav. Inget publicerat.</p></div>'
+    + '<p>Välj bild. Välj mall. Uppgifterna hämtas automatiskt. Verktygen är dörren in till Viewly. Video i 9:16, allt annat i 4:5. Förslag, inte låsta krav. Inget publicerat.</p></div>'
     + v3Tabs() + body + v3Underlag() + '</div>';
 }
+var V3_REPAINT = 0;
+function v3Repaint(){ if(V3_REPAINT) return; V3_REPAINT = requestAnimationFrame(function(){ V3_REPAINT = 0; v3Mount() }) }
 document.addEventListener("click", function(e){
   var b = e.target.closest("[data-a3]"); if(!b) return;
   var k = b.dataset.a3, v = b.dataset.v;
   if(k === "tab"){ V3S.tab = v; V3S.playing = false; v3StopSound(); render({top:true}); return }
-  if(k === "comp"){ V3S.comp = v; V3S.t = {lang:3.0, kort:2.4, mer:2.8, forrnu:1.9}[v] || 0; V3S.playing = false; v3StopSound(); render(); return }
+  if(k === "comp"){ V3S.comp = v; V3S.t = V3_COMPS[v].thumb; V3S.playing = false; v3StopSound(); render(); return }
   if(k === "fmt"){ V3S.fmt = v; render(); return }
   if(k === "sound"){ V3S.sound = v === "1"; if(!V3S.sound) v3StopSound(); render(); return }
-  if(k === "hook"){ V3S.hook = +v; render(); return }
+  if(k === "hook"){ V3_CFG.hook = V3_HOOKS[+v].slice(); v3SaveCfg(); render(); return }
+  if(k === "msg"){ V3_CFG.msg = V3_MSGS[+v].slice(); v3SaveCfg(); render(); return }
+  if(k === "reset"){ V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
   if(k === "outro"){ V3S.outro = v; render(); return }
   if(k === "tpl"){ V3S.tplStyle = v; render(); return }
   if(k === "tplfmt"){ V3S.tplFmt = v; render(); return }
@@ -560,8 +596,14 @@ document.addEventListener("click", function(e){
   if(k === "png"){ v3ExportPng(b, v); return }
 });
 document.addEventListener("input", function(e){
+  var cf = e.target.dataset && e.target.dataset.a3cfg;
+  if(cf){
+    var p = cf.split("."), val = e.target.value;
+    if(p[0] === "hook" || p[0] === "msg") V3_CFG[p[0]][+p[1]] = val; else V3_CFG[p[0]][p[1]] = val;
+    v3Apply(); v3SaveCfg(); v3Repaint(); return;
+  }
   if(e.target.id !== "v3scrub") return;
   V3S.playing = false; v3StopSound(); var pb = document.getElementById("v3play"); if(pb) pb.textContent = "▶";
   v3Stage(e.target.value/1000*V3_COMPS[V3S.comp].dur);
 });
-window.__v3 = {load:v3Load, begin:v3Begin, post:v3Post, comps:V3_COMPS, drawComp:v3DrawComp, painter:v3Painter, S:V3S, geo:v3Geo, outro:v3Outro, audio:v3Audio, wav:v3Wav, encA:v3EncodeAudio, encV:v3EncodeVideo, mux:v3MuxAV};
+window.__v3 = {load:v3Load, begin:v3Begin, post:v3Post, comps:V3_COMPS, drawComp:v3DrawComp, painter:v3Painter, S:V3S, geo:v3Geo, outro:v3Outro, audio:v3Audio, wav:v3Wav, encA:v3EncodeAudio, encV:v3EncodeVideo, mux:v3MuxAV, cfg:V3_CFG};
