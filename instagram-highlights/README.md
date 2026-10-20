@@ -27,6 +27,7 @@ bild ligger inbäddad som data-URI, inga externa anrop.
 | 05 | Studio | Redigera: välj bland tre förslag per bildruta, byt bild, ladda upp egna, skriv om texten, spara, ladda ner |
 | 06 | Lager & media | Vad som är låst, halvlåst och redigerbart — med en live media-slot |
 | 09 | Ads | Viewlys första annonskampanj: översikt, Annons A (Reel 9:16, med MP4-export), skisser för B och C. Källa: `ads.js`, `ads.css`, bild i `assets/` |
+| 10 | Ads (ny) | Annonserna i ny form: Annons A som video i 9:16 och 4:5, B och C som karuseller i 4:5. Källa: `ads2.js`, `ads2.css` |
 
 I Studio öppnar du ett kapitel och får filmremsa, live-scen och inspektör. `▶ Spela
 sekvensen` startar uppspelningen; `←` `→` bläddrar · `Esc` stänger.

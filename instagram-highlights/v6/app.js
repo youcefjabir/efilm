@@ -2098,7 +2098,8 @@ var SECTIONS=[
  {id:"lager",    n:"Lager & media",num:"06", f:secLager},
  {id:"motion",   n:"Motion",       num:"07", f:secMotion},
  {id:"export",   n:"Export",       num:"08", f:secExport},
- {id:"ads",      n:"Ads",          num:"09", f:secAds}
+ {id:"ads",      n:"Ads · utkast 1",num:"09", f:secAds},
+ {id:"ads2",     n:"Ads",          num:"10", f:secAds2}
 ];
 
 /* =====================================================================
