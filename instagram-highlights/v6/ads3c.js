@@ -497,7 +497,7 @@ function v3Customizer(){
 }
 function v3VideoTab(){
   var comp = V3_COMPS[V3S.comp];
-  var cards = Object.keys(V3_COMPS).map(function(id){
+  var cards = Object.keys(V3_COMPS).filter(function(id){ return V3_COMPS[id].group !== "hl" }).map(function(id){
     var c2 = V3_COMPS[id];
     return '<button type="button" class="a3card" data-a3="comp" data-v="' + id + '" aria-current="' + (V3S.comp === id) + '">'
       + '<div class="a3cth">' + v3Canvas("comp:" + id + ":916:" + c2.thumb, 270) + '</div>'
@@ -583,6 +583,7 @@ function v3PlanTab(){
   + '</div>';
 }
 function secAds3(){
+  if(V3_COMPS[V3S.comp] && V3_COMPS[V3S.comp].group === "hl"){ V3S.comp = "salu"; V3S.t = V3_COMPS.salu.thumb; V3S.playing = false; v3StopSound() }
   var body = V3S.tab === "video" ? v3VideoTab() : V3S.tab === "kar" ? v3KarTab() : V3S.tab === "stat" ? v3StatTab() : V3S.tab === "inl" ? v3InlTab() : V3S.tab === "plan" ? v3PlanTab() : v3OutTab();
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 11</div><h2>Viewlys annonser</h2>'
