@@ -181,96 +181,114 @@ function v3NLogo(c, x, y, sz, col, al, p){
    --------------------------------------------------------------------- */
 var V3_PHOTO = {kommande:"dining", tillsalu:"home", visning:"beige", sald:"bedroom"};
 function v3Step(prog, a, b){ return oQ(k3(prog, a, b)) }
-/* En mall ritas i en egen 100-bred koordinat; ar = höjd/bredd. prog 0→1 fyller
-   den med text i tre lugna steg. skel (0–1, eller "auto") visar mallens
-   layout som grå staplar där texten ska stå — så ser man mallen innan den
-   fylls med bostadens uppgifter. */
+/* En mall ritas i en egen 100-bred koordinat; ar = höjd/bredd. prog 0→1 bygger
+   upp den i tre lugna steg. Mallens FASTA text (TILL SALU, Såld, Tack för
+   förtroendet, kontorets logga) syns alltid. De DYNAMISKA fälten — adress,
+   ort, rum, yta — visas som fältnamn (Adress, Ort, Rum, Yta) tills inlägget
+   skapas, och fylls då med bostadens uppgifter. o.skel: 0/odefinierat =
+   färdigt inlägg · tal = andel fältnamn · "auto" = fältnamnen byts mot
+   uppgifterna medan prog går 0→1. o.place = vad som är utplacerat i
+   mallredigeraren. */
 function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
   o = o || {};
-  var H = 100*ar, p = prog == null ? 1 : prog, tall = ar > 1.5;
-  var skel = o.skel === "auto" ? 1 - k3(p, .08, .62) : (o.skel || 0);
+  var H = 100*ar, p = prog == null ? 1 : prog, tall = ar > 1.5, pl = o.place || null;
+  var tokMode = o.skel !== undefined && o.skel !== 0 && o.skel !== false;
+  var tkOf = function(a, b){ return o.skel === "auto" ? 1 - k3(p, a, b) : (o.skel || 0) };
   c.save(); c.translate(x, y); c.scale(w/100, w/100);
   c.beginPath(); c.rect(0, 0, 100, H); c.clip();
   v3Photo(c, name || V3_PHOTO[phase], 0, 0, 100, H, {scale:o.zoom || 1});
-  var main = phase === "tillsalu", sa = Math.max(k3(p, 0, .25), skel);
+  var main = phase === "tillsalu", sa = tokMode || pl ? 1 : k3(p, 0, .25);
   if(!main) v3Fill(c, 0, 0, 100, H, "#0c0a0a", (style === "badge" ? .12 : .26)*sa);
   if(main) v3Grad(c, 0, H*.24, 100, H*.76, [[0, "rgba(12,10,10,0)"], [.3, "rgba(12,10,10,.34)"], [.62, "rgba(12,10,10,.72)"], [1, "rgba(12,10,10,.93)"]], sa);
   else v3Grad(c, 0, H*.34, 100, H*.66, [[0, "rgba(12,10,10,0)"], [.45, "rgba(12,10,10,.16)"], [1, "rgba(12,10,10,.55)"]], sa);
   v3Grad(c, 0, 0, 100, H*.15, [[0, "rgba(12,10,10,.32)"], [1, "rgba(12,10,10,0)"]], sa);
   var m = tall ? 16 : 0, mt = tall ? 18 : 0, W = "#fff", acc = OFF.accentL, cream = C3.cream;
-  var w1 = Math.max(k3(p, 0, .26), skel), lg = Math.max(v3Step(p, .04, .28), skel);
-  /* fyra steg: ram + logga, rubrik, adress, uppgifter */
+  /* fast text: alltid där i token-läge, annars i steg */
+  var st = function(v){ return tokMode ? 1 : (pl ? 0 : v) };
+  var plc = function(k){ return pl ? (pl[k] == null ? 0 : pl[k]) : 0 };
+  var fixedA = function(k, v){ return pl ? plc(k) : st(v) };
+  var w1 = pl ? plc("logo")*.0 + 1 : (tokMode ? 1 : k3(p, 0, .26)), lg = pl ? plc("logo") : (tokMode ? 1 : v3Step(p, .04, .28));
   var sLab = v3Step(p, .22, .4), sAdr = v3Step(p, .3, .58), sCity = v3Step(p, .42, .6), sFact = v3Step(p, .58, .82), sSub = v3Step(p, .74, .96);
-  var bar = function(cx, by, bw, bh, al){ c.globalAlpha = skel*(al == null ? .34 : al); c.fillStyle = "#fff"; c.fillRect(cx - bw/2, by - bh, bw, bh); c.globalAlpha = 1 };
-  var barL = function(lx, by, bw, bh, al){ c.globalAlpha = skel*(al == null ? .34 : al); c.fillStyle = "#fff"; c.fillRect(lx, by - bh, bw, bh); c.globalAlpha = 1 };
+  /* dynamiskt fält: värde (uppgiften) och fältnamn (token) */
+  var tkA = tkOf(.12, .4), tkC = tkOf(.26, .52), tkF = tkOf(.42, .7);
+  var dynV = function(tk, stage, k){ return pl ? 0 : (tokMode ? 1 - tk : stage) };
+  var dynT = function(tk, k){ return pl ? plc(k) : (tokMode ? tk : 0) };
+  var token = function(cx, base, tw, th, label, al, left, fs){
+    if(al <= .01) return;
+    var x0 = left ? cx : cx - tw/2, y0 = base - th;
+    c.save(); c.globalAlpha = al; c.fillStyle = "rgba(255,255,255,.12)"; c.fillRect(x0, y0, tw, th);
+    c.setLineDash([1.1, .9]); c.lineWidth = .3; c.strokeStyle = "rgba(255,255,255,.85)"; c.strokeRect(x0, y0, tw, th); c.setLineDash([]);
+    v3Text(c, label, x0 + tw/2, y0 + th/2 + (fs || 2)*.36, {size:fs || 2, weight:600, f:"sans", sp:.22, color:"#fff", align:"c"}); c.restore();
+  };
+  var frameA = pl ? plc("logo") : (tokMode ? 1 : k3(p, 0, .26));
   if(style === "overlay"){
-    c.globalAlpha = .55*w1; c.strokeStyle = "#fff"; c.lineWidth = .26; c.strokeRect(3.5, 3.5, 93, H - 7); c.globalAlpha = 1;
+    c.globalAlpha = .55*frameA; c.strokeStyle = "#fff"; c.lineWidth = .26; c.strokeRect(3.5, 3.5, 93, H - 7); c.globalAlpha = 1;
     v3NLogo(c, 50, 8.5 + mt, 1.05, W, "c", lg);
     var fy = H - 17 - m;
     if(phase === "tillsalu"){
-      var lly = fy - 43, lw = v3Measure(c, "TILL SALU", {size:2.2, weight:600, f:"sans", sp:.42});
-      v3Line(c, 50 - lw/2 - 12, 50 - lw/2 - 3, lly - .8, acc, .3, sLab); v3Line(c, 50 + lw/2 + 3, 50 + lw/2 + 12, lly - .8, acc, .3, sLab);
-      v3Text(c, "TILL SALU", 50, lly, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:sLab});
-      v3Text(c, V3_OBJ.addr, 50, fy - 29, {size:13, color:W, align:"c", p:sAdr, shadow:true});
-      v3Text(c, V3_OBJ.city.toUpperCase(), 50, fy - 20, {size:2.3, weight:500, f:"sans", sp:.38, color:W, align:"c", alpha:sCity});
-      v3Line(c, 43, 57, fy - 14, acc, .3, sCity);
-      [[V3_OBJ.rum, "RUM", 36], [V3_OBJ.yta, "M²", 64]].forEach(function(f){
-        c.save(); c.globalAlpha = sFact; c.translate(0, (1 - sFact)*1.4);
-        v3Text(c, f[0], f[2], fy, {size:6.6, weight:400, color:W, align:"c"}); v3Text(c, f[1], f[2], fy + 5.2, {size:1.7, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:.8});
-        c.restore();
+      var lly = fy - 43, lw = v3Measure(c, "TILL SALU", {size:2.2, weight:600, f:"sans", sp:.42}), la = fixedA("label", sLab);
+      v3Line(c, 50 - lw/2 - 12, 50 - lw/2 - 3, lly - .8, acc, .3, la); v3Line(c, 50 + lw/2 + 3, 50 + lw/2 + 12, lly - .8, acc, .3, la);
+      v3Text(c, "TILL SALU", 50, lly, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:la});
+      v3Text(c, V3_OBJ.addr, 50, fy - 29, {size:13, color:W, align:"c", p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true});
+      token(50, fy - 23.6, 58, 11, "ADRESS", dynT(tkA, "addr"));
+      v3Text(c, V3_OBJ.city.toUpperCase(), 50, fy - 20, {size:2.3, weight:500, f:"sans", sp:.38, color:W, align:"c", alpha:dynV(tkC, sCity)});
+      token(50, fy - 17.4, 22, 5, "ORT", dynT(tkC, "city"), false, 1.8);
+      v3Line(c, 43, 57, fy - 14, acc, .3, pl ? plc("addr") : (tokMode ? 1 : sCity));
+      [[V3_OBJ.rum, "RUM", 36, "rum"], [V3_OBJ.yta, "M²", 64, "yta"]].forEach(function(f){
+        var va = dynV(tkF, sFact), ta = dynT(tkF, f[3]);
+        c.save(); c.globalAlpha = va; c.translate(0, (tokMode || pl ? 0 : (1 - sFact)*1.4)); v3Text(c, f[0], f[2], fy, {size:6.6, weight:400, color:W, align:"c"}); c.restore();
+        token(f[2], fy + .4, 15, 8.4, f[3] === "rum" ? "RUM" : "YTA", ta, false, 1.9);
+        c.save(); c.globalAlpha = Math.max(va, ta > 0 ? .8 : 0)*(pl ? plc(f[3]) : 1); v3Text(c, f[1], f[2], fy + 5.2 + (ta > 0 ? 1.6 : 0), {size:1.7, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:.8}); c.restore();
       });
-      v3VLine(c, 50, fy - 6, fy + 6, "#fff", .2, sFact, .45);
-      bar(50, lly + 1, 18, .8); bar(50, fy - 20.6, 56, 3.6); bar(50, fy - 18.4, 22, .9, .26); bar(36, fy + 1, 7, 2.4, .3); bar(64, fy + 1, 7, 2.4, .3);
+      v3VLine(c, 50, fy - 6, fy + 6, "#fff", .2, pl ? Math.max(plc("rum"), plc("yta")) : (tokMode ? 1 : sFact), .45);
     } else if(phase === "kommande"){
-      var cy = H/2 + 4, lw2 = v3Measure(c, "KOMMANDE", {size:2.2, weight:600, f:"sans", sp:.42});
-      v3Line(c, 50 - lw2/2 - 12, 50 - lw2/2 - 3, cy - 18.8, acc, .3, sLab); v3Line(c, 50 + lw2/2 + 3, 50 + lw2/2 + 12, cy - 18.8, acc, .3, sLab);
-      v3Text(c, "KOMMANDE", 50, cy - 18, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:sLab});
-      v3Text(c, V3_OBJ.addr, 50, cy, {size:15.5, color:W, align:"c", p:sAdr, shadow:true});
-      v3Line(c, 43, 57, cy + 8, acc, .3, sCity);
-      v3Text(c, V3_OBJ.kommande, 50, cy + 17, {size:5.2, italic:true, color:cream, align:"c", alpha:sFact});
-      bar(50, cy - 17, 18, .8); bar(50, cy - 3, 60, 4); bar(50, cy + 17, 28, 1.2, .26);
-    } else if(phase === "visning"){
-      var cy2 = H/2 + 2;
-      v3Text(c, "VISNING", 50, cy2 - 22, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:sLab});
-      v3Text(c, "Välkommen.", 50, cy2 + 2, {size:18, color:W, align:"c", p:sAdr, shadow:true});
-      v3Line(c, 43, 57, cy2 + 11, acc, .3, sCity);
-      v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy2 + 19, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:sFact});
+      var cy = H/2 + 4, lw2 = v3Measure(c, "KOMMANDE", {size:2.2, weight:600, f:"sans", sp:.42}), la2 = fixedA("label", sLab);
+      v3Line(c, 50 - lw2/2 - 12, 50 - lw2/2 - 3, cy - 18.8, acc, .3, la2); v3Line(c, 50 + lw2/2 + 3, 50 + lw2/2 + 12, cy - 18.8, acc, .3, la2);
+      v3Text(c, "KOMMANDE", 50, cy - 18, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:la2});
+      v3Text(c, V3_OBJ.addr, 50, cy, {size:15.5, color:W, align:"c", p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true});
+      token(50, cy + 6, 62, 12, "ADRESS", dynT(tkA, "addr"));
+      v3Line(c, 43, 57, cy + 8, acc, .3, tokMode ? 1 : sCity);
+      v3Text(c, V3_OBJ.kommande, 50, cy + 17, {size:5.2, italic:true, color:cream, align:"c", alpha:dynV(tkF, sFact)});
+      token(50, cy + 21, 36, 6.4, "TEXT", dynT(tkF, "yta"), false, 1.8);
     } else {
       var cy3 = H/2 + 4;
-      v3Text(c, "Såld", 50, cy3 + 8, {size:42, italic:true, color:W, align:"c", p:v3Step(p, .26, .6), shadow:true});
-      v3Line(c, 40, 60, cy3 + 18, acc, .3, sCity);
-      v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy3 + 27, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:sFact});
-      v3Text(c, "Tack för förtroendet", 50, cy3 + 34, {size:3.8, italic:true, color:cream, align:"c", alpha:sSub});
-      bar(50, cy3 + 1, 40, 12, .22); bar(50, cy3 + 27.6, 40, 1, .26);
+      v3Text(c, "Såld", 50, cy3 + 8, {size:42, italic:true, color:W, align:"c", p:tokMode || pl ? 1 : v3Step(p, .26, .6), alpha:fixedA("label", 1), shadow:true});
+      v3Line(c, 40, 60, cy3 + 18, acc, .3, tokMode ? 1 : sCity);
+      v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy3 + 27, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:dynV(tkA, sFact)});
+      token(50, cy3 + 29.4, 56, 5.6, "ADRESS · ORT", dynT(tkA, "addr"), false, 1.8);
+      v3Text(c, "Tack för förtroendet", 50, cy3 + 38, {size:3.8, italic:true, color:cream, align:"c", alpha:tokMode ? 1 : sSub});
     }
   } else if(style === "editorial"){
     v3NLogo(c, 9, 9 + mt, .95, W, "l", lg);
     var bb = H - 9.5 - m, lab = {kommande:"KOMMANDE", tillsalu:"TILL SALU", visning:"VISNING", sald:"SÅLD"}[phase];
-    var big = phase === "sald" ? 24 : 15, labY = bb - 11.5 - big*.74 - 4.2;
-    v3Line(c, 9, 91, labY - 6.4, "#fff", .2, w1, .5);
-    v3Fill(c, 9, labY - .8, 5*sLab, .3, acc);
-    v3Text(c, lab, 16, labY, {size:2.2, weight:600, f:"sans", sp:.4, color:acc, alpha:sLab});
-    v3Text(c, phase === "sald" ? "Såld." : phase === "visning" ? "Välkommen." : V3_OBJ.addr, 9, bb - 11.5, {size:big, italic:phase === "sald", color:W, p:sAdr, shadow:true});
+    var big = phase === "sald" ? 24 : 15, labY = bb - 11.5 - big*.74 - 4.2, la3 = fixedA("label", sLab);
+    v3Line(c, 9, 91, labY - 6.4, "#fff", .2, frameA, .5);
+    v3Fill(c, 9, labY - .8, 5*la3, .3, acc);
+    v3Text(c, lab, 16, labY, {size:2.2, weight:600, f:"sans", sp:.4, color:acc, alpha:la3});
+    var adrTxt = phase === "sald" ? "Såld." : V3_OBJ.addr;
+    if(phase === "sald") v3Text(c, adrTxt, 9, bb - 11.5, {size:big, italic:true, color:W, p:tokMode || pl ? 1 : sAdr, alpha:fixedA("label", 1), shadow:true});
+    else { v3Text(c, adrTxt, 9, bb - 11.5, {size:big, color:W, p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true}); token(9, bb - 8.6, 62, 12.4, "ADRESS", dynT(tkA, "addr"), true) }
     var sub = phase === "tillsalu" ? v3Facts() : phase === "kommande" ? V3_OBJ.kommande : V3_OBJ.addr + " · " + V3_OBJ.city;
-    v3Text(c, sub.toUpperCase(), 9, bb - 2.5, {size:2.2, weight:500, f:"sans", sp:.28, color:W, alpha:sFact*.95});
-    v3Text(c, V3_OBJ.city.toUpperCase(), 91, 12.4 + mt, {size:1.9, weight:500, f:"sans", sp:.34, color:W, align:"r", alpha:Math.max(lg, 0)*.85});
-    barL(16, labY + .4, 13, .8); barL(9, bb - 11.5 + 1, 62, big*.55, .3); barL(9, bb - 1.5, 44, 1.1, .26);
+    v3Text(c, sub.toUpperCase(), 9, bb - 2.5, {size:2.2, weight:500, f:"sans", sp:.28, color:W, alpha:dynV(tkF, sFact)*.95});
+    token(9, bb - .4, 46, 5.4, phase === "tillsalu" ? "RUM · YTA" : phase === "kommande" ? "TEXT" : "ADRESS · ORT", dynT(tkF, "yta"), true, 1.8);
+    v3Text(c, V3_OBJ.city.toUpperCase(), 91, 12.4 + mt, {size:1.9, weight:500, f:"sans", sp:.34, color:W, align:"r", alpha:Math.max(lg, 0)*.85*dynV(tkC, 1)});
   } else {
     v3NLogo(c, 9, 9 + mt, .95, W, "l", lg);
-    var bq = Math.max(oBack(k3(p, .2, .5)), skel), r = 12.5;
+    var bq = tokMode || pl ? 1 : oBack(k3(p, .2, .5)), r = 12.5;
     if(bq > 0){
       c.save(); c.translate(80, 24 + mt); c.rotate(-.12); c.scale(bq, bq);
       c.fillStyle = OFF.accent; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
       var bl = phase === "tillsalu" ? ["TILL", "SALU"] : phase === "kommande" ? ["KOM-", "MANDE"] : phase === "visning" ? ["VIS-", "NING"] : ["SÅLD", ""];
-      if(skel < .5){ v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"}); if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"}) }
+      v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"}); if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"});
       c.restore();
     }
     var b2 = H - 11 - m;
-    v3Text(c, phase === "visning" ? "Välkommen." : phase === "sald" ? "Såld" : V3_OBJ.addr, 9, b2 - 8, {size:phase === "sald" ? 26 : 14.5, italic:phase === "sald", color:W, p:sAdr, shadow:true});
-    v3Fill(c, 9, b2 - 3.8, 11*sCity, .35, acc);
+    if(phase === "sald") v3Text(c, "Såld", 9, b2 - 8, {size:26, italic:true, color:W, p:tokMode || pl ? 1 : sAdr, shadow:true});
+    else { v3Text(c, phase === "visning" ? "Välkommen." : V3_OBJ.addr, 9, b2 - 8, {size:14.5, color:W, p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true}); token(9, b2 - 5.6, 62, 11.6, "ADRESS", dynT(tkA, "addr"), true) }
+    v3Fill(c, 9, b2 - 3.8, 11*(tokMode ? 1 : sCity), .35, acc);
     var s2 = phase === "tillsalu" ? v3Facts() : phase === "kommande" ? V3_OBJ.kommande : phase === "visning" ? V3_OBJ.addr + " · " + V3_OBJ.city : "Tack för förtroendet";
-    v3Text(c, s2.toUpperCase(), 9, b2 + 1.8, {size:2.2, weight:500, f:"sans", sp:.28, color:W, alpha:sFact});
-    barL(9, b2 - 7, 60, 7, .3); barL(9, b2 + 2.4, 42, 1.1, .26);
+    v3Text(c, s2.toUpperCase(), 9, b2 + 1.8, {size:2.2, weight:500, f:"sans", sp:.28, color:W, alpha:phase === "sald" ? (tokMode ? 1 : sFact) : dynV(tkF, sFact)});
+    if(phase !== "sald") token(9, b2 + 3.4, 46, 5.4, phase === "tillsalu" ? "RUM · YTA" : phase === "kommande" ? "TEXT" : "ADRESS · ORT", dynT(tkF, "yta"), true, 1.8);
   }
   c.restore();
 }

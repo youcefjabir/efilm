@@ -90,6 +90,16 @@ function v3Portal(c, G, t, ua, o){
   v3Text(c, "VÄLJ BILD", m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*sq*(1 - m12)});
   v3Text(c, "VÄLJ MALL", m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*m12});
   v3Text(c, "12 BILDER", 100 - m, G.sectY, {size:1.5, weight:500, f:"sans", sp:.2, color:mut, align:"r", alpha:ua*sq*(1 - m12)});
+  /* väljare: Mina mallar (aktiv) | Viewlys mallar – visar att kontoret har egna mallar */
+  if(m12 > 0){
+    var sa = ua*m12, sw = 19.5, sx = 100 - m - sw*2, sy = G.sectY - 2.3, sh = 3.9;
+    c.save(); c.globalAlpha = sa;
+    c.strokeStyle = C3.line; c.lineWidth = .2; c.strokeRect(sx, sy, sw*2, sh);
+    c.fillStyle = ink; c.fillRect(sx, sy, sw, sh);
+    c.restore();
+    v3Text(c, "MINA MALLAR", sx + sw/2, G.sectY, {size:1.2, weight:600, f:"sans", sp:.18, color:"#fff", align:"c", alpha:sa});
+    v3Text(c, "VIEWLYS", sx + sw*1.5, G.sectY, {size:1.2, weight:500, f:"sans", sp:.18, color:mut, align:"c", alpha:sa});
+  }
   /* bildrutorna */
   var a1 = 1 - m12;
   if(a1 > 0) tl.forEach(function(nm, i){
@@ -117,6 +127,15 @@ function v3Portal(c, G, t, ua, o){
     c.restore();
     if(i === sidx && t > T.tap2) v3Tick(c, x + G.tw - .4, y - .4, 2.1, k3(t, T.tap2 + .05, T.tap2 + .4), C3.oli);
   });
+  /* + Skapa egen mall */
+  if(m12 > 0){
+    var ba = ua*oQ(k3(t, T.cards + .5, T.cards + 1.2))*lerp(1, .32, ioC(k3(t, T.tap2 + .2, T.tap2 + .7))), by = G.gridY + G.tw*1.25 + 9.5;
+    if(ba > 0){
+      c.save(); c.globalAlpha = ba; c.strokeStyle = C3.mut; c.lineWidth = .22; c.setLineDash([.8, .7]);
+      c.strokeRect(m, by, 100 - m*2, 5.6); c.restore();
+      v3Text(c, "+  SKAPA EGEN MALL", 50, by + 3.5, {size:1.3, weight:600, f:"sans", sp:.22, color:ink, align:"c", alpha:ba});
+    }
+  }
 }
 
 /* —— hook + portal + mall som fylls (flödet) ———————————————————————— */
@@ -331,7 +350,11 @@ var V3_VARS = [
   {id:"sald",   n:"Såld · Editorial",      d:"Sovrummet. Samma resa, slutar på Såld.",                          photo:"bedroom", tpl:"editorial", phase:"sald",     kind:"flow",   trio:false},
   {id:"fore",   n:"Före / efter",          d:"Matsalen. Ett reglage visar vad som hände med bilden.",          photo:"dining",  tpl:"badge",     phase:"tillsalu", kind:"fore"},
   {id:"portal", n:"Välj bild. Välj mall.", d:"Hallen. Börjar i portalen, hooken är bara text.",                photo:"beige",   tpl:"editorial", phase:"kommande", kind:"portal"},
-  {id:"direkt", n:"Direkt",                d:"Terrassen. Kortversion: bild vald, mallen fylls, logga.",        photo:"terrace", tpl:"editorial", phase:"tillsalu", kind:"direkt"}
+  {id:"direkt", n:"Direkt",                d:"Terrassen. Kortversion: bild vald, mallen fylls, logga.",        photo:"terrace", tpl:"editorial", phase:"tillsalu", kind:"direkt"},
+  {id:"kommande", n:"Kommande · Badge",     d:"Huset. Samma resa, mallen visar Kommande.",                     photo:"house",   tpl:"badge",     phase:"kommande", kind:"flow",   trio:false},
+  {id:"sald2",  n:"Såld · Overlay",        d:"Förstugan. Kortversion som slutar på Såld.",                     photo:"porch",   tpl:"overlay",   phase:"sald",     kind:"direkt"},
+  {id:"salu3",  n:"Till salu · Badge",     d:"Hallen. Kortversion med märke på bilden.",                       photo:"beige",   tpl:"badge",     phase:"tillsalu", kind:"direkt"},
+  {id:"sald3",  n:"Såld · Badge",          d:"Terrassen. Börjar i portalen, slutar på Såld.",                  photo:"terrace", tpl:"badge",     phase:"sald",     kind:"portal"}
 ];
 var V3_COMPS = {};
 (function(){
