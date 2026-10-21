@@ -46,6 +46,7 @@ function TH(dark){
 }
 /* kapitelmärke uppe till vänster, på varje scen */
 function tag(c, R, F, th, a){
+  if(!F.name) return;
   v3Text(c, F.num + " — " + F.name, R.x0, R.y0 + 2.6, {size:1.5, weight:500, f:"sans", sp:.3, color:th.dark ? "rgba(255,255,255,.8)" : C3.mut, alpha:a});
 }
 /* Wrapped headline. Draws lines top-down from y, returns the y after the last line. */
@@ -549,6 +550,7 @@ window.hlSetText = function(key, val){
 window.hlReset = function(){ HX = {}; hxSave() };
 function chapter(id){ return HL.filter(function(h){ return h.id === id })[0] }
 window.V3_HL = [];
+window.HL_BEATS = BEATS;
 Object.keys(SC).forEach(function(id){
   var ch = chapter(id); if(!ch) return;
   var F = {num:ch.num, name:ch.name}, beats = SC[id].map(function(_, i){ return beatOf(id, i) }), starts = [], acc = 0;

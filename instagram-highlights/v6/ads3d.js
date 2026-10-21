@@ -188,6 +188,7 @@ function v3Camp(c, G, t, o){
   }
 }
 
+window.v3Camp = v3Camp;
 /* ---------- komposition och ljud ---------- */
 var CFG = {
   salu:     {kind:"photo", photo:"home",    tpl:"overlay",   picks:["house", "home", "bedroom"], k:1,    n:"Till salu · Overlay",   d:"Välj bilder, välj mallar, uppgifterna fylls i, kampanjen är klar."},

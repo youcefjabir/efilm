@@ -56,6 +56,7 @@ function v3Noise(ctx, len){
   return b;
 }
 function v3Score(ctx, comp){
+  if(comp.cin) return v3CinScore(ctx, comp);
   var A = comp.audio, dur = comp.dur;
   var master = ctx.createGain(); master.gain.setValueAtTime(.62, 0); master.gain.setValueAtTime(.62, Math.max(0, dur - 1.2)); master.gain.linearRampToValueAtTime(0, dur);
   var cmp = ctx.createDynamicsCompressor(); cmp.threshold.value = -20; cmp.ratio.value = 3; cmp.attack.value = .01; cmp.release.value = .25;
@@ -505,7 +506,7 @@ function v3Customizer(open){
 }
 function v3VideoTab(){
   var comp = V3_COMPS[V3S.comp];
-  var cards = Object.keys(V3_COMPS).filter(function(id){ return V3_COMPS[id].group !== "hl" }).map(function(id){
+  var cards = Object.keys(V3_COMPS).filter(function(id){ return !V3_COMPS[id].group }).map(function(id){
     var c2 = V3_COMPS[id];
     return '<button type="button" class="a3card" data-a3="comp" data-v="' + id + '" aria-current="' + (V3S.comp === id) + '">'
       + '<div class="a3cth">' + v3Canvas("comp:" + id + ":916:" + c2.thumb, 270) + '</div>'
@@ -594,7 +595,7 @@ function v3PlanTab(){
   + '</div>';
 }
 function secAds3(){
-  if(V3_COMPS[V3S.comp] && V3_COMPS[V3S.comp].group === "hl"){ V3S.comp = "salu"; V3S.t = V3_COMPS.salu.thumb; V3S.playing = false; v3StopSound() }
+  if(V3_COMPS[V3S.comp] && V3_COMPS[V3S.comp].group){ V3S.comp = "salu"; V3S.t = V3_COMPS.salu.thumb; V3S.playing = false; v3StopSound() }
   var body = V3S.tab === "video" ? v3VideoTab() : V3S.tab === "kar" ? v3KarTab() : V3S.tab === "stat" ? v3StatTab() : V3S.tab === "inl" ? v3InlTab() : V3S.tab === "plan" ? v3PlanTab() : v3OutTab();
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 11</div><h2>Viewlys annonser</h2>'
@@ -612,7 +613,7 @@ document.addEventListener("click", function(e){
   if(k === "fmt"){ V3S.fmt = v; render(); return }
   if(k === "sound"){ V3S.sound = v === "1"; if(!V3S.sound) v3StopSound(); render(); return }
   if(k === "hook"){ V3_CFG.hook = V3_HOOKS[+v].slice(); v3SaveCfg(); render(); return }
-  if(k === "reset"){ V3_TX = {}; if(window.hlReset) hlReset(); V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
+  if(k === "reset"){ V3_TX = {}; if(window.hlReset) hlReset(); if(window.brReset) brReset(); V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
   if(k === "outro"){ V3S.outro = v; render(); return }
   if(k === "tpl"){ V3S.tplStyle = v; render(); return }
   if(k === "tplfmt"){ V3S.tplFmt = v; render(); return }
@@ -625,6 +626,8 @@ document.addEventListener("click", function(e){
 document.addEventListener("input", function(e){
   var tx = e.target.dataset && e.target.dataset.a3tx;
   if(tx){ V3_TX[tx] = e.target.value; v3SaveCfg(); v3Repaint(); return }
+  var bx = e.target.dataset && e.target.dataset.a3bx;
+  if(bx && window.brSetText){ brSetText(bx, e.target.value); v3Repaint(); return }
   var hx = e.target.dataset && e.target.dataset.a3hx;
   if(hx && window.hlSetText){ hlSetText(hx, e.target.value); v3SaveCfg(); v3Repaint(); return }
   var cf = e.target.dataset && e.target.dataset.a3cfg;

@@ -2101,7 +2101,8 @@ var SECTIONS=[
  {id:"ads",      n:"Ads · utkast 1",num:"09", f:secAds},
  {id:"ads2",     n:"Ads · utkast 2",num:"10", f:secAds2},
  {id:"ads3",     n:"Ads",          num:"11", f:secAds3},
- {id:"ads4",     n:"Highlight-videor", num:"12", f:secAds4}
+ {id:"ads4",     n:"Highlight-videor", num:"12", f:secAds4},
+ {id:"brand",    n:"Varumärke",    num:"13", f:secBrand}
 ];
 
 /* =====================================================================
