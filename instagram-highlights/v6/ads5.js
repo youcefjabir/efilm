@@ -76,13 +76,14 @@ function capText(film, i, def){ var o = BX[film]; return o && o[i] != null ? o[i
 function capsDraw(c, G, t, film, CAPS, bwDark){
   var i, cp, t0, t1, u, size, txt, w, sizes = [13.4, 11.6, 10, 8.6, 7.4, 6.4], k, sc, y, ink;
   for(i = 0; i < CAPS.length; i++){
-    cp = CAPS[i]; t0 = T(cp[0]); t1 = T(cp[0] + (cp[3] || 2)); if(t < t0 || t >= t1) continue;
+    cp = CAPS[i]; if(cp[4] === "cta") continue; t0 = T(cp[0]); t1 = T(cp[0] + (cp[3] || 2)); if(t < t0 || t >= t1) continue;
     txt = capText(film, i, cp[1]); if(!txt) continue; ink = cp[4] === "ui";
     u = t - t0; size = sizes[sizes.length - 1];
     for(k = 0; k < sizes.length; k++){ w = v3Measure(c, txt, {size:sizes[k], weight:300, italic:!!cp[2]}); if(w <= 82){ size = sizes[k]; break } }
     if(ink){ size = Math.min(size, 6.6) } else if(cp[4] === "low"){ size = Math.min(size, 8.6) }
     sc = 1 + .08*(1 - oQ(k3(u, 0, .16)));
     y = ink ? G.H - G.bot - 6 : cp[4] === "low" ? G.H - G.bot - 7 : G.cy + size*.3;
+    if(!ink){ var bd = c.createLinearGradient(0, y - size*1.4, 0, y + size*.9); bd.addColorStop(0, "rgba(0,0,0,0)"); bd.addColorStop(.5, "rgba(0,0,0,.5)"); bd.addColorStop(1, "rgba(0,0,0,0)"); c.save(); c.globalAlpha = oQ(k3(u, 0, .1)); c.fillStyle = bd; c.fillRect(0, y - size*1.4, 100, size*2.3); c.restore() }
     c.save(); c.translate(50, y); c.scale(sc, sc); c.translate(-50, -y);
     v3Text(c, txt, 50, y, {size:size, weight:300, italic:!!cp[2], color:ink ? C3.ink : (cp[2] ? C3.cream : "#fff"), align:"c", shadow:!ink, sp:cp[2] ? 0 : 0});
     c.restore();
@@ -93,125 +94,111 @@ function progress(c, G, t, dur){
   v3Fill(c, 8, y, 84, .18, "#fff", .18); v3Fill(c, 8, y, 84*Math.min(1, t/dur), .18, "#fff", .7);
 }
 
-/* ---------- filmerna ---------- */
-var SC = {};
-/* A — Ett hem säljs en gång */
-var CAPS_A = [
-  [1, "Varje hem", 0, 2], [3, "säljs bara", 0, 2], [5, "en gång.", 1, 2.6],
-  [8, "Första visningen", 0, 2], [10, "sker på", 0, 1.5], [11.5, "en skärm.", 1, 2.4],
-  [14, "Därför", 0, 1], [15, "räcker det", 0, 1.5], [16.5, "inte", 0, 1], [17.5, "att dokumentera.", 0, 1.8],
-  [19, "Ljus.", 0, 1], [20, "Rum.", 0, 1], [21, "Rörelse.", 0, 1], [22, "Läge.", 0, 1],
-  [23.5, "Det handlar om", 0, 2], [25.5, "att få någon", 0, 1.5], [27, "att stanna.", 1, 2],
-  [30, "Tänk om", 0, 2], [32, "allt fanns", 0, 1.5], [33.5, "på ett ställe?", 1, 1.5],
-  [37.4, "Välj bild.", 0, 2.4, "ui"], [40, "Välj mall.", 0, 2.4, "ui"], [42.6, "Klart.", 1, 2.4, "ui"],
-  [49, "Gör första", 0, 1.5], [50.5, "intrycket rätt.", 1, 2.4]];
-var SHOTS_A = [[0, 3, "house"], [3, 5, "porch"], [5, 7, "terrace"], [7, 9, "bedroom"], [9, 11, "home"], [11, 13, "h_dining2"], [13, 15, "beige"],
-  [15, 16.5, "h_living"], [16.5, 17.5, "h_boucle"], [17.5, 19, "h_kitchen"], [19, 20, "h_hero"], [20, 21, "h_living"], [21, 22, "h_dining"], [22, 23, "h_drone"], [23, 29, "h_eames"]];
-var END_A = 52.5;
-function drawA(c, G, t, o){
-  var H = G.H, b = t/BT, i;
-  v3Fill(c, 0, 0, 100, H, DARK);
-  if(b < 29.2){
-    for(i = 0; i < SHOTS_A.length; i++){ var s = SHOTS_A[i]; if(shot(c, G, t, s[0], s[1], s[2], {s0:1.22, s1:1.05, pos:s[2] === "h_drone" ? [.5, .3] : null})) break }
-    tone(c, G, 1, b < 1 ? lerp(1, .3, b) : .3 + (b > 24 ? .1 : 0));
-    if(b >= 19 && b < 23) sweep(c, G, t, b - (b % 1), b - (b % 1) + .8);
-  } else if(b >= 30 && b < 35){
-    v3Photo(c, "blur", 0, 0, 100, H, {alpha:.38, scale:1.4 - .04*(b - 30)}); tone(c, G, 1, .2);
-  } else if(b >= 35 && b < 48.5){
-    v3Camp(c, G, (t - T(35))*2.4 + 1.0, {photo:"home", tpl:"editorial", picks:["terrace", "beige", "bedroom"], hook:o.hook});
-  }
-  var ui = b >= 35 && b < 48.5;
-  if(!ui) finish(c, G, t, {vig:b > 30 && b < 35 ? .8 : .62});
-  [5, 11.5, 19, 20, 21, 22, 27].forEach(function(h){ flash(c, G, t, T(h), .5, .14) });
-  flash(c, G, t, T(35), 1, .3); flash(c, G, t, T(48.5), .0, .1);
-  capsDraw(c, G, t, "hem", CAPS_A);
-  if(!ui && b < 48.5) progress(c, G, t, T(48.5));
-}
-SC.hem = {n:"Ett hem säljs en gång", d:"Varumärket. Första intrycket sker på en skärm — gör det rätt.", end:END_A, draw:drawA, caps:CAPS_A, thumb:T(21.4),
-  cin:{bpm:BPM, kick:[2, 29], hat:[12, 29], pluck:[8, 29], snare:[23, 29], riser:[20, 29], sil:[29, 30], quiet:[30, 35], drop:35, calm:48.5, hits:[5, 11.5, 19, 20, 21, 22, 27]}};
+/* ---------- filmen: "Förutom några." ---------- */
+var BR = {br_moon:"brMoon", br_rocket:"brRocket", br_sprint:"brSprint", br_stage:"brStage", br_dunk:"brDunk", br_earth:"brEarth", br_eye:"brEye", br_photog:"brPhotog", br_door:"brDoor"};
+Object.keys(BR).forEach(function(k){ V3_KEYS[k] = BR[k] });
+V3_POS.br_moon = [.5, .5]; V3_POS.br_door = [.6, .5]; V3_POS.br_eye = [.5, .45];
 
-/* B — Sex kontakter. Eller en. */
-var VEND = ["Fotograf.", "Filmare.", "3D-leverantör.", "Stylist.", "Textbyrå.", "Annonsverktyg."];
-var CAPS_B = [
-  [8, "Sex kontakter", 0, 1.8], [9.6, "för varje bostad.", 1, 2.4],
-  [12, "Varje bokning.", 0, 1], [13, "Varje faktura.", 0, 1], [14, "Varje mapp.", 0, 1],
-  [16.2, "Eller", 0, 1.4], [17.6, "en.", 1, 1.6],
-  [32, "Mer tid för affären.", 0, 3], [35, "Mindre tid i mappar.", 1, 3]];
-var PH_B = ["h_hero", "h_kitchen", "h_matterport", "h_esLivAft", "h_drone", "h_dining2", "h_living", "h_eames", "home", "terrace"];
-var END_B = 38.5;
-function drawB(c, G, t, o){
-  var H = G.H, b = t/BT, i;
-  v3Fill(c, 0, 0, 100, H, DARK);
-  var ui = b >= 19.5 && b < 31;
-  if(b < 8){
-    var k = Math.min(5, Math.floor(b/1.5)); shot(c, G, t, k*1.5, k*1.5 + 1.5, PH_B[k], {s0:1.26, s1:1.08}); tone(c, G, 1, .5);
-  } else if(b < 12){
-    var q = Math.floor((b - 8)*4); v3Photo(c, PH_B[q % PH_B.length], 0, 0, 100, H, {scale:1.15 + (q % 3)*.05, pos:[.3 + (q % 4)*.15, .5]}); tone(c, G, 1, .18);
-  } else if(b < 15){
-    var k2 = Math.floor(b - 12); shot(c, G, t, 12 + k2, 13 + k2, PH_B[(k2 + 6) % PH_B.length], {s0:1.35, s1:1.05}); tone(c, G, 1, .38);
-  } else if(ui){
-    var lt = (t - T(19.5))*1.7; window.HL_BEATS.merge(c, G, lt, window.HL_SC_B, {num:"", name:""});
-  } else if(b >= 31 && b < 33){
-    v3Photo(c, "blur", 0, 0, 100, H, {alpha:.3, scale:1.4}); tone(c, G, 1, .25);
-  }
-  /* leverantörerna staplas, en per takt */
-  if(b >= 1 && b < 12){
-    var n = Math.min(6, Math.floor(b - 1) + 1), fade = 1 - ioC(k3(b, 8, 8.4)), size = 6.8, lh = 9.2, y0 = G.cy - (6*lh)/2 + 7;
-    for(i = 0; i < n; i++){
-      var tb = T(1 + i), age = t - tb, pop = oQ(k3(age, 0, .12)), last = i === n - 1;
-      v3Text(c, VEND[i], 10, y0 + i*lh, {size:size, weight:400, color:"#fff", alpha:fade*(last ? 1 : .62)*pop, shadow:true, rise:1.2*(1 - pop), italic:false});
+/* ord som klipps in på takten: [takt, text, kursiv, längd, läge] */
+var CAPS_V = [
+  [1, "Vissa ögonblick", 0, 2], [3, "avgör allt.", 1, 2],
+  [5.2, "Historien", 0, 1.3], [6.7, "minns inte alla.", 0, 1.8],
+  [8.7, "Den minns", 0, 1.3], [10.2, "dem som fick", 0, 1.8], [12, "världen", 0, 1.5], [13.4, "att stanna upp.", 1, 2.6],
+  [16.2, "På en skärm", 0, 1.6], [17.8, "ser nästan alla", 0, 1.3], [19.1, "bostäder", 0, 1], [20.1, "likadana ut.", 1, 1.6],
+  [21.9, "Köparen", 0, 1], [22.9, "scrollar vidare.", 1, 1.2],
+  [24.5, "Förutom några.", 1, 1.2],
+  [25.8, "Några mäklare", 0, 1.6], [27.5, "vinner uppdraget", 0, 1.5], [29.1, "innan de ens", 0, 1.3], [30.5, "har ringt.", 1, 2.2],
+  [34.6, "Vad vet de", 0, 1.5], [36.2, "som du inte vet?", 1, 2.4],
+  [40.6, "Ta reda på det", 0, 3, "cta"]];
+var SHOTS_I = [[.5, 3, "br_moon", [.5, .5]], [3, 5, "br_rocket", [.5, .5]], [5, 6.5, "br_sprint", [.5, .5]], [6.5, 8.5, "br_stage", [.5, .5]], [8.5, 10, "br_dunk", [.5, .5]],
+               [10, 12, "br_earth", [.5, .38]], [12, 13.5, "br_eye", [.5, .45]], [13.5, 16, "br_door", [.55, .5]]];
+var SOLD = [["Storgatan 13", "Landskrona", "4 850 000 kr"], ["Kungsgatan 7", "Helsingborg", "5 295 000 kr"], ["Parkvägen 21", "Lund", "6 100 000 kr"], ["Strandvägen 3", "Malmö", "7 450 000 kr"],
+            ["Björkgatan 18", "Landskrona", "3 975 000 kr"], ["Fyrvägen 5", "Höganäs", "5 890 000 kr"], ["Ekbacken 9", "Lund", "4 420 000 kr"], ["Skolgatan 12", "Helsingborg", "3 650 000 kr"]];
+var PH_III = ["house", "terrace", "home", "bedroom", "dining", "porch", "beige", "h_hero"];
+var FEED = ["home", "dining", "beige", "bedroom", "terrace", "house", "porch", "h_kitchen", "h_living"];
+var END_V = 43;
+function feed(c, G, t, t0){
+  var H = G.H, tw = 26.4, th = 21, gap = 2.4, rows, p = 25*t + 135*t*t, rowH = th + gap + 5, r0 = Math.floor(p/rowH) - 1, r, ci, x, y, idx;
+  v3Fill(c, 0, 0, 100, H, "#0a0a0a");
+  for(r = r0; r < r0 + Math.ceil(H/rowH) + 3; r++){
+    for(ci = 0; ci < 3; ci++){
+      idx = ((r*3 + ci)*7 + (r % 3)) % FEED.length; if(idx < 0) idx += FEED.length;
+      x = 8 + ci*(tw + gap); y = r*rowH - p + 6;
+      if(y < -rowH || y > H + rowH) continue;
+      v3Photo(c, FEED[idx], x, y, tw, th, {scale:1.15, pos:[.5, .5]});
+      v3Fill(c, x, y, tw, th, "#8a8a8a", .38);
+      v3Fill(c, x, y + th + 1.4, tw*.5, .9, "#fff", .3); v3Fill(c, x, y + th + 3.2, tw*.32, .9, "#fff", .18);
     }
-    v3Text(c, String(n), 92, G.top + 10, {size:20, weight:300, color:"#fff", align:"r", alpha:fade*.9, shadow:true});
-    for(i = 0; i < 6; i++) flash(c, G, t, T(1 + i), .38, .12);
   }
-  if(!ui) finish(c, G, t, {vig:.66});
-  [8, 9.6, 12, 13, 14, 17.6].forEach(function(h){ flash(c, G, t, T(h), .5, .14) });
-  flash(c, G, t, T(19.5), 1, .3);
-  capsDraw(c, G, t, "sex", CAPS_B);
-  if(!ui && b < 31) progress(c, G, t, T(31));
+  tone(c, G, 1, .2);
 }
-SC.sex = {n:"Sex kontakter. Eller en.", d:"Systemet, riktad till mäklare. Från sex leverantörer till en yta.", end:END_B, draw:drawB, caps:CAPS_B, thumb:T(5.2),
-  cin:{bpm:BPM, kick:[1, 15], hat:[6, 15], pluck:[4, 15], snare:[10, 15], riser:[8, 15], sil:[15, 19.5], quiet:[15.2, 19.5], drop:19.5, calm:31, hits:[1, 2, 3, 4, 5, 6, 8, 9.6, 12, 13, 14, 17.6]}};
-
-/* C — Sju delar */
-var CAPS_C = [
-  [1, "Foto.", 0, 1.8], [3, "3D.", 0, 1.8], [5, "E-styling.", 0, 1.8], [7, "Atmosphere.", 0, 1.8], [9, "Drönare.", 0, 1.4], [10.5, "Karta.", 0, 1.3], [12, "Motion.", 1, 1.6],
-  [14.5, "Sju delar.", 0, 2.4, "low"], [17, "Ett ekosystem.", 1, 2.4, "low"],
-  [27.4, "Ett objekt.", 0, 1.6], [29, "Hela marknadsföringen.", 1, 2.6]];
-var END_C = 32.5;
-function drawC(c, G, t, o){
-  var H = G.H, b = t/BT, i;
+function ticker(c, G, t, t0){
+  var R = {x0:8, x1:92}, y1 = G.H - G.bot, n = 5, rh = G.is9 ? 10.6 : 9.2, top = y1 - n*rh - 2, i;
+  v3Grad(c, 0, top - 22, 100, y1 - top + 26, [[0, "rgba(5,5,5,0)"], [.35, "rgba(5,5,5,.78)"], [1, "rgba(5,5,5,.94)"]]);
+  var k = Math.floor((t - t0)/(BT*.5)); /* en ny rad var halv takt */
+  for(i = 0; i < n; i++){
+    var rowIdx = k - i; if(rowIdx < 0) continue;
+    var row = SOLD[rowIdx % SOLD.length], age = (t - t0) - rowIdx*BT*.5, enter = oQ(k3(age, 0, .2)), y = top + i*rh + (1 - enter)*-3, a = enter*(1 - i*.14);
+    v3Line(c, R.x0, R.x1, y, "rgba(255,255,255,.18)", .15, 1, a);
+    v3Text(c, "SÅLD", R.x0, y + 6.7, {size:1.7, weight:700, f:"sans", sp:.3, color:C3.olil, alpha:a});
+    v3Text(c, row[0], R.x0 + 12, y + 6.9, {size:4.2, weight:400, color:"#fff", alpha:a});
+    v3Text(c, row[1].toUpperCase(), R.x0 + 12, y + 9.3, {size:1.3, weight:500, f:"sans", sp:.26, color:"rgba(255,255,255,.55)", alpha:a});
+    v3Text(c, row[2], R.x1, y + 6.8, {size:2.5, weight:600, f:"sans", color:"#fff", align:"r", alpha:a});
+  }
+}
+function drawVem(c, G, t, o){
+  var H = G.H, b = t/BT, i, ci;
   v3Fill(c, 0, 0, 100, H, DARK);
-  var bwA = b < 14 ? 1 : 1 - ioC(k3(b, 14, 15)), ui = b >= 14;
-  if(b < 14){
-    if(b >= 1 && b < 3) shot(c, G, t, 1, 3, "h_hero", {s0:1.3, s1:1.06});
-    else if(b >= 3 && b < 5){ shot(c, G, t, 3, 5, "h_matterport", {s0:1.1, s1:1.0}); sweep(c, G, t, 3.2, 4.8) }
-    else if(b >= 5 && b < 7){
-      var u = ioC(k3(b, 5.4, 6.8)); v3Photo(c, "h_esLivBef", 0, 0, 100, H, {scale:1.08}); c.save(); c.beginPath(); c.rect(0, 0, 100*u, H); c.clip(); v3Photo(c, "h_esLivAft", 0, 0, 100, H, {scale:1.08}); c.restore();
-      v3Fill(c, 100*u - .12, 0, .24, H, "#fff", u > 0 && u < 1 ? .8 : 0);
-    } else if(b >= 7 && b < 9){
-      var u2 = ioC(k3(b, 7.4, 8.8)); v3Photo(c, "h_skyBef", 0, 0, 100, H, {scale:1.08}); c.save(); c.beginPath(); c.rect(0, 0, 100*u2, H); c.clip(); v3Photo(c, "h_skyAft", 0, 0, 100, H, {scale:1.08}); c.restore();
-      v3Fill(c, 100*u2 - .12, 0, .24, H, "#fff", u2 > 0 && u2 < 1 ? .8 : 0);
-    } else if(b >= 9 && b < 10.5) shot(c, G, t, 9, 10.5, "h_drone", {s0:1.4, s1:1.05, pos:[.5, .35]});
-    else if(b >= 10.5 && b < 12){
-      window.HL_BEATS.map(c, G, 2.2 + (t - T(10.5)), {k:"", h:"", items:["Kommunikationer", "Skolor", "Service", "Natur"], dur:6}, {num:"", name:""});
-      c.save(); c.globalCompositeOperation = "difference"; v3Fill(c, 0, 0, 100, H, "#fff"); c.restore();
-    } else if(b >= 12 && b < 14) shot(c, G, t, 12, 14, "h_dining", {s0:1.5, s1:1.05});
-    tone(c, G, 1, .2);
-  } else {
-    var lt = t - T(14.4);
-    if(b < 26.4){ window.HL_BEATS.orbit(c, G, lt, {k:"", dir:b < 20 ? "in" : "out", h:b < 20 ? "Allt börjar i bostaden." : "Samma objekt, vidare.", items:b < 20 ? ["Fotografering", "3D visning", "Drönare", "E-styling", "Atmosphere"] : ["Planritning", "Motion", "Områdeskarta", "Annonstext", "Social / Ads"], s:"", dur:6}, {num:"", name:""}) }
-    else v3Fill(c, 0, 0, 100, H, DARK);
+  var shutters = [.5, 3, 5, 6.5, 8.5, 10, 12, 13.5], act3 = b >= 25.5 && b < 34;
+  if(b < 16){
+    for(i = 0; i < SHOTS_I.length; i++){ var s = SHOTS_I[i]; if(shot(c, G, t, s[0], s[1], s[2], {s0:1.22, s1:1.05, pos:s[3]})) break }
+    tone(c, G, 0, 0);
+  } else if(b < 24){
+    var t0 = T(16);
+    feed(c, G, t - t0, t0);
+    var wh = 1 - ioC(k3(t - t0, 0, .35)); if(wh > 0) v3Fill(c, 0, 0, 100, H, "#fff", wh);
+  } else if(act3){
+    var ia = Math.min(PH_III.length - 1, Math.floor(b - 25.5)), ta = T(25.5 + ia);
+    shot(c, G, t, 25.5 + ia, 26.5 + ia, PH_III[ia], {s0:1.18, s1:1.04});
+    v3Grad(c, 0, H*.3, 100, H*.7, [[0, "rgba(5,5,5,0)"], [1, "rgba(5,5,5,.88)"]]);
+    v3Grad(c, 0, 0, 100, H*.2, [[0, "rgba(5,5,5,.45)"], [1, "rgba(5,5,5,0)"]]);
+    ticker(c, G, t, T(25.5));
+  } else if(b >= 34 && b < 39){
+    shot(c, G, t, 34, 39, "br_photog", {s0:1.25, s1:1.04, pos:[.5, .5]}); tone(c, G, 1, .1);
+  } else if(b >= 40 && b < END_V + .6){
+    /* knappen */
+    var u = oQ(k3(b, 40.4, 41.3)), cx = 50, cy = G.cy + 2, w = 58, h = 9, press = k3(b, 41.45, 41.6)*(1 - k3(b, 41.7, 41.95));
+    var capI = CAPS_V.length - 1, label = capText("vem", capI, CAPS_V[capI][1]);
+    c.save(); c.globalAlpha = u; c.shadowColor = "rgba(255,255,255,.25)"; c.shadowBlur = 5 + 3*Math.sin(t*5); c.fillStyle = "#fff";
+    var bw = w*(1 - .05*press), bh = h*(1 - .05*press); c.beginPath(); c.moveTo(cx - bw/2 + bh/2, cy - bh/2); c.arcTo(cx + bw/2, cy - bh/2, cx + bw/2, cy + bh/2, bh/2); c.arcTo(cx + bw/2, cy + bh/2, cx - bw/2, cy + bh/2, bh/2); c.arcTo(cx - bw/2, cy + bh/2, cx - bw/2, cy - bh/2, bh/2); c.arcTo(cx - bw/2, cy - bh/2, cx + bw/2, cy - bh/2, bh/2); c.closePath(); c.fill(); c.restore();
+    v3Text(c, label.toUpperCase(), cx - 1.8, cy + .85, {size:2.2, weight:600, f:"sans", sp:.26, color:"#0a0a0a", align:"c", alpha:u});
+    c.save(); c.globalAlpha = u; c.strokeStyle = "#0a0a0a"; c.lineWidth = .35; c.lineCap = "round"; c.lineJoin = "round"; var ax = cx + v3Measure(c, label.toUpperCase(), {size:2.2, weight:600, f:"sans", sp:.26})/2 + 1.8 - 1.8;
+    c.beginPath(); c.moveTo(ax, cy); c.lineTo(ax + 3.2, cy); c.moveTo(ax + 2.2, cy - 1.1); c.lineTo(ax + 3.2, cy); c.lineTo(ax + 2.2, cy + 1.1); c.stroke(); c.restore();
+    var cp = ioC(k3(b, 40.7, 41.45)), curX = lerp(104, cx + 8, cp), curY = lerp(H - 20, cy + 3, cp) - Math.sin(cp*Math.PI)*4;
+    v3Cursor(c, curX, curY, press, k3(b, 40.7, 41.0));
+    v3Tap(c, cx + 8, cy + 3, k3(b, 41.5, 42.2));
   }
-  if(b >= 14 && b < 26.4){ /* orbit-scenens byte vid takt 19.4 */ }
-  if(b < 14) finish(c, G, t, {vig:.66});
-  [1, 3, 5, 7, 9, 10.5, 12].forEach(function(h){ flash(c, G, t, T(h), .45, .12) });
-  flash(c, G, t, T(14.4), 1, .3);
-  capsDraw(c, G, t, "sju", CAPS_C);
-  if(b < 14) progress(c, G, t, T(14));
+  if(!(b >= 16 && b < 24) && !act3) finish(c, G, t, {vig:b >= 40 ? .5 : .66});
+  if(act3) finish(c, G, t, {vig:.5});
+  if(b >= 16 && b < 24) finish(c, G, t, {vig:.7});
+  shutters.forEach(function(h){ flash(c, G, t, T(h), .55, .1) });
+  for(i = 0; i < 8; i++) flash(c, G, t, T(25.5 + i), i ? .4 : 1, i ? .1 : .3);
+  flash(c, G, t, T(34), .3, .12); flash(c, G, t, T(41.5), .6, .14); flash(c, G, t, T(END_V - .08), .9, .25);
+  capsDraw(c, G, t, "vem", CAPS_V);
 }
-SC.sju = {n:"Sju delar", d:"Vad Viewly är. Sju tjänster som en kedja.", end:END_C, draw:drawC, caps:CAPS_C, thumb:T(9.6),
-  cin:{bpm:BPM, kick:[2, 13], hat:[7, 13], pluck:[5, 13], snare:[9, 13], riser:[8, 13], sil:[13, 14.4], quiet:[13, 14.4], drop:14.4, calm:26.4, hits:[1, 3, 5, 7, 9, 10.5, 12]}};
+
+/* ---------- komposition ---------- */
+window.V3_BR = [];
+(function(){
+  var outroAt = T(END_V), comp = {n:"Förutom några.", d:"Ett ögonblick som avgör allt, en bransch där allt ser likadant ut, och en cliffhanger. Ingen produkt visas.", group:"brand", dur:outroAt + 4.4, thumb:T(12.8), caps:CAPS_V, id:"br_vem", v:{id:"br_vem"}, endAt:outroAt,
+    cin:{bpm:BPM, kick:[3, 24], hat:[12, 24], pluck:[10, 24], snare:[17, 24], riser:[17, 24], sil:[24, 25.5], quiet:null, drop:25.5, calm:34, suspend:true, cta:41.5, tick:[0, 9], hits:[],
+         shut:[.5, 3, 5, 6.5, 8.5, 10, 12, 13.5, 25.5, 26.5, 27.5, 28.5, 29.5, 30.5, 31.5, 32.5, 34]}};
+  comp.draw = function(c, G, t, o){
+    if(t < outroAt + .6) drawVem(c, G, t, o);
+    if(t >= outroAt) v3Outro(c, G, o.outro, t - outroAt);
+  };
+  V3_COMPS.br_vem = comp; V3_BR.push("br_vem");
+})();
 
 /* ---------- ljudet: uppbyggnad, tystnad, släpp ---------- */
 var CH = [[33, [57, 60, 64], [69, 72, 76]], [29, [53, 57, 60], [65, 69, 72]], [36, [55, 60, 64], [67, 72, 76]], [31, [55, 59, 62], [67, 71, 74]]];
@@ -290,6 +277,18 @@ window.v3CinScore = function(ctx, comp){
     var n = ctx.createBufferSource(); n.buffer = noiseBuf(.012); var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 2500; var gn = ctx.createGain(); gn.gain.value = v*.6; n.connect(hp); hp.connect(gn); out(gn); n.start(t);
   };
 
+  var shutter = function(t, v){
+    var n = ctx.createBufferSource(); n.buffer = noiseBuf(.03); var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 3200; bp.Q.value = 1.2;
+    var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .025); n.connect(bp); bp.connect(g); out(g, 1, .15); n.start(t);
+    var n2 = ctx.createBufferSource(); n2.buffer = noiseBuf(.05); var bp2 = ctx.createBiquadFilter(); bp2.type = "bandpass"; bp2.frequency.value = 1800; bp2.Q.value = 1;
+    var g2 = ctx.createGain(); g2.gain.setValueAtTime(v*.8, t + .055); g2.gain.exponentialRampToValueAtTime(.001, t + .09); n2.connect(bp2); bp2.connect(g2); out(g2); n2.start(t + .055);
+    var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(200, t); o.frequency.exponentialRampToValueAtTime(90, t + .07); var g3 = ctx.createGain(); g3.gain.setValueAtTime(v*.7, t); g3.gain.exponentialRampToValueAtTime(.001, t + .09); o.connect(g3); out(g3); o.start(t); o.stop(t + .1);
+  };
+  var tick = function(t, k, v){
+    var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = k ? 1050 : 1500; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .06);
+    o.connect(g); out(g, 1, .25); o.start(t); o.stop(t + .08);
+    var n = ctx.createBufferSource(); n.buffer = noiseBuf(.008); var gn = ctx.createGain(); gn.gain.value = v*.5; n.connect(gn); out(gn); n.start(t);
+  };
   var b, chordAt = function(bb){ return CH[Math.floor(bb/4) % 4] };
   var sil0 = C.sil[0], drop = C.drop, k0 = C.kick[0], k1 = C.kick[1];
   /* i. uppbyggnad: puls, hattar, arpeggio, virvel — allt stiger */
@@ -327,60 +326,48 @@ window.v3CinScore = function(ctx, comp){
   }
   /* iv. andas ut: ett långt a-mollackord som ljusnar mot a-dur, och slutkortets ackord */
   var end = TT(calm), outro = comp.endAt != null ? comp.endAt : end;
+  if(C.suspend){
+    pad(end, TT(C.cta != null ? C.cta : calm + 6) - end, [45, 52, 59], .07, 260, 800);
+    piano(end + .05, 45, .45, 6); [59, 64, 66].forEach(function(m, k){ piano(end + .4 + k*.9, m, .26, 4) });
+    for(b = calm; b < (C.cta != null ? C.cta - 1 : calm + 6); b += 2) kick(TT(b), .12);
+  } else {
   piano(end + .05, 45, .5, 5); [57, 64, 69, 72, 76].forEach(function(m, k){ piano(end + .1 + k*.05, m, k ? .3 : .45, 5) });
+  }
   bass(end, 33, 4, .5);
   piano(outro + .1, 38, .5, 5); [57, 61, 64, 69, 73].forEach(function(m, k){ piano(outro + .15 + k*.05, m, .32, 5) });
   [1320, 1980, 2640].forEach(function(fr, k){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr; var g = ctx.createGain(); g.gain.setValueAtTime(0, outro + .6); g.gain.linearRampToValueAtTime(.05/(1 + k), outro + .61); g.gain.setTargetAtTime(0, outro + .7, .6); o.connect(g); out(g, 1, .5); o.start(outro + .6); o.stop(outro + 3.5) });
+  /* kameraslut vid varje bildbyte, tickande klocka i inledningen */
+  (C.shut || []).forEach(function(sb){ shutter(TT(sb), .22) });
+  if(C.tick) for(b = C.tick[0], i = 0; b < C.tick[1]; b += 1, i++) tick(TT(b), i % 2, .05 + .07*(b - C.tick[0])/(C.tick[1] - C.tick[0]));
+  if(C.cta != null){ riser(TT(C.cta) - 1.4, 1.4, .06); tok(TT(C.cta), 7, .14); shutter(TT(C.cta), .25) }
   /* ordens klick, ett per inklippt ord, stiger i tonhöjd */
-  var ci = 0; (comp.caps || []).forEach(function(cp, k){ if(cp[4] === "ui") return; tok(TT(cp[0]), ci++, .1) });
+  var ci = 0; (comp.caps || []).forEach(function(cp, k){ if(cp[4] === "ui" || cp[4] === "cta") return; tok(TT(cp[0]), ci++, .1) });
   /* markörens klick i gränssnittet */
   (comp.uiTaps || []).forEach(function(tp){ tok(tp, 5, .07) });
   /* träffar */
   (C.hits || []).forEach(function(h){ kick(TT(h), .35) });
 };
 
-/* ---------- komposition ---------- */
-var IDS = {hem:"br_hem", sex:"br_sex", sju:"br_sju"};
-window.V3_BR = [];
-Object.keys(SC).forEach(function(k){
-  var s = SC[k], outroAt = T(s.end), comp = {n:s.n, d:s.d, group:"brand", dur:outroAt + 4.4, thumb:s.thumb, caps:s.caps, cin:s.cin, endAt:outroAt, id:IDS[k], v:{id:IDS[k]}};
-  comp.draw = function(c, G, t, o){
-    if(t < outroAt + .6) s.draw(c, G, t, o);
-    if(t >= outroAt) v3Outro(c, G, o.outro, t - outroAt);
-  };
-  if(k === "hem"){ comp.uiTaps = [3.4, 4.0, 4.6, 5.85, 7.55, 8.15, 8.75, 9.95].map(function(l){ return T(35) + (l - 1.0)/2.4 }) }
-  V3_COMPS[IDS[k]] = comp; V3_BR.push(IDS[k]);
-});
-/* Systemets "sex blir en"-scen är hämtad ur Highlights */
-window.HL_SC_B = {t:"merge", k:"Administrationen", h:"Från sex kontakter till en yta.", before:VEND.map(function(v){ return v.replace(".", "") }), plate:"Mäklarportalen", after:["En beställning", "Ett arbetsflöde", "En leverans", "En faktura"], dur:9.4};
 
 /* ---------- sidan ---------- */
-function brEditor(film){
-  var k = Object.keys(IDS).filter(function(x){ return IDS[x] === film })[0], s = SC[k];
-  return '<details class="a3det a3cust" open><summary>Ändra orden i filmen</summary><p class="a3hint">Varje rad är ett ord som klipps in på takten. Kortare är bättre: två–tre ord åt gången. Rubriken krymper om den blir för lång.</p><div class="a3hxs">'
-    + s.caps.map(function(cp, i){ return '<label class="a3f"><span>' + (i + 1) + ' · takt ' + cp[0] + (cp[4] === "ui" ? ' · över gränssnittet' : '') + '</span><input type="text" value="' + esc(String(capText(k, i, cp[1]))) + '" data-a3bx="' + k + '|' + i + '"></label>' }).join("")
+function brEditor(){
+  return '<details class="a3det a3cust" open><summary>Ändra orden i filmen</summary><p class="a3hint">Varje rad är ord som klipps in på takten, två–tre åt gången. Kortare är bättre. Sista raden är knappens text.</p><div class="a3hxs">'
+    + CAPS_V.map(function(cp, i){ return '<label class="a3f"><span>' + (i + 1) + ' · takt ' + cp[0] + (cp[4] === "cta" ? ' · knappen' : '') + '</span><input type="text" value="' + esc(String(capText("vem", i, cp[1]))) + '" data-a3bx="vem|' + i + '"></label>' }).join("")
     + '</div></details>';
 }
 function outroEd(){
   var f = v3TxField;
   return '<details class="a3det a3cust" open><summary>Ändra slutkortets text</summary><div class="a3custg"><div>' + f("outro.tag1", "Slagord rad 1") + f("outro.tag2", "Slagord rad 2 (kursiv)") + '</div><div>' + f("outro.aud", "Målgruppsrad") + f("outro.url", "Adress / länk") + '<button type="button" class="a3mini" data-a3="reset" style="margin-top:6px">Återställ allt</button></div></div></details>';
 }
-function brCards(){
-  return '<div class="a3cards">' + V3_BR.map(function(id){
-    var c2 = V3_COMPS[id];
-    return '<button type="button" class="a3card" data-a3="comp" data-v="' + id + '" aria-current="' + (V3S.comp === id) + '">'
-      + '<div class="a3cth">' + v3Canvas("comp:" + id + ":916:" + c2.thumb, 270) + '</div>'
-      + '<div class="a3ctl"><i>' + c2.dur.toFixed(0) + ' s · 9:16 och 4:5 · ljud</i><b>' + esc(c2.n) + '</b><span>' + esc(c2.d) + '</span></div></button>';
-  }).join("") + '</div>';
-}
 function para(h, body){ return '<div class="a3pc"><h4>' + h + '</h4>' + body + '</div>' }
+var BR_FIRST = true;
 window.secBrand = function(){
-  if(V3_BR.indexOf(V3S.comp) < 0){ V3S.comp = "br_hem"; V3S.t = V3_COMPS.br_hem.thumb; V3S.playing = false; v3StopSound() }
+  if(V3_BR.indexOf(V3S.comp) < 0){ V3S.comp = "br_vem"; V3S.t = V3_COMPS.br_vem.thumb; V3S.playing = false; v3StopSound() }
+  if(BR_FIRST){ BR_FIRST = false; V3S.outro = "mork" }
   var comp = V3_COMPS[V3S.comp], outs = V3_OUT.map(function(o){ return v3Seg("outro", o.id, o.n, V3S.outro === o.id) }).join("");
   setTimeout(v3Mount, 0);
-  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Varumärke · 13</div><h2>Varumärkesfilmer</h2>'
-    + '<p>Filmer som inte förklarar produkten utan får en att känna ett påstående. Ett enda budskap, berättat två–tre ord i taget, klippt på takten, i svartvitt som stramas åt, en takt tystnad, och sedan färg, produkten och varumärket. Allt är Viewlys egna bilder och skärmar. Förslag, inget publicerat.</p></div>'
-    + brCards()
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Varumärke · 13</div><h2>Varumärkesfilm för mäklare</h2>'
+    + '<p>Inte en annons och inget produktvisande. En film som skapar nyfikenhet och lämnar en cliffhanger: ett ögonblick som avgör allt, en bransch där allt ser likadant ut, och en fråga som mäklaren inte släpper. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
     + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
@@ -391,20 +378,20 @@ window.secBrand = function(){
     + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
     + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div></div></div>'
-    + brEditor(V3S.comp) + outroEd()
-    + '<div class="a3sub">Så är filmerna byggda</div><div class="a3plan">'
-    + para("Dramaturgin, samma i alla tre", '<table class="a3tb"><tr><th>Tes</th><td>Ett påstående, två–tre ord i taget. Svartvitt, långsamma inzoomningar, en puls som börjar svagt.</td></tr><tr><th>Press</th><td>Klippen blir kortare, orden färre, virveln tätare, ett riser stiger. Allt pekar mot en punkt.</td></tr><tr><th>Stillhet</th><td>Musiken tar slut. Bilden blir mörk. Ett hjärtslag. Det är den takten som gör släppet kännbart.</td></tr><tr><th>Vändning</th><td>Färg och produkt: Mäklarportalen, i ljus. Samma ögonblick som musiken släpper.</td></tr><tr><th>Varumärket</th><td>En avslutande rad och slutkortet. Varumärket kommer sist, när man redan känner något.</td></tr></table>')
-    + para("Musiken", '<p>Tempo 120, a-moll. Låg puls och en mörk pad som öppnar sig, ett arpeggio som ljusnar, en virvelrull som blir tätare, ett riser. Så stillhet i en takt, ett omvänt cymbalsvep och släppet: slag, fyra i golvet, klapp, ljus arpeggio, pianoackord. Efter släppet andas den ut i ett långt ackord, och slutkortet får ett eget.</p><p>Den är syntetiserad i webbläsaren från samma tidslinje som bilden, så varje klipp har ett ljud. <b>Jag har skrivit den men inte hört den.</b> För en riktig lansering: låt en kompositör göra en egen version med samma struktur, och använd WAV-filen som referens.</p>')
+    + brEditor() + outroEd()
+    + '<div class="a3sub">Idén</div><div class="a3plan">'
+    + para("Förebilden och vår version", '<p>Förebilden gör fyra saker: den öppnar med ögonblick som alla känner igen och som fick världen att stanna upp, den vänder det mot sin egen målgrupp, den ger socialt bevis i form av en ström av resultat, och den slutar med en knapp och en rad. Produkten förklaras aldrig.</p><p>Vår version följer samma kurva, men i mäklarens värld: <b>historien minns dem som fick världen att stanna upp. På en skärm ser nästan alla bostäder likadana ut. Förutom några.</b> Sedan en ström av sålda objekt, och en fråga: vad vet de som du inte vet? Knappen: Ta reda på det.</p>')
+    + para("Dramaturgin", '<table class="a3tb"><tr><th>0–8 s</th><td><b>Prestige.</b> Månen, raketen, mållinjen, scenen. Svartvitt, kamerasluten klickar på varje bild, en klocka tickar. "Vissa ögonblick avgör allt."</td></tr><tr><td colspan="2"></td></tr><tr><th>8–12 s</th><td><b>Tesen.</b> Hoppet, jorden, ögat, dörren som öppnas mot ljus. "Historien minns dem som fick världen att stanna upp."</td></tr><tr><th>12–15 s</th><td><b>Vändningen.</b> Flöde av bostäder som scrollas förbi, snabbare och snabbare. "På en skärm ser nästan alla bostäder likadana ut. Köparen scrollar vidare."</td></tr><tr><th>15 s</th><td><b>Stillhet.</b> Svart. "Förutom några."</td></tr><tr><th>15–20 s</th><td><b>Släppet.</b> Färg, slag och en ström av sålda objekt. "Några mäklare vinner uppdraget innan de ens har ringt."</td></tr><tr><th>20–24 s</th><td><b>Cliffhangern.</b> Fotografen i siluett i ett tomt rum. "Vad vet de som du inte vet?" Musiken löser sig inte.</td></tr><tr><th>24–26 s</th><td><b>Knappen och varumärket.</b> "Ta reda på det." Slutkortet löser ackordet.</td></tr></table>')
     + '</div>'
-    + '<div class="a3sub">Budskap och innehåll</div><div class="a3plan">'
-    + para("A · Ett hem säljs en gång", '<p><b>Budskap.</b> Första visningen sker på en skärm. Då räcker det inte att dokumentera: man ska få någon att stanna.</p><p><b>Bevis.</b> Mäklarportalens flöde: välj bild, välj mall, uppgifterna fylls i, kampanjen är klar.</p><p><b>Till vem.</b> Mäklare och kontorschefer som inte känner Viewly än. Varumärkesfilmen.</p>')
-    + para("B · Sex kontakter. Eller en.", '<p><b>Budskap.</b> Mer tid för affären, mindre tid i mappar. Sex leverantörer blir en yta.</p><p><b>Bevis.</b> Systemet och Ekosystemet i Highlights: en beställning, ett arbetsflöde, en leverans, en faktura.</p><p><b>Till vem.</b> Mäklare som redan koordinerar flera leverantörer. Den vassaste säljfilmen.</p>')
-    + para("C · Sju delar", '<p><b>Budskap.</b> Viewly är inte sju tjänster bredvid varandra, det är en kedja där varje steg gör nästa enklare.</p><p><b>Bevis.</b> Fotografering, 3D, e-styling, Atmosphere, drönare, karta och motion, i den ordning de byggs på varandra.</p><p><b>Till vem.</b> Den som undrar vad Viewly är. Passar på startsidan.</p>')
-    + para("Röst och regler", '<p>Korta meningar på svenska. Ett påstående per film. Inga siffror utan källa, inga superlativ, inga löften om försäljningspris. Orden vi använder: första intrycket, presentation, ett ställe. Orden vi undviker: bäst, revolutionerande, AI-driven.</p>')
-    + para("Det som tar den hela vägen: material att filma", '<p>Förebilden bygger på licensierat arkivmaterial och riktiga inspelningar. Det kan vi inte låna, och vi ska inte. Vår motsvarighet är eget material, och det är det som lyfter filmerna från bra till minnesvärda:</p><ul><li>Ljus som glider över en vägg i ett tomt rum, tidsförlopp</li><li>Handen på dörrhandtaget, dörren öppnas mot ett rum</li><li>Fotografen i en tom lägenhet, kamera på stativ</li><li>Drönaren som lyfter från en tomt och avslöjar läget</li><li>Mäklaren som bläddrar bland bostäder på mobilen</li><li>E-styling före och efter, i rörelse</li><li>Skärminspelning av Mäklarportalen, från början till klar kampanj</li><li>Kvällsljuset som tänds i fönstren</li><li>Skuggan som vandrar över golvet, solbanan på riktigt</li><li>Nycklarna som läggs i en hand</li></ul><p>Tio planer räcker. Med dem byter jag ut stillbilderna och filmerna blir rörliga hela vägen.</p>')
+    + '<div class="a3sub">Hur man pratar med en mäklare</div><div class="a3plan">'
+    + para("Det som väcker en mäklare", '<ul><li><b>Uppdraget.</b> Mäklarens valuta är att vinna uppdraget. Säljaren väljer den som presenterar bäst. Allt handlar om att vinna rummet innan det börjar.</li><li><b>Resultat, inte funktioner.</b> Sålt är språket. Siffror och namn på objekt väger mer än adjektiv.</li><li><b>Skärmen är arenan.</b> Köparens första visning sker på en skärm. Den som stannar blicken vinner.</li><li><b>Status och yrkesstolthet.</b> Mäklaren vill se proffsig ut inför säljaren. Det är varumärke, inte teknik.</li><li><b>Insiderkänsla.</b> "De som redan vet" är starkare än "alla borde".</li></ul>')
+    + para("Hur vi låter", '<p>Korta, trygga meningar. Understatement: inga utropstecken, inga superlativ, ingen jargong. Ett påstående per scen. Frågor som inte besvaras. Svenska, torrt, självsäkert, lite hårt.</p><p>Vi lovar inga priser eller försäljningsresultat. Vi påstår ingenting som inte går att stå för.</p>')
+    + para("Vad Viewly är i filmen", '<p>Aldrig en lista på tjänster. Viewly är det som syns när blicken stannar: fotografiet. Därför är den sista bilden före slutkortet fotografen, i siluett, i ett tomt rum med ljuset som faller in. Det är svaret på frågan, utan att säga det.</p>')
+    + para("Knappen", '<p>"Ta reda på det" leder till den första konverteringen: bokning av provfotografering (verifierat på viewly.se/maklare). Texten är ett förslag och ändras i fältet ovan.</p>')
     + '</div>'
-    + '<details class="a3det"><summary>Underlag och vad som inte är klart</summary><div class="a3und"><div><b>Text</b><p>Raderna är förslag. Inga siffror eller påståenden som inte redan står i Highlights. "Första visningen sker på en skärm" är ett resonemang, inte en mätning.</p></div>'
-    + '<div><b>Bild</b><p>Stillbilder ur biblioteket, behandlade i svartvitt. Gränssnittet är Mäklarportalens flöde i förenklad återgivning och ska jämföras med de riktiga skärmarna. Bilderna är små och blir mjuka i 1080 px.</p></div>'
-    + '<div><b>Ljud</b><p>Syntetiserat, ohört. Lyssna innan det används. Lägg gärna ett eget musikspår under.</p></div></div></details></div>';
+    + '<details class="a3det"><summary>Underlag, rättigheter och vad som inte är klart</summary><div class="a3und"><div><b>Bildmaterial</b><p>De nio bilderna i inledningen (astronaut, raket, löpare, scen, basketspelare, jorden, öga, fotograf, dörr) är <b>AI-genererade stilleben</b> i dokumentär svartvit stil, tagna fram för det här förslaget. De föreställer inga verkliga personer och är inte arkivmaterial. Månens, raketens och jordens motiv liknar välkända bilder, men är egna. Innan publicering: bestäm om de ska ersättas med licensierat material eller eget filmat material, och märk AI-bilder om det krävs.</p></div>'
+    + '<div><b>SÅLD-listan</b><p>Adresserna, orterna och priserna i strömmen är <b>exempeldata</b> och finns inte. Byt mot riktiga sålda objekt med mäklarens och säljarens godkännande, eller ta bort priserna.</p></div>'
+    + '<div><b>Texten</b><p>Raderna är förslag. "Några mäklare vinner uppdraget innan de ens har ringt" är ett resonemang, inte en mätning. Kontrollera att det går att stå för.</p></div>'
+    + '<div><b>Ljud</b><p>Syntetiserat och ohört av mig: klocka, kameraslut, puls, riser, tystnad, släpp, hängande ackord och ett slutackord. För lansering bör en kompositör göra en egen version med samma struktur.</p></div></div></details></div>';
 };
 })();
