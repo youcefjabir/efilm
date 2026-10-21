@@ -523,20 +523,44 @@ var SC = {
 
 /* ---------- sätter ihop komposition och ljud ---------- */
 var TR = .9;
+/* ---------- ändrade texter (sparas i webbläsaren) ---------- */
+var HX = {};
+try { HX = JSON.parse(localStorage.getItem("viewly.hl.tx") || "{}") || {} } catch(e){ HX = {} }
+function hxSave(){ try { localStorage.setItem("viewly.hl.tx", JSON.stringify(HX)) } catch(e){} }
+var LINES = {items:1, before:1, after:1, tones:1};
+function beatOf(id, i){
+  var b = SC[id][i], o = HX[id] && HX[id][i]; if(!o) return b;
+  var r = {}, k; for(k in b) r[k] = b[k]; for(k in o) r[k] = o[k]; return r;
+}
+function toLines(v){ return (v || []).map(function(x){ return Array.isArray(x) ? x.join(" | ") : x }).join("\n") }
+function fromLines(txt, orig){
+  var ls = String(txt).split("\n").filter(function(l){ return l.trim() }), pair = orig && Array.isArray(orig[0]);
+  return ls.map(function(l, j){
+    if(!pair) return l.trim();
+    var p = l.split("|"); return [p[0].trim(), (p[1] || "").trim()];
+  });
+}
+window.hlSetText = function(key, val){
+  var p = key.split("|"), id = p[0], i = +p[1], f = p[2], b = SC[id][i];
+  if(!HX[id]) HX[id] = {}; if(!HX[id][i]) HX[id][i] = {};
+  HX[id][i][f] = LINES[f] ? fromLines(val, b[f]) : val;
+  hxSave();
+};
+window.hlReset = function(){ HX = {}; hxSave() };
 function chapter(id){ return HL.filter(function(h){ return h.id === id })[0] }
 window.V3_HL = [];
 Object.keys(SC).forEach(function(id){
   var ch = chapter(id); if(!ch) return;
-  var F = {num:ch.num, name:ch.name}, beats = SC[id], starts = [], acc = 0;
+  var F = {num:ch.num, name:ch.name}, beats = SC[id].map(function(_, i){ return beatOf(id, i) }), starts = [], acc = 0;
   beats.forEach(function(b){ starts.push(acc); acc += b.dur });
   var outroAt = acc, raw = outroAt + 4.4;
   var comp = {n:ch.label, d:ch.q + " — " + beats.length + " scener", group:"hl", dur:raw, thumb:Math.min(starts[Math.min(2, beats.length - 1)] + 2.4, outroAt - .5), id:id, v:{id:id}};
   comp.draw = function(c, G, t, o){
     var i = 0; while(i + 1 < beats.length && t >= starts[i + 1]) i++;
-    var bt = t >= outroAt ? beats.length - 1 : i, lt = t - starts[bt], b = beats[bt], prev = bt > 0 ? bt - 1 : -1;
+    var bt = t >= outroAt ? beats.length - 1 : i, lt = t - starts[bt], b = beatOf(id, bt), prev = bt > 0 ? bt - 1 : -1;
     if(t >= outroAt) lt = beats[bt].dur + (t - outroAt);
     if(prev >= 0 && lt < TR){
-      BEATS[beats[prev].t](c, G, beats[prev].dur + lt, beats[prev], F);
+      var pb = beatOf(id, prev); BEATS[pb.t](c, G, pb.dur + lt, pb, F);
       var e = ioC(k3(lt, 0, TR)); if(e <= .002) return; c.save(); c.beginPath();
       if(bt % 2) c.rect(0, G.H*(1 - e), 100, G.H*e + .1); else c.rect(0, 0, 100*e + .1, G.H);
       c.clip();
@@ -565,6 +589,25 @@ function hlCards(){
       + '<div class="a3ctl"><i>' + c2.dur.toFixed(0) + ' s · 9:16 och 4:5 · ljud</i><b>' + esc(c2.n) + '</b><span>' + esc(c2.d) + '</span></div></button>';
   }).join("") + '</div>';
 }
+var FLAB = {k:"Etikett", h:"Rubrik", em:"Kursiv rad", s:"Text under", la:"Före-etikett", lb:"Efter-etikett", title:"Annonsrubrik", lead:"Annonstext", plate:"Plattan", items:"Rader (en per rad)", before:"Före (en per rad)", after:"Efter (en per rad)", tones:"Tonlägen (en per rad)"};
+var FORDER = ["k", "h", "em", "s", "la", "lb", "title", "lead", "items", "before", "plate", "after", "tones"];
+var TLAB = {photo:"Bild", quiet:"Text", list:"Lista", stats:"Siffror", split:"Före / efter", chain:"Steg", product:"Produktbild", cta:"Avslutande rad", orbit:"Delarna runt objektet", merge:"Sex blir en", write:"Annonsskrivaren", fmts:"Tre format", phases:"Mallar per fas", plan:"Planritning", sun:"Solbana", map:"Karta"};
+function hlEditor(id){
+  var chp = chapter(id.replace("hl_", "")), html = "";
+  SC[id.replace("hl_", "")].forEach(function(b0, i){
+    var b = beatOf(id.replace("hl_", ""), i), fs = FORDER.filter(function(f){ return b0[f] !== undefined || ({photo:"k h s", quiet:"k h em s", cta:"h s", product:"k h s"}[b0.t] || "").split(" ").indexOf(f) >= 0 });
+    html += '<div class="a3hxb"><div class="a3hxh"><span class="mono">' + (i + 1) + '</span> ' + esc(TLAB[b0.t] || b0.t) + '</div>' + fs.map(function(f){
+      var key = id.replace("hl_", "") + "|" + i + "|" + f, v = b[f];
+      if(LINES[f] || f === "lead" || (f === "s" && String(v).length > 60)) return '<label class="a3f"><span>' + esc(FLAB[f]) + '</span><textarea rows="' + (LINES[f] ? Math.min(7, (v || []).length + 1) : 3) + '" data-a3hx="' + key + '">' + esc(LINES[f] ? toLines(v) : String(v || "")) + '</textarea></label>';
+      return '<label class="a3f"><span>' + esc(FLAB[f]) + '</span><input type="text" value="' + esc(String(v == null ? "" : v)) + '" data-a3hx="' + key + '"></label>';
+    }).join("") + '</div>';
+  });
+  return '<details class="a3det a3cust" open><summary>Ändra texterna i den här filmen</summary><p class="a3hint">Ändringarna syns direkt och sparas i webbläsaren. Rubrikerna anpassar sin storlek efter längden. Tomt fält döljer raden. Steg skrivs som <b>Titel | beskrivning</b>.</p><div class="a3hxs">' + html + '</div></details>';
+}
+function hlOutroEditor(){
+  var f = v3TxField;
+  return '<details class="a3det a3cust" open><summary>Ändra slutkortets text (gäller alla filmer)</summary><div class="a3custg"><div>' + f("outro.tag1", "Slagord rad 1") + f("outro.tag2", "Slagord rad 2 (kursiv)") + '</div><div>' + f("outro.aud", "Målgruppsrad") + f("outro.url", "Adress / länk") + '<button type="button" class="a3mini" data-a3="reset" style="margin-top:6px">Återställ allt</button></div></div></details>';
+}
 window.secAds4 = function(){
   if(V3_HL.indexOf(V3S.comp) < 0){ V3S.comp = "hl_systemet"; V3S.t = V3_COMPS.hl_systemet.thumb; V3S.playing = false; v3StopSound() }
   var comp = V3_COMPS[V3S.comp], outs = V3_OUT.map(function(o){ return v3Seg("outro", o.id, o.n, V3S.outro === o.id) }).join("");
@@ -582,6 +625,7 @@ window.secAds4 = function(){
     + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
     + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div></div></div>'
+    + hlEditor(V3S.comp) + hlOutroEditor()
     + '<details class="a3det"><summary>Underlag och vad som inte är klart</summary><div class="a3und"><div><b>Text</b><p>Allt som står i filmerna är kapitlens egna rader ur Highlights, kortade. Siffrorna i Motion är branschdata från viewly.se/bostadsfilm, som kapitlet anger. Inga nya påståenden.</p></div>'
     + '<div><b>Bilder</b><p>Filmerna använder bibliotekets egna bilder. Skärmbilder av portalen, planritningen och kartan finns inte i biblioteket (se <i>need</i> i kapitlen), så de scenerna är ritade förenklat och ska bytas mot riktiga skärmar. Bilderna är 648 × 1152 px och blir något mjuka i 1080-bredd.</p></div>'
     + '<div><b>Ljud</b><p>Syntetiserat piano, samma som annonserna. Jag har inte hört det; lyssna innan ni använder det.</p></div></div></details></div>';

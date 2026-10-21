@@ -764,6 +764,12 @@ tr:last-child td{border-bottom:0}
 .a3tb td{padding:7px 0;border-top:1px solid var(--line)}
 .a3pc .mono{word-break:break-all;font-size:11px}
 
+.a3hint{display:block;font-size:11.5px;color:var(--mut);margin:6px 0 0;line-height:1.5}
+.a3hxs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-top:14px}
+.a3hxb{border:1px solid var(--line2);border-radius:6px;padding:12px 14px;background:var(--raise)}
+.a3hxh{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+.a3f textarea{font:inherit;font-size:13px;color:var(--ink);background:var(--bg,#fff);border:1px solid var(--line2);border-radius:4px;padding:8px 10px;resize:vertical;line-height:1.45}
+
 </style>
 
 <div class="shell">
@@ -9501,6 +9507,12 @@ var C3 = {paper:"#ECE8E5", ink:"#1C1C1E", oli:"#6E7266", olil:"#98A088", dark:"#
           mut:"#8C8782", line:"#D8D2CF", cream:"#EFEDE7", green:"#6E9A6B"};
 /* Kontorets profil (exempel). Ändras i panelen Anpassa. */
 var OFF = {name:"NORDVIK", sub:"MÄKLARBYRÅ", accent:"#2F6F6B", accentL:"#9CC7C0"};
+/* Texter som går att ändra i videorna (Anpassa). Tom sträng döljer texten. */
+var V3_TXD = {"outro.tag1":"En bostadsfotograf som gör", "outro.tag2":"mer än bara fotografering.", "outro.aud":"FÖR FASTIGHETSMÄKLARE I SKÅNE", "outro.url":"VIEWLY.SE/MAKLARE",
+  "tpl.tillsalu":"TILL SALU", "tpl.kommande":"KOMMANDE", "tpl.sald":"Såld", "tpl.tack":"Tack för förtroendet",
+  "ui.portal":"MÄKLARPORTALEN", "ui.valjbild":"VÄLJ BILD", "ui.valjmall":"VÄLJ MALL", "ui.mina":"MINA MALLAR", "ui.viewlys":"VIEWLYS", "ui.egen":"+  SKAPA EGEN MALL"};
+var V3_TX = {};
+function v3t(k){ return Object.prototype.hasOwnProperty.call(V3_TX, k) ? V3_TX[k] : V3_TXD[k] }
 var V3F = {serif:"'Cormorant Garamond',Georgia,serif", sans:"Montserrat,sans-serif"};
 var V3_OBJ = {addr:"Storgatan 13", city:"Landskrona", rum:"4", yta:"112", kommande:"Släpps vecka 12", maklare:"Anna Lindqvist"};
 function v3Facts(){ return V3_OBJ.rum + " rum  ·  " + V3_OBJ.yta + " m²" }
@@ -9706,9 +9718,9 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
     v3NLogo(c, 50, 8.5 + mt, 1.05, W, "c", lg);
     var fy = H - 17 - m;
     if(phase === "tillsalu"){
-      var lly = fy - 43, lw = v3Measure(c, "TILL SALU", {size:2.2, weight:600, f:"sans", sp:.42}), la = fixedA("label", sLab);
+      var lly = fy - 43, lw = v3Measure(c, v3t("tpl.tillsalu"), {size:2.2, weight:600, f:"sans", sp:.42}), la = fixedA("label", sLab);
       v3Line(c, 50 - lw/2 - 12, 50 - lw/2 - 3, lly - .8, acc, .3, la); v3Line(c, 50 + lw/2 + 3, 50 + lw/2 + 12, lly - .8, acc, .3, la);
-      v3Text(c, "TILL SALU", 50, lly, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:la});
+      v3Text(c, v3t("tpl.tillsalu"), 50, lly, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:la});
       v3Text(c, V3_OBJ.addr, 50, fy - 29, {size:13, color:W, align:"c", p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true});
       token(50, fy - 23.6, 58, 11, "ADRESS", dynT(tkA, "addr"));
       v3Text(c, V3_OBJ.city.toUpperCase(), 50, fy - 20, {size:2.3, weight:500, f:"sans", sp:.38, color:W, align:"c", alpha:dynV(tkC, sCity)});
@@ -9722,9 +9734,9 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
       });
       v3VLine(c, 50, fy - 6, fy + 6, "#fff", .2, pl ? Math.max(plc("rum"), plc("yta")) : (tokMode ? 1 : sFact), .45);
     } else if(phase === "kommande"){
-      var cy = H/2 + 4, lw2 = v3Measure(c, "KOMMANDE", {size:2.2, weight:600, f:"sans", sp:.42}), la2 = fixedA("label", sLab);
+      var cy = H/2 + 4, lw2 = v3Measure(c, v3t("tpl.kommande"), {size:2.2, weight:600, f:"sans", sp:.42}), la2 = fixedA("label", sLab);
       v3Line(c, 50 - lw2/2 - 12, 50 - lw2/2 - 3, cy - 18.8, acc, .3, la2); v3Line(c, 50 + lw2/2 + 3, 50 + lw2/2 + 12, cy - 18.8, acc, .3, la2);
-      v3Text(c, "KOMMANDE", 50, cy - 18, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:la2});
+      v3Text(c, v3t("tpl.kommande"), 50, cy - 18, {size:2.2, weight:600, f:"sans", sp:.42, color:acc, align:"c", alpha:la2});
       v3Text(c, V3_OBJ.addr, 50, cy, {size:15.5, color:W, align:"c", p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true});
       token(50, cy + 6, 62, 12, "ADRESS", dynT(tkA, "addr"));
       v3Line(c, 43, 57, cy + 8, acc, .3, tokMode ? 1 : sCity);
@@ -9732,15 +9744,15 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
       token(50, cy + 21, 36, 6.4, "TEXT", dynT(tkF, "yta"), false, 1.8);
     } else {
       var cy3 = H/2 + 4;
-      v3Text(c, "Såld", 50, cy3 + 8, {size:42, italic:true, color:W, align:"c", p:tokMode || pl ? 1 : v3Step(p, .26, .6), alpha:fixedA("label", 1), shadow:true});
+      v3Text(c, v3t("tpl.sald"), 50, cy3 + 8, {size:42, italic:true, color:W, align:"c", p:tokMode || pl ? 1 : v3Step(p, .26, .6), alpha:fixedA("label", 1), shadow:true});
       v3Line(c, 40, 60, cy3 + 18, acc, .3, tokMode ? 1 : sCity);
       v3Text(c, (V3_OBJ.addr + " · " + V3_OBJ.city).toUpperCase(), 50, cy3 + 27, {size:2.3, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:dynV(tkA, sFact)});
       token(50, cy3 + 29.4, 56, 5.6, "ADRESS · ORT", dynT(tkA, "addr"), false, 1.8);
-      v3Text(c, "Tack för förtroendet", 50, cy3 + 38, {size:3.8, italic:true, color:cream, align:"c", alpha:tokMode ? 1 : sSub});
+      v3Text(c, v3t("tpl.tack"), 50, cy3 + 38, {size:3.8, italic:true, color:cream, align:"c", alpha:tokMode ? 1 : sSub});
     }
   } else if(style === "editorial"){
     v3NLogo(c, 9, 9 + mt, .95, W, "l", lg);
-    var bb = H - 9.5 - m, lab = {kommande:"KOMMANDE", tillsalu:"TILL SALU", visning:"VISNING", sald:"SÅLD"}[phase];
+    var bb = H - 9.5 - m, lab = {kommande:v3t("tpl.kommande"), tillsalu:v3t("tpl.tillsalu"), visning:"VISNING", sald:String(v3t("tpl.sald")).toUpperCase()}[phase];
     var big = phase === "sald" ? 24 : 15, labY = bb - 11.5 - big*.74 - 4.2, la3 = fixedA("label", sLab);
     v3Line(c, 9, 91, labY - 6.4, "#fff", .2, frameA, .5);
     v3Fill(c, 9, labY - .8, 5*la3, .3, acc);
@@ -9758,15 +9770,16 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
     if(bq > 0){
       c.save(); c.translate(80, 24 + mt); c.rotate(-.12); c.scale(bq, bq);
       c.fillStyle = OFF.accent; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
-      var bl = phase === "tillsalu" ? ["TILL", "SALU"] : phase === "kommande" ? ["KOM-", "MANDE"] : phase === "visning" ? ["VIS-", "NING"] : ["SÅLD", ""];
+      var bsp = function(s, d){ s = String(s); if(s === d[0] + d[1] || s === d[0] + " " + d[1]) return d; var w = s.toUpperCase().split(" "); return [w[0], w.slice(1).join(" ")] };
+      var bl = phase === "tillsalu" ? bsp(v3t("tpl.tillsalu"), ["TILL", "SALU"]) : phase === "kommande" ? bsp(v3t("tpl.kommande"), ["KOM-", "MANDE"]) : phase === "visning" ? ["VIS-", "NING"] : bsp(v3t("tpl.sald"), ["SÅLD", ""]);
       v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"}); if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"});
       c.restore();
     }
     var b2 = H - 11 - m;
-    if(phase === "sald") v3Text(c, "Såld", 9, b2 - 8, {size:26, italic:true, color:W, p:tokMode || pl ? 1 : sAdr, shadow:true});
+    if(phase === "sald") v3Text(c, v3t("tpl.sald"), 9, b2 - 8, {size:26, italic:true, color:W, p:tokMode || pl ? 1 : sAdr, shadow:true});
     else { v3Text(c, phase === "visning" ? "Välkommen." : V3_OBJ.addr, 9, b2 - 8, {size:14.5, color:W, p:tokMode || pl ? 1 : sAdr, alpha:dynV(tkA, 1), shadow:true}); token(9, b2 - 5.6, 62, 11.6, "ADRESS", dynT(tkA, "addr"), true) }
     v3Fill(c, 9, b2 - 3.8, 11*(tokMode ? 1 : sCity), .35, acc);
-    var s2 = phase === "tillsalu" ? v3Facts() : phase === "kommande" ? V3_OBJ.kommande : phase === "visning" ? V3_OBJ.addr + " · " + V3_OBJ.city : "Tack för förtroendet";
+    var s2 = phase === "tillsalu" ? v3Facts() : phase === "kommande" ? V3_OBJ.kommande : phase === "visning" ? V3_OBJ.addr + " · " + V3_OBJ.city : v3t("tpl.tack");
     v3Text(c, s2.toUpperCase(), 9, b2 + 1.8, {size:2.2, weight:500, f:"sans", sp:.28, color:W, alpha:phase === "sald" ? (tokMode ? 1 : sFact) : dynV(tkF, sFact)});
     if(phase !== "sald") token(9, b2 + 3.4, 46, 5.4, phase === "tillsalu" ? "RUM · YTA" : phase === "kommande" ? "TEXT" : "ADRESS · ORT", dynT(tkF, "yta"), true, 1.8);
   }
@@ -9843,7 +9856,7 @@ function v3Portal(c, G, t, ua, o){
   var q = oQ(k3(t, T.hdr, T.hdr + .9));
   c.save(); c.globalAlpha = ua*q;
   v3Lock(c, 0, G.top + 2.2, 2.4, ink, C3.oli, {left:m});
-  v3Text(c, "MÄKLARPORTALEN", 100 - m, G.top + 3, {size:1.8, weight:500, f:"sans", sp:.24, color:mut, align:"r"});
+  v3Text(c, v3t("ui.portal"), 100 - m, G.top + 3, {size:1.8, weight:500, f:"sans", sp:.24, color:mut, align:"r"});
   c.restore();
   v3Line(c, m, 100 - m, G.top + 7.4, C3.uil, .2, oQ(k3(t, T.hdr + .1, T.hdr + 1.1)), ua);
   /* leveransen: adress, ort, och uppgifterna som följer med till mallen */
@@ -9862,8 +9875,8 @@ function v3Portal(c, G, t, ua, o){
   v3Fill(c, m, G.dataY + 8.2 - .18, 84*m12, .36, C3.oli, ua);
   /* sektionsrubrik */
   var sq = oQ(k3(t, T.tiles - .1, T.tiles + .7));
-  v3Text(c, "VÄLJ BILD", m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*sq*(1 - m12)});
-  v3Text(c, "VÄLJ MALL", m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*m12});
+  v3Text(c, v3t("ui.valjbild"), m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*sq*(1 - m12)});
+  v3Text(c, v3t("ui.valjmall"), m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*m12});
   v3Text(c, "12 BILDER", 100 - m, G.sectY, {size:1.5, weight:500, f:"sans", sp:.2, color:mut, align:"r", alpha:ua*sq*(1 - m12)});
   /* väljare: Mina mallar (aktiv) | Viewlys mallar – visar att kontoret har egna mallar */
   if(m12 > 0){
@@ -9872,8 +9885,8 @@ function v3Portal(c, G, t, ua, o){
     c.strokeStyle = C3.line; c.lineWidth = .2; c.strokeRect(sx, sy, sw*2, sh);
     c.fillStyle = ink; c.fillRect(sx, sy, sw, sh);
     c.restore();
-    v3Text(c, "MINA MALLAR", sx + sw/2, G.sectY, {size:1.2, weight:600, f:"sans", sp:.18, color:"#fff", align:"c", alpha:sa});
-    v3Text(c, "VIEWLYS", sx + sw*1.5, G.sectY, {size:1.2, weight:500, f:"sans", sp:.18, color:mut, align:"c", alpha:sa});
+    v3Text(c, v3t("ui.mina"), sx + sw/2, G.sectY, {size:1.2, weight:600, f:"sans", sp:.18, color:"#fff", align:"c", alpha:sa});
+    v3Text(c, v3t("ui.viewlys"), sx + sw*1.5, G.sectY, {size:1.2, weight:500, f:"sans", sp:.18, color:mut, align:"c", alpha:sa});
   }
   /* bildrutorna */
   var a1 = 1 - m12;
@@ -9908,7 +9921,7 @@ function v3Portal(c, G, t, ua, o){
     if(ba > 0){
       c.save(); c.globalAlpha = ba; c.strokeStyle = C3.mut; c.lineWidth = .22; c.setLineDash([.8, .7]);
       c.strokeRect(m, by, 100 - m*2, 5.6); c.restore();
-      v3Text(c, "+  SKAPA EGEN MALL", 50, by + 3.5, {size:1.3, weight:600, f:"sans", sp:.22, color:ink, align:"c", alpha:ba});
+      v3Text(c, v3t("ui.egen"), 50, by + 3.5, {size:1.3, weight:600, f:"sans", sp:.22, color:ink, align:"c", alpha:ba});
     }
   }
 }
@@ -10032,7 +10045,6 @@ var V3_OUT = [
   {id:"marke",   n:"Märket först, ordbilden glider ut"},
   {id:"ordbild", n:"Foto i ordbilden"}
 ];
-var V3_TAG = ["En bostadsfotograf som gör", "mer än bara fotografering."];
 function v3Outro(c, G, id, t, o){
   o = o || {}; var H = G.H, cy = G.cy, dark = id === "mork" || id === "bokstav" || id === "ordbild" || id === "foto";
   var ink = dark ? "#fff" : C3.ink, dot = dark ? C3.olil : C3.oli, acc = dot, tagc = dark ? C3.cream : C3.ink, tag2 = dark ? C3.olil : C3.oli, small = dark ? "rgba(255,255,255,.78)" : C3.mut;
@@ -10048,29 +10060,29 @@ function v3Outro(c, G, id, t, o){
   c.restore();
   var A = a, capH = G.is9 ? 7.3 : 6.8, ft = H - G.bot;
   var foot = function(col1, col2){
-    v3Text(c, "FÖR FASTIGHETSMÄKLARE I SKÅNE", 50, ft - 8, {size:1.95, weight:500, f:"sans", sp:.28, color:col1, align:"c", alpha:A*oQ(k3(t, 3.0, 3.8))});
-    v3Text(c, "VIEWLY.SE/MAKLARE", 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:col2, align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
+    v3Text(c, v3t("outro.aud"), 50, ft - 8, {size:1.95, weight:500, f:"sans", sp:.28, color:col1, align:"c", alpha:A*oQ(k3(t, 3.0, 3.8))});
+    v3Text(c, v3t("outro.url"), 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:col2, align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
   };
   if(id === "papper" || id === "mork" || id === "foto"){
     var lp = oQ(k3(t, .5, 1.7)), y = cy - (G.is9 ? 14 : 12);
     v3Lock(c, 50, y, capH, ink, dot, {pm:lp, pd:oQ(k3(t, 1.2, 2.0)), pw:oQ(k3(t, .8, 2.0)), alpha:A});
     v3Line(c, 42, 58, y + capH*1.9, acc, .3, oQ(k3(t, 1.8, 2.6)), A);
-    v3Text(c, V3_TAG[0], 50, y + capH*1.9 + 10, {size:G.is9 ? 6 : 5.2, color:tagc, align:"c", p:oQ(k3(t, 2.0, 3.0)), rise:1.6, alpha:A});
-    v3Text(c, V3_TAG[1], 50, y + capH*1.9 + 10 + (G.is9 ? 7.4 : 6.4), {size:G.is9 ? 6 : 5.2, italic:true, color:tag2, align:"c", p:oQ(k3(t, 2.5, 3.5)), rise:1.6, alpha:A});
+    v3Text(c, v3t("outro.tag1"), 50, y + capH*1.9 + 10, {size:G.is9 ? 6 : 5.2, color:tagc, align:"c", p:oQ(k3(t, 2.0, 3.0)), rise:1.6, alpha:A});
+    v3Text(c, v3t("outro.tag2"), 50, y + capH*1.9 + 10 + (G.is9 ? 7.4 : 6.4), {size:G.is9 ? 6 : 5.2, italic:true, color:tag2, align:"c", p:oQ(k3(t, 2.5, 3.5)), rise:1.6, alpha:A});
     foot(small, ink);
   } else if(id === "stapel"){
     var mh = G.is9 ? 26 : 21, y2 = cy - (G.is9 ? 24 : 20), fs = G.is9 ? 12 : 10.4;
     v3Mark(c, 50 - mh*858.6/756.3/2, y2, mh, ink, dot, {reveal:oQ(k3(t, .4, 1.6)), dot:oQ(k3(t, 1.2, 2.0)), alpha:A});
     v3Text(c, "VIEWLY", 50, y2 + mh + fs*1.35, {size:fs, weight:500, f:"sans", sp:.3, color:ink, align:"c", p:oQ(k3(t, 1.3, 2.5)), rise:2, alpha:A});
     v3Line(c, 42, 58, y2 + mh + fs*1.35 + 7, acc, .3, oQ(k3(t, 2.2, 3.0)), A);
-    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y2 + mh + fs*1.35 + 16, {size:G.is9 ? 3.6 : 3.2, italic:true, color:C3.oli, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
+    v3Text(c, (v3t("outro.tag1") + " " + v3t("outro.tag2")).trim(), 50, y2 + mh + fs*1.35 + 16, {size:G.is9 ? 3.6 : 3.2, italic:true, color:C3.oli, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
     foot(C3.mut, C3.ink);
   } else if(id === "bokstav"){
     var y3 = cy - (G.is9 ? 12 : 10);
     v3Lock(c, 50, y3, capH, "#fff", C3.olil, {pm:oQ(k3(t, .4, 1.4)), pd:oQ(k3(t, 1.0, 1.8)), letters:k3(t, .9, 2.8), alpha:A});
     v3Line(c, 42, 58, y3 + capH*1.9, C3.olil, .3, oQ(k3(t, 2.6, 3.3)), A);
-    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y3 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
-    v3Text(c, "VIEWLY.SE/MAKLARE", 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
+    v3Text(c, (v3t("outro.tag1") + " " + v3t("outro.tag2")).trim(), 50, y3 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
+    v3Text(c, v3t("outro.url"), 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
   } else if(id === "marke"){
     var y4 = cy - (G.is9 ? 12 : 10), mh2 = capH*1.55, mw2 = mh2*858.6/756.3;
     var fs2 = capH/.7, ww = v3Measure(c, "VIEWLY", {size:fs2, weight:500, f:"sans", sp:.2}), gap = capH*.95, tot = mw2 + gap + ww;
@@ -10082,8 +10094,8 @@ function v3Outro(c, G, id, t, o){
     v3Text(c, "VIEWLY", wx - (1 - slide)*(ww + gap), y4 + capH/2 + capH*.02, {size:fs2, weight:500, f:"sans", sp:.2, color:C3.ink, alpha:A*slide});
     c.restore();
     v3Line(c, 42, 58, y4 + capH*1.9, C3.oli, .3, oQ(k3(t, 2.6, 3.3)), A);
-    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y4 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.oli, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
-    v3Text(c, "VIEWLY.SE/MAKLARE", 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:C3.ink, align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
+    v3Text(c, (v3t("outro.tag1") + " " + v3t("outro.tag2")).trim(), 50, y4 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.oli, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
+    v3Text(c, v3t("outro.url"), 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:C3.ink, align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
   } else {   /* foto i ordbilden */
     var w20 = v3Measure(c, "VIEWLY", {size:20, weight:700, f:"sans", sp:.06}), fs3 = 20*80/w20, y5 = cy + 4;
     var w3 = v3Measure(c, "VIEWLY", {size:fs3, weight:700, f:"sans", sp:.06}), reveal = oQ(k3(t, .6, 2.2));
@@ -10099,8 +10111,8 @@ function v3Outro(c, G, id, t, o){
     var mh3 = G.is9 ? 14 : 11.5;
     v3Mark(c, 50 - mh3*858.6/756.3/2, y5 - fs3 - mh3 - 5, mh3, "#fff", C3.olil, {reveal:oQ(k3(t, .3, 1.4)), dot:oQ(k3(t, 1.0, 1.8)), alpha:A});
     v3Line(c, 42, 58, y5 + 8, C3.olil, .3, oQ(k3(t, 2.2, 3.0)), A);
-    v3Text(c, V3_TAG[0] + " " + V3_TAG[1], 50, y5 + 17, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
-    v3Text(c, "VIEWLY.SE/MAKLARE", 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
+    v3Text(c, (v3t("outro.tag1") + " " + v3t("outro.tag2")).trim(), 50, y5 + 17, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
+    v3Text(c, v3t("outro.url"), 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
   }
 }
 
@@ -10267,11 +10279,12 @@ function v3Apply(){
 function v3LoadCfg(){
   try {
     var raw = localStorage.getItem("viewly.ads3.cfg");
+    var rx = localStorage.getItem("viewly.ads3.tx"); if(rx) V3_TX = JSON.parse(rx) || {};
     if(raw){ var o = JSON.parse(raw); ["hook", "fore", "typo"].forEach(function(k){ if(o[k]) V3_CFG[k] = o[k] }); ["obj", "off", "col"].forEach(function(g){ if(o[g]) for(var k in o[g]) V3_CFG[g][k] = o[g][k] }) }
   } catch(e){}
   v3Apply();
 }
-function v3SaveCfg(){ try { localStorage.setItem("viewly.ads3.cfg", JSON.stringify(V3_CFG)) } catch(e){} }
+function v3SaveCfg(){ try { localStorage.setItem("viewly.ads3.cfg", JSON.stringify(V3_CFG)); localStorage.setItem("viewly.ads3.tx", JSON.stringify(V3_TX)) } catch(e){} }
 v3LoadCfg();
 
 var V3S = {tab:"video", comp:"salu", fmt:"916", t:3.2, playing:false, raf:0, outro:"papper", sound:true,
@@ -10726,6 +10739,9 @@ function v3Tabs(){
     return '<button type="button" class="a3tab" data-a3="tab" data-v="' + x[0] + '" aria-current="' + (V3S.tab === x[0]) + '">' + x[1] + '</button>';
   }).join("") + '</div>';
 }
+function v3TxField(key, label){
+  return '<label class="a3f"><span>' + esc(label) + '</span><input type="text" value="' + esc(String(v3t(key))) + '" placeholder="' + esc(V3_TXD[key]) + '" data-a3tx="' + key + '"></label>';
+}
 function v3Field(path, label, type){
   var p = path.split("."), v = V3_CFG[p[0]]; if(p[1]) v = v[p[1]]; else v = V3_CFG[p[0]];
   if(p[0] === "hook" || p[0] === "fore" || p[0] === "typo") v = V3_CFG[p[0]][+p[1]];
@@ -10735,6 +10751,9 @@ function v3Customizer(){
   var f = v3Field;
   return '<details class="a3det a3cust"><summary>Anpassa texter, färger och objektuppgifter</summary><div class="a3custg">'
     + '<div><b>Texter</b>' + f("hook.0", "Hook (Till salu, Såld, Direkt) rad 1") + f("hook.1", "Hook rad 2") + f("fore.0", "Före/efter rad 1") + f("fore.1", "Före/efter rad 2") + f("typo.0", "Välj bild-hooken rad 1") + f("typo.1", "Välj bild-hooken rad 2") + '</div>'
+    + '<div><b>Slutkort (outro)</b>' + v3TxField("outro.tag1", "Slagord rad 1") + v3TxField("outro.tag2", "Slagord rad 2 (kursiv)") + v3TxField("outro.aud", "Målgruppsrad") + v3TxField("outro.url", "Adress / länk") + '<small class="a3hint">Tomt fält döljer raden. Logotypen är fast.</small></div>'
+    + '<div><b>Mallarnas fasta text</b>' + v3TxField("tpl.tillsalu", "Till salu") + v3TxField("tpl.kommande", "Kommande") + v3TxField("tpl.sald", "Såld") + v3TxField("tpl.tack", "Under Såld") + '</div>'
+    + '<div><b>Portalen i videon</b>' + v3TxField("ui.portal", "Portalens namn") + v3TxField("ui.valjbild", "Rubrik 1") + v3TxField("ui.valjmall", "Rubrik 2") + v3TxField("ui.mina", "Väljare, aktiv") + v3TxField("ui.viewlys", "Väljare, andra") + v3TxField("ui.egen", "Knapp: egen mall") + '</div>'
     + '<div><b>Bostad (demodata)</b>' + f("obj.addr", "Adress") + f("obj.city", "Ort") + f("obj.rum", "Rum") + f("obj.yta", "Boarea (m²)") + f("obj.kommande", "Kommande-text") + f("obj.maklare", "Ansvarig mäklare") + '</div>'
     + '<div><b>Kontorsprofil (exempel)</b>' + f("off.name", "Kontorsnamn") + f("off.sub", "Underrad") + f("off.accent", "Kontorets färg", "color") + f("off.accentL", "Kontorets ljusa färg", "color") + '</div>'
     + '<div><b>Viewlys färger</b>' + f("col.dark", "Mörk bakgrund", "color") + f("col.paper", "Papper", "color") + f("col.ink", "Text och logga (ljus bakgrund)", "color") + f("col.oli", "Oliv (ljus bakgrund)", "color") + f("col.olil", "Oliv lyft (mörk bakgrund)", "color")
@@ -10846,7 +10865,7 @@ document.addEventListener("click", function(e){
   if(k === "fmt"){ V3S.fmt = v; render(); return }
   if(k === "sound"){ V3S.sound = v === "1"; if(!V3S.sound) v3StopSound(); render(); return }
   if(k === "hook"){ V3_CFG.hook = V3_HOOKS[+v].slice(); v3SaveCfg(); render(); return }
-  if(k === "reset"){ V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
+  if(k === "reset"){ V3_TX = {}; if(window.hlReset) hlReset(); V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
   if(k === "outro"){ V3S.outro = v; render(); return }
   if(k === "tpl"){ V3S.tplStyle = v; render(); return }
   if(k === "tplfmt"){ V3S.tplFmt = v; render(); return }
@@ -10857,6 +10876,10 @@ document.addEventListener("click", function(e){
   if(k === "png"){ v3ExportPng(b, v); return }
 });
 document.addEventListener("input", function(e){
+  var tx = e.target.dataset && e.target.dataset.a3tx;
+  if(tx){ V3_TX[tx] = e.target.value; v3SaveCfg(); v3Repaint(); return }
+  var hx = e.target.dataset && e.target.dataset.a3hx;
+  if(hx && window.hlSetText){ hlSetText(hx, e.target.value); v3SaveCfg(); v3Repaint(); return }
   var cf = e.target.dataset && e.target.dataset.a3cfg;
   if(cf){
     var p = cf.split("."), val = e.target.value;
@@ -11394,20 +11417,44 @@ var SC = {
 
 /* ---------- sätter ihop komposition och ljud ---------- */
 var TR = .9;
+/* ---------- ändrade texter (sparas i webbläsaren) ---------- */
+var HX = {};
+try { HX = JSON.parse(localStorage.getItem("viewly.hl.tx") || "{}") || {} } catch(e){ HX = {} }
+function hxSave(){ try { localStorage.setItem("viewly.hl.tx", JSON.stringify(HX)) } catch(e){} }
+var LINES = {items:1, before:1, after:1, tones:1};
+function beatOf(id, i){
+  var b = SC[id][i], o = HX[id] && HX[id][i]; if(!o) return b;
+  var r = {}, k; for(k in b) r[k] = b[k]; for(k in o) r[k] = o[k]; return r;
+}
+function toLines(v){ return (v || []).map(function(x){ return Array.isArray(x) ? x.join(" | ") : x }).join("\n") }
+function fromLines(txt, orig){
+  var ls = String(txt).split("\n").filter(function(l){ return l.trim() }), pair = orig && Array.isArray(orig[0]);
+  return ls.map(function(l, j){
+    if(!pair) return l.trim();
+    var p = l.split("|"); return [p[0].trim(), (p[1] || "").trim()];
+  });
+}
+window.hlSetText = function(key, val){
+  var p = key.split("|"), id = p[0], i = +p[1], f = p[2], b = SC[id][i];
+  if(!HX[id]) HX[id] = {}; if(!HX[id][i]) HX[id][i] = {};
+  HX[id][i][f] = LINES[f] ? fromLines(val, b[f]) : val;
+  hxSave();
+};
+window.hlReset = function(){ HX = {}; hxSave() };
 function chapter(id){ return HL.filter(function(h){ return h.id === id })[0] }
 window.V3_HL = [];
 Object.keys(SC).forEach(function(id){
   var ch = chapter(id); if(!ch) return;
-  var F = {num:ch.num, name:ch.name}, beats = SC[id], starts = [], acc = 0;
+  var F = {num:ch.num, name:ch.name}, beats = SC[id].map(function(_, i){ return beatOf(id, i) }), starts = [], acc = 0;
   beats.forEach(function(b){ starts.push(acc); acc += b.dur });
   var outroAt = acc, raw = outroAt + 4.4;
   var comp = {n:ch.label, d:ch.q + " — " + beats.length + " scener", group:"hl", dur:raw, thumb:Math.min(starts[Math.min(2, beats.length - 1)] + 2.4, outroAt - .5), id:id, v:{id:id}};
   comp.draw = function(c, G, t, o){
     var i = 0; while(i + 1 < beats.length && t >= starts[i + 1]) i++;
-    var bt = t >= outroAt ? beats.length - 1 : i, lt = t - starts[bt], b = beats[bt], prev = bt > 0 ? bt - 1 : -1;
+    var bt = t >= outroAt ? beats.length - 1 : i, lt = t - starts[bt], b = beatOf(id, bt), prev = bt > 0 ? bt - 1 : -1;
     if(t >= outroAt) lt = beats[bt].dur + (t - outroAt);
     if(prev >= 0 && lt < TR){
-      BEATS[beats[prev].t](c, G, beats[prev].dur + lt, beats[prev], F);
+      var pb = beatOf(id, prev); BEATS[pb.t](c, G, pb.dur + lt, pb, F);
       var e = ioC(k3(lt, 0, TR)); if(e <= .002) return; c.save(); c.beginPath();
       if(bt % 2) c.rect(0, G.H*(1 - e), 100, G.H*e + .1); else c.rect(0, 0, 100*e + .1, G.H);
       c.clip();
@@ -11436,6 +11483,25 @@ function hlCards(){
       + '<div class="a3ctl"><i>' + c2.dur.toFixed(0) + ' s · 9:16 och 4:5 · ljud</i><b>' + esc(c2.n) + '</b><span>' + esc(c2.d) + '</span></div></button>';
   }).join("") + '</div>';
 }
+var FLAB = {k:"Etikett", h:"Rubrik", em:"Kursiv rad", s:"Text under", la:"Före-etikett", lb:"Efter-etikett", title:"Annonsrubrik", lead:"Annonstext", plate:"Plattan", items:"Rader (en per rad)", before:"Före (en per rad)", after:"Efter (en per rad)", tones:"Tonlägen (en per rad)"};
+var FORDER = ["k", "h", "em", "s", "la", "lb", "title", "lead", "items", "before", "plate", "after", "tones"];
+var TLAB = {photo:"Bild", quiet:"Text", list:"Lista", stats:"Siffror", split:"Före / efter", chain:"Steg", product:"Produktbild", cta:"Avslutande rad", orbit:"Delarna runt objektet", merge:"Sex blir en", write:"Annonsskrivaren", fmts:"Tre format", phases:"Mallar per fas", plan:"Planritning", sun:"Solbana", map:"Karta"};
+function hlEditor(id){
+  var chp = chapter(id.replace("hl_", "")), html = "";
+  SC[id.replace("hl_", "")].forEach(function(b0, i){
+    var b = beatOf(id.replace("hl_", ""), i), fs = FORDER.filter(function(f){ return b0[f] !== undefined || ({photo:"k h s", quiet:"k h em s", cta:"h s", product:"k h s"}[b0.t] || "").split(" ").indexOf(f) >= 0 });
+    html += '<div class="a3hxb"><div class="a3hxh"><span class="mono">' + (i + 1) + '</span> ' + esc(TLAB[b0.t] || b0.t) + '</div>' + fs.map(function(f){
+      var key = id.replace("hl_", "") + "|" + i + "|" + f, v = b[f];
+      if(LINES[f] || f === "lead" || (f === "s" && String(v).length > 60)) return '<label class="a3f"><span>' + esc(FLAB[f]) + '</span><textarea rows="' + (LINES[f] ? Math.min(7, (v || []).length + 1) : 3) + '" data-a3hx="' + key + '">' + esc(LINES[f] ? toLines(v) : String(v || "")) + '</textarea></label>';
+      return '<label class="a3f"><span>' + esc(FLAB[f]) + '</span><input type="text" value="' + esc(String(v == null ? "" : v)) + '" data-a3hx="' + key + '"></label>';
+    }).join("") + '</div>';
+  });
+  return '<details class="a3det a3cust" open><summary>Ändra texterna i den här filmen</summary><p class="a3hint">Ändringarna syns direkt och sparas i webbläsaren. Rubrikerna anpassar sin storlek efter längden. Tomt fält döljer raden. Steg skrivs som <b>Titel | beskrivning</b>.</p><div class="a3hxs">' + html + '</div></details>';
+}
+function hlOutroEditor(){
+  var f = v3TxField;
+  return '<details class="a3det a3cust" open><summary>Ändra slutkortets text (gäller alla filmer)</summary><div class="a3custg"><div>' + f("outro.tag1", "Slagord rad 1") + f("outro.tag2", "Slagord rad 2 (kursiv)") + '</div><div>' + f("outro.aud", "Målgruppsrad") + f("outro.url", "Adress / länk") + '<button type="button" class="a3mini" data-a3="reset" style="margin-top:6px">Återställ allt</button></div></div></details>';
+}
 window.secAds4 = function(){
   if(V3_HL.indexOf(V3S.comp) < 0){ V3S.comp = "hl_systemet"; V3S.t = V3_COMPS.hl_systemet.thumb; V3S.playing = false; v3StopSound() }
   var comp = V3_COMPS[V3S.comp], outs = V3_OUT.map(function(o){ return v3Seg("outro", o.id, o.n, V3S.outro === o.id) }).join("");
@@ -11453,6 +11519,7 @@ window.secAds4 = function(){
     + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
     + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div></div></div>'
+    + hlEditor(V3S.comp) + hlOutroEditor()
     + '<details class="a3det"><summary>Underlag och vad som inte är klart</summary><div class="a3und"><div><b>Text</b><p>Allt som står i filmerna är kapitlens egna rader ur Highlights, kortade. Siffrorna i Motion är branschdata från viewly.se/bostadsfilm, som kapitlet anger. Inga nya påståenden.</p></div>'
     + '<div><b>Bilder</b><p>Filmerna använder bibliotekets egna bilder. Skärmbilder av portalen, planritningen och kartan finns inte i biblioteket (se <i>need</i> i kapitlen), så de scenerna är ritade förenklat och ska bytas mot riktiga skärmar. Bilderna är 648 × 1152 px och blir något mjuka i 1080-bredd.</p></div>'
     + '<div><b>Ljud</b><p>Syntetiserat piano, samma som annonserna. Jag har inte hört det; lyssna innan ni använder det.</p></div></div></details></div>';

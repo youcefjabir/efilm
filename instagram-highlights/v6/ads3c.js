@@ -21,11 +21,12 @@ function v3Apply(){
 function v3LoadCfg(){
   try {
     var raw = localStorage.getItem("viewly.ads3.cfg");
+    var rx = localStorage.getItem("viewly.ads3.tx"); if(rx) V3_TX = JSON.parse(rx) || {};
     if(raw){ var o = JSON.parse(raw); ["hook", "fore", "typo"].forEach(function(k){ if(o[k]) V3_CFG[k] = o[k] }); ["obj", "off", "col"].forEach(function(g){ if(o[g]) for(var k in o[g]) V3_CFG[g][k] = o[g][k] }) }
   } catch(e){}
   v3Apply();
 }
-function v3SaveCfg(){ try { localStorage.setItem("viewly.ads3.cfg", JSON.stringify(V3_CFG)) } catch(e){} }
+function v3SaveCfg(){ try { localStorage.setItem("viewly.ads3.cfg", JSON.stringify(V3_CFG)); localStorage.setItem("viewly.ads3.tx", JSON.stringify(V3_TX)) } catch(e){} }
 v3LoadCfg();
 
 var V3S = {tab:"video", comp:"salu", fmt:"916", t:3.2, playing:false, raf:0, outro:"papper", sound:true,
@@ -480,6 +481,9 @@ function v3Tabs(){
     return '<button type="button" class="a3tab" data-a3="tab" data-v="' + x[0] + '" aria-current="' + (V3S.tab === x[0]) + '">' + x[1] + '</button>';
   }).join("") + '</div>';
 }
+function v3TxField(key, label){
+  return '<label class="a3f"><span>' + esc(label) + '</span><input type="text" value="' + esc(String(v3t(key))) + '" placeholder="' + esc(V3_TXD[key]) + '" data-a3tx="' + key + '"></label>';
+}
 function v3Field(path, label, type){
   var p = path.split("."), v = V3_CFG[p[0]]; if(p[1]) v = v[p[1]]; else v = V3_CFG[p[0]];
   if(p[0] === "hook" || p[0] === "fore" || p[0] === "typo") v = V3_CFG[p[0]][+p[1]];
@@ -489,6 +493,9 @@ function v3Customizer(){
   var f = v3Field;
   return '<details class="a3det a3cust"><summary>Anpassa texter, färger och objektuppgifter</summary><div class="a3custg">'
     + '<div><b>Texter</b>' + f("hook.0", "Hook (Till salu, Såld, Direkt) rad 1") + f("hook.1", "Hook rad 2") + f("fore.0", "Före/efter rad 1") + f("fore.1", "Före/efter rad 2") + f("typo.0", "Välj bild-hooken rad 1") + f("typo.1", "Välj bild-hooken rad 2") + '</div>'
+    + '<div><b>Slutkort (outro)</b>' + v3TxField("outro.tag1", "Slagord rad 1") + v3TxField("outro.tag2", "Slagord rad 2 (kursiv)") + v3TxField("outro.aud", "Målgruppsrad") + v3TxField("outro.url", "Adress / länk") + '<small class="a3hint">Tomt fält döljer raden. Logotypen är fast.</small></div>'
+    + '<div><b>Mallarnas fasta text</b>' + v3TxField("tpl.tillsalu", "Till salu") + v3TxField("tpl.kommande", "Kommande") + v3TxField("tpl.sald", "Såld") + v3TxField("tpl.tack", "Under Såld") + '</div>'
+    + '<div><b>Portalen i videon</b>' + v3TxField("ui.portal", "Portalens namn") + v3TxField("ui.valjbild", "Rubrik 1") + v3TxField("ui.valjmall", "Rubrik 2") + v3TxField("ui.mina", "Väljare, aktiv") + v3TxField("ui.viewlys", "Väljare, andra") + v3TxField("ui.egen", "Knapp: egen mall") + '</div>'
     + '<div><b>Bostad (demodata)</b>' + f("obj.addr", "Adress") + f("obj.city", "Ort") + f("obj.rum", "Rum") + f("obj.yta", "Boarea (m²)") + f("obj.kommande", "Kommande-text") + f("obj.maklare", "Ansvarig mäklare") + '</div>'
     + '<div><b>Kontorsprofil (exempel)</b>' + f("off.name", "Kontorsnamn") + f("off.sub", "Underrad") + f("off.accent", "Kontorets färg", "color") + f("off.accentL", "Kontorets ljusa färg", "color") + '</div>'
     + '<div><b>Viewlys färger</b>' + f("col.dark", "Mörk bakgrund", "color") + f("col.paper", "Papper", "color") + f("col.ink", "Text och logga (ljus bakgrund)", "color") + f("col.oli", "Oliv (ljus bakgrund)", "color") + f("col.olil", "Oliv lyft (mörk bakgrund)", "color")
@@ -600,7 +607,7 @@ document.addEventListener("click", function(e){
   if(k === "fmt"){ V3S.fmt = v; render(); return }
   if(k === "sound"){ V3S.sound = v === "1"; if(!V3S.sound) v3StopSound(); render(); return }
   if(k === "hook"){ V3_CFG.hook = V3_HOOKS[+v].slice(); v3SaveCfg(); render(); return }
-  if(k === "reset"){ V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
+  if(k === "reset"){ V3_TX = {}; if(window.hlReset) hlReset(); V3_CFG = JSON.parse(JSON.stringify(V3_DEF)); v3Apply(); v3SaveCfg(); render(); return }
   if(k === "outro"){ V3S.outro = v; render(); return }
   if(k === "tpl"){ V3S.tplStyle = v; render(); return }
   if(k === "tplfmt"){ V3S.tplFmt = v; render(); return }
@@ -611,6 +618,10 @@ document.addEventListener("click", function(e){
   if(k === "png"){ v3ExportPng(b, v); return }
 });
 document.addEventListener("input", function(e){
+  var tx = e.target.dataset && e.target.dataset.a3tx;
+  if(tx){ V3_TX[tx] = e.target.value; v3SaveCfg(); v3Repaint(); return }
+  var hx = e.target.dataset && e.target.dataset.a3hx;
+  if(hx && window.hlSetText){ hlSetText(hx, e.target.value); v3SaveCfg(); v3Repaint(); return }
   var cf = e.target.dataset && e.target.dataset.a3cfg;
   if(cf){
     var p = cf.split("."), val = e.target.value;
