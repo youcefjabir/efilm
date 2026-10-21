@@ -76,15 +76,18 @@ function v3Portal(c, G, t, ua, o){
   v3Text(c, V3_OBJ.addr, m, G.titleY, {size:hs, color:ink, alpha:ua, p:tq, rise:1.4});
   v3Text(c, (V3_OBJ.city + " · 12 bilder levererade idag").toUpperCase(), m, G.subY, {size:1.85, weight:500, f:"sans", sp:.22, color:mut, alpha:ua*tq});
   var dq = oQ(k3(t, T.data, T.data + 1.0));
-  var cols = [[8, "BOSTAD", V3_OBJ.rum + " rum · " + V3_OBJ.yta + " m²"], [38, "ANSVARIG MÄKLARE", V3_OBJ.maklare], [68, "KONTOR", OFF.name.charAt(0) + OFF.name.slice(1).toLowerCase()]];
-  v3Line(c, m, 100 - m, G.dataY - 3.4, C3.uil, .15, dq, ua);
+  var cols = [[12, "BOSTAD", V3_OBJ.rum + " rum · " + V3_OBJ.yta + " m²"], [41, "ANSVARIG MÄKLARE", V3_OBJ.maklare], [70, "KONTOR", OFF.name.charAt(0) + OFF.name.slice(1).toLowerCase()]];
+  /* uppgifterna ligger i ett vitt, rundat kort med mjuk skugga */
+  var cy0 = G.dataY - 4.4 + (1 - dq)*1.6, ch0 = 13.4, cr = 1.7;
+  c.save(); c.globalAlpha = ua*dq; c.shadowColor = "rgba(28,28,30,.16)"; c.shadowBlur = 3.2; c.shadowOffsetY = 1; c.fillStyle = "#fff";
+  c.beginPath(); c.moveTo(m + cr, cy0); c.arcTo(100 - m, cy0, 100 - m, cy0 + ch0, cr); c.arcTo(100 - m, cy0 + ch0, m, cy0 + ch0, cr); c.arcTo(m, cy0 + ch0, m, cy0, cr); c.arcTo(m, cy0, 100 - m, cy0, cr); c.closePath(); c.fill();
+  c.shadowColor = "transparent"; c.strokeStyle = "rgba(28,28,30,.08)"; c.lineWidth = .15; c.stroke(); c.restore();
   cols.forEach(function(cl){
-    v3Text(c, cl[1], cl[0], G.dataY, {size:1.4, weight:600, f:"sans", sp:.2, color:mut, alpha:ua*dq});
-    v3Text(c, cl[2], cl[0], G.dataY + 4.6, {size:G.is9 ? 3.7 : 3.3, color:ink, alpha:ua, p:dq});
+    v3Text(c, cl[1], cl[0], G.dataY + (1 - dq)*1.6, {size:1.4, weight:600, f:"sans", sp:.2, color:"#6E6A66", alpha:ua*dq});
+    v3Text(c, cl[2], cl[0], G.dataY + 4.8 + (1 - dq)*1.6, {size:G.is9 ? 3.7 : 3.3, color:ink, alpha:ua*dq});
   });
-  v3Line(c, m, 100 - m, G.dataY + 8.2, C3.uil, .15, dq, ua);
-  /* uppgifterna följer med: en oliv linje under raden när mallen visas */
-  v3Fill(c, m, G.dataY + 8.2 - .18, 84*m12, .36, C3.oli, ua);
+  /* uppgifterna följer med: en oliv linje i kortets nederkant när mallen visas */
+  v3Fill(c, m + 2, cy0 + ch0 - .5, (84 - 4)*m12, .4, C3.oli, ua*dq);
   /* sektionsrubrik */
   var sq = oQ(k3(t, T.tiles - .1, T.tiles + .7));
   v3Text(c, v3t("ui.valjbild"), m, G.sectY, {size:1.9, weight:600, f:"sans", sp:.26, color:ink, alpha:ua*sq*(1 - m12)});

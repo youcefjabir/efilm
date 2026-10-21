@@ -489,9 +489,9 @@ function v3Field(path, label, type){
   if(p[0] === "hook" || p[0] === "fore" || p[0] === "typo") v = V3_CFG[p[0]][+p[1]];
   return '<label class="a3f"><span>' + esc(label) + '</span><input type="' + (type || "text") + '" value="' + esc(String(v)) + '" data-a3cfg="' + path + '"></label>';
 }
-function v3Customizer(){
+function v3Customizer(open){
   var f = v3Field;
-  return '<details class="a3det a3cust"><summary>Anpassa texter, färger och objektuppgifter</summary><div class="a3custg">'
+  return '<details class="a3det a3cust"' + (open ? ' open' : '') + ' id="v3cust"><summary>Ändra texter: hook, slutkort, mallar, portal · färger och objektuppgifter</summary><div class="a3custg">'
     + '<div><b>Texter</b>' + f("hook.0", "Hook (Till salu, Såld, Direkt) rad 1") + f("hook.1", "Hook rad 2") + f("fore.0", "Före/efter rad 1") + f("fore.1", "Före/efter rad 2") + f("typo.0", "Välj bild-hooken rad 1") + f("typo.1", "Välj bild-hooken rad 2") + '</div>'
     + '<div><b>Slutkort (outro)</b>' + v3TxField("outro.tag1", "Slagord rad 1") + v3TxField("outro.tag2", "Slagord rad 2 (kursiv)") + v3TxField("outro.aud", "Målgruppsrad") + v3TxField("outro.url", "Adress / länk") + '<small class="a3hint">Tomt fält döljer raden. Logotypen är fast.</small></div>'
     + '<div><b>Mallarnas fasta text</b>' + v3TxField("tpl.tillsalu", "Till salu") + v3TxField("tpl.kommande", "Kommande") + v3TxField("tpl.sald", "Såld") + v3TxField("tpl.tack", "Under Såld") + '</div>'
@@ -520,11 +520,14 @@ function v3VideoTab(){
     + '<span class="mono" id="v3time"></span></div></div>'
     + '<div class="a3panel"><div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel · 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde · 4:5", V3S.fmt === "45") + '</div>'
     + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
-    + '<div class="a3h">Hook</div><div class="a3segs col">' + hooks + '</div>'
+    + '<div class="a3h">Hook (första sekunderna)</div><div class="a3segs col">' + hooks + '</div>'
+    + '<label class="a3f" style="margin-top:8px"><span>Egen hook, rad 1</span><input type="text" value="' + esc(V3_CFG.hook[0]) + '" data-a3cfg="hook.0"></label>'
+    + '<label class="a3f"><span>Egen hook, rad 2</span><input type="text" value="' + esc(V3_CFG.hook[1]) + '" data-a3cfg="hook.1"></label>'
+    + '<div class="a3h">Slutkortets text</div><a class="a3hint" href="#v3cust" data-a3="opencust" style="text-decoration:underline;cursor:pointer">Ändra slagord, adress och mer ↓</a>'
     + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
     + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div>'
-    + '</div></div>' + v3Customizer()
+    + '</div></div>' + v3Customizer(true)
     + '<div class="a3sub">Text till Meta</div><div class="a3copy"><div><b>Rubrik</b><p>Dina bilder är levererade. Kampanjen är redan klar.</p><b>Primärtext</b><p>Dina bilder är levererade. Välj bild, välj mall — bostadens uppgifter följer med från leveransen, och inlägget är klart i ditt kontors egen profil. Det är bara en del av Viewly: bostadsfotografering för mäklare i Skåne.</p></div>'
     + '<div><b>Knapp och länk</b><p>Läs mer · viewly.se/maklare</p><b>Mål</b><p>Trafik till /maklare och bokning av provfotografering.</p></div></div>';
 }
@@ -604,6 +607,7 @@ document.addEventListener("click", function(e){
   var k = b.dataset.a3, v = b.dataset.v;
   if(k === "tab"){ V3S.tab = v; V3S.playing = false; v3StopSound(); render({top:true}); return }
   if(k === "comp"){ V3S.comp = v; V3S.t = V3_COMPS[v].thumb; V3S.playing = false; v3StopSound(); render(); return }
+  if(k === "opencust"){ e.preventDefault(); var dc = document.getElementById("v3cust"); if(dc){ dc.open = true; dc.scrollIntoView({behavior:"smooth", block:"start"}) } return }
   if(k === "fmt"){ V3S.fmt = v; render(); return }
   if(k === "sound"){ V3S.sound = v === "1"; if(!V3S.sound) v3StopSound(); render(); return }
   if(k === "hook"){ V3_CFG.hook = V3_HOOKS[+v].slice(); v3SaveCfg(); render(); return }
