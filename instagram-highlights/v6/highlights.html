@@ -9703,14 +9703,15 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
   var sLab = v3Step(p, .22, .4), sAdr = v3Step(p, .3, .58), sCity = v3Step(p, .42, .6), sFact = v3Step(p, .58, .82), sSub = v3Step(p, .74, .96);
   /* dynamiskt fält: värde (uppgiften) och fältnamn (token) */
   var tkA = tkOf(.12, .4), tkC = tkOf(.26, .52), tkF = tkOf(.42, .7);
-  var dynV = function(tk, stage, k){ return pl ? 0 : (tokMode ? 1 - tk : stage) };
-  var dynT = function(tk, k){ return pl ? plc(k) : (tokMode ? tk : 0) };
+  /* fältnamnet tonas ut först, uppgiften tonas in efteråt — aldrig båda samtidigt */
+  var dynV = function(tk, stage, k){ return pl ? 0 : (tokMode ? ioC(k3(1 - tk, .5, 1)) : stage) };
+  var dynT = function(tk, k){ return pl ? plc(k) : (tokMode ? ioC(k3(tk, .5, 1)) : 0) };
+  /* fältnamn: rent, utan ruta — namnet i små versaler över en tunn linje, som en rad att fylla i */
   var token = function(cx, base, tw, th, label, al, left, fs){
     if(al <= .01) return;
-    var x0 = left ? cx : cx - tw/2, y0 = base - th;
-    c.save(); c.globalAlpha = al; c.fillStyle = "rgba(255,255,255,.12)"; c.fillRect(x0, y0, tw, th);
-    c.setLineDash([1.1, .9]); c.lineWidth = .3; c.strokeStyle = "rgba(255,255,255,.85)"; c.strokeRect(x0, y0, tw, th); c.setLineDash([]);
-    v3Text(c, label, x0 + tw/2, y0 + th/2 + (fs || 2)*.36, {size:fs || 2, weight:600, f:"sans", sp:.22, color:"#fff", align:"c"}); c.restore();
+    var x0 = left ? cx : cx - tw/2, sz = Math.min(fs || 2, 2), ly = base - th*.18;
+    c.save(); c.globalAlpha = al*.9; c.fillStyle = "rgba(255,255,255,.7)"; c.fillRect(x0, ly, tw, .2); c.restore();
+    v3Text(c, label, left ? x0 : x0 + tw/2, ly - 1.1, {size:sz, weight:500, f:"sans", sp:.3, color:"rgba(255,255,255,.88)", align:left ? "l" : "c", alpha:al});
   };
   var frameA = pl ? plc("logo") : (tokMode ? 1 : k3(p, 0, .26));
   if(style === "overlay"){
@@ -9728,9 +9729,9 @@ function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
       v3Line(c, 43, 57, fy - 14, acc, .3, pl ? plc("addr") : (tokMode ? 1 : sCity));
       [[V3_OBJ.rum, "RUM", 36, "rum"], [V3_OBJ.yta, "M²", 64, "yta"]].forEach(function(f){
         var va = dynV(tkF, sFact), ta = dynT(tkF, f[3]);
-        c.save(); c.globalAlpha = va; c.translate(0, (tokMode || pl ? 0 : (1 - sFact)*1.4)); v3Text(c, f[0], f[2], fy, {size:6.6, weight:400, color:W, align:"c"}); c.restore();
-        token(f[2], fy + .4, 15, 8.4, f[3] === "rum" ? "RUM" : "YTA", ta, false, 1.9);
-        c.save(); c.globalAlpha = Math.max(va, ta > 0 ? .8 : 0)*(pl ? plc(f[3]) : 1); v3Text(c, f[1], f[2], fy + 5.2 + (ta > 0 ? 1.6 : 0), {size:1.7, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:.8}); c.restore();
+        c.save(); c.globalAlpha = va; c.translate(0, (tokMode || pl ? 0 : (1 - sFact)*1.4)); v3Text(c, f[0], f[2], fy, {size:6.6, weight:400, color:W, align:"c", alpha:va}); c.restore();
+        token(f[2], fy + 3.1, 15, 8.4, f[3] === "rum" ? "RUM" : "YTA", ta, false, 1.9);
+        c.save(); c.globalAlpha = Math.max(va, ta > 0 ? .8 : 0)*(pl ? plc(f[3]) : 1); v3Text(c, f[1], f[2], fy + 5.2 + (ta > 0 ? 1.6 : 0), {size:1.7, weight:500, f:"sans", sp:.3, color:W, align:"c", alpha:.8*Math.max(va, ta > 0 ? 1 : 0)*(pl ? plc(f[3]) : 1)}); c.restore();
       });
       v3VLine(c, 50, fy - 6, fy + 6, "#fff", .2, pl ? Math.max(plc("rum"), plc("yta")) : (tokMode ? 1 : sFact), .45);
     } else if(phase === "kommande"){
@@ -10125,7 +10126,7 @@ function v3Outro(c, G, id, t, o){
      5  Direkt                 kortversion: bild vald, mallen fylls, logga
    Råtiden skalas med WARP (utom nr 3). Varje sekund är räknad.
    --------------------------------------------------------------------- */
-var V3_WARP = 1.15;
+var V3_WARP = 1.08;
 function v3W(list, w){ return list.map(function(x){ return Array.isArray(x) ? x.map(function(y, i){ return i < 2 && typeof y === "number" ? y/w : y }) : x/w }) }
 function v3Cues(w, d){
   var o = {chords:d.chords.map(function(k){ return [k[0]/w, k[1]/w, k[2]] }), whoosh:d.whoosh.map(function(x){ return x/w }), tap:d.tap.map(function(x){ return x/w }),

@@ -337,7 +337,7 @@ function v3Outro(c, G, id, t, o){
      5  Direkt                 kortversion: bild vald, mallen fylls, logga
    Råtiden skalas med WARP (utom nr 3). Varje sekund är räknad.
    --------------------------------------------------------------------- */
-var V3_WARP = 1.15;
+var V3_WARP = 1.08;
 function v3W(list, w){ return list.map(function(x){ return Array.isArray(x) ? x.map(function(y, i){ return i < 2 && typeof y === "number" ? y/w : y }) : x/w }) }
 function v3Cues(w, d){
   var o = {chords:d.chords.map(function(k){ return [k[0]/w, k[1]/w, k[2]] }), whoosh:d.whoosh.map(function(x){ return x/w }), tap:d.tap.map(function(x){ return x/w }),
