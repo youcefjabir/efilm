@@ -24,7 +24,9 @@ var OFF = {name:"NORDVIK", sub:"MÄKLARBYRÅ", accent:"#2F6F6B", accentL:"#9CC7C
 /* Texter som går att ändra i videorna (Anpassa). Tom sträng döljer texten. */
 var V3_TXD = {"outro.tag1":"En bostadsfotograf som gör", "outro.tag2":"mer än bara fotografering.", "outro.aud":"FÖR FASTIGHETSMÄKLARE I SKÅNE", "outro.url":"VIEWLY.SE/MAKLARE",
   "tpl.tillsalu":"TILL SALU", "tpl.kommande":"KOMMANDE", "tpl.sald":"Såld", "tpl.tack":"Tack för förtroendet",
-  "ui.portal":"MÄKLARPORTALEN", "ui.valjbild":"VÄLJ BILD", "ui.valjmall":"VÄLJ MALL", "ui.mina":"MINA MALLAR", "ui.viewlys":"VIEWLYS", "ui.egen":"+  SKAPA EGEN MALL"};
+  "ui.portal":"MÄKLARPORTALEN", "ui.valjbild":"VÄLJ BILD", "ui.valjmall":"VÄLJ MALL", "ui.mina":"MINA MALLAR", "ui.viewlys":"VIEWLYS", "ui.egen":"+ Skapa egen mall",
+  "ui.valjbilder":"VÄLJ BILDER", "ui.valjmallar":"VÄLJ MALLAR", "ui.av":"AV", "ui.valda":"VALDA", "ui.fortsatt":"FORTSÄTT", "ui.skapa":"SKAPA KAMPANJ",
+  "camp.skapas":"KAMPANJEN SKAPAS", "camp.fyll":"Bostadens uppgifter fylls i automatiskt", "camp.klar1":"Din kampanj", "camp.klar2":"är klar.", "camp.dl":"LADDA NER ALLA 3", "camp.klart":"NEDLADDAD"};
 var V3_TX = {};
 function v3t(k){ return Object.prototype.hasOwnProperty.call(V3_TX, k) ? V3_TX[k] : V3_TXD[k] }
 var V3F = {serif:"'Cormorant Garamond',Georgia,serif", sans:"Montserrat,sans-serif"};
@@ -73,7 +75,7 @@ function v3Photo(c, name, x, y, w, h, o){
   var pos = o.pos || V3_POS[name] || [.5, .5], sc = o.scale || 1, iw = im.naturalWidth, ih = im.naturalHeight;
   var s = Math.max(w/iw, h/ih)*sc, dw = iw*s, dh = ih*s;
   var dx = x - (dw - w)*pos[0], dy = y - (dh - h)*pos[1];
-  c.save(); c.globalAlpha = o.alpha == null ? 1 : o.alpha;
+  c.save(); c.globalAlpha = c.globalAlpha*(o.alpha == null ? 1 : o.alpha);
   c.beginPath(); c.rect(x, y, w, h); c.clip(); c.drawImage(im, dx, dy, dw, dh); c.restore();
 }
 function v3Grad(c, x, y, w, h, stops, a){

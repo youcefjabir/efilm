@@ -28,7 +28,7 @@ function v3Shadow(c, r, a, blur){
 /* Mörk scen: samma foto, mjukt och varmt svart. */
 function v3DarkBg(c, G, a, t){
   c.save(); c.globalAlpha = a;
-  v3Photo(c, "blur", 0, 0, 100, G.H, {alpha:a, scale:1.3 + .02*Math.sin((t || 0)*.25), pos:[.5 + .02*Math.sin((t || 0)*.2), .5]});
+  v3Photo(c, "blur", 0, 0, 100, G.H, {alpha:1, scale:1.3 + .02*Math.sin((t || 0)*.25), pos:[.5 + .02*Math.sin((t || 0)*.2), .5]});
   c.fillStyle = "rgba(14,14,13,.78)"; c.fillRect(0, 0, 100, G.H);
   v3Grad(c, 0, 0, 100, G.H, [[0, "rgba(6,6,5,.35)"], [.5, "rgba(6,6,5,0)"], [1, "rgba(6,6,5,.4)"]]);
   c.restore();
