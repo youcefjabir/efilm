@@ -9,7 +9,7 @@
    faller vid 40,3 s. Alla tider är mätta mot de genererade röstraderna.
    ===================================================================== */
 (function(){
-var FX = window.BR_FX, DARK = "#050505", OUT_AT = 43.5, DUR = OUT_AT + 4.4, DROP = 28.3;
+var FX = window.BR_FX, DARK = "#050505", CLICK = 39.6, DUR = 45.8, DROP = 28.3;
 
 /* ---------- media ---------- */
 var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan"};
@@ -42,12 +42,12 @@ function seek(e, t){
 }
 /* var klipp visas, från vilken sekund i klippet, i vilken fart, och hur länge sista bilden hålls */
 var CLIPS = [
-  {v:"rocket", t0:7.0, t1:10.3, from:0, speed:.72, hold:12.1},
+  {v:"engine", t0:7.0, t1:9.2, from:.3, speed:.85},
+  {v:"rocket", t0:9.2, t1:12.1, from:0, speed:.8},
   {v:"earth1", t0:12.1, t1:13.9, from:2.4, speed:1},
   {v:"earth2", t0:13.9, t1:16.4, from:.8, speed:1},
   {v:"eye", t0:15.9, t1:19.0, from:.4, speed:1},
-  {v:"ct", t0:18.3, t1:21.1, from:0, speed:.9},
-  {v:"engine", t0:34.2, t1:37.5, from:.2, speed:1}
+  {v:"ct", t0:18.3, t1:21.1, from:0, speed:.9}
 ];
 function clipTime(c, t){ return c.from + Math.max(0, Math.min(t, c.t1) - c.t0)*c.speed }
 function prep(t){
@@ -101,8 +101,10 @@ var SUBS = [
   {t0:12.1, d:3.4, txt:"En bild på jorden. Vårt hem."},
   {t0:16.0, d:4.96, txt:"Så fungerar vår hjärna. Den minns bilder bättre än ord."},
   {t0:21.1, d:3.92, txt:"Därför minns vi dem som nådde längre än alla andra."},
-  {t0:34.2, d:3.24, txt:"Men ingen nådde dit utan rätt verktyg."},
-  {t0:40.8, d:2.7, txt:"Upptäck Viewly", btn:1}];
+  {t0:34.2, d:2.2, txt:"Men ingen nådde dit utan rätt"},
+  {t0:CLICK, d:.9, txt:"verktyg."},
+  {t0:0, d:0, txt:"Upptäck verktygen", btn:1},
+  {t0:0, d:0, txt:"viewly.se", url:1}];
 var SX = {};
 try { SX = JSON.parse(localStorage.getItem("viewly.film.tx") || "{}") || {} } catch(e){ SX = {} }
 function sxSave(){ try { localStorage.setItem("viewly.film.tx", JSON.stringify(SX)) } catch(e){} }
@@ -124,7 +126,7 @@ function chunks(txt){
 function subtitles(c, G, t){
   var i, s, ch, tot, acc, k, y = G.H - G.bot - (G.is9 ? 3.2 : 4.6);
   for(i = 0; i < SUBS.length; i++){
-    s = SUBS[i]; if(s.btn || t < s.t0 || t >= s.t0 + s.d + .25) continue;
+    s = SUBS[i]; if(s.btn || s.url || t < s.t0 || t >= s.t0 + s.d + .25) continue;
     ch = chunks(subText(i)); if(!ch.length) continue;
     tot = ch.join("").length; acc = 0;
     for(k = 0; k < ch.length; k++){
@@ -158,13 +160,11 @@ function tvScene(c, G, t){
   c.restore();
 }
 function rocketScene(c, G, t){
-  var H = G.H, full = [0, 0, 100, H], fr = frameRect(G);
-  var p = ioC(k3(t, 10.45, 11.0)), r = mixR(full, fr, p), b = lerp(0, 2.3, p);
+  var H = G.H;
   v3Fill(c, 0, 0, 100, H, DARK);
-  print(c, r, b, lerp(0, -.012, p), function(x, y, w, h){
-    vcover(c, "rocket", x, y, w, h, {scale:lerp(1.9, 2.4, k3(t, 7, 10.3)), pos:[.5, lerp(.55, .3, k3(t, 7.0, 10.3))]});
-    if(p > 0) return;
-  });
+  if(t < 9.2) vcover(c, "engine", 0, 0, 100, H, {scale:lerp(1.35, 1.7, k3(t, 7, 9.2)), pos:[.5, lerp(.6, .45, k3(t, 7, 9.2))]});
+  else vcover(c, "rocket", 0, 0, 100, H, {scale:lerp(1.9, 2.3, k3(t, 9.2, 12.1)), pos:[.5, lerp(.55, .3, k3(t, 9.2, 12.1))]});
+  var vg = c.createRadialGradient(50, H/2, H*.2, 50, H/2, H*.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.55)"); c.fillStyle = vg; c.fillRect(0, 0, 100, H);
 }
 function earthScene(c, G, t){
   var H = G.H, full = [0, 0, 100, H], fr = frameRect(G);
@@ -247,59 +247,66 @@ function iconScene(c, G, t){
 var SOLD = [["Storgatan 13", "Landskrona", "4 850 000 kr"], ["Kungsgatan 7", "Helsingborg", "5 295 000 kr"], ["Parkvägen 21", "Lund", "6 100 000 kr"], ["Strandvägen 3", "Malmö", "7 450 000 kr"], ["Björkgatan 18", "Landskrona", "3 975 000 kr"], ["Fyrvägen 5", "Höganäs", "5 890 000 kr"], ["Ekbacken 9", "Lund", "4 420 000 kr"], ["Skolgatan 12", "Helsingborg", "3 650 000 kr"]];
 var CH = (function(){ var s = 99, pts = [], v = .08, i; for(i = 0; i <= 40; i++){ s = (s*1664525 + 1013904223) >>> 0; v += .022 + ((s/4294967296) - .35)*.05; pts.push(Math.max(.04, Math.min(.98, v))) } return pts })();
 function moneyFmt(n){ return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ") }
-function graphScene(c, G, t){
-  var H = G.H, u = t - DROP, i, y0 = G.top + 4, R = {x0:8, x1:92};
-  v3Fill(c, 0, 0, 100, H, "#070707");
-  /* rutnät som andas på slagen */
-  var beat = (u*2) % 1, pulse = Math.pow(1 - beat, 3); c.save(); c.globalAlpha = .05 + .06*pulse; c.strokeStyle = "#fff"; c.lineWidth = .1;
-  for(i = 0; i <= 10; i++){ c.beginPath(); c.moveTo(R.x0 + i*8.4, y0 + 22); c.lineTo(R.x0 + i*8.4, y0 + 78); c.stroke() }
-  for(i = 0; i <= 6; i++){ c.beginPath(); c.moveTo(R.x0, y0 + 22 + i*9.3); c.lineTo(R.x1, y0 + 22 + i*9.3); c.stroke() }
-  c.restore();
-  /* räknaren */
-  var cnt = oQ(k3(u, .1, 5.2))*48250000;
-  v3Text(c, "SÅLT I ÅR", R.x0, y0 + 6, {size:1.7, weight:600, f:"sans", sp:.34, color:C3.olil, alpha:ioC(k3(u, 0, .4))});
-  v3Text(c, moneyFmt(cnt), R.x0, y0 + 19, {size:G.is9 ? 12.4 : 10.8, weight:300, color:"#fff", alpha:ioC(k3(u, 0, .3))});
-  v3Text(c, "kr", R.x1, y0 + 19, {size:3.6, italic:true, color:C3.cream, align:"r", alpha:ioC(k3(u, .2, .6))});
-  /* kurvan */
-  var cx0 = R.x0, cw = R.x1 - R.x0, cy1 = y0 + 78, ch = 52, prog = ioC(k3(u, .3, 4.6)), n = Math.floor(prog*(CH.length - 1)), fr = prog*(CH.length - 1) - n;
-  var px = function(k){ return cx0 + cw*k/(CH.length - 1) }, py = function(k){ return cy1 - ch*CH[k] };
-  if(prog > .001){
-    c.save(); c.beginPath(); c.moveTo(px(0), cy1);
-    for(i = 0; i <= n; i++) c.lineTo(px(i), py(i));
-    var ex = lerp(px(n), px(Math.min(CH.length - 1, n + 1)), fr), ey = lerp(py(n), py(Math.min(CH.length - 1, n + 1)), fr); c.lineTo(ex, ey);
-    c.lineTo(ex, cy1); c.closePath(); var gf = c.createLinearGradient(0, cy1 - ch, 0, cy1); gf.addColorStop(0, "rgba(152,160,136,.32)"); gf.addColorStop(1, "rgba(152,160,136,0)"); c.fillStyle = gf; c.fill();
-    c.beginPath(); c.moveTo(px(0), py(0)); for(i = 1; i <= n; i++) c.lineTo(px(i), py(i)); c.lineTo(ex, ey);
-    c.strokeStyle = "#fff"; c.lineWidth = .45; c.lineJoin = "round"; c.stroke();
-    var gl = c.createRadialGradient(ex, ey, 0, ex, ey, 5); gl.addColorStop(0, "rgba(255,255,255,.9)"); gl.addColorStop(1, "rgba(255,255,255,0)"); c.fillStyle = gl; c.fillRect(ex - 5, ey - 5, 10, 10);
+/* en mekanisk räknare: varje siffra rullar för sig */
+function odometer(c, x, y, n, size, a, u){
+  var str = moneyFmt(n), len = str.length, cw = size*.62, sp = size*.3, tot = 0, i, k;
+  for(i = 0; i < len; i++) tot += str[i] === " " ? sp : cw;
+  var px = x - tot/2;
+  var digs = [], pw = 1; for(k = 0; k < 9; k++){ digs.push(pw); pw *= 10 }
+  var di = 0, nd = str.replace(/ /g, "").length;
+  for(i = 0; i < len; i++){
+    if(str[i] === " "){ px += sp; continue }
+    var pos = nd - 1 - di, val = n/Math.pow(10, pos), whole = Math.floor(val), fr = val - whole;
+    var d0 = whole % 10, roll = pos === 0 ? fr : Math.pow(fr, 6), d1 = (d0 + 1) % 10;
+    c.save(); c.beginPath(); c.rect(px - cw*.1, y - size*.74, cw*1.2, size*.86); c.clip();
+    v3Text(c, String(d0), px + cw/2, y + roll*size*.9, {size:size, weight:300, f:"sans", color:"#fff", align:"c", alpha:a*(1 - roll*.6)});
+    v3Text(c, String(d1), px + cw/2, y + (roll - 1)*size*.9, {size:size, weight:300, f:"sans", color:"#fff", align:"c", alpha:a*(.4 + roll*.6)});
     c.restore();
+    px += cw; di++;
   }
-  /* strömmen av sålda objekt */
-  var rh = G.is9 ? 8.6 : 7.4, nrow = 5, top = Math.max(y0 + 86, G.H - G.bot - nrow*rh - 2), k = Math.floor(Math.max(0, u - .3)/.5), r;
+}
+function graphScene(c, G, t){
+  var H = G.H, u = t - DROP, i, y0 = G.top + 3, R = {x0:8, x1:92}, beat = (u*2) % 1, pulse = Math.pow(1 - beat, 3);
+  v3Fill(c, 0, 0, 100, H, "#060606");
+  var gl = c.createRadialGradient(50, y0 + 22, 2, 50, y0 + 22, 60); gl.addColorStop(0, "rgba(255,255,255," + (.07 + .05*pulse) + ")"); gl.addColorStop(1, "rgba(255,255,255,0)"); c.fillStyle = gl; c.fillRect(0, 0, 100, H);
+  /* räknaren, mitt på skärmen som i förebilden */
+  var cnt = oQ(k3(u, .1, 5.0))*48250000, sz = G.is9 ? 12.5 : 10.5, ca = ioC(k3(u, 0, .3));
+  v3Text(c, "SÅLT I ÅR", 50, y0 + 6, {size:1.7, weight:600, f:"sans", sp:.34, color:C3.olil, align:"c", alpha:ca});
+  odometer(c, 50, y0 + 6 + sz*1.15, cnt, sz, ca, u);
+  v3Text(c, "kr", 50, y0 + 6 + sz*1.15 + 7.6, {size:3.2, italic:true, color:C3.cream, align:"c", alpha:ca});
+  /* en rad per sålt objekt, SÅLD stämplas in på varje slag */
+  var rh = G.is9 ? 12.5 : 10.2, nrow = G.is9 ? 6 : 5, top = y0 + 6 + sz*1.15 + 15, k = Math.floor(Math.max(0, u - .35)/.45), r;
   for(r = 0; r < nrow; r++){
     var idx = k - r; if(idx < 0) continue;
-    var row = SOLD[idx % SOLD.length], age = (u - .3) - idx*.5, en = oQ(k3(age, 0, .2)), y = top + r*rh + (1 - en)*-3, a = en*(1 - r*.16);
-    v3Line(c, R.x0, R.x1, y, "rgba(255,255,255,.2)", .14, 1, a);
-    v3Text(c, "SÅLD", R.x0, y + 5.4, {size:1.5, weight:700, f:"sans", sp:.3, color:C3.olil, alpha:a});
-    v3Text(c, row[0], R.x0 + 11, y + 5.6, {size:3.7, weight:400, color:"#fff", alpha:a});
-    v3Text(c, row[1].toUpperCase(), R.x0 + 11, y + 7.6, {size:1.2, weight:500, f:"sans", sp:.26, color:"rgba(255,255,255,.55)", alpha:a});
-    v3Text(c, row[2], R.x1, y + 5.5, {size:2.3, weight:600, f:"sans", color:"#fff", align:"r", alpha:a});
+    var row = SOLD[idx % SOLD.length], age = (u - .35) - idx*.45, en = oQ(k3(age, 0, .18)), y = top + r*rh, a = en*(1 - r*.1);
+    var st = oBack(k3(age, .05, .3)), sa = Math.min(1, st);
+    v3Line(c, R.x0, R.x1, y, "rgba(255,255,255,.22)", .14, 1, a);
+    v3Text(c, row[0], R.x0, y + 5.6, {size:3.5, weight:400, color:"#fff", alpha:a});
+    v3Text(c, row[1].toUpperCase() + "  ·  " + row[2], R.x0, y + 8.6, {size:1.35, weight:500, f:"sans", sp:.22, color:"rgba(255,255,255,.6)", alpha:a});
+    /* stämpeln */
+    c.save(); var bx = R.x1 - 12, by = y + 5.8, sc = lerp(1.9, 1, Math.min(1, st)); c.translate(bx, by); c.rotate(-.08); c.scale(sc, sc);
+    c.globalAlpha = a*sa; c.strokeStyle = "#fff"; c.lineWidth = .32; c.strokeRect(-9.2, -3.1, 18.4, 6.2);
+    c.restore();
+    v3Text(c, "SÅLD", bx, by + 1.05, {size:2.9, weight:700, f:"sans", sp:.22, color:"#fff", align:"c", alpha:a*sa});
+  }
+  /* till sist ett enda ord */
+  var fin = k3(u, 4.55, 5.0);
+  if(fin > 0){
+    var fa = oQ(fin); v3Fill(c, 0, 0, 100, H, "#050505", ioC(k3(u, 4.5, 4.8)));
+    var s2 = lerp(1.25, 1, oBack(fin));
+    c.save(); c.translate(50, G.cy); c.scale(s2, s2); c.translate(-50, -G.cy);
+    v3Text(c, "SÅLD", 50, G.cy + 6.2, {size:G.is9 ? 24 : 21, weight:300, color:"#fff", align:"c", alpha:fa});
+    c.restore();
   }
 }
 
-/* ---------- motorn och bländaren ---------- */
-function engineScene(c, G, t){
-  var H = G.H, u = k3(t, 34.2, 37.5);
-  v3Fill(c, 0, 0, 100, H, DARK);
-  vcover(c, "engine", 0, 0, 100, H, {scale:lerp(1.15, 1.42, u), pos:[.5, lerp(.55, .42, u)]});
-  var vg = c.createRadialGradient(50, H/2, H*.18, 50, H/2, H*.72); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.72)"); c.fillStyle = vg; c.fillRect(0, 0, 100, H);
-}
+/* ---------- bländaren, knappen, adressen ---------- */
 function aperture(c, cx, cy, R, open, rot){
   var i, n = 8, hole = R*(.03 + .8*open);
   var g = c.createRadialGradient(cx, cy, R*.1, cx, cy, R); g.addColorStop(0, "#232323"); g.addColorStop(1, "#0b0b0b");
   c.save(); c.fillStyle = g; c.beginPath(); c.arc(cx, cy, R, 0, Math.PI*2);
   for(i = 0; i < n; i++){ var a = rot + i*Math.PI*2/n; c.lineTo(cx + Math.cos(a)*hole, cy + Math.sin(a)*hole) }
   c.closePath(); c.fill("evenodd");
-  /* skuggan på bladen */
   c.strokeStyle = "rgba(255,255,255,.16)"; c.lineWidth = .16;
   for(i = 0; i < n; i++){
     var a1 = rot + i*Math.PI*2/n, vx = cx + Math.cos(a1)*hole, vy = cy + Math.sin(a1)*hole, a2 = a1 + .9;
@@ -312,26 +319,37 @@ function aperture(c, cx, cy, R, open, rot){
   c.save(); c.globalCompositeOperation = "lighter"; c.fillStyle = lg; c.fillRect(cx - hole*1.2, cy - hole*1.2, hole*2.4, hole*2.4); c.restore();
 }
 function apertureScene(c, G, t){
-  var H = G.H, u = k3(t, 37.5, 40.3), o = ioC(u)*.92 + .05*oQ(k3(t, 37.5, 37.7));
+  var H = G.H, u = k3(t, 34.2, 37.4), o = ioC(u)*.9 + .05*oQ(k3(t, 34.2, 34.4));
   v3Fill(c, 0, 0, 100, H, DARK);
-  var wob = 1 + .004*Math.sin(t*3);
-  aperture(c, 50, G.cy - 2, 36*wob, o, t*.18 + .3);
+  aperture(c, 50, G.cy - 2, 36*(1 + .004*Math.sin(t*3)), o, t*.18 + .3);
+  v3Fill(c, 0, 0, 100, H, "#fff", oQ(k3(t, 36.9, 37.4))*.9);
 }
-
-/* ---------- knappen ---------- */
+function btnPath(c, cx, cy, bw, bh){
+  c.beginPath(); c.moveTo(cx - bw/2 + bh/2, cy - bh/2); c.arcTo(cx + bw/2, cy - bh/2, cx + bw/2, cy + bh/2, bh/2); c.arcTo(cx + bw/2, cy + bh/2, cx - bw/2, cy + bh/2, bh/2); c.arcTo(cx - bw/2, cy + bh/2, cx - bw/2, cy - bh/2, bh/2); c.arcTo(cx - bw/2, cy - bh/2, cx + bw/2, cy - bh/2, bh/2); c.closePath();
+}
 function buttonScene(c, G, t){
-  var H = G.H, u = oQ(k3(t, 40.9, 41.7)), cx = 50, cy = G.cy + 1, w = 62, h = 9.4, press = k3(t, 42.3, 42.4)*(1 - k3(t, 42.5, 42.65));
+  var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 62, h = 10.4;
   v3Fill(c, 0, 0, 100, H, DARK);
-  var bw = w*(1 - .045*press), bh = h*(1 - .045*press);
-  c.save(); c.globalAlpha = u; c.shadowColor = "rgba(255,255,255," + (.22 + .1*Math.sin(t*5)) + ")"; c.shadowBlur = 6; c.fillStyle = "#fff";
-  c.beginPath(); c.moveTo(cx - bw/2 + bh/2, cy - bh/2); c.arcTo(cx + bw/2, cy - bh/2, cx + bw/2, cy + bh/2, bh/2); c.arcTo(cx + bw/2, cy + bh/2, cx - bw/2, cy + bh/2, bh/2); c.arcTo(cx - bw/2, cy + bh/2, cx - bw/2, cy - bh/2, bh/2); c.arcTo(cx - bw/2, cy - bh/2, cx + bw/2, cy - bh/2, bh/2); c.closePath(); c.fill(); c.restore();
-  var lab = subText(SUBS.length - 1).toUpperCase(), lw = v3Measure(c, lab, {size:2.3, weight:600, f:"sans", sp:.26});
-  v3Text(c, lab, cx - 2, cy + .9, {size:2.3, weight:600, f:"sans", sp:.26, color:"#0a0a0a", align:"c", alpha:u});
-  var ax = cx - 2 + lw/2 + 2.2;
-  c.save(); c.globalAlpha = u; c.strokeStyle = "#0a0a0a"; c.lineWidth = .38; c.lineCap = "round"; c.lineJoin = "round"; c.beginPath(); c.moveTo(ax, cy); c.lineTo(ax + 3.4, cy); c.moveTo(ax + 2.3, cy - 1.15); c.lineTo(ax + 3.4, cy); c.lineTo(ax + 2.3, cy + 1.15); c.stroke(); c.restore();
-  var cp = ioC(k3(t, 41.0, 42.25)), curX = lerp(104, cx + 9, cp), curY = lerp(H - 22, cy + 3, cp) - Math.sin(cp*Math.PI)*4;
-  v3Cursor(c, curX, curY, press, k3(t, 41.0, 41.3)*(1 - k3(t, 43.2, 43.45)));
-  v3Tap(c, cx + 9, cy + 3, k3(t, 42.35, 43.0));
+  var u = oQ(k3(t, 37.5, 38.3)), press = k3(t, CLICK - .12, CLICK) * (1 - k3(t, CLICK + .08, CLICK + .26)), gone = ioC(k3(t, CLICK + .12, CLICK + .55));
+  /* knappen, som i förebilden: ljus, mjuk, med skugga */
+  if(gone < 1){
+    var bw = w*(1 - .05*press), bh = h*(1 - .05*press), a = u*(1 - gone), sc = 1 + .08*gone;
+    c.save(); c.translate(cx, cy); c.scale(sc, sc); c.translate(-cx, -cy);
+    c.globalAlpha = a; c.shadowColor = "rgba(255,255,255," + (.18 + .08*Math.sin(t*5)) + ")"; c.shadowBlur = 7; c.shadowOffsetY = 1.2;
+    var bg = c.createLinearGradient(0, cy - bh/2, 0, cy + bh/2); bg.addColorStop(0, "#ffffff"); bg.addColorStop(1, "#cfcfcf");
+    c.fillStyle = bg; btnPath(c, cx, cy, bw, bh); c.fill(); c.restore();
+    var lab = subText(SUBS.length - 2); 
+    v3Text(c, lab, cx, cy + 1.05, {size:3.1, weight:500, f:"sans", sp:.02, color:"#0a0a0a", align:"c", alpha:a});
+    var cp = ioC(k3(t, 38.2, CLICK - .15)), curX = lerp(106, cx + 14, cp), curY = lerp(H - 20, cy + 3.4, cp) - Math.sin(cp*Math.PI)*4;
+    v3Cursor(c, curX, curY, press, k3(t, 38.2, 38.5)*(1 - k3(t, CLICK + .5, CLICK + .8)));
+    v3Tap(c, cx + 14, cy + 3.4, k3(t, CLICK - .02, CLICK + .55));
+  }
+  /* efter klicket: adressen */
+  var ua = k3(t, CLICK + .45, CLICK + 1.5);
+  if(ua > 0){
+    var ra = ioC(ua), ur = subText(SUBS.length - 1);
+    v3Text(c, ur, cx, cy + 3.6 + (1 - ra)*1.6, {size:G.is9 ? 9.4 : 8.6, weight:300, color:"#fff", align:"c", alpha:ra});
+  }
 }
 
 /* ---------- hela filmen ---------- */
@@ -344,26 +362,26 @@ function draw(c, G, t, o){
   if(t >= 15.75 && t < 21.1){ eyeScene(c, G, t); neuronLayer(c, G, t) }
   if(t >= 21.1 && t < DROP) iconScene(c, G, t);
   if(t >= DROP && t < 34.2) graphScene(c, G, t);
-  if(t >= 34.2 && t < 37.5) engineScene(c, G, t);
-  if(t >= 37.5 && t < 40.3) apertureScene(c, G, t);
-  if(t >= 40.8 && t < OUT_AT + .6) buttonScene(c, G, t);
-  if((t >= .6 && t < 12.1) || (t >= 21.1 && t < DROP) || (t >= 34.2 && t < 37.5)) FX.tone(c, G, 1, .12);
+  if(t >= 34.2 && t < 37.4) apertureScene(c, G, t);
+  if(t >= 37.4) buttonScene(c, G, t);
+  if((t >= .6 && t < 12.1) || (t >= 21.1 && t < DROP)) FX.tone(c, G, 1, .12);
   FX.finish(c, G, t, {vig:t >= DROP && t < 34.2 ? .35 : .62});
-  [10.5, 12.1, 16.0, 21.1, 22.9, 24.7, 26.5, 34.2].forEach(function(h){ FX.flash(c, G, t, h, .5, .12) });
-  FX.flash(c, G, t, DROP, 1, .35); FX.flash(c, G, t, 42.35, .5, .14); FX.flash(c, G, t, 37.5, .35, .1);
+  [9.2, 12.1, 16.0, 21.1, 22.9, 24.7, 26.5].forEach(function(h){ FX.flash(c, G, t, h, .5, .12) });
+  FX.flash(c, G, t, DROP, 1, .35); FX.flash(c, G, t, CLICK, .6, .22); FX.flash(c, G, t, 37.4, .3, .1);
   subtitles(c, G, t);
 }
 
 /* ---------- ljudet: din låt, rösten, och ljudeffekterna ---------- */
 var V6 = {music:null, musicName:"", vo:[], voReady:null};
-var VO_FILES = [["media/vo/vo1.mp3", .6], ["media/vo/vo2.mp3", 7.0], ["media/vo/vo3.mp3", 12.1], ["media/vo/vo4.mp3", 16.0], ["media/vo/vo5.mp3", 21.1], ["media/vo/vo6.mp3", 34.2]];
+var VO_FILES = [["media/vo/vo1.mp3", .6], ["media/vo/vo2.mp3", 7.0], ["media/vo/vo3.mp3", 12.1], ["media/vo/vo4.mp3", 16.0], ["media/vo/vo5.mp3", 21.1], ["media/vo/vo6a.mp3", 34.2], ["media/vo/vo6b.mp3", CLICK - .07]];
 function ctxAudio(){ var AC = window.AudioContext || window.webkitAudioContext; return window.__v6ac || (window.__v6ac = new AC()) }
 function decode(ab){ return new Promise(function(res, rej){ var p = ctxAudio().decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej) }) }
 function loadAudio(){
   if(!V6.voReady) V6.voReady = Promise.all(VO_FILES.map(function(f, i){
     return fetch(f[0]).then(function(r){ return r.arrayBuffer() }).then(decode).then(function(b){ V6.vo[i] = b }).catch(function(){ V6.vo[i] = null });
   }));
-  return V6.voReady;
+  if(!V6.musicReady) V6.musicReady = V6.music ? Promise.resolve() : fetch("media/over.mp3").then(function(r){ return r.arrayBuffer() }).then(decode).then(function(b){ if(!V6.music){ V6.music = b; V6.musicName = "Over (inbyggd)" } }).catch(function(){});
+  return Promise.all([V6.voReady, V6.musicReady]);
 }
 function mix(ctx, comp){
   var master = ctx.createGain(); master.gain.value = .72;
@@ -401,38 +419,37 @@ function mix(ctx, comp){
   var drone = function(t, dd, v){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = 55; var o2 = ctx.createOscillator(); o2.type = "sine"; o2.frequency.value = 82.5; var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd); g.gain.linearRampToValueAtTime(0, t + dd + .4); o.connect(g); o2.connect(g); g.connect(bus(1)); o.start(t); o2.start(t); o.stop(t + dd + .5); o2.stop(t + dd + .5) };
   var piano = function(t, midi, vel, dd){ var fr = 440*Math.pow(2, (midi - 69)/12), b = ctx.createGain(); b.gain.value = vel*.34; var tf = ctx.createBiquadFilter(); tf.type = "lowpass"; tf.frequency.value = Math.min(7000, 1400 + fr*5); b.connect(tf); tf.connect(bus(1, .45));
     [1, .5, .26, .13, .07].forEach(function(a, k){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr*(k + 1); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + .007); g.gain.setTargetAtTime(0, t + .01, dd/(1 + k*.9)/3.2); o.connect(g); g.connect(b); o.start(t); o.stop(t + dd + .3) }) };
-  [10.5, 12.1, 16.0, 21.1, 22.9, 24.7, 26.5, 34.2].forEach(function(t){ shutter(t, .2) });
+  [9.2, 12.1, 16.0, 21.1, 22.9, 24.7, 26.5].forEach(function(t){ shutter(t, .2) });
   for(i = 0; i < 6; i++) shutter(27.55 + i*.12, .1 + i*.02);
   for(i = 0; i < 6; i++){ thud(16.2 + i*.88, .22); thud(16.2 + i*.88 + .2, .14) }
   riser(24.9, 3.4, .07); impact(DROP, .55); shutter(DROP, .3);
   for(i = 0; i < 12; i++) tick(DROP + .3 + i*.5, .025);
-  click(37.5, .22); drone(37.5, 2.8, .1);
-  click(42.35, .16); shutter(42.35, .12);
-  [38, 45, 52, 57, 64, 69].forEach(function(m, k){ piano(OUT_AT + .1 + k*.05, m, k ? .28 : .5, 5) });
+  riser(35.0, 2.4, .06); drone(36.4, 3.2, .1);
+  click(CLICK, .26); impact(CLICK + .02, .5); thud(CLICK, .3);
+  [38, 45, 52, 57, 64, 69].forEach(function(m, k){ piano(CLICK + .5, m, k ? .26 : .45, 5) });
 }
 
 /* ---------- komposition ---------- */
 window.V3_FILM2 = [];
 (function(){
-  var comp = {n:"Verktyg", d:"Varumärkesfilm för mäklare. Berättare, Over, motion graphics och en bländare som öppnas.", group:"film2", dur:DUR, thumb:23.5, id:"fm_verktyg", v:{id:"fm_verktyg"}};
+  var comp = {n:"Verktyg", d:"Varumärkesfilm för mäklare. Berättare, Over, motion graphics och en knapp som öppnar verktygen.", group:"film2", dur:DUR, thumb:23.5, id:"fm_verktyg", v:{id:"fm_verktyg"}};
   comp.prep = prep; comp.loadAudio = loadAudio; comp.mix = mix;
   comp.draw = function(c, G, t, o){
-    if(t < OUT_AT + .6) draw(c, G, t, o);
-    if(t >= OUT_AT) v3Outro(c, G, o.outro, t - OUT_AT);
+    draw(c, G, t, o);
   };
   V3_COMPS.fm_verktyg = comp; V3_FILM2.push("fm_verktyg");
 })();
 
 /* ---------- sidan ---------- */
 var SLOTS = [["f_astro", "Månlandning (bild)", "img"], ["rocket", "Raket som lyfter (klipp)", "vid"], ["earth1", "Jorden som reser sig (klipp)", "vid"], ["earth2", "Jorden med solen (klipp)", "vid"], ["eye", "Öga i närbild (klipp)", "vid"], ["ct", "Hjärnskanning (klipp)", "vid"],
-  ["f_ali", "Ikon 1 (bild)", "img"], ["f_jordan", "Ikon 2 (bild)", "img"], ["f_maradona", "Ikon 3 (bild)", "img"], ["f_malcolm", "Ikon 4 (bild)", "img"], ["engine", "Motorn i närbild (klipp)", "vid"]];
+  ["f_ali", "Ikon 1 (bild)", "img"], ["f_jordan", "Ikon 2 (bild)", "img"], ["f_maradona", "Ikon 3 (bild)", "img"], ["f_malcolm", "Ikon 4 (bild)", "img"], ["engine", "Raketen i närbild (klipp)", "vid"]];
 function slots(){
   return '<details class="a3det a3cust" open><summary>Byt bilder och klipp</summary><p class="a3hint">Välj en egen fil för en plats. Bilden eller klippet får samma bildbehandling och samma rörelse automatiskt. Filerna stannar i din webbläsare.</p><div class="a3hxs">'
     + SLOTS.map(function(s){ return '<label class="a3f"><span>' + esc(s[1]) + '</span><input type="file" accept="' + (s[2] === "img" ? "image/*" : "video/*") + '" data-a3slot="' + s[0] + '" data-kind="' + s[2] + '"></label>' }).join("") + '</div></details>';
 }
 function subEd(){
   return '<details class="a3det a3cust" open><summary>Ändra undertexterna och knappen</summary><p class="a3hint">Undertexterna följer rösten, två–tre ord i taget. Rösten ändras inte av texten, så ändrar du en rad behöver rösten spelas in på nytt.</p><div class="a3hxs">'
-    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.btn ? "Knappen" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
+    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
     + '</div></details>';
 }
 function outroEd(){
@@ -446,19 +463,18 @@ window.secFilm = function(){
   var comp = V3_COMPS[V3S.comp], outs = V3_OUT.map(function(o){ return v3Seg("outro", o.id, o.n, V3S.outro === o.id) }).join("");
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Varumärke · 14</div><h2>Verktyg</h2>'
-    + '<p>Varumärkesfilmen för mäklare: berättarrösten Arthur, din låt Over, fotografier, klipp och motion graphics. Ladda upp låten nedan för att höra den med. Förslag, inget publicerat.</p></div>'
+    + '<p>Varumärkesfilmen för mäklare: berättarrösten Arthur, din låt Over, fotografier, klipp och motion graphics. Over följer med. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
     + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
     + '<div class="a3scrubw"><input type="range" id="v3scrub" min="0" max="1000" value="' + Math.round(V3S.t/comp.dur*1000) + '"></div>'
     + '<span class="mono" id="v3time"></span></div></div>'
     + '<div class="a3panel"><div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Story · 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde · 4:5", V3S.fmt === "45") + '</div>'
-    + '<div class="a3h">Låt</div><label class="a3f"><span id="v6music">' + (V6.music ? "Uppladdad: " + esc(V6.musicName) : "Ingen låt uppladdad. Ladda upp Over (mp3) här.") + '</span><input type="file" accept="audio/*" data-a3music="1"></label>'
+    + '<div class="a3h">Låt</div><label class="a3f"><span id="v6music">' + (V6.music ? "Låt: " + esc(V6.musicName) + ". Byt genom att välja en annan fil." : "Over laddas in automatiskt. Eller välj en egen låt här.") + '</span><input type="file" accept="audio/*" data-a3music="1"></label>'
     + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
-    + '<div class="a3h">Slutkort</div><div class="a3segs col">' + outs + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + (V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350") + ' · med ljud</button>'
     + '<button class="a3seg dl" type="button" data-a3="wav">Ljud · WAV</button></div></div></div>'
-    + subEd() + outroEd() + slots()
+    + subEd() + slots()
     + '<details class="a3det"><summary>Underlag, rättigheter och vad som inte är klart</summary><div class="a3und"><div><b>Musiken</b><p>Over (Drake, 2010) är en kommersiell låt. Den laddas upp av dig i webbläsaren och följer inte med sidan. För publicering krävs licens från skivbolag och förlag, eller ett annat spår.</p></div>'
     + '<div><b>Rösten</b><p>Arthur är en AI-röst. Jag har inte hört om uttalet håller som svenska, och en riktig röst kan ersätta raderna.</p></div>'
     + '<div><b>Bilderna</b><p>Bilderna på Ali, Jordan, Maradona och Malcolm X, och månlandningsbilden, kommer från dig. Rättigheter för bilderna och för personernas bild i en annons måste klaras. Jordan-bilden visar sponsorer i bakgrunden. Jordklippen är renderade.</p></div>'
