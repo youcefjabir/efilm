@@ -65,6 +65,7 @@ function sweep(c, G, t, b0, b1){
   c.save(); c.fillStyle = g; c.fillRect(0, y - 7, 100, 14); c.restore();
 }
 
+window.BR_FX = {tone:tone, finish:finish, flash:flash, sweep:sweep};
 /* ---------- texten ---------- */
 var BX = {};
 try { BX = JSON.parse(localStorage.getItem("viewly.brand.tx") || "{}") || {} } catch(e){ BX = {} }
