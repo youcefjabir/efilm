@@ -474,8 +474,12 @@ async function v3Play(){
   if(V3S.sound){
     try {
       var AC = window.AudioContext || window.webkitAudioContext;
+      /* iPhone: ljudet tystas av ringsignalsknappen och kräver ett användartryck. Spelläge och ett tyst ljud i samma tryck låser upp det. */
+      try { if(navigator.audioSession) navigator.audioSession.type = "playback" } catch(e){}
       if(!V3S.ctxA) V3S.ctxA = new AC();
-      if(V3S.ctxA.state === "suspended") await V3S.ctxA.resume();
+      var rsm = V3S.ctxA.state === "suspended" ? V3S.ctxA.resume() : null;
+      try { var ub = V3S.ctxA.createBuffer(1, 1, 22050), us = V3S.ctxA.createBufferSource(); us.buffer = ub; us.connect(V3S.ctxA.destination); us.start(0) } catch(e){}
+      if(rsm) await rsm;
       var buf = await v3Audio(V3S.comp, 44100);
       if(buf && V3S.playing){
         var s = V3S.ctxA.createBufferSource(); s.buffer = buf; s.connect(V3S.ctxA.destination);
