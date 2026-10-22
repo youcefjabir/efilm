@@ -16,8 +16,6 @@ var PAPER = C3.paper, INK = C3.ink, MUT = "#5f5a55", DARK = "#070606", OLI = C3.
 
 /* ---------- texter ---------- */
 var TX = {
-  "a8.btnB":["Boka fotografering", "Slutet · knapp när annonsen handlar om fotograferingen"],
-  "a8.btnT":["Upptäck verktygen", "Slutet · knapp när annonsen handlar om verktygen"],
   "a8.r1t":["Bostadsfoton", "Innehåll · rad 1"], "a8.r1d":["Redigerade", "Innehåll · rad 1, förklaring"],
   "a8.r2t":["Färdiga inlägg", "Innehåll · rad 2"], "a8.r2d":["Kommande, till salu, såld", "Innehåll · rad 2, förklaring"],
   "a8.r3t":["Tre format", "Innehåll · rad 3"], "a8.r3d":["Story, flöde, kvadrat", "Innehåll · rad 3, förklaring"],
@@ -282,7 +280,7 @@ function steps(c, G, t){
 }
 
 /* ---------- komponera ---------- */
-var CT = {b:"a8.btnB", u:"a7.url", t:"a7.tag"}, CV = {b:"a8.btnT", u:"a7.url", t:"a7.tag"};
+var CT = {b:"a7.btnB", u:"a7.url", t:"a7.tag"}, CV = CT;
 window.V3_ADS8 = [];
 var VOB_P8 = null;
 function loadAudio8(){
@@ -325,7 +323,7 @@ window.secAds8 = function(){
   var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : V3S.fmt === "45" ? "4:5 · 1080 × 1350" : "1:1 · 1080 × 1080";
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 16</div><h2>Magasin</h2>'
-    + '<p>Sex annonser med tidningskänsla för mäklaren på Facebook och Instagram, två av dem även med svensk röst. Omslag, innehåll, citat, uppslag, register och steg. Alla i A, B och C. Slutknappen anpassas: <b>Boka fotografering</b> där annonsen handlar om fotograferingen, <b>Upptäck verktygen</b> där den handlar om verktygen. Bara era egna bilder, inga erbjudanden, ingen musik. Förslag, inget publicerat.</p></div>'
+    + '<p>Sex annonser med tidningskänsla för mäklaren på Facebook och Instagram, två av dem även med svensk röst. Omslag, innehåll, citat, uppslag, register och steg. Alla i A, B och C. Alla slutar med knappen <b>Boka fotografering</b>. Bara era egna bilder, inga erbjudanden, ingen musik. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
     + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play" aria-label="Spela">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
@@ -336,7 +334,7 @@ window.secAds8 = function(){
     + '<div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde 4:5", V3S.fmt === "45") + v3Seg("fmt", "11", "Kvadrat 1:1", V3S.fmt === "11") + '</div>'
     + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + comp.n + " " + A7.v + " · " + fn + ' · med ljud</button></div></div></div>'
-    + '<details class="a3det a3cust"><summary>Slutet, knappens text</summary><div class="a3hxs">' + ["a8.btnB", "a8.btnT", "a7.url", "a7.tag"].map(function(k){ return v3TxField(k, (TX[k] || [0, k === "a7.url" ? "Slutet · adressen" : "Slutet · raden efter adressen"])[1]) }).join("") + '</div></details>'
+    + '<details class="a3det a3cust"><summary>Slutet, knappens text</summary><div class="a3hxs">' + ["a7.btnB", "a7.url", "a7.tag"].map(function(k){ return v3TxField(k, k === "a7.btnB" ? "Slutet · knappens text (Boka fotografering)" : k === "a7.url" ? "Slutet · adressen" : "Slutet · raden efter adressen") }).join("") + '</div></details>'
     + Object.keys(HOOK).map(function(id){ return txEd("a8." + id + ".", "Rader · " + HOOK[id].n) }).join("")
     + txEd("a8.r", "Innehåll · rader") + txEd("a8.s", "Steg · texter") + txEd("a8.cap", "Uppslag · texter")
     + '<details class="a3det"><summary>Underlag, rättigheter och vad som inte är klart</summary><div class="a3und">'

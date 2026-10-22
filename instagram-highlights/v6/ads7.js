@@ -33,6 +33,7 @@ function ph(i){ return PH[A7.v][i % 5] }
 var TX = {
   "a7.btn2":["Kontakta oss", "Slutet med röst · knappens text"], "a7.url2":["viewly.se", "Slutet med röst · adressen"], "a7.tag2":["Foton och färdiga inlägg. I samma leverans.", "Slutet med röst · raden efter adressen"],
   "a7.btn":["Upptäck verktygen", "Slutet · knappens text"],
+  "a7.btnB":["Boka fotografering", "Slutet · knappens text när annonsen handlar om fotograf och fotografering"],
   "a7.url":["viewly.se", "Slutet · adressen efter klicket"],
   "a7.tag":["För fastighetsmäklare som vill mer.", "Slutet · raden efter adressen"],
   "a7.k1m1":["Uppgifterna finns redan", "Klick · mellanrubrik 1, rad 1"], "a7.k1m2":["i bokningen.", "Klick · mellanrubrik 1, rad 2"],
@@ -68,7 +69,7 @@ function loadAudio(){
       return fetch("media/vo4/" + n + ".mp3").then(function(r){ return r.arrayBuffer() }).then(function(ab){ return new Promise(function(res, rej){ var q = ctx.decodeAudioData(ab, res, rej); if(q && q.then) q.then(res, rej) }) }).then(function(b){ VOB[n] = b }).catch(function(){});
     }));
   }
-  return Promise.all([v3SfxLoad(), VOB_P]);
+  return Promise.all([v3SfxLoad(), VOB_P, window.A7K ? A7K.loadVo(["c4"], "media/vo5/") : null]);
 }
 
 /* ---------- testläge: varje element registrerar sin ruta ---------- */
@@ -509,34 +510,35 @@ function makeMix(sched){
 
 /* ---------- komponera ---------- */
 window.V3_ADS7 = [];
-function reg2(id, hid, n, d, L, fn, thumb, sched){
+var BOOK = {b:"a7.btnB"};
+function reg2(id, hid, n, d, L, fn, thumb, sched, cta){
   var comp = {n:n, d:d, group:"ads7", dur:L + END_L, thumb:thumb, id:id, hid:hid, v:{id:id}, L:L};
-  comp.draw = function(c, G, t){ fn(c, G, t); if(t >= L) endSeq(c, G, t, L) };
+  comp.draw = function(c, G, t){ fn(c, G, t); if(t >= L) endSeq(c, G, t, L, cta) };
   comp.mix = makeMix(sched); comp.loadAudio = loadAudio;
   V3_COMPS[id] = comp; V3_ADS7.push(id);
 }
 reg2("a7_klick", "klick", "Klick", "Först resultatet, sedan hur: bokningen, två klick, tre format.", L1, ad1, 9.8, snd1);
-reg2("a7_fotograf", "fotograf", "Fotografen", "En fråga över en bild, och sedan svaret: foton och färdiga inlägg i samma leverans.", L3, ad3, 7.8, snd3);
+reg2("a7_fotograf", "fotograf", "Fotografen", "En fråga över en bild, och sedan svaret: foton och färdiga inlägg i samma leverans.", L3, ad3, 7.8, snd3, BOOK);
 reg2("a7_varumarke", "varumarke", "Varumärket", "Samma foto i tre kontors färger och namn.", L4, ad4, 3.4, snd4);
-reg2("a7_bilderna", "bilderna", "Bilderna först", "Fotohantverket först, sedan allt som följer.", L5, ad5, 2.8, snd5);
-reg2("a7_skane", "skane", "Skåne", "Malmö, Lund, Landskrona och Helsingborg.", L6, ad6, 3.0, snd6);
+reg2("a7_bilderna", "bilderna", "Bilderna först", "Fotohantverket först, sedan allt som följer.", L5, ad5, 2.8, snd5, BOOK);
+reg2("a7_skane", "skane", "Skåne", "Malmö, Lund, Landskrona och Helsingborg.", L6, ad6, 3.0, snd6, BOOK);
 reg2("a7_faser", "faser", "Fyra faser", "Samma foto: Kommande, Till salu, Visning och Såld.", L7, ad7, 5.0, snd7);
 reg2("a7_format", "format", "Alla format", "Ett inlägg i flöde, story och kvadrat.", L8, ad8, 6.5, snd8);
 reg2("a7_leverans", "leverans", "Leverans", "Kampanjen är klar: tre mallar, alla format, ladda ner.", L9, ad9, 4.0, snd9);
 
 /* ---------- annonser med svensk röst, med ett tydligare uppmaningsslut ---------- */
-function regVO(id, n, d, L, fn, thumb, sched, vo){
-  var comp = {n:n, d:d, group:"ads7", dur:L + END_L, thumb:thumb, id:id, v:{id:id}, L:L, vo:vo.concat([["k6", L + .6]]), isvo:true};
-  comp.draw = function(c, G, t){ A7.vo = true; try { fn(c, G, t, L) } finally { A7.vo = false } if(t >= L) endSeq(c, G, t, L, true) };
+function regVO(id, n, d, L, fn, thumb, sched, vo, book){
+  var comp = {n:n, d:d, group:"ads7", dur:L + END_L, thumb:thumb, id:id, v:{id:id}, L:L, vo:vo.concat(book ? [["c4", L + .5]] : [["k6", L + .6]]), isvo:true};
+  comp.draw = function(c, G, t){ A7.vo = true; try { fn(c, G, t, L) } finally { A7.vo = false } if(t >= L) endSeq(c, G, t, L, book ? BOOK : true) };
   comp.mix = makeMix(sched); comp.loadAudio = loadAudio;
   V3_COMPS[id] = comp; V3_ADS7.push(id);
 }
 regVO("a7_klick_vo", "Klick · med röst", "Svensk röst: två klick, uppgifterna finns redan, du väljer bild och mall. Slut: Kontakta oss.", 14.5, ad1, 9.8,
   function(H){ var d = D1; H.s("shutter", .2, .5); [0, 1, 2, 3, 4].forEach(function(i){ H.s("tick1", d + 2.9 + i*.1, .15) }); H.click(d + 3.85, .85); H.click(d + 5.6, .85); [0, 1, 2, 3, 4, 5].forEach(function(i){ H.s("tick1", d + 6.65 + i*.09, .16) }); H.s("shutter2", d + 7.4, .5) },
   [["k1", .2], ["k2", 2.5], ["k3", 5.2], ["k4", 6.75], ["k5", 9.0]]);
-regVO("a7_fotograf_vo", "Fotografen · med röst", "Svensk röst: frågan, svaret och leveransen. Slut: Är du mäklare i Skåne? Kontakta oss.", 12.0, function(c, G, t, L){ ad3(c, G, t, L, 1.0) }, 8.8,
+regVO("a7_fotograf_vo", "Fotografen · med röst", "Svensk röst: frågan, svaret och leveransen. Slut: Boka fotografering.", 12.0, function(c, G, t, L){ ad3(c, G, t, L, 1.0) }, 8.8,
   function(H){ H.s("shutter", 5.5, .5); [6.4, 7.6].forEach(function(t){ H.s("tick1", t, .2) }) },
-  [["f1", .4], ["f2", 4.0], ["f3", 6.15]]);
+  [["f1", .4], ["f2", 4.0], ["f3", 6.15]], true);
 regVO("a7_varumarke_vo", "Varumärket · med röst", "Svensk röst: dina objekt, ditt varumärke, ditt namn, din färg och din logga.", 14.0, function(c, G, t, L){ ad4(c, G, t, L, {sw:[3.6, 5.6], c0:3.9, cd:1.0}) }, 5.5,
   function(H){ [3.55, 5.55].forEach(function(s){ H.click(s, .7) }) },
   [["m1", .3], ["m2", 3.8], ["m3", 9.9]]);
@@ -566,7 +568,7 @@ window.secAds7 = function(){
     + '<div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel · 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde · 4:5", V3S.fmt === "45") + v3Seg("fmt", "11", "Kvadrat · 1:1", V3S.fmt === "11") + '</div>'
     + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + comp.n + " " + A7.v + " · " + fn + ' · med ljud</button></div></div></div>'
-    + '<details class="a3det a3cust"><summary>Slutet, gemensamt för alla</summary><div class="a3hxs">' + ["a7.btn", "a7.url", "a7.tag", "a7.btn2", "a7.url2", "a7.tag2"].map(function(k){ return v3TxField(k, TX[k][1]) }).join("") + '</div></details>'
+    + '<details class="a3det a3cust"><summary>Slutet, gemensamt för alla</summary><div class="a3hxs">' + ["a7.btn", "a7.btnB", "a7.url", "a7.tag", "a7.btn2", "a7.url2", "a7.tag2"].map(function(k){ return v3TxField(k, TX[k][1]) }).join("") + '</div></details>'
     + Object.keys(HOOK).map(function(id){ return txEd("a7." + id + ".", "Öppningsrader · " + HOOK[id].n) }).join("")
     + txEd("a7.k1", "Klick · mellanrubriker") + txEd("a7.k3", "Fotografen · svar") + txEd("a7.k5", "Bilderna först · rubrik") + txEd("a7.k6", "Skåne · rader")
     + '<details class="a3det"><summary>Underlag, rättigheter och vad som inte är klart</summary><div class="a3und">'
