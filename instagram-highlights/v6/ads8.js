@@ -134,7 +134,7 @@ function sndNy(H){ H.s("shutter", .1, .6); NY_CUT.forEach(function(s){ H.s("shut
    samma uppgifter och kontorets utseende hela vägen. Sparar tid och ger bättre resultat.
    ===================================================================== */
 var WHITE = "#fff";
-var L6 = 26.4, WIN6 = [2.5, 23.0];
+var L6 = 29.4, WIN6 = [2.5, 23.0];
 var SR6 = [[3.0, 8.0], [8.0, 10.2], [10.2, 13.8], [13.8, 23.0]];
 var SYS = {bg:"#ECE8E4", ink:"#1c1a19", mut:"#6f6a65", line:"rgba(28,26,25,.12)", grn:"#2f3a2d", org:"#F2681C"};
 var LABS = ["Till salu", "Visning", "Såld"], KB = ["salu", "visning", "sald"];
@@ -194,24 +194,25 @@ function tplB(c, kind, x, y, w, prog, d){
 }
 function DO(i, ph){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", photo:ph} }
 /* en scen i fönstret: mjuk in och ut, utan hårda klipp */
-function scn(t, s0, s1){ var i = rev(t, s0, .8), o = rev(t, s1 - .55, .5); return {a:i*(1 - o), dy:(1 - i)*2.6 - o*1.6} }
+function scn(t, s0, s1){ var i = rev(t, s0 - .05, .6), o = rev(t, s1 - .55, .45); return {a:i*(1 - o), dy:(1 - i)*2.6 - o*1.6} }
 function adResa(c, G, t){
   var H = G.H, S = SG(G), i;
   v3Fill(c, 0, 0, 100, H, DARK);
   /* bakgrund: sängen i öppningen, sedan ett mörkt skymningsfoto som tonar fram, och samma slutbild som förut */
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .6 ? ioC(k3(t, 0, .6)) : 1});
-  var mid = rev(t, 2.2, 1.1)*(1 - rev(t, WIN6[1] + .4, .6)), fin = rev(t, WIN6[1] + .4, .6);
-  if(mid > .01) v3Photo(c, "rs_dusk1", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, 2.2, WIN6[1] + .8)), pos:V3_POS.rs_dusk1, alpha:mid});
-  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, WIN6[1] + .4, L6)), pos:V3_POS.rs_dusk2, alpha:fin});
-  var dim = (.30 + .30*rev(t, 1.0, .6))*(1 - rev(t, 2.2, .8)) + .72*rev(t, 2.2, .8)*(1 - fin) + .80*fin;
+  var OFF = 1.9, mid = rev(t, 3.8, 1.2)*(1 - rev(t, WIN6[1] + OFF + .4, .6)), fin = rev(t, WIN6[1] + OFF + .4, .6);
+  if(mid > .01) v3Photo(c, "rs_dusk1", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, 3.8, WIN6[1] + OFF + .8)), pos:V3_POS.rs_dusk1, alpha:mid});
+  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, WIN6[1] + OFF + .4, L6)), pos:V3_POS.rs_dusk2, alpha:fin});
+  var dim = (.30 + .30*rev(t, 1.0, .6))*(1 - rev(t, 3.8, .9)) + .72*rev(t, 3.8, .9)*(1 - fin) + .80*fin;
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", dim);
   v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
   v3Frame(c, 4, 4, 92, H - 8, WHITE, .26, oQ(k3(t, .2, 1.8)), .5);
   /* öppningen (oförändrad) */
-  var introA = 1 - rev(t, 2.0, .3);
+  var introA = 1 - rev(t, 3.7, .4);
   lab(c, "VIEWLY · FÖR FASTIGHETSMÄKLARE", 50, S.y0 + 2.6, rev(t, .4, .8)*.92*introA, {size:2.1, color:WHITE, align:"c", weight:500, sp:.3});
   var sH = G.is9 ? 15 : 12, l1 = T("a8.re.l1"), l2 = T("a8.re.l2"), sHero = Math.min(sH, fz(c, l1, {size:sH, weight:300}, 84), fz(c, l2, {size:sH, weight:300, italic:true}, 84));
-  twoPart(c, t, .6, 1.9, l1, l2, sHero, S.y0 + S.h*.42);
+  twoPart(c, t, .6, 4.0, l1, l2, sHero, S.y0 + S.h*.42);
+  var tr = t; t = t - OFF;
   /* fönstret: ett system som glider genom hela resan, ett enda fokus i taget */
   var wa = rev(t, WIN6[0], .8)*(1 - rev(t, WIN6[1], .6));
   if(wa > .02){
@@ -231,7 +232,7 @@ function adResa(c, G, t){
     /* 1 · intag: så kan bostaden presenteras. En stor bild, en rad val. */
     k = scn(t, 3.0, 8.0);
     if(k.a > .02){
-      var ih = 38, ch1 = 5 + ih + 5 + 12 + 6 + 8.6, y0 = cen(ch1);
+      var ih = 30, ch1 = 5 + ih + 5 + 12 + 6 + 8.6, y0 = cen(ch1);
       c.save(); c.translate(0, k.dy);
       sTx(c, "EXEMPEL · SÅ KAN ANNONSEN SE UT", 50, y0 + 2, k.a*rev(t, 3.3, .7), {size:2.5, weight:500, color:SYS.mut, align:"c", sp:.3});
       var imgs = [P.kitchen, "rs_dusk1", P.bed], t0s = [3.8, 5.0, 6.2], act = t < t0s[1] ? 0 : t < t0s[2] ? 1 : 2, ia = rev(t, 3.6, .8)*k.a, iy = y0 + 7;
@@ -322,11 +323,12 @@ function adResa(c, G, t){
     }
     c.restore();
   }
+  t = tr;
   /* slutsatsen (oförändrad) */
-  if(t >= WIN6[1] + .5) twoPart(c, t, WIN6[1] + .5, 99, T("a8.re.f1"), T("a8.re.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
+  if(t >= WIN6[1] + OFF + .5) twoPart(c, t, WIN6[1] + OFF + .5, 99, T("a8.re.f1"), T("a8.re.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
 function DOBJ(){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", ph:{o:"rs_dusk1", g:P.dining, e:"rs_dusk2"}} }
-function sndResa(H){ H.s("shutter", .1, .6); [7.45, 13.35, 16.45, 19.55, 22.3].forEach(function(s){ H.s("tick1", s, .06) }); [9.1, 11.65].forEach(function(s){ H.s("tick2", s, .1) }) }
+function sndResa(H){ var O = 1.9; H.s("shutter", .1, .6); [7.45, 13.35, 16.45, 19.55, 22.3].forEach(function(s){ H.s("tick1", s + O, .06) }); [9.1, 11.65].forEach(function(s){ H.s("tick2", s + O, .1) }) }
 
 /* =====================================================================
    5 · SKÅNE   (foto + ett inlägg i tre kontors utseende, uppgifterna följer med)
