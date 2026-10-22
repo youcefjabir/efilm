@@ -155,7 +155,7 @@ function endSeq(c, G, t, e0, cta){
   var kb = cta ? "a7.btn2" : "a7.btn", ku = cta ? "a7.url2" : "a7.url", kt = cta ? "a7.tag2" : "a7.tag";
   if(cta && cta.b){ kb = cta.b; ku = cta.u || "a7.url"; kt = cta.t || "a7.tag" }
   var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 58, h = G.is9 ? 10.4 : 9, ts = h*.3;
-  var bgA = ioC(k3(u0, 0, .5)), ap = oQ(k3(u0, .3, .8)), press = k3(u0, E_CLICK - .1, E_CLICK)*(1 - k3(u0, E_CLICK + .08, E_CLICK + .26)), gone = ioC(k3(u0, E_CLICK + .08, E_CLICK + .26));
+  var bgA = cta && cta.over ? ioC(k3(u0, E_CLICK + .05, E_CLICK + .75)) : ioC(k3(u0, 0, .5)), ap = oQ(k3(u0, .3, .8)), press = k3(u0, E_CLICK - .1, E_CLICK)*(1 - k3(u0, E_CLICK + .08, E_CLICK + .26)), gone = ioC(k3(u0, E_CLICK + .08, E_CLICK + .26));
   v3Fill(c, 0, 0, 100, H, "#050505", bgA);
   if(gone < 1){
     var bw = w*(1 - .05*press), bh = h*(1 - .05*press), a = ap*(1 - gone);

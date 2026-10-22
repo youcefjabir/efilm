@@ -134,8 +134,8 @@ function sndNy(H){ H.s("shutter", .1, .6); NY_CUT.forEach(function(s){ H.s("shut
    samma uppgifter och kontorets utseende hela vägen. Sparar tid och ger bättre resultat.
    ===================================================================== */
 var WHITE = "#fff";
-var L6 = 29.4, WIN6 = [2.5, 23.0];
-var SR6 = [[3.0, 8.0], [8.0, 10.2], [10.2, 13.8], [13.8, 23.0]];
+var L6 = 28.4, WIN6 = [2.5, 23.0];
+var SR6 = [[3.0, 8.0], [8.0, 9.6], [10.2, 13.8], [13.8, 23.0]];
 var SYS = {bg:"#ECE8E4", ink:"#1c1a19", mut:"#6f6a65", line:"rgba(28,26,25,.12)", grn:"#2f3a2d", org:"#F2681C"};
 var LABS = ["Till salu", "Visning", "Såld"], KB = ["salu", "visning", "sald"];
 var BR_G = "#1F4B39", BR_C = "#F3EFE7";
@@ -156,39 +156,35 @@ function chk(c, cx, cy, r, p, col, lw){ if(p <= 0) return; c.save(); c.strokeSty
   var p1 = Math.min(1, p*2); c.lineTo(lerp(a[0], b[0], p1), lerp(a[1], b[1], p1)); if(p > .5){ var p2 = (p - .5)*2; c.lineTo(lerp(b[0], d[0], p2), lerp(b[1], d[1], p2)) } c.stroke(); c.restore() }
 /* ett kontor, tre mallar: samma färger, samma typsnitt, samma sidfot. Bara layouten byter med skedet. */
 function tplB(c, kind, x, y, w, prog, d){
-  var f = function(a, b){ return k3(prog, a, b) };
+  var f = function(a, b){ return k3(prog, a, b) }, CR = "#F3EFE7";
   c.save(); c.translate(x, y); c.scale(w/100, w/100); c.beginPath(); rr(c, 0, 0, 100, 125, 2.4); c.clip();
-  var foot = function(col, mut){ c.save(); c.globalAlpha = f(.55, .85); c.fillStyle = col === BR_G ? BR_G : BR_C; c.beginPath(); c.arc(11, 114, 4.6, 0, 7); c.fill(); c.restore();
-    v3Text(c, "ER", 11, 115.4, {size:3.6, weight:700, f:"sans", color:col === BR_G ? BR_C : BR_G, align:"c", alpha:f(.55, .85)});
-    v3Text(c, d.agent, 19, 115.2, {size:4, f:"sans", weight:500, color:mut, alpha:f(.6, .9)}) };
+  v3Photo(c, d.photo, 0, 0, 100, 125, {scale:1.1, pos:[.5, .5]});
+  v3Grad(c, 0, 0, 100, 36, [[0, "rgba(8,16,11,.5)"], [1, "rgba(8,16,11,0)"]]);
+  v3Grad(c, 0, kind === "sald" ? 0 : 52, 100, kind === "sald" ? 125 : 73, kind === "sald" ? [[0, "rgba(8,16,11,.5)"], [1, "rgba(8,16,11,.6)"]] : [[0, "rgba(8,16,11,0)"], [1, "rgba(8,16,11,.82)"]]);
+  /* samma kontor i alla: monogram uppe till vänster */
+  var ma = f(0, .3); c.save(); c.globalAlpha = ma; c.fillStyle = CR; c.beginPath(); c.arc(11, 11, 4.8, 0, 7); c.fill(); c.restore();
+  v3Text(c, "ER", 11, 12.4, {size:3.6, weight:700, f:"sans", color:BR_G, align:"c", alpha:ma});
+  v3Text(c, "Er Mäklarbyrå", 18.4, 12.2, {size:3.6, weight:500, f:"sans", color:CR, alpha:ma});
+  var sub = d.city.toUpperCase() + "  ·  " + d.facts.toUpperCase();
   if(kind === "salu"){
-    v3Photo(c, d.photo, 0, 0, 100, 125, {scale:1.1, pos:[.5, .5]});
-    var rp = oQ(f(0, .25)); c.save(); c.globalAlpha = rp; c.fillStyle = BR_G; rr(c, 6, 6, 30, 8.6, 4.3); c.fill(); c.restore();
-    v3Text(c, "TILL SALU", 21, 11.7, {size:3.3, weight:700, f:"sans", sp:.22, color:BR_C, align:"c", alpha:rp});
-    var cp = oQ(f(0, .3)); c.save(); c.translate(0, (1 - cp)*10); c.globalAlpha = cp; c.shadowColor = "rgba(0,0,0,.28)"; c.shadowBlur = 10; c.shadowOffsetY = 2; c.fillStyle = BR_C; rr(c, 5, 72, 90, 48, 2); c.fill(); c.restore();
-    if(cp > .4){
-      v3Text(c, d.addr, 11, 87, {size:11.5, color:"#1c1c1e", alpha:f(.1, .35), p:f(.1, .4)});
-      v3Text(c, d.city.toUpperCase(), 11, 94, {size:3.4, weight:500, f:"sans", sp:.22, color:"#6a655e", alpha:f(.3, .55)});
-      v3Line(c, 11, 28, 98.4, BR_G, .6, f(.45, .6), 1);
-      v3Text(c, d.facts, 11, 106.2, {size:5.4, weight:600, f:"sans", color:BR_G, alpha:f(.5, .75), p:f(.5, .8)});
-      foot(BR_G, "#6a655e");
-    }
+    v3Text(c, "TILL SALU", 8, 82, {size:3.6, weight:600, f:"sans", sp:.3, color:CR, alpha:f(0, .25), p:f(0, .3)});
+    v3Line(c, 8, 12, 87, CR, .4, f(.2, .45), .8);
+    v3Text(c, d.addr, 8, 101, {size:14, color:CR, alpha:f(.1, .4), p:f(.1, .45)});
+    v3Text(c, sub, 8, 109.4, {size:3.2, weight:500, f:"sans", sp:.16, color:"rgba(243,239,231,.88)", alpha:f(.35, .65)});
+    v3Text(c, d.agent, 8, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", alpha:f(.55, .85)});
   } else if(kind === "visning"){
-    v3Photo(c, d.photo, 0, 0, 100, 72, {scale:1.1, pos:[.5, .5]});
-    v3Fill(c, 0, 72, 100, 53, BR_G);
-    var vp = f(0, .25); v3Text(c, "VISNING", 8, 82, {size:3.6, weight:700, f:"sans", sp:.28, color:BR_C, alpha:vp, p:f(0, .3)});
-    v3Text(c, "Söndag 14:00 – 14:45", 92, 82, {size:3.6, weight:500, f:"sans", color:"rgba(243,239,231,.85)", align:"r", alpha:f(.15, .4)});
-    v3Text(c, d.addr, 8, 96, {size:11.5, color:BR_C, alpha:f(.1, .35), p:f(.1, .4)});
-    v3Text(c, d.city.toUpperCase() + "  ·  " + d.facts.toUpperCase(), 8, 103.6, {size:3.1, weight:500, f:"sans", sp:.18, color:"rgba(243,239,231,.85)", alpha:f(.35, .6)});
-    foot(BR_C, "rgba(243,239,231,.8)"); c.save(); c.globalAlpha = f(.55, .85); c.fillStyle = BR_C; c.beginPath(); c.arc(11, 114, 4.6, 0, 7); c.fill(); c.restore(); v3Text(c, "ER", 11, 115.4, {size:3.6, weight:700, f:"sans", color:BR_G, align:"c", alpha:f(.55, .85)});
+    v3Text(c, "VISNING", 50, 58, {size:3.6, weight:600, f:"sans", sp:.34, color:CR, align:"c", alpha:f(0, .25), p:f(0, .3)});
+    v3Text(c, "Sön 14:00 – 14:45", 50, 72, {size:11, italic:true, color:CR, align:"c", alpha:f(.1, .4), p:f(.1, .45)});
+    v3Line(c, 44, 12, 80, CR, .4, f(.3, .55), .8);
+    v3Text(c, d.addr, 50, 94, {size:8.4, color:CR, align:"c", alpha:f(.3, .6)});
+    v3Text(c, sub, 50, 101.4, {size:3.1, weight:500, f:"sans", sp:.16, color:"rgba(243,239,231,.88)", align:"c", alpha:f(.45, .75)});
+    v3Text(c, d.agent, 50, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", align:"c", alpha:f(.6, .9)});
   } else {
-    v3Photo(c, d.photo, 0, 0, 100, 125, {scale:1.1, pos:[.5, .5]});
-    v3Fill(c, 0, 0, 100, 125, "#0c1a13", .46*oQ(f(0, .25)));
-    v3Text(c, "Såld", 50, 58, {size:24, italic:true, color:BR_C, align:"c", alpha:f(.05, .3), p:f(.05, .4)});
-    v3Line(c, 42, 16, 66, BR_C, .4, f(.4, .6), .8);
-    v3Text(c, d.addr, 50, 80, {size:7.6, color:BR_C, align:"c", alpha:f(.3, .55)});
-    v3Text(c, d.city.toUpperCase() + "  ·  " + d.facts.toUpperCase(), 50, 88, {size:3, weight:500, f:"sans", sp:.2, color:"rgba(243,239,231,.85)", align:"c", alpha:f(.45, .7)});
-    c.save(); c.globalAlpha = f(.55, .85); c.fillStyle = BR_C; c.beginPath(); c.arc(11, 114, 4.6, 0, 7); c.fill(); c.restore(); v3Text(c, "ER", 11, 115.4, {size:3.6, weight:700, f:"sans", color:BR_G, align:"c", alpha:f(.55, .85)}); v3Text(c, d.agent, 19, 115.2, {size:4, f:"sans", weight:500, color:"rgba(243,239,231,.85)", alpha:f(.6, .9)});
+    v3Text(c, "Såld", 50, 62, {size:24, italic:true, color:CR, align:"c", alpha:f(.05, .3), p:f(.05, .4)});
+    v3Line(c, 44, 12, 72, CR, .4, f(.4, .6), .8);
+    v3Text(c, d.addr, 50, 90, {size:8.4, color:CR, align:"c", alpha:f(.3, .55)});
+    v3Text(c, sub, 50, 97.4, {size:3.1, weight:500, f:"sans", sp:.16, color:"rgba(243,239,231,.88)", align:"c", alpha:f(.45, .7)});
+    v3Text(c, d.agent, 50, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", align:"c", alpha:f(.6, .9)});
   }
   c.restore();
 }
@@ -200,9 +196,9 @@ function adResa(c, G, t){
   v3Fill(c, 0, 0, 100, H, DARK);
   /* bakgrund: sängen i öppningen, sedan ett mörkt skymningsfoto som tonar fram, och samma slutbild som förut */
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .6 ? ioC(k3(t, 0, .6)) : 1});
-  var OFF = 1.9, mid = rev(t, 3.8, 1.2)*(1 - rev(t, WIN6[1] + OFF + .4, .6)), fin = rev(t, WIN6[1] + OFF + .4, .6);
+  var OFF = 1.9, mid = rev(t, 3.8, 1.2)*(1 - rev(t, WIN6[1] + OFF - .8, .6)), fin = rev(t, WIN6[1] + OFF - .8, .6);
   if(mid > .01) v3Photo(c, "rs_dusk1", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, 3.8, WIN6[1] + OFF + .8)), pos:V3_POS.rs_dusk1, alpha:mid});
-  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, WIN6[1] + OFF + .4, L6)), pos:V3_POS.rs_dusk2, alpha:fin});
+  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, WIN6[1] + OFF - .8, L6)), pos:V3_POS.rs_dusk2, alpha:fin});
   var dim = (.30 + .30*rev(t, 1.0, .6))*(1 - rev(t, 3.8, .9)) + .72*rev(t, 3.8, .9)*(1 - fin) + .80*fin;
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", dim);
   v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
@@ -212,7 +208,7 @@ function adResa(c, G, t){
   lab(c, "VIEWLY · FÖR FASTIGHETSMÄKLARE", 50, S.y0 + 2.6, rev(t, .4, .8)*.92*introA, {size:2.1, color:WHITE, align:"c", weight:500, sp:.3});
   var sH = G.is9 ? 15 : 12, l1 = T("a8.re.l1"), l2 = T("a8.re.l2"), sHero = Math.min(sH, fz(c, l1, {size:sH, weight:300}, 84), fz(c, l2, {size:sH, weight:300, italic:true}, 84));
   twoPart(c, t, .6, 4.0, l1, l2, sHero, S.y0 + S.h*.42);
-  var tr = t; t = t - OFF;
+  var tr = t; t = t - OFF; if(t >= 9.6) t += .6;
   /* fönstret: ett system som glider genom hela resan, ett enda fokus i taget */
   var wa = rev(t, WIN6[0], .8)*(1 - rev(t, WIN6[1], .6));
   if(wa > .02){
@@ -244,14 +240,14 @@ function adResa(c, G, t){
       c.restore();
     }
     /* 2 · bokad: bocken exakt i mitten, tunn linje */
-    k = scn(t, 8.0, 10.2);
+    k = scn(t, 8.0, 9.6);
     if(k.a > .02){
       c.save(); c.translate(0, k.dy);
-      var cy0 = wy + wh*.5 - 3, cp = oBack(k3(t, 8.4, 9.2)), R0 = 11;
+      var cy0 = wy + wh*.5 - 3, cp = oBack(k3(t, 8.25, 8.85)), R0 = 11;
       c.save(); c.globalAlpha = k.a; c.shadowColor = "rgba(40,30,20,.16)"; c.shadowBlur = 8; c.shadowOffsetY = 1.5; c.fillStyle = "#fff"; c.beginPath(); c.arc(50, cy0, R0*Math.max(.01, cp), 0, 7); c.fill(); c.restore();
-      chk(c, 50, cy0, R0*.8, k3(t, 9.0, 9.6), SYS.ink, .55);
-      sTx(c, "BOKAD", 50, cy0 + R0 + 8, k.a*rev(t, 9.3, .6), {size:3.4, weight:500, align:"c", sp:.55});
-      sTx(c, T("a8.re.addr") + ", " + T("a8.re.city"), 50, cy0 + R0 + 13.4, k.a*rev(t, 9.5, .6), {size:2.7, color:SYS.mut, align:"c"});
+      chk(c, 50, cy0, R0*.8, k3(t, 8.75, 9.2), SYS.ink, .55);
+      sTx(c, "BOKAD", 50, cy0 + R0 + 8, k.a*rev(t, 8.9, .5), {size:3.4, weight:500, align:"c", sp:.55});
+      sTx(c, T("a8.re.addr") + ", " + T("a8.re.city"), 50, cy0 + R0 + 13.4, k.a*rev(t, 9.0, .5), {size:2.7, color:SYS.mut, align:"c"});
       c.restore();
     }
     /* 3 · mäklarportalen: levererad, bilderna fylls i */
@@ -281,7 +277,7 @@ function adResa(c, G, t){
       for(i = 0; i < 3; i++){
         var mx = x0 + i*(mw + 2.6), ma = rev(t, 14.5 + i*.25, .8)*k.a, sel = clamp(k3(t, 15.4 + i*.35, 15.7 + i*.35), 0, 1);
         sCard(c, mx - .6, my - .6, mw + 1.2, mh + 1.2, ma, 1.8, "#fff", 3, sel > .5 ? SYS.ink : null);
-        if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, 1, DO(i, ["rs_dusk1", P.dining, "rs_dusk2"][i])); c.restore() }
+        if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, 1, DO(i, ["rs_dusk1", P.bed, "rs_dusk2"][i])); c.restore() }
         sTx(c, LABS[i], mx + .6, my + mh + 6, ma, {size:3, weight:600});
         if(sel > .02){ var br = 2.2*oBack(sel); c.save(); c.globalAlpha = ma; c.fillStyle = SYS.grn; c.beginPath(); c.arc(mx + mw - 2.6, my + mh + 5, Math.max(.01, br), 0, 7); c.fill(); c.restore(); if(sel > .6) sTx(c, String(i + 1), mx + mw - 2.6, my + mh + 6, ma, {size:2.2, weight:600, color:"#fff", align:"c"}) }
       }
@@ -315,7 +311,7 @@ function adResa(c, G, t){
       sTx(c, "KAMPANJEN ÄR KLAR", 50, y8 + 2, k.a*rev(t, 20.3, .7), {size:2.5, weight:500, color:SYS.mut, align:"c", sp:.3});
       for(i = 0; i < 3; i++){ var fx = x0 + i*(fw + 2.6), fa = rev(t, 20.6 + i*.25, .8)*k.a;
         sCard(c, fx - .6, y8 + 8 - .6, fw + 1.2, fh + 1.2, fa, 1.8, "#fff", 3);
-        if(fa > .02){ c.save(); c.globalAlpha = fa; tplB(c, KB[i], fx, y8 + 8, fw, 1, DO(i, ["rs_dusk2", P.dining, "rs_dusk1"][i])); c.restore() }
+        if(fa > .02){ c.save(); c.globalAlpha = fa; tplB(c, KB[i], fx, y8 + 8, fw, 1, DO(i, ["rs_dusk1", P.bed, "rs_dusk2"][i])); c.restore() }
         sTx(c, LABS[i], fx + .6, y8 + 8 + fh + 5.6, fa, {size:3, weight:600}) }
       var by8 = y8 + 8 + fh + 10, ba8 = rev(t, 21.8, .6)*k.a;
       sBtn(c, 50, by8, 56, 8.6, "PUBLICERA KAMPANJEN  ›", ba8, k3(t, 22.2, 22.5));
@@ -325,10 +321,10 @@ function adResa(c, G, t){
   }
   t = tr;
   /* slutsatsen (oförändrad) */
-  if(t >= WIN6[1] + OFF + .5) twoPart(c, t, WIN6[1] + OFF + .5, 99, T("a8.re.f1"), T("a8.re.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
+  if(t >= WIN6[1] + OFF - .3) twoPart(c, t, WIN6[1] + OFF - .3, L6 + .05, T("a8.re.f1"), T("a8.re.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
 function DOBJ(){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", ph:{o:"rs_dusk1", g:P.dining, e:"rs_dusk2"}} }
-function sndResa(H){ var O = 1.9; H.s("shutter", .1, .6); [7.45, 13.35, 16.45, 19.55, 22.3].forEach(function(s){ H.s("tick1", s + O, .06) }); [9.1, 11.65].forEach(function(s){ H.s("tick2", s + O, .1) }) }
+function sndResa(H){ var O = 1.9; H.s("shutter", .1, .6); [7.45, 12.75, 15.85, 18.95, 21.7].forEach(function(s){ H.s("tick1", s + O, .06) }); [8.85, 11.05].forEach(function(s){ H.s("tick2", s + O, .1) }) }
 
 /* =====================================================================
    5 · SKÅNE   (foto + ett inlägg i tre kontors utseende, uppgifterna följer med)
@@ -455,17 +451,17 @@ function adSkane(c, G, t){
 function sndSkane(H){ [0, 1, 2, 3].forEach(function(i){ H.s("shutter", i === 0 ? .08 : .3 + i*1.1, .6) }); H.s("tick1", 7.0, .07) }
 
 /* ---------- komponera ---------- */
-var BOOK = {b:"a7.btnB"};
+var BOOK = {b:"a7.btnB"}, BOVER = {b:"a7.btnB", over:true};
 window.V3_ADS8 = [];
 function loadAudio8(){ return v3SfxLoad() }
-function reg8(id, n, d, L, fn, thumb, sched){
+function reg8(id, n, d, L, fn, thumb, sched, over){
   var comp = {n:n, d:d, group:"ads8", dur:L + END_L, thumb:thumb, id:id, v:{id:id}, L:L};
-  comp.draw = function(c, G, t){ fn(c, G, t); if(t >= L) K.endSeq(c, G, t, L, BOOK) };
+  comp.draw = function(c, G, t){ fn(c, G, t); if(t >= L) K.endSeq(c, G, t, L, over ? BOVER : BOOK) };
   comp.mix = K.makeMix(sched); comp.loadAudio = loadAudio8;
   V3_COMPS[id] = comp; V3_ADS8.push(id);
 }
 reg8("a8_ny", "1 · Bostadsfoto. Och lite till.", "Fotografering och allt som ingår i presentationen.", L1, adNy, 9.6, sndNy);
-reg8("a8_resa", "2 · Ett objekt. Hela vägen.", "Ett objekt följs från intag och bokning till leverans, annonstext och inlägg.", L6, adResa, 16.0, sndResa);
+reg8("a8_resa", "2 · Ett objekt. Hela vägen.", "Ett objekt följs från intag och bokning till leverans, annonstext och inlägg.", L6, adResa, 16.0, sndResa, true);
 reg8("a8_skane", "3 · Din bostadsfotograf i Skåne", "Orterna, och ett inlägg som byter mall medan uppgifterna ligger kvar.", L5, adSkane, 12.4, sndSkane);
 
 /* ---------- annonsplan ---------- */
