@@ -401,7 +401,7 @@ function loadAudio(){
     return fetch(f[0]).then(function(r){ return r.arrayBuffer() }).then(decode).then(function(b){ V6.vo[i] = b }).catch(function(){ V6.vo[i] = null });
   }));
   if(!V6.musicReady) V6.musicReady = V6.music ? Promise.resolve() : fetch("media/over.mp3").then(function(r){ return r.arrayBuffer() }).then(decode).then(function(b){ if(!V6.music){ V6.music = b; V6.musicName = "Over (inbyggd)" } }).catch(function(){});
-  return Promise.all([V6.voReady, V6.musicReady]);
+  return Promise.all([V6.voReady, V6.musicReady, v3SfxLoad()]);
 }
 function mix(ctx, comp){
   var master = ctx.createGain(); master.gain.value = .5;
@@ -432,11 +432,12 @@ function mix(ctx, comp){
   var vg = bus(1.7, .12);
   VO_FILES.forEach(function(f, k){ if(!V6.vo[k]) return; var s = ctx.createBufferSource(); s.buffer = V6.vo[k]; s.connect(vg); s.start(f[1]) });
   /* ljudeffekter */
-  var shutter = function(t, v){
+  var shutterSyn = function(t, v){
     var n = ctx.createBufferSource(); n.buffer = nb(.03); var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = 3200; bp.Q.value = 1.2; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .025); n.connect(bp); bp.connect(g); g.connect(bus(1, .12)); n.start(t);
     var n2 = ctx.createBufferSource(); n2.buffer = nb(.05); var bp2 = ctx.createBiquadFilter(); bp2.type = "bandpass"; bp2.frequency.value = 1800; bp2.Q.value = 1; var g2 = ctx.createGain(); g2.gain.setValueAtTime(v*.8, t + .055); g2.gain.exponentialRampToValueAtTime(.001, t + .09); n2.connect(bp2); bp2.connect(g2); g2.connect(bus(1)); n2.start(t + .055);
     var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(85, t + .07); var g3 = ctx.createGain(); g3.gain.setValueAtTime(v*.7, t); g3.gain.exponentialRampToValueAtTime(.001, t + .09); o.connect(g3); g3.connect(bus(1)); o.start(t); o.stop(t + .1);
   };
+  var shutter = function(t, v){ if(!smp(Math.round(t*10) % 2 ? "shutter" : "shutter2", t, Math.min(1, .4 + v*2.2))) shutterSyn(t, v) };
   var thud = function(t, v){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(42, t + .12); var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .28); o.connect(g); g.connect(bus(1)); o.start(t); o.stop(t + .3) };
   var tick = function(t, v){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = 1700; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .04); o.connect(g); g.connect(bus(1, .1)); o.start(t); o.stop(t + .05) };
   var riser = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.Q.value = .8; f.frequency.setValueAtTime(400, t); f.frequency.exponentialRampToValueAtTime(8000, t + dd); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.exponentialRampToValueAtTime(v, t + dd*.97); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1, .25)); n.start(t) };
@@ -452,19 +453,20 @@ function mix(ctx, comp){
   var mouseTick = function(t, v, tone){ var n = ctx.createBufferSource(); n.buffer = nb(.02); var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = tone; bp.Q.value = .9; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .012); n.connect(bp); bp.connect(g); g.connect(bus(1)); n.start(t);
     var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(260, t); o.frequency.exponentialRampToValueAtTime(120, t + .018); var g2 = ctx.createGain(); g2.gain.setValueAtTime(v*.55, t); g2.gain.exponentialRampToValueAtTime(.001, t + .025); o.connect(g2); g2.connect(bus(1)); o.start(t); o.stop(t + .03) };
   /* ett klassiskt datormusklick: tryck ner, och en lite lättare släpp strax efter */
-  var uiClick = function(t, v, up){ mouseTick(t, v, 3200); if(up !== false) mouseTick(t + .075, v*.55, 4200) };
-  var camShot = function(t, v){ shutter(t, v); var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(2600, t); o.frequency.exponentialRampToValueAtTime(1800, t + .05); var g = ctx.createGain(); g.gain.setValueAtTime(v*.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .07); o.connect(g); g.connect(bus(1, .15)); o.start(t); o.stop(t + .08) };
+  var smp = function(name, t, v){ var b = V3_SND[name]; if(!b) return false; var s2 = ctx.createBufferSource(); s2.buffer = b; var g2 = ctx.createGain(); g2.gain.value = v; s2.connect(g2); g2.connect(master); s2.start(Math.max(0, t)); return true };
+  var uiClick = function(t, v, up){ if(!smp("down", t, Math.min(1, v*1.1))) mouseTick(t, v, 3200); if(up !== false && !smp("up", t + .085, Math.min(1, v*.85))) mouseTick(t + .075, v*.55, 4200) };
+  var camShot = function(t, v){ shutter(t, v) };
   var burst = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2400; f.Q.value = .5; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
   burst(0, .5, .22); drone(0, 6.0, .05);
   shutter(3.3, .22); shutter(4.5, .12);
-  rumble(5.2, 2.4, .35); thud(5.8, .3);
-  for(i = 0; i < ICONN; i++){ whoosh(7.6 + i*((12.4 - 7.6)/ICONN) - .14, .16, .09); camShot(7.6 + i*((12.4 - 7.6)/ICONN), .38) }
-  for(i = 0; i < 4; i++){ thud(12.9 + i*.9, .17); thud(12.9 + i*.9 + .2, .11) }
-  riser(15.4, 2.3, .07); impact(17.7, .4);
-  SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ var r = k/(SHOWT.length - 1); whoosh(h - .1, .1, .12 + .12*r); camShot(h, .55 + .4*r); thud(h, .34 + .16*r) } });
+  rumble(5.2, 2.4, .35); smp("thump", 5.8, .8);
+  for(i = 0; i < ICONN; i++){ camShot(7.6 + i*((12.4 - 7.6)/ICONN), .38) }
+  for(i = 0; i < 4; i++){ smp("thunk", 12.9 + i*.9, .32); smp("thunk", 12.9 + i*.9 + .2, .2) }
+  smp("thump", 17.7, .95);
+  SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ var r = k/(SHOWT.length - 1); camShot(h, .5 + .3*r); if(k % 2 === 0) smp("thunk", h, .55 + .25*r) } });
   
-  drone(24.3, CLICK - 24.3, .09); riser(29.0, 2.3, .04);
-  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .5, false);
+  drone(24.3, CLICK - 24.3, .09);
+  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .35, false); smp("sting", CLICK + END_T3 + .65, .7);
 }
 
 /* ---------- komposition ---------- */

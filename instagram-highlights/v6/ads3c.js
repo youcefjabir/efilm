@@ -68,6 +68,7 @@ function v3Score(ctx, comp){
   var conv = ctx.createConvolver(); conv.buffer = ir;
   var wet = ctx.createGain(); wet.gain.value = .3; conv.connect(wet); wet.connect(master);
   var dry = ctx.createGain(); dry.gain.value = .85; dry.connect(master);
+  var smp = function(name, t, v, rate){ var b = V3_SND[name]; if(!b) return false; var s2 = ctx.createBufferSource(); s2.buffer = b; if(rate) s2.playbackRate.value = rate; var g2 = ctx.createGain(); g2.gain.value = v; s2.connect(g2); g2.connect(master); s2.start(Math.max(0, t)); return true };
   var out = function(node, g){ var a = ctx.createGain(); a.gain.value = g == null ? 1 : g; node.connect(a); a.connect(dry); a.connect(conv); return a };
 
   var piano = function(t, midi, vel, dur2){
@@ -136,16 +137,24 @@ function v3Score(ctx, comp){
       piano(tt, note, .26 + .08*((n2 % 4) === 0), 2.6);
     }
   });
-  (A.whoosh || []).forEach(function(t){ whoosh(t, .55, .05) });
-  (A.tap || []).forEach(function(t){ tap(t, .15) });
-  (A.pop || []).forEach(function(t, k){ pop(t, .042, 560 + (k % 5)*60) });
-  (A.chime || []).forEach(function(t){ chime(t, .065) });
-  (A.riser || []).forEach(function(r){ riser(r[0], r[1], .04) });
+  (A.tap || []).forEach(function(t){ if(!(smp("down", t, .75) && smp("up", t + .085, .55))) tap(t, .15) });
+  (A.chime || []).forEach(function(t){ if(!smp("sting", t, .6)) chime(t, .065) });
   if(A.sub != null){
-    sub(A.sub, .1);
-    [38, 50, 54, 57, 61, 64].forEach(function(m, k){ piano(A.sub + .15 + k*.04, m, k ? .3 : .55, 5) });
-    piano(A.sub + 1.2, 74, .24, 3);
+    /* slutet ska låta ljust och glatt: ett pluck-ackord i dur, inte ett mörkt bastoner */
+    if(!smp("sting", A.sub + .05, .65)) sub(A.sub, .1);
+    [50, 62, 66, 69, 73, 76].forEach(function(m, k){ piano(A.sub + .15 + k*.04, m, k ? .22 : .38, 4) });
+    piano(A.sub + 1.2, 86, .16, 3);
   }
+}
+/* riktiga ljudinspelningar (CC0), delade av alla annonser och filmer */
+var V3_SND = {}, V3_SND_P = null, V3_SND_FILES = ["down", "up", "tick1", "tick2", "select", "confirm", "drop", "swish", "open", "click1", "pluck", "shutter", "shutter2", "sting", "thunk", "thump"];
+function v3SfxLoad(){
+  if(V3_SND_P) return V3_SND_P;
+  var AC = window.AudioContext || window.webkitAudioContext, ctx = window.__v3sfx || (window.__v3sfx = new AC());
+  V3_SND_P = Promise.all(V3_SND_FILES.map(function(n){
+    return fetch("media/sfx/" + n + ".wav").then(function(r){ return r.arrayBuffer() }).then(function(ab){ return new Promise(function(res, rej){ var p = ctx.decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej) }) }).then(function(b){ V3_SND[n] = b }).catch(function(){});
+  }));
+  return V3_SND_P;
 }
 var V3_AUD = {};
 function v3Audio(compId, sr){
@@ -155,6 +164,7 @@ function v3Audio(compId, sr){
   if(!OAC) return Promise.resolve(null);
   var comp = V3_COMPS[compId];
   V3_AUD[key] = (async function(){
+    await v3SfxLoad();
     if(comp.loadAudio) await comp.loadAudio();
     var ctx = new OAC(2, Math.ceil(sr*(comp.dur + .3)), sr);
     v3Score(ctx, comp);
