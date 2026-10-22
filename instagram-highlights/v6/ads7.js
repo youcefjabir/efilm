@@ -152,6 +152,7 @@ function postBox(c, x, y, w, ar, prog, o, style, phase, photo, name){
 /* ---------- slutet, som i varumärkesfilmen ---------- */
 function endSeq(c, G, t, e0, cta){
   var u0 = t - e0; if(u0 < 0) return;
+  if(cta && cta.logo){ v3Fill(c, 0, 0, 100, G.H, "#050505", ioC(k3(u0, 0, .7))); if(u0 >= .55) endLogo(c, G, u0 - .55); return }
   var kb = cta ? "a7.btn2" : "a7.btn", ku = cta ? "a7.url2" : "a7.url", kt = cta ? "a7.tag2" : "a7.tag";
   if(cta && cta.b){ kb = cta.b; ku = cta.u || "a7.url"; kt = cta.t || "a7.tag" }
   var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 58, h = G.is9 ? 10.4 : 9, ts = h*.3;
@@ -502,6 +503,7 @@ function makeMix(sched){
     H.click = function(t, v){ H.s("down", t, v); H.s("up", t + .085, v*.75) };
     (comp.vo || []).forEach(function(l){ var b = VOB[l[0]]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; var g = ctx.createGain(); g.gain.value = 1.15; src.connect(g); g.connect(master); src.start(Math.max(0, l[1] < 0 ? comp.dur + l[1] : l[1])) });
     sched(H, comp);
+    if(comp.logo){ H.s("sting", comp.L + .55 - .02, .8); return }
     var e0 = comp.dur - END_L;
     H.click(e0 + E_CLICK, .5); H.s("tick2", e0 + E_CLICK + .2, .16); H.s("tick2", e0 + E_CLICK + E_T2, .16); H.s("sting", e0 + E_CLICK + E_T3 - .02, .8);
   };
