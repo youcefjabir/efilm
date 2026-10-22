@@ -321,7 +321,7 @@ function endLogo(c, G, t, u){
   /* märket och pricken animeras först i mitten, sedan skjuts märket åt vänster när ordet kommer in */
   var slide = ioC(k3(u, 1.0, 1.7)), x0 = lerp(50 - mw/2, fx, slide), mx = x0 + mw/2;
   c.save(); c.translate(mx, cy); c.rotate(-1.25*(1 - oQ(k3(u, 0, .95)))); var sc = lerp(.45, 1, oBack(k3(u, 0, .85))); c.scale(sc, sc); c.translate(-mx, -cy);
-  v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.olil, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
+  v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
   c.restore();
   var by = cy + capH/2 + capH*.02, wx = fx + mw + gap, i, str = "VIEWLY", x = wx;
   for(i = 0; i < str.length; i++){
@@ -466,7 +466,7 @@ function mix(ctx, comp){
   SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ var r = k/(SHOWT.length - 1); camShot(h, .5 + .3*r); if(k % 2 === 0) smp("thunk", h, .55 + .25*r) } });
   
   drone(24.3, CLICK - 24.3, .09);
-  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .35, false); smp("sting", CLICK + END_T3 + .65, .7);
+  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .35, false); smp("sting", CLICK + END_T3 + .65, .5);
 }
 
 /* ---------- komposition ---------- */

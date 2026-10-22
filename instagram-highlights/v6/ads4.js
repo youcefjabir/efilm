@@ -231,7 +231,7 @@ function bOrbit(c, G, t, b, F){
     var cs = Math.cos(ang), al = Math.abs(cs) < .3 ? "c" : cs > 0 ? "l" : "r", lx = nx + (al === "c" ? 0 : cs > 0 ? 2.4 : -2.4), ly = ny + (Math.abs(cs) < .3 ? (Math.sin(ang) < 0 ? -2.6 : 4.8) : 1.2);
     v3Text(c, b.items[i], lx, ly, {size:2.5, weight:400, f:"sans", color:"#fff", align:al, alpha:pa});
   }
-  v3Mark(c, cx - 4.3, cy - 3.8, 7.6, "#fff", C3.olil, {alpha:ioC(k3(t, .4, 1.2)), reveal:oQ(k3(t, .4, 1.4))});
+  v3Mark(c, cx - 4.3, cy - 3.8, 7.6, "#fff", C3.dotL, {alpha:ioC(k3(t, .4, 1.2)), reveal:oQ(k3(t, .4, 1.4))});
   if(b.s) sub(c, b.s, R.x0, R.y1 - subH(c, b.s, 2.4, 80) + 1, th.soft, "l", t, 1.2 + n*.5, 2.1, 80);
 }
 

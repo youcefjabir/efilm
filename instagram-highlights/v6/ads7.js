@@ -186,7 +186,7 @@ function endLogo(c, G, u){
   var tot = mw + gap + ww, fx = 50 - tot/2 - capH*.113;
   var slide = ioC(k3(u, 1.0, 1.7)), x0 = lerp(50 - mw/2, fx, slide), mx = x0 + mw/2;
   c.save(); c.translate(mx, cy); c.rotate(-1.25*(1 - oQ(k3(u, 0, .95)))); var sc = lerp(.45, 1, oBack(k3(u, 0, .85))); c.scale(sc, sc); c.translate(-mx, -cy);
-  v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.olil, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
+  v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
   c.restore();
   var by = cy + capH/2 + capH*.02, wx = fx + mw + gap, i, str = "VIEWLY", x = wx;
   for(i = 0; i < str.length; i++){
@@ -504,7 +504,7 @@ function makeMix(sched){
     (comp.vo || []).forEach(function(l){ var b = VOB[l[0]]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; var g = ctx.createGain(); g.gain.value = 1.15; src.connect(g); g.connect(master); src.start(Math.max(0, l[1] < 0 ? comp.dur + l[1] : l[1])) });
     sched(H, comp);
     var e0 = comp.dur - END_L;
-    H.click(e0 + E_CLICK, .95); H.s("tick2", e0 + E_CLICK + .2, .4); H.s("tick2", e0 + E_CLICK + E_T2, .4); H.s("sting", e0 + E_CLICK + E_T3 + .65, .75);
+    H.click(e0 + E_CLICK, .95); H.s("tick2", e0 + E_CLICK + .2, .4); H.s("tick2", e0 + E_CLICK + E_T2, .4); H.s("sting", e0 + E_CLICK + E_T3 + .65, .55);
   };
 }
 

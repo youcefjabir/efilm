@@ -295,7 +295,7 @@ function v3Outro(c, G, id, t, o){
     foot(C3.mut, C3.ink);
   } else if(id === "bokstav"){
     var y3 = cy - (G.is9 ? 12 : 10);
-    v3Lock(c, 50, y3, capH, "#fff", C3.olil, {pm:oQ(k3(t, .4, 1.4)), pd:oQ(k3(t, 1.0, 1.8)), letters:k3(t, .9, 2.8), alpha:A});
+    v3Lock(c, 50, y3, capH, "#fff", C3.dotL, {pm:oQ(k3(t, .4, 1.4)), pd:oQ(k3(t, 1.0, 1.8)), letters:k3(t, .9, 2.8), alpha:A});
     v3Line(c, 42, 58, y3 + capH*1.9, C3.olil, .3, oQ(k3(t, 2.6, 3.3)), A);
     v3Text(c, (v3t("outro.tag1") + " " + v3t("outro.tag2")).trim(), 50, y3 + capH*1.9 + 9, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 3.0, 4.0)), alpha:A});
     v3Text(c, v3t("outro.url"), 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.4, 4.2))});
@@ -325,7 +325,7 @@ function v3Outro(c, G, id, t, o){
     oc.globalCompositeOperation = "source-over";
     c.save(); c.globalAlpha = A*reveal; c.setTransform(1, 0, 0, 1, 0, 0); c.drawImage(off, 0, 0); c.restore();
     var mh3 = G.is9 ? 14 : 11.5;
-    v3Mark(c, 50 - mh3*858.6/756.3/2, y5 - fs3 - mh3 - 5, mh3, "#fff", C3.olil, {reveal:oQ(k3(t, .3, 1.4)), dot:oQ(k3(t, 1.0, 1.8)), alpha:A});
+    v3Mark(c, 50 - mh3*858.6/756.3/2, y5 - fs3 - mh3 - 5, mh3, "#fff", C3.dotL, {reveal:oQ(k3(t, .3, 1.4)), dot:oQ(k3(t, 1.0, 1.8)), alpha:A});
     v3Line(c, 42, 58, y5 + 8, C3.olil, .3, oQ(k3(t, 2.2, 3.0)), A);
     v3Text(c, (v3t("outro.tag1") + " " + v3t("outro.tag2")).trim(), 50, y5 + 17, {size:G.is9 ? 3.8 : 3.3, italic:true, color:C3.cream, align:"c", p:oQ(k3(t, 2.6, 3.6)), alpha:A});
     v3Text(c, v3t("outro.url"), 50, ft - 3.6, {size:1.95, weight:600, f:"sans", sp:.28, color:"#fff", align:"c", alpha:A*oQ(k3(t, 3.2, 4.0))});
@@ -438,19 +438,19 @@ var V3_STATIC = [
   {id:"p3", n:"Klart i alla format", d:"Samma inlägg som story, inlägg och kvadrat.", draw:function(c, G){
       v3Fill(c, 0, 0, 100, G.H, C3.dark); v3DarkBg(c, G, 1, 0);
       v3Trio(c, G, 20, 17.0, {photo:"home", tpl:"overlay", phase:"tillsalu"});
-      v3Lock(c, 50, G.H - 11, 2.2, "#fff", C3.olil);
+      v3Lock(c, 50, G.H - 11, 2.2, "#fff", C3.dotL);
   }},
   {id:"p4", n:"Fotona levereras. Kampanjen är klar.", d:"Foto först, ett påstående.", draw:function(c, G){
       v3PhotoFrame(c, G, "home", .4);
       v3Small(c, "VIEWLY · BOSTADSFOTOGRAFERING", 50, 11, "#fff", "c", .9);
       v3Headline(c, [["Fotona levereras.", false], ["Kampanjen är klar.", true, C3.cream]], G.H - 33, 10.2, {shadow:true});
-      v3Lock(c, 50, G.H - 11, 2.1, "#fff", C3.olil);
+      v3Lock(c, 50, G.H - 11, 2.1, "#fff", C3.dotL);
   }},
   {id:"p5", n:"Du bokar. Vi sköter resten.", d:"Sloganen ur viewly.se/maklare.", draw:function(c, G){
       v3PhotoFrame(c, G, "dining", .4);
       v3Small(c, "FÖR FASTIGHETSMÄKLARE I SKÅNE", 50, 11, "#fff", "c", .9);
       v3Headline(c, [["Du bokar.", false], ["Vi sköter resten.", true, C3.cream]], G.H - 33, 10.6, {shadow:true});
-      v3Lock(c, 50, G.H - 11, 2.1, "#fff", C3.olil);
+      v3Lock(c, 50, G.H - 11, 2.1, "#fff", C3.dotL);
   }},
   {id:"p6", n:"Varumärket · skymning", d:"Stor logga över foto.", draw:function(c, G){ v3Outro(c, G, "foto", 5, {noFade:true}) }}
 ];

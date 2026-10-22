@@ -17,7 +17,7 @@ var V3_KEYS = {home:"adHome", dining:"adDining", beige:"adBeige", bedroom:"adBed
 var V3_POS = {home:[.5,.45], dining:[.46,.5], beige:[.56,.5], bedroom:[.5,.52], house:[.5,.72], terrace:[.4,.5], porch:[.3,.5]};
 /* Viewlys egen palett, hämtad ur Highlights-systemet: ARKIV (papper, ink, oliv)
    och SKUGGA (varmt svart, oliv lyft). Ingen blå, inget guld. */
-var C3 = {paper:"#ECE8E5", ink:"#1C1C1E", oli:"#6E7266", olil:"#98A088", dark:"#0E0E0D", ui:"#F3F0ED", uil:"#E3DED9",
+var C3 = {dotL:"#c8cfc0", paper:"#ECE8E5", ink:"#1C1C1E", oli:"#6E7266", olil:"#98A088", dark:"#0E0E0D", ui:"#F3F0ED", uil:"#E3DED9",
           mut:"#8C8782", line:"#D8D2CF", cream:"#EFEDE7", green:"#6E9A6B"};
 /* Kontorets profil (exempel). Ändras i panelen Anpassa. */
 var OFF = {name:"NORDVIK", sub:"MÄKLARBYRÅ", accent:"#2F6F6B", accentL:"#9CC7C0"};
@@ -296,7 +296,7 @@ function v3PostInner(c, style, phase, name, x, y, w, ar, prog, o){
     if(bq > 0){
       c.save(); c.translate(80, 24 + mt); c.rotate(-.12); c.scale(bq, bq);
       c.fillStyle = OFF.accent; c.beginPath(); c.arc(0, 0, r, 0, Math.PI*2); c.fill();
-      var bsp = function(s, d){ s = String(s); if(s === d[0] + d[1] || s === d[0] + " " + d[1]) return d; var w = s.toUpperCase().split(" "); return [w[0], w.slice(1).join(" ")] };
+      var bsp = function(s, d){ s = String(s); if(s === d[0] + d[1] || s === d[0] + " " + d[1] || s.toUpperCase() === (d[0] + d[1]).replace("-", "")) return d; var w = s.toUpperCase().split(" "); return [w[0], w.slice(1).join(" ")] };
       var bl = phase === "tillsalu" ? bsp(v3t("tpl.tillsalu"), ["TILL", "SALU"]) : phase === "kommande" ? bsp(v3t("tpl.kommande"), ["KOM-", "MANDE"]) : phase === "visning" ? ["VIS-", "NING"] : bsp(v3t("tpl.sald"), ["SÅLD", ""]);
       v3Text(c, bl[0], 0, bl[1] ? -1 : 2.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"}); if(bl[1]) v3Text(c, bl[1], 0, 4.4, {size:3.3, weight:700, f:"sans", sp:.22, color:"#fff", align:"c"});
       c.restore();
