@@ -2,3 +2,6 @@ Ljud i annonser och filmer (alla CC0 / public domain):
 - down, up, tick, select, confirm, drop, swish, open, click, pluck: Kenney.nl (UI Audio, Interface Sounds), CC0.
 - shutter, shutter2: "Camera Shutter Sound", A Clock in the Kingdom, archive.org/details/CameraShutterSound, CC0 1.0.
 - sting: byggd av Kenney-ljuden pluck_001 och glass_003 (pitchad till ett durackord).
+- shutter, shutter2 (från 2026-10-22): "Dragon Studio, camera shutter effect" (Pixabay), tillhandahållen av användaren och klippt till själva slutarljudet.
+- sting (annonser, från 2026-10-22): "VoiceBosch, audio logo sidestep" (Pixabay), tillhandahållen av användaren och klippt till själva ljudlogotypen.
+- sting_brand (varumärkesfilmen): den tidigare logoljudet, byggt av Kenney-ljuden pluck_001 och glass_003.

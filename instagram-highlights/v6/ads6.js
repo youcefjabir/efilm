@@ -213,7 +213,7 @@ function neuronLayer(c, G, t, s, a0){
 
 /* ---------- ikonerna, tryckta på kopior av sig själva, och bildspelet ---------- */
 var ICONN = 4;
-var ICONS = [["f_ali", [.55, .5], 1], ["f_jordan", [.85, .65], 1.4], ["f_maradona", [.45, .4], 1], ["f_malcolm", [.62, .45], 1], ["f_astro", [.56, .5], 1], ["f_palme1", [.5, .4], 1], ["f_mays", [.28, .5], 1], ["f_palme2", [.5, .3], 1], ["f_jobs", [.5, .4], 1]];
+var ICONS = [["f_ali", [.55, .5], 1], ["f_jordan", [.85, .65], 1.4], ["f_maradona", [.45, .4], 1], ["f_malcolm", [.62, .45], 1], ["f_astro", [.56, .5], 1], ["f_palme1", [.5, .4], 1], ["f_mays", [.28, .5], 1], ["f_jobs", [.5, .4], 1], ["f_palme2", [.5, .3], 1]];
 /* ett foto med vit kant, centrerat i cx, cy; k skalar storleken */
 function cardPrint(c, G, i, o){
   var H = G.H, s = ICONS[i], key = s[0], f = fit(key, 86*o.k, Math.min(G.is9 ? 112 : 96, H - 8)*o.k);
@@ -393,7 +393,7 @@ var V6 = {music:null, musicName:"", vo:[], voReady:null};
 var VO_FILES = VO.map(function(v){ return ["media/vo3/" + v[0] + ".mp3", v[1]] });
 var MUSIC_OFFSET = 10.6;
 var MUSIC_DIPS = [[16.75, 17.65, .25, .95], [17.75, 22.95, .62, .62], [23.0, 24.1, .2, .55]];
-var OUTRO_AT = 42.68, OUTRO_DELAY = .85;
+var OUTRO_AT = 42.68, OUTRO_DELAY = 1.0;
 function ctxAudio(){ var AC = window.AudioContext || window.webkitAudioContext; return window.__v6ac || (window.__v6ac = new AC()) }
 function decode(ab){ return new Promise(function(res, rej){ var p = ctxAudio().decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej) }) }
 function loadAudio(){
@@ -466,7 +466,7 @@ function mix(ctx, comp){
   SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ var r = k/(SHOWT.length - 1); camShot(h, .5 + .3*r); if(k % 2 === 0) smp("thunk", h, .55 + .25*r) } });
   
   drone(24.3, CLICK - 24.3, .09);
-  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .35, false); smp("sting", CLICK + END_T3 + .65, .5);
+  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .35, false); smp("sting_brand", CLICK + END_T3 + .65, .5);
 }
 
 /* ---------- komposition ---------- */
@@ -482,7 +482,7 @@ window.V3_FILM2 = [];
 
 /* ---------- sidan ---------- */
 var SLOTS = [["tv", "Månlandningen på TV (klipp)", "vid"], ["f_astro", "Bildspelets femte bild", "img"], ["rocket", "Raket som lyfter (klipp)", "vid"], ["earth1", "Jorden som reser sig (klipp)", "vid"], ["earth2", "Jorden med solen (klipp)", "vid"], ["eye", "Öga i närbild (klipp)", "vid"], ["ct", "Hjärnskanning (klipp)", "vid"],
-  ["f_ali", "Ikon 1 (bild)", "img"], ["f_palme1", "Bildspel: bild 6", "img"], ["f_mays", "Bildspel: bild 7", "img"], ["f_palme2", "Bildspel: bild 8", "img"], ["f_jobs", "Bildspel: bild 9", "img"], ["f_jordan", "Ikon 2 (bild)", "img"], ["f_maradona", "Ikon 3 (bild)", "img"], ["f_malcolm", "Ikon 4 (bild)", "img"], ["engine", "Raketen i närbild (klipp)", "vid"]];
+  ["f_ali", "Ikon 1 (bild)", "img"], ["f_palme1", "Bildspel: bild 6", "img"], ["f_mays", "Bildspel: bild 7", "img"], ["f_jobs", "Bildspel: bild 8", "img"], ["f_palme2", "Bildspel: bild 9", "img"], ["f_jordan", "Ikon 2 (bild)", "img"], ["f_maradona", "Ikon 3 (bild)", "img"], ["f_malcolm", "Ikon 4 (bild)", "img"], ["engine", "Raketen i närbild (klipp)", "vid"]];
 function slots(){
   return '<details class="a3det a3cust" open><summary>Byt bilder och klipp</summary><p class="a3hint">Välj en egen fil för en plats. Bilden eller klippet får samma bildbehandling och samma rörelse automatiskt. Filerna stannar i din webbläsare.</p><div class="a3hxs">'
     + SLOTS.map(function(s){ return '<label class="a3f"><span>' + esc(s[1]) + '</span><input type="file" accept="' + (s[2] === "img" ? "image/*" : "video/*") + '" data-a3slot="' + s[0] + '" data-kind="' + s[2] + '"></label>' }).join("") + '</div></details>';

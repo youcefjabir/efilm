@@ -92,7 +92,7 @@ function adNy(c, G, t){
   var H = G.H, S = SG(G), i;
   v3Fill(c, 0, 0, 100, H, DARK);
   /* bildspåret: sängen, stolen, matplatsen, sängen */
-  var a2 = rev(t, 3.1, .8), a3 = rev(t, 7.6, .8), a4 = rev(t, 10.0, .8);
+  var a2 = t >= 3.1 ? 1 : 0, a3 = t >= 7.6 ? 1 : 0, a4 = t >= 10.0 ? 1 : 0;
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.16, k3(t, 0, 5)), pos:V3_POS.bedroom, alpha:ioC(k3(t, 0, .6))});
   if(a2 > 0) v3Photo(c, P.chair, 0, 0, 100, H, {scale:lerp(1.05, 1.14, k3(t, 3.1, 8)), pos:V3_POS.rs_chair, alpha:a2});
   if(a3 > 0) v3Photo(c, P.dining, 0, 0, 100, H, {scale:lerp(1.05, 1.14, k3(t, 7.6, 10.5)), pos:V3_POS.rs_dining, alpha:a3});
@@ -117,11 +117,9 @@ function adNy(c, G, t){
     v3Text(c, u1, 50, cy, {size:su, color:"#fff", align:"c", alpha:al, p:oQ(k3(t, t0, t0 + 1.0)), rise:2, shadow:true});
     v3Text(c, u2, 50, cy + su*1.18, {size:su, italic:true, color:C3.cream, align:"c", alpha:al*rev(t, t0 + .35, .5), p:oQ(k3(t, t0 + .35, t0 + 1.35)), rise:2, shadow:true});
     if(al > .5) reg("rubrik", 8, cy - su*.85, 84, su*2.3, {head:1});
-    /* tre små markeringar längst ner i den säkra ytan */
-    dot(c, 50 + (i - 1)*3.6, S.y1 - 4, 1.0, "#fff", al*.9);
   }
 }
-function sndNy(H){ H.s("shutter", .25, .5); H.s("shutter2", 3.15, .45); NY_S.forEach(function(s, i){ H.s("tick1", s[2] + .25, .16); if(i > 0) H.s(i % 2 ? "shutter" : "shutter2", s[2] - .35, .4) }) }
+function sndNy(H){ H.s("shutter", .1, .75); [3.1, 7.6, 10.0].forEach(function(s){ H.s("shutter", s, .75) }); NY_S.forEach(function(s){ H.s("tick1", s[2] + .25, .14) }) }
 
 /* =====================================================================
    2 · BOKA EN FOTOGRAFERING   (ljus, tid: texten och inläggen följer med)
@@ -349,9 +347,9 @@ var KINDS = ["o", "g", "e"], TS5 = [7.4, 9.6, 11.6];
 function adSkane(c, G, t){
   var H = G.H, S = SG(G), i;
   v3Fill(c, 0, 0, 100, H, DARK);
-  var bg = [P.chair, P.dining, P.kitchen, P.bed], step = 1.1, k = Math.min(3, Math.floor(Math.max(0, t - .3)/step)), a;
+  var bg = [P.chair, P.dining, P.kitchen, P.bed], step = 1.1, k = Math.min(3, Math.max(0, Math.floor((t - .3)/step))), a;
   for(i = 0; i < 4; i++){
-    a = i < k ? 0 : i === k ? rev(t, .3 + i*step, .3) : 0; if(i === k && k > 0) a = 1; if(i === 0) a = Math.max(a, ioC(k3(t, 0, .6)));
+    a = i === k ? 1 : 0;
     if(a > 0) v3Photo(c, bg[i], 0, 0, 100, H, {scale:lerp(1.06, 1.16, k3(t, .3 + i*step, 7)), pos:V3_POS[bg[i]], alpha:a});
   }
   var dim = rev(t, 4.6, .8);
@@ -361,8 +359,8 @@ function adSkane(c, G, t){
   var sC = G.is9 ? 15 : 12, cy = S.y0 + S.h*.42, gone = rev(t, 4.5, .4);
   lab(c, T("a8.sk.l"), 50, cy - sC*1.0, rev(t, .3, .7)*.92*(1 - gone), {size:2.1, color:"#fff", align:"c", weight:500, sp:.3, shadow:true});
   CITIES.forEach(function(ci, j){
-    var s0 = .3 + j*step, va = rev(t, s0, .3)*(j < 3 ? 1 - rev(t, s0 + step - .3, .3) : 1 - gone);
-    if(va > 0) v3Text(c, ci, 50, cy, {size:Math.min(sC, fz(c, ci, {size:sC, weight:300}, 84)), color:"#fff", align:"c", alpha:va, p:oQ(k3(t, s0, s0 + .6)), rise:2, shadow:true});
+    var s0 = .3 + j*step, va = (t >= s0 ? 1 : 0)*(j < 3 ? (t < s0 + step ? 1 : 0) : 1 - gone);
+    if(va > 0) v3Text(c, ci, 50, cy, {size:Math.min(sC, fz(c, ci, {size:sC, weight:300}, 84)), color:"#fff", align:"c", alpha:va, p:oQ(k3(t, s0, s0 + .5)), rise:2, shadow:true});
   });
   if(t > 1 && t < 4.4) reg("stad", 8, cy - sC*.85, 84, sC*1.1, {head:1});
   /* rubriken */
@@ -406,12 +404,9 @@ function adSkane(c, G, t){
         }
       }
     }
-    /* sidindikator */
-    var pk = rev(t, 8.0, .5);
-    for(i = 0; i < 3; i++) dot(c, 50 + (i - 1)*3.4, pY + ph + 3.2, i === kk ? .95 : .6, i === kk ? "#fff" : "rgba(255,255,255,.5)", pk);
   }
 }
-function sndSkane(H){ [0, 1, 2, 3].forEach(function(i){ H.s(i % 2 ? "shutter2" : "shutter", .35 + i*1.1, .45) }); H.s("tick1", 7.0, .16); H.s("thunk", 7.5, .4); TS5.forEach(function(s, i){ for(var d = 0; d < 3; d++) H.s("tick1", s + .3 + d*.16, .1); if(i > 0) H.s("thunk", s + .2, .35) }) }
+function sndSkane(H){ [0, 1, 2, 3].forEach(function(i){ H.s("shutter", i === 0 ? .08 : .3 + i*1.1, .75) }); H.s("tick1", 7.0, .16); H.s("thunk", 7.5, .4); TS5.forEach(function(s, i){ for(var d = 0; d < 3; d++) H.s("tick1", s + .3 + d*.16, .1); if(i > 0) H.s("thunk", s + .2, .35) }) }
 
 /* ---------- komponera ---------- */
 var BOOK = {b:"a7.btnB"};

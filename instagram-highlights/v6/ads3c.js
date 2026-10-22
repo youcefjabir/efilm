@@ -147,7 +147,7 @@ function v3Score(ctx, comp){
   }
 }
 /* riktiga ljudinspelningar (CC0), delade av alla annonser och filmer */
-var V3_SND = {}, V3_SND_P = null, V3_SND_FILES = ["down", "up", "tick1", "tick2", "select", "confirm", "drop", "swish", "open", "click1", "pluck", "shutter", "shutter2", "sting", "thunk", "thump"];
+var V3_SND = {}, V3_SND_P = null, V3_SND_FILES = ["down", "up", "tick1", "tick2", "select", "confirm", "drop", "swish", "open", "click1", "pluck", "shutter", "shutter2", "sting", "sting_brand", "thunk", "thump"];
 function v3SfxLoad(){
   if(V3_SND_P) return V3_SND_P;
   var AC = window.AudioContext || window.webkitAudioContext, ctx = window.__v3sfx || (window.__v3sfx = new AC());

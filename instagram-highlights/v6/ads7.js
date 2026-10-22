@@ -340,9 +340,8 @@ function ad5(c, G, t){
   var P5 = [ph(0), ph(1), ph(2), ph(3)];
   if(t < 7.6){
     c.save(); rr(c, r[0], r[1], r[2], r[3], lerp(0, 2, collapse)); c.clip();
-    var k = Math.min(3, Math.floor(t/1.65)), u = k3(t, k*1.65, (k + 1)*1.65), nxt = Math.min(3, k + 1), fade = k < 3 ? ioC(k3(t, (k + 1)*1.65 - .3, (k + 1)*1.65)) : 0;
+    var k = Math.min(3, Math.floor(t/1.65)), u = k3(t, k*1.65, (k + 1)*1.65);
     v3Photo(c, P5[k], r[0], r[1], r[2], r[3], {scale:lerp(1.05, 1.16, u), pos:V3_POS[P5[k]]});
-    if(fade > 0) v3Photo(c, P5[nxt], r[0], r[1], r[2], r[3], {scale:1.05, pos:V3_POS[P5[nxt]], alpha:fade});
     c.restore();
     var tx = 1 - collapse;
     if(tx > .01){
@@ -365,7 +364,7 @@ function ad5(c, G, t){
   });
 }
 function snd5(H){
-  [0, 1.65, 3.3, 4.95].forEach(function(t, i){ H.s(i % 2 ? "shutter2" : "shutter", t + .05, .5) });
+  [0, 1.65, 3.3, 4.95].forEach(function(t, i){ H.s("shutter", i === 0 ? .05 : t, .75) });
   H.s("thunk", 7.5, .6);
   [8.9, 9.1, 9.3].forEach(function(t){ H.s("tick1", t, .2) });
 }
@@ -396,7 +395,7 @@ function ad6(c, G, t){
   }
 }
 function snd6(H){
-  [0, 1, 2, 3].forEach(function(i){ H.s(i % 2 ? "shutter2" : "shutter", .55 + i*1.25, .5) });
+  [0, 1, 2, 3].forEach(function(i){ H.s("shutter", i === 0 ? .1 : .5 + i*1.25, .75) });
 }
 
 /* =====================================================================
@@ -504,7 +503,7 @@ function makeMix(sched){
     (comp.vo || []).forEach(function(l){ var b = VOB[l[0]]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; var g = ctx.createGain(); g.gain.value = 1.15; src.connect(g); g.connect(master); src.start(Math.max(0, l[1] < 0 ? comp.dur + l[1] : l[1])) });
     sched(H, comp);
     var e0 = comp.dur - END_L;
-    H.click(e0 + E_CLICK, .95); H.s("tick2", e0 + E_CLICK + .2, .4); H.s("tick2", e0 + E_CLICK + E_T2, .4); H.s("sting", e0 + E_CLICK + E_T3 + .65, .55);
+    H.click(e0 + E_CLICK, .95); H.s("tick2", e0 + E_CLICK + .2, .4); H.s("tick2", e0 + E_CLICK + E_T2, .4); H.s("sting", e0 + E_CLICK + E_T3 - .02, .8);
   };
 }
 
