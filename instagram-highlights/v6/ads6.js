@@ -10,7 +10,7 @@
    vid 39 s, i tystnaden före bildspelet.
    ===================================================================== */
 (function(){
-var FX = window.BR_FX, DARK = "#050505", CLICK = 46.0, DUR = 51.6;
+var FX = window.BR_FX, DARK = "#050505", CLICK = 29.9, DUR = 34.5;
 
 /* ---------- media ---------- */
 var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan"};
@@ -44,25 +44,20 @@ function seek(e, t){
 /* var klipp visas, från vilken sekund i klippet, i vilken fart, och hur länge sista bilden hålls */
 /* bildspåret: a–b är när skottet syns, from/speed är var i klippet och hur fort det spelas, z är inzoomningen, zw skalar den för 16:9 */
 var SHOTS = [
-  {k:"tv", a:0, b:6.4, v:"tv", from:0, speed:.8},
-  {k:"clip", a:6.4, b:8.9, v:"earth1", from:2.4, speed:1, z:[1, 1.06], pos:[.5, .6]},
-  {k:"clip", a:8.9, b:10.1, v:"engine", from:.3, speed:1, z:[1, 1.08], pos:[.5, .6]},
-  {k:"clip", a:10.0, b:11.5, v:"rocket", from:0, speed:1, z:[1.05, 1.12], pos:[.5, .5], out:.25},
-  {k:"icons", a:11.9, b:16.5},
-  {k:"clip", a:16.7, b:21.4, v:"eye", from:.3, speed:1, z:[1, 1.1], pos:[.46, .5]},
-  {k:"ct", a:21.3, b:24.2, v:"ct", from:0, speed:.92, z:[2.3, 2.45], zw:.85, pos:[.5, .46]},
-  {k:"clip", a:24.1, b:26.4, v:"earth2", from:1, speed:1, z:[1, 1.08], pos:[.35, .5]},
-  {k:"tv", a:26.3, b:29.9, v:"tv", from:.4, speed:.9, out:.3},
-  {k:"show", a:30.9, b:36.4},
-  {k:"clip", a:37.7, b:41.8, v:"earth1", from:.6, speed:1, z:[1, 1.05], pos:[.5, .6], dim:true, out:.4},
-  {k:"ui", a:41.4, b:44.4}
+  {k:"tv", a:0, b:5.2, v:"tv", from:0, speed:1, z:[2.1, 1.3]},
+  {k:"icons", a:5.6, b:10.4},
+  {k:"clip", a:10.9, b:14.9, v:"eye", from:.3, speed:1, z:[1, 1.1], pos:[.46, .5], out:.2},
+  {k:"show", a:15.7, b:21.2},
+  {k:"clip", a:22.1, b:26.6, v:"earth1", from:.6, speed:1, z:[1, 1.05], pos:[.5, .6], dim:true, out:.4, color:true},
+  {k:"ui", a:25.3, b:28.1}
 ];
+var SHOWCLIPS = [];
 function clipTime(c, t){ return c.from + Math.max(0, Math.min(t, c.b) - c.a)*c.speed }
 /* vid uppspelning går klippen på riktigt, vid skrubbning och export söks varje bildruta fram */
 function prep(t){
   return loadMedia().then(function(){
     var live = window.V3S && V3S.playing, jobs = [];
-    SHOTS.forEach(function(c){
+    SHOTS.concat(SHOWCLIPS).forEach(function(c){
       if(!c.v) return;
       var e = vel(c.v), on = t >= c.a - .15 && t < c.b + .35;
       if(live){
@@ -116,19 +111,16 @@ function fit(key, maxW, maxH){
 /* ---------- undertexter, två–tre ord i taget, som i förebilden ---------- */
 /* rösten: fil, start, längd och text. Klippt i de verkliga pauserna mellan meningarna */
 var VO = [
-  ["w01", .4, 1.7, "1969."],
-  ["w02", 2.55, 3.74, "Hundratals miljoner människor håller andan."],
-  ["w03", 6.8, 4.47, "Hela världen bevittnar det som en gång ansågs omöjligt."],
-  ["w04", 11.9, 4.91, "Genom historien har det alltid funnits människor som vågat drömma större."],
-  ["w05", 17.3, 3.89, "Som ser möjligheter där andra ser begränsningar."],
-  ["w06", 21.8, 4.26, "Men det som gör dem extraordinära är inte bara vad de ser."],
-  ["w07", 26.5, 3.13, "Utan förmågan att få andra att se det också."],
-  ["w08", 31.0, 2.43, "Det är så gränser flyttas."],
-  ["w09", 33.85, 2.43, "Och människor gör skillnad."],
-  ["w10", 37.9, 4.55, "Men ingen har någonsin förverkligat sina största drömmar…"],
-  ["w11a", 44.0, 1.28, "Utan rätt"],
+  ["w02", 1.4, 3.74, "Hundratals miljoner människor håller andan."],
+  ["w04", 5.6, 4.91, "Genom historien har det alltid funnits människor som vågat drömma större."],
+  ["w05", 10.9, 3.89, "Som ser möjligheter där andra ser begränsningar."],
+  ["w08", 15.8, 2.43, "Det är så gränser flyttas."],
+  ["w09", 18.55, 2.43, "Och människor gör skillnad."],
+  ["w10", 22.3, 4.55, "Men ingen har någonsin förverkligat sina största drömmar…"],
+  ["w11a", 27.9, 1.28, "Utan rätt"],
   ["w11b", CLICK - .11, 1.07, "verktyg."]];
 var SUBS = VO.map(function(v){ return {t0:v[1], d:v[2], txt:v[3]} }).concat([
+  {t0:.1, d:1.6, txt:"1969", year:1},
   {t0:0, d:0, txt:"Upptäck verktygen", btn:1},
   {t0:0, d:0, txt:"viewly.se", url:1}]);
 var SX = {};
@@ -152,14 +144,14 @@ function chunks(txt){
 function subtitles(c, G, t){
   var i, s, ch, tot, acc, k, y = G.H - G.bot - (G.is9 ? 3.2 : 4.6);
   for(i = 0; i < SUBS.length; i++){
-    s = SUBS[i]; if(s.btn || s.url || t < s.t0 || t >= s.t0 + s.d + .25) continue;
+    s = SUBS[i]; if(s.btn || s.url || s.year || t < s.t0 || t >= s.t0 + s.d + .25) continue;
     ch = chunks(subText(i)); if(!ch.length) continue;
     tot = ch.join("").length; acc = 0;
     for(k = 0; k < ch.length; k++){
       var a0 = s.t0 + s.d*acc/tot, a1 = s.t0 + s.d*(acc + ch[k].length)/tot; acc += ch[k].length;
       if(k === ch.length - 1) a1 = s.t0 + s.d + .25;
       if(t >= a0 && t < a1){
-        v3Text(c, ch[k], 50, y, {size:3.1, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", shadow:true, alpha:Math.min(1, (t - a0)/.07)});
+        v3Text(c, ch[k], 50, y, {size:G.is9 ? 3.9 : 3.2, weight:600, f:"sans", sp:.04, color:"#fff", align:"c", shadow:true, alpha:Math.min(1, (t - a0)/.07)});
       }
     }
   }
@@ -177,10 +169,10 @@ function tvShot(c, G, t, s, a){
   var u = k3(t, s.a, s.b), vw = e.videoWidth, vh = e.videoHeight;
   c.save(); c.globalAlpha = c.globalAlpha*a;
   if(G.is9){
-    var w = 100*lerp(1, 2.1, ioC(u)), h = w*vh/vw;
+    var w = 100*lerp(s.z ? s.z[0] : 1, s.z ? s.z[1] : 2.1, ioC(u)), h = w*vh/vw;
     c.drawImage(e, 50 - .47*w, H*.46 - .48*h, w, h);
   } else {
-    var sc = Math.max(100/vw, H/vh)*lerp(1, 1.12, u), dw = vw*sc, dh = vh*sc;
+    var sc = Math.max(100/vw, H/vh)*lerp(1.12, 1.0, u), dw = vw*sc, dh = vh*sc;
     c.drawImage(e, 50 - dw*.5, H/2 - dh*.5, dw, dh);
   }
   c.restore();
@@ -225,18 +217,26 @@ function iconCard(c, G, i, rot, sc, zoom, bgA){
   c.restore();
 }
 function iconScene(c, G, t, s){
-  var n = 4, per = (s.b - s.a)/n, k = Math.min(n - 1, Math.floor((t - s.a)/per)), t0 = s.a + k*per, u = k3(t, t0, t0 + per), land = oQ(k3(t, t0, t0 + .24));
+  var n = ICONS.length, per = (s.b - s.a)/n, k = Math.min(n - 1, Math.floor((t - s.a)/per)), t0 = s.a + k*per, u = k3(t, t0, t0 + per), land = oQ(k3(t, t0, t0 + .24));
   v3Fill(c, 0, 0, 100, G.H, DARK);
   if(t < s.b) iconCard(c, G, k, ((k*7) % 5 - 2)*.006, lerp(1.14, 1, land), lerp(1, 1.08, u), .5*land + .1);
 }
 /* bildspelet: tätare och tätare, ett slutarklick per bild */
-var SHOWT = (function(){ var a = 30.9, b = 36.3, n = 16, r = .86, arr = [], k; for(k = 0; k <= n; k++) arr.push(a + (b - a)*(1 - Math.pow(r, k))/(1 - Math.pow(r, n))); return arr })();
-var SHOWQ = [0, 2, 4, 1, 3, 0, 4, 2, 1, 3, 0, 2, 4, 1, 3, 0, 2];
+var SHOWT = (function(){ var a = 15.7, b = 21.1, n = 16, r = .86, arr = [], k; for(k = 0; k <= n; k++) arr.push(a + (b - a)*(1 - Math.pow(r, k))/(1 - Math.pow(r, n))); return arr })();
+/* bildspelet: foton och korta klipp om vartannat, tätare och tätare */
+var SHOWQ = [0, 2, 4, 1, "engine", 3, 0, 2, "rocket", 4, 1, "earth2", 3, 0, 4, 2];
+var SHOWSRC = {engine:[.3, 1], rocket:[0, .5], earth2:[1, 1]};
+SHOWQ.forEach(function(q, k){ if(typeof q === "string") SHOWCLIPS.push({v:q, a:SHOWT[k], b:SHOWT[k + 1] + .12, from:SHOWSRC[q][0], speed:SHOWSRC[q][1]}) });
 function showScene(c, G, t, s){
   v3Fill(c, 0, 0, 100, G.H, DARK);
   var k = 0; while(k < SHOWT.length - 2 && t >= SHOWT[k + 1]) k++;
   var q = SHOWQ[k], u = k3(t, SHOWT[k], SHOWT[k + 1]);
-  if(t < s.b) iconCard(c, G, q, (q - 2)*.008, lerp(1.03, 1, oQ(k3(t, SHOWT[k], SHOWT[k] + .1))), lerp(1.02, 1.07, u), .45);
+  if(t >= s.b) return;
+  if(typeof q === "string"){
+    var cl = SHOWCLIPS.filter(function(x){ return x.v === q })[0];
+    vcover(c, q, 0, 0, 100, G.H, {scale:lerp(1.04, 1.12, u), pos:q === "earth2" ? [.35, .5] : [.5, .55]});
+    var vg = c.createRadialGradient(50, G.H/2, G.H*.2, 50, G.H/2, G.H*.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.6)"); c.fillStyle = vg; c.fillRect(0, 0, 100, G.H);
+  } else iconCard(c, G, q, (q - 2)*.008, lerp(1.03, 1, oQ(k3(t, SHOWT[k], SHOWT[k] + .1))), lerp(1.02, 1.07, u), .45);
 }
 
 /* ---------- inne i systemet: en lugn gränssnittsrörelse ---------- */
@@ -324,21 +324,23 @@ function draw(c, G, t, o){
   });
   if(t >= CLICK - 1.0) buttonScene(c, G, t);
   var bwA = 0;
-  SHOTS.forEach(function(s){ if(t >= s.a && t < s.b + .35 && (s.k === "tv" || s.k === "icons" || s.k === "show" || s.v === "engine" || s.v === "rocket")) bwA = Math.max(bwA, s.k === "icons" || s.k === "show" ? 1 : shotAlpha(t, s)) });
+  SHOTS.forEach(function(s){ if(t >= s.a && t < s.b + .35 && !s.color && s.k !== "ui") bwA = Math.max(bwA, s.k === "icons" || s.k === "show" ? 1 : shotAlpha(t, s)) });
   FX.tone(c, G, Math.min(1, bwA), .12);
-  FX.finish(c, G, t, {vig:.62});
-  [6.4, 8.9, 11.9, 30.9].forEach(function(h){ FX.flash(c, G, t, h, .4, .12) });
+    FX.finish(c, G, t, {vig:.62});
+  [5.6, 10.9, 15.7].forEach(function(h){ FX.flash(c, G, t, h, .4, .12) });
   SHOWT.forEach(function(h, k){ if(k > 0 && k < SHOWT.length - 1) FX.flash(c, G, t, h, .12, .08) });
   FX.flash(c, G, t, CLICK, .35, .1);
+  var yi = SUBS.length - 3, ya = ioC(k3(t, .1, .45))*(1 - ioC(k3(t, 1.4, 1.75)));
+  if(ya > 0){ var yz = lerp(1.08, 1, oQ(k3(t, .1, .7))); c.save(); c.translate(50, G.is9 ? 70 : H*.5); c.scale(yz, yz); v3Text(c, subText(yi), 0, 0, {size:G.is9 ? 27 : 18, weight:300, color:"#fff", align:"c", shadow:true, alpha:ya}); c.restore() }
   subtitles(c, G, t);
 }
 
 /* ---------- ljudet: din låt, rösten, och ljudeffekterna ---------- */
 var V6 = {music:null, musicName:"", vo:[], voReady:null};
 var VO_FILES = VO.map(function(v){ return ["media/vo3/" + v[0] + ".mp3", v[1]] });
-var MUSIC_START = 2.6;
-var MUSIC_DIPS = [[29.75, 30.85, .25, .95], [36.45, 37.8, .2, .55]];
-var OUTRO_AT = 41.5;
+var MUSIC_OFFSET = 12.6;
+var MUSIC_DIPS = [[14.75, 15.65, .25, .95], [21.0, 22.1, .2, .55]];
+var OUTRO_AT = 42.68;
 function ctxAudio(){ var AC = window.AudioContext || window.webkitAudioContext; return window.__v6ac || (window.__v6ac = new AC()) }
 function decode(ab){ return new Promise(function(res, rej){ var p = ctxAudio().decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej) }) }
 function loadAudio(){
@@ -365,12 +367,13 @@ function mix(ctx, comp){
   if(V6.music){
     /* före klicket: låtens början, därefter låtens slut när knappen trycks */
     var ms = ctx.createBufferSource(); ms.buffer = V6.music; var mg = ctx.createGain(); mg.gain.setValueAtTime(.95, 0);
-    voiceWin.forEach(function(w){ if(w[0] < CLICK - .3){ mg.gain.setTargetAtTime(.55, w[0] - .15, .12); mg.gain.setTargetAtTime(.95, w[1] + .1, .35) } });
+    var inDip = function(t){ return MUSIC_DIPS.some(function(d){ return t >= d[0] - .2 && t < d[1] }) };
+    voiceWin.forEach(function(w){ if(w[0] < CLICK - .3){ if(!inDip(w[0] - .15)) mg.gain.setTargetAtTime(.55, w[0] - .15, .12); if(!inDip(w[1] + .1)) mg.gain.setTargetAtTime(.95, w[1] + .1, .35) } });
     MUSIC_DIPS.forEach(function(d){ mg.gain.setTargetAtTime(d[2], d[0], .1); mg.gain.setTargetAtTime(d[3], d[1], .04) });
-    mg.gain.setValueAtTime(.95, CLICK - .06); mg.gain.linearRampToValueAtTime(0, CLICK + .02);
-    ms.connect(mg); mg.connect(master); ms.start(MUSIC_START, 0); ms.stop(CLICK + .05);
-    var mo = ctx.createBufferSource(); mo.buffer = V6.music; var og = ctx.createGain(); og.gain.setValueAtTime(0, CLICK - .02); og.gain.linearRampToValueAtTime(1, CLICK + .04); 
-    mo.connect(og); og.connect(master); mo.start(CLICK - .02, OUTRO_AT); mo.stop(DUR);
+    mg.gain.setValueAtTime(.95, CLICK - .14); mg.gain.linearRampToValueAtTime(0, CLICK + .05);
+    ms.connect(mg); mg.connect(master); ms.start(0, MUSIC_OFFSET); ms.stop(CLICK + .06);
+    var mo = ctx.createBufferSource(); mo.buffer = V6.music; var og = ctx.createGain(); og.gain.setValueAtTime(0, CLICK - .005); og.gain.linearRampToValueAtTime(1, CLICK + .02); 
+    mo.connect(og); og.connect(master); mo.start(CLICK - .005, OUTRO_AT); mo.stop(DUR);
   }
   /* rösten */
   var vg = bus(1.7, .12);
@@ -390,14 +393,13 @@ function mix(ctx, comp){
   var piano = function(t, midi, vel, dd){ var fr = 440*Math.pow(2, (midi - 69)/12), b = ctx.createGain(); b.gain.value = vel*.34; var tf = ctx.createBiquadFilter(); tf.type = "lowpass"; tf.frequency.value = Math.min(7000, 1400 + fr*5); b.connect(tf); tf.connect(bus(1, .45));
     [1, .5, .26, .13, .07].forEach(function(a, k){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr*(k + 1); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + .007); g.gain.setTargetAtTime(0, t + .01, dd/(1 + k*.9)/3.2); o.connect(g); g.connect(b); o.start(t); o.stop(t + dd + .3) }) };
   var rumble = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .2); var f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 130; var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd*.6); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
-  shutter(6.4, .22); shutter(8.9, .12);
-  rumble(9.8, 2.2, .35); thud(10.0, .3);
-  [11.9, 13.05, 14.2, 15.35].forEach(function(t){ shutter(t, .2) });
-  for(i = 0; i < 3; i++){ thud(21.3 + i*.9, .17); thud(21.3 + i*.9 + .2, .11) }
-  riser(28.3, 2.6, .08); impact(30.9, .4);
+  var burst = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2400; f.Q.value = .5; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
+  burst(0, .5, .22); drone(0, 5.2, .05);
+  for(i = 0; i < 5; i++) shutter(5.6 + i*((10.4 - 5.6)/5), .2);
+  for(i = 0; i < 4; i++){ thud(10.9 + i*.9, .17); thud(10.9 + i*.9 + .2, .11) }
+  riser(13.4, 2.3, .07); impact(15.7, .4);
   SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ shutter(h, .12 + .16*k/SHOWT.length); if(k % 4 === 0) thud(h, .2) } });
-  impact(36.4, .22);
-  drone(41.0, CLICK - 41.0, .09); riser(43.6, 2.3, .04);
+  drone(22.3, CLICK - 22.3, .09); riser(27.0, 2.3, .04);
   click(CLICK, .26); thud(CLICK, .35);
 }
 
@@ -421,7 +423,7 @@ function slots(){
 }
 function subEd(){
   return '<details class="a3det a3cust" open><summary>Ändra undertexterna och knappen</summary><p class="a3hint">Undertexterna följer rösten, två–tre ord i taget. Rösten ändras inte av texten, så ändrar du en rad behöver rösten spelas in på nytt.</p><div class="a3hxs">'
-    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
+    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.year ? "Årtalet i öppningen" : s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
     + '</div></details>';
 }
 function outroEd(){
