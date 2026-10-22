@@ -503,7 +503,7 @@ function makeMix(sched){
     (comp.vo || []).forEach(function(l){ var b = VOB[l[0]]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; var g = ctx.createGain(); g.gain.value = 1.15; src.connect(g); g.connect(master); src.start(Math.max(0, l[1] < 0 ? comp.dur + l[1] : l[1])) });
     sched(H, comp);
     var e0 = comp.dur - END_L;
-    H.click(e0 + E_CLICK, .95); H.s("tick2", e0 + E_CLICK + .2, .4); H.s("tick2", e0 + E_CLICK + E_T2, .4); H.s("sting", e0 + E_CLICK + E_T3 - .02, .8);
+    H.click(e0 + E_CLICK, .5); H.s("tick2", e0 + E_CLICK + .2, .16); H.s("tick2", e0 + E_CLICK + E_T2, .16); H.s("sting", e0 + E_CLICK + E_T3 - .02, .8);
   };
 }
 
