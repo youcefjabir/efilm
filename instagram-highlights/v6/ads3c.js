@@ -453,7 +453,7 @@ function v3Stage(t){
     comp.prep(tt0).then(function(){ if(pt === V3S._pt) v3DrawComp(cv, W, V3S.comp, V3S.fmt, V3S.t) });
   } else v3DrawComp(cv, W, V3S.comp, V3S.fmt, V3S.t);
   var sc = document.getElementById("v3scrub"); if(sc && document.activeElement !== sc) sc.value = Math.round(V3S.t/comp.dur*1000);
-  var tm = document.getElementById("v3time"); if(tm) tm.textContent = V3S.t.toFixed(1).replace(".", ",") + " / " + comp.dur.toFixed(1).replace(".", ",") + " s";
+  var tm = document.getElementById("v3time"); if(tm) tm.innerHTML = V3S.t.toFixed(1).replace(".", ",") + " / " + comp.dur.toFixed(1).replace(".", ",") + " s<br><span style=\"font-size:10px;color:var(--mut)\">bygge 47</span>";
 }
 function v3StopSound(){ if(V3S.src){ try{ V3S.src.stop() }catch(e){} V3S.src = null } }
 function v3Loop(now){

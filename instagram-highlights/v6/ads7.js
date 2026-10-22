@@ -269,7 +269,7 @@ function ad3(c, G, t, Lx, sh){
     c.save(); c.globalAlpha = dark; v3Photo(c, ph(0), 0, 0, 100, H, {scale:lerp(1.05, 1.16, k3(t, 0, 3.8)), pos:V3_POS[ph(0)]}); c.restore();
     v3Fill(c, 0, 0, 100, H, "#0c0a0a", .55*dark);
     var s = G.is9 ? 10.4 : (H > 110 ? 8.6 : 7.4), B = box(G), y = B.y0 + B.h*.42;
-    var ta = 1 - ioC(k3(t, 3.0, 3.5));
+    var ta = 1 - ioC(k3(t, 2.8, 3.3));
     v3Text(c, hook("fotograf", 0), 50, y, {size:s, color:"#fff", align:"c", alpha:ta, p:oQ(k3(t, .5, 1.8)), rise:2, shadow:true});
     v3Text(c, hook("fotograf", 1), 50, y + s*1.2, {size:s, italic:true, color:C3.cream, align:"c", alpha:ta, p:oQ(k3(t, 1.5, 2.8)), rise:2, shadow:true});
   }
@@ -556,7 +556,7 @@ window.secAds7 = function(){
   if(V3S.fmt !== "916" && V3S.fmt !== "45" && V3S.fmt !== "11") V3S.fmt = "916";
   var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : V3S.fmt === "45" ? "4:5 · 1080 × 1350" : "1:1 · 1080 × 1080";
   setTimeout(v3Mount, 0);
-  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 15 · bygge 46</div><h2>Annonsbyggare</h2>'
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 15 · bygge 47</div><h2>Annonsbyggare</h2>'
     + '<p>Åtta annonser för den enskilda mäklaren på Facebook och Instagram, var och en i tre varianter: A (stolen och tavlorna först), B (matplatsen först) och C (detaljerna först). Målet är att de ska få veta att Viewly finns och bli nyfikna, inte att boka. Bara era egna bilder, få och diskreta ljud. Varje annons slutar som varumärkesfilmen. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
