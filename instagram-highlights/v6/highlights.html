@@ -12188,7 +12188,7 @@ window.secBrand = function(){
    vid 39 s, i tystnaden före bildspelet.
    ===================================================================== */
 (function(){
-var FX = window.BR_FX, DARK = "#050505", CLICK = 31.9, DUR = 37.7;
+var FX = window.BR_FX, DARK = "#050505", CLICK = 31.9, DUR = 39.5;
 
 /* ---------- media ---------- */
 var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan"};
@@ -12302,7 +12302,9 @@ var VO = [
   ["w11b", CLICK - .11, 1.07, "verktyg."]];
 var SUBS = VO.map(function(v){ return {t0:v[1], d:v[2], txt:v[3]} }).concat([
   {t0:0, d:0, txt:"Upptäck verktygen", btn:1},
-  {t0:0, d:0, txt:"viewly.se", url:1}]);
+  {t0:0, d:0, txt:"viewly.se", url:1},
+  {t0:0, d:0, txt:"För fastighetsmäklare.", tag:1}]);
+var IDX = {btn:SUBS.length - 3, url:SUBS.length - 2, tag:SUBS.length - 1};
 var SX = {};
 try { SX = JSON.parse(localStorage.getItem("viewly.film.tx") || "{}") || {} } catch(e){ SX = {} }
 function sxSave(){ try { localStorage.setItem("viewly.film.tx", JSON.stringify(SX)) } catch(e){} }
@@ -12324,7 +12326,7 @@ function chunks(txt){
 function subtitles(c, G, t){
   var i, s, ch, tot, acc, k, y = G.H - G.bot - (G.is9 ? 3.2 : 4.6);
   for(i = 0; i < SUBS.length; i++){
-    s = SUBS[i]; if(s.btn || s.url || t < s.t0 || t >= s.t0 + s.d + .25) continue;
+    s = SUBS[i]; if(s.btn || s.url || s.tag || t < s.t0 || t >= s.t0 + s.d + .25) continue;
     ch = chunks(subText(i)); if(!ch.length) continue;
     tot = ch.join("").length; acc = 0;
     for(k = 0; k < ch.length; k++){
@@ -12488,25 +12490,49 @@ function uiScene(c, G, t, s){
 function btnPath(c, cx, cy, bw, bh){
   c.beginPath(); c.moveTo(cx - bw/2 + bh/2, cy - bh/2); c.arcTo(cx + bw/2, cy - bh/2, cx + bw/2, cy + bh/2, bh/2); c.arcTo(cx + bw/2, cy + bh/2, cx - bw/2, cy + bh/2, bh/2); c.arcTo(cx - bw/2, cy + bh/2, cx - bw/2, cy - bh/2, bh/2); c.arcTo(cx - bw/2, cy - bh/2, cx + bw/2, cy - bh/2, bh/2); c.closePath();
 }
+/* slutet som i förebilden: knappen trycks, adressen står där knappen var, en rad, och loggan sätts ihop */
+var END_T2 = 2.3, END_T3 = 4.1;
+function endLogo(c, G, t, u){
+  var cy = G.cy, capH = G.is9 ? 6.2 : 4.4, mh = capH*1.55, mw = mh*858.6/756.3, fs = capH/.7, gap = capH*.95;
+  var wo = {size:fs, weight:500, f:"sans", sp:.2, color:"#fff"}, ww = v3Measure(c, "VIEWLY", wo), tot = mw + gap + ww, x0 = 50 - tot/2;
+  /* ett mjukt sken bakom när märket låser */
+  var g = ioC(k3(u, .55, .9))*(1 - ioC(k3(u, .9, 1.9)));
+  if(g > 0){ var gr = c.createRadialGradient(x0 + mw/2, cy, 0, x0 + mw/2, cy, mh*1.6); gr.addColorStop(0, "rgba(255,255,255," + (.22*g) + ")"); gr.addColorStop(1, "rgba(255,255,255,0)"); c.fillStyle = gr; c.fillRect(0, 0, 100, G.H) }
+  var mx = x0 + mw/2, my = cy;
+  c.save(); c.translate(mx, my); c.rotate(-1.25*(1 - oQ(k3(u, 0, .95)))); var sc = lerp(.45, 1, oBack(k3(u, 0, .85))); c.scale(sc, sc); c.translate(-mx, -my);
+  v3Mark(c, x0, my - mh/2, mh, "#fff", C3.olil, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
+  c.restore();
+  var by = cy + capH/2 + capH*.02, wx = x0 + mw + gap, i, str = "VIEWLY", x = wx;
+  for(i = 0; i < str.length; i++){
+    var lp = oQ(k3(u, .75 + i*.07, .75 + i*.07 + .45));
+    v3Text(c, str[i], x, by, {size:fs, weight:500, f:"sans", color:"#fff", p:lp, rise:capH*.5});
+    x += c.measureText(str[i]).width + .2*fs;
+  }
+}
 function buttonScene(c, G, t){
   var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 46, h = G.is9 ? 10.4 : 7.6, ts = h*.3;
   if(t < CLICK - .96) return;
-  var u = oQ(k3(t, CLICK - .95, CLICK - .5)), press = k3(t, CLICK - .1, CLICK)*(1 - k3(t, CLICK + .08, CLICK + .26)), swap = ioC(k3(t, CLICK + .08, CLICK + .5));
+  var u = oQ(k3(t, CLICK - .95, CLICK - .5)), press = k3(t, CLICK - .1, CLICK)*(1 - k3(t, CLICK + .08, CLICK + .26)), gone = ioC(k3(t, CLICK + .14, CLICK + .42));
   v3Fill(c, 0, 0, 100, H, "#050505", u);
-  /* samma knapp före och efter: texten rullar upp och adressen tar dess plats */
-  var bw = w*(1 - .05*press), bh = h*(1 - .05*press);
-  c.save(); c.globalAlpha = u; c.shadowColor = "rgba(255,255,255," + (.18 + .08*Math.sin(t*5)) + ")"; c.shadowBlur = 7; c.shadowOffsetY = 1.2;
-  var bg = c.createLinearGradient(0, cy - bh/2, 0, cy + bh/2); bg.addColorStop(0, "#ffffff"); bg.addColorStop(1, "#cfcfcf");
-  c.fillStyle = bg; btnPath(c, cx, cy, bw, bh); c.fill(); c.restore();
-  c.save(); btnPath(c, cx, cy, bw, bh); c.clip();
-  v3Text(c, subText(SUBS.length - 2), cx, cy + ts*.34 - swap*h*.4, {size:ts, weight:500, f:"sans", sp:.02, color:"#0a0a0a", align:"c", alpha:u*(1 - swap)});
-  var ur = subText(SUBS.length - 1), mh = h*.6, mw = mh*858.6/756.3, gp = h*.28, lw = v3Measure(c, ur, {size:ts, weight:500, f:"sans", sp:.02}), x0 = cx - (mw + gp + lw)/2, yo = (1 - swap)*h*.4;
-  v3Mark(c, x0, cy + yo - mh/2, mh, "#0a0a0a", C3.oli, {reveal:ioC(k3(t, CLICK + .3, CLICK + .95)), dot:oBack(k3(t, CLICK + .85, CLICK + 1.2)), alpha:swap});
-  v3Text(c, ur, x0 + mw + gp, cy + ts*.34 + yo, {size:ts, weight:500, f:"sans", sp:.02, color:"#0a0a0a", alpha:swap});
-  c.restore();
-  var cp = ioC(k3(t, CLICK - .8, CLICK - .08)), curX = lerp(106, cx + w*.21, cp), curY = lerp(H - (G.is9 ? 20 : 8), cy + h*.33, cp) - Math.sin(cp*Math.PI)*4;
-  v3Cursor(c, curX, curY, press, k3(t, CLICK - .8, CLICK - .55)*(1 - k3(t, CLICK + .5, CLICK + .8)));
-  v3Tap(c, cx + w*.21, cy + h*.33, k3(t, CLICK - .02, CLICK + .5));
+  if(gone < 1){
+    var bw = w*(1 - .05*press), bh = h*(1 - .05*press), a = u*(1 - gone);
+    c.save(); c.translate(cx, cy); c.scale(1 + .05*gone, 1 + .05*gone); c.translate(-cx, -cy);
+    c.save(); c.globalAlpha = a; c.shadowColor = "rgba(255,255,255," + (.18 + .08*Math.sin(t*5)) + ")"; c.shadowBlur = 7; c.shadowOffsetY = 1.2;
+    var bg = c.createLinearGradient(0, cy - bh/2, 0, cy + bh/2); bg.addColorStop(0, "#ffffff"); bg.addColorStop(1, "#cfcfcf");
+    c.fillStyle = bg; btnPath(c, cx, cy, bw, bh); c.fill(); c.restore();
+    v3Text(c, subText(IDX.btn), cx, cy + ts*.34, {size:ts, weight:500, f:"sans", sp:.02, color:"#0a0a0a", align:"c", alpha:a});
+    c.restore();
+    var cp = ioC(k3(t, CLICK - .8, CLICK - .08)), curX = lerp(106, cx + w*.21, cp), curY = lerp(H - (G.is9 ? 20 : 8), cy + h*.33, cp) - Math.sin(cp*Math.PI)*4;
+    v3Cursor(c, curX, curY, press, k3(t, CLICK - .8, CLICK - .55)*(1 - k3(t, CLICK + .3, CLICK + .55)));
+    v3Tap(c, cx + w*.21, cy + h*.33, k3(t, CLICK - .02, CLICK + .5));
+  }
+  /* adressen tar knappens plats */
+  var T2 = CLICK + END_T2, T3 = CLICK + END_T3, ts2 = G.is9 ? 6.4 : 4.6;
+  var aA = ioC(k3(t, CLICK + .45, CLICK + .9))*(1 - ioC(k3(t, T2 - .3, T2)));
+  if(aA > 0) v3Text(c, subText(IDX.url), cx, cy + ts2*.34 - (1 - ioC(k3(t, CLICK + .45, CLICK + .9)))*-1.2 - ioC(k3(t, T2 - .3, T2))*1.2, {size:ts2, weight:500, f:"sans", sp:.01, color:"#fff", align:"c", alpha:aA});
+  var aB = ioC(k3(t, T2, T2 + .45))*(1 - ioC(k3(t, T3 - .3, T3)));
+  if(aB > 0) v3Text(c, subText(IDX.tag), cx, cy + ts2*.3 + (1 - ioC(k3(t, T2, T2 + .45)))*1.2 - ioC(k3(t, T3 - .3, T3))*1.2, {size:ts2*.8, weight:500, f:"sans", sp:.01, color:"#fff", align:"c", alpha:aB});
+  if(t >= T3) endLogo(c, G, t, t - T3);
 }
 
 /* ---------- hela filmen ---------- */
@@ -12537,7 +12563,7 @@ function draw(c, G, t, o){
     FX.finish(c, G, t, {vig:.62});
   [3.3, 4.5, 5.8, 7.6, 12.9, 17.7].forEach(function(h){ FX.flash(c, G, t, h, .4, .12) });
   SHOWT.forEach(function(h, k){ if(k > 0 && k < SHOWT.length - 1) FX.flash(c, G, t, h, .12, k % 3 === 0 ? .16 : .08) });
-  FX.flash(c, G, t, CLICK, .35, .1);
+  FX.flash(c, G, t, CLICK, .35, .1); FX.flash(c, G, t, CLICK + END_T3 + .8, .5, .1);
   subtitles(c, G, t);
 }
 
@@ -12609,6 +12635,7 @@ function mix(ctx, comp){
   SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ shutter(h, .12 + .16*k/SHOWT.length); if(k % 4 === 0) thud(h, .2) } });
   drone(24.3, CLICK - 24.3, .09); riser(29.0, 2.3, .04);
   click(CLICK, .26); thud(CLICK, .35);
+  tick(CLICK + .45, .05); tick(CLICK + END_T2, .05); thud(CLICK + END_T3, .14); impact(CLICK + END_T3 + .8, .22);
 }
 
 /* ---------- komposition ---------- */
@@ -12631,7 +12658,7 @@ function slots(){
 }
 function subEd(){
   return '<details class="a3det a3cust" open><summary>Ändra undertexterna och knappen</summary><p class="a3hint">Undertexterna följer rösten, två–tre ord i taget. Rösten ändras inte av texten, så ändrar du en rad behöver rösten spelas in på nytt.</p><div class="a3hxs">'
-    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
+    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : s.tag ? "Raden efter adressen" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
     + '</div></details>';
 }
 function outroEd(){
