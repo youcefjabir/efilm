@@ -10,7 +10,7 @@
    vid 39 s, i tystnaden före bildspelet.
    ===================================================================== */
 (function(){
-var FX = window.BR_FX, DARK = "#050505", CLICK = 31.9, DUR = 39.5;
+var FX = window.BR_FX, DARK = "#050505", CLICK = 31.9, DUR = 38.9;
 
 /* ---------- media ---------- */
 var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan", f_palme1:"filmPalme1", f_mays:"filmMays", f_palme2:"filmPalme2", f_jobs:"filmJobs"};
@@ -313,20 +313,19 @@ function btnPath(c, cx, cy, bw, bh){
   c.beginPath(); c.moveTo(cx - bw/2 + bh/2, cy - bh/2); c.arcTo(cx + bw/2, cy - bh/2, cx + bw/2, cy + bh/2, bh/2); c.arcTo(cx + bw/2, cy + bh/2, cx - bw/2, cy + bh/2, bh/2); c.arcTo(cx - bw/2, cy + bh/2, cx - bw/2, cy - bh/2, bh/2); c.arcTo(cx - bw/2, cy - bh/2, cx + bw/2, cy - bh/2, bh/2); c.closePath();
 }
 /* slutet som i förebilden: knappen trycks, adressen står där knappen var, en rad, och loggan sätts ihop */
-var END_T2 = 2.3, END_T3 = 4.1;
+var END_T2 = 1.9, END_T3 = 3.5, MARK_DX = 0;
 function endLogo(c, G, t, u){
-  var cy = G.cy, capH = G.is9 ? 6.2 : 4.4, mh = capH*1.55, mw = mh*858.6/756.3, fs = capH/.7, gap = capH*.95;
-  var wo = {size:fs, weight:500, f:"sans", sp:.2, color:"#fff"}, ww = v3Measure(c, "VIEWLY", wo), tot = mw + gap + ww, x0 = 50 - tot/2;
-  /* ett mjukt sken bakom när märket låser */
-  var g = ioC(k3(u, .55, .9))*(1 - ioC(k3(u, .9, 1.9)));
-  if(g > 0){ var gr = c.createRadialGradient(x0 + mw/2, cy, 0, x0 + mw/2, cy, mh*1.6); gr.addColorStop(0, "rgba(255,255,255," + (.22*g) + ")"); gr.addColorStop(1, "rgba(255,255,255,0)"); c.fillStyle = gr; c.fillRect(0, 0, 100, G.H) }
-  var mx = x0 + mw/2, my = cy;
-  c.save(); c.translate(mx, my); c.rotate(-1.25*(1 - oQ(k3(u, 0, .95)))); var sc = lerp(.45, 1, oBack(k3(u, 0, .85))); c.scale(sc, sc); c.translate(-mx, -my);
-  v3Mark(c, x0, my - mh/2, mh, "#fff", C3.olil, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
+  var cy = G.cy, capH = G.is9 ? 6.2 : 4.4, mh = capH*1.7, mw = mh*858.6/756.3, fs = capH/.7*.8, gap = capH*.8;
+  var wo = {size:fs, weight:500, f:"sans", sp:.2, color:"#fff"}, ww = v3Measure(c, "VIEWLY", wo) - .2*fs;
+  var tot = mw + gap + ww, fx = 50 - tot/2 - capH*.113;
+  /* märket och pricken animeras först i mitten, sedan skjuts märket åt vänster när ordet kommer in */
+  var slide = ioC(k3(u, 1.0, 1.7)), x0 = lerp(50 - mw/2, fx, slide), mx = x0 + mw/2;
+  c.save(); c.translate(mx, cy); c.rotate(-1.25*(1 - oQ(k3(u, 0, .95)))); var sc = lerp(.45, 1, oBack(k3(u, 0, .85))); c.scale(sc, sc); c.translate(-mx, -cy);
+  v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.olil, {reveal:ioC(k3(u, .05, .8)), dot:oBack(k3(u, .75, 1.05)), alpha:ioC(k3(u, 0, .25))});
   c.restore();
-  var by = cy + capH/2 + capH*.02, wx = x0 + mw + gap, i, str = "VIEWLY", x = wx;
+  var by = cy + capH/2 + capH*.02, wx = fx + mw + gap, i, str = "VIEWLY", x = wx;
   for(i = 0; i < str.length; i++){
-    var lp = oQ(k3(u, .75 + i*.07, .75 + i*.07 + .45));
+    var lp = oQ(k3(u, 1.15 + i*.07, 1.15 + i*.07 + .45));
     v3Text(c, str[i], x, by, {size:fs, weight:500, f:"sans", color:"#fff", p:lp, rise:capH*.5});
     x += c.measureText(str[i]).width + .2*fs;
   }
@@ -334,7 +333,7 @@ function endLogo(c, G, t, u){
 function buttonScene(c, G, t){
   var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 46, h = G.is9 ? 10.4 : 7.6, ts = h*.3;
   if(t < CLICK - .96) return;
-  var u = oQ(k3(t, CLICK - .95, CLICK - .5)), press = k3(t, CLICK - .1, CLICK)*(1 - k3(t, CLICK + .08, CLICK + .26)), gone = ioC(k3(t, CLICK + .14, CLICK + .42));
+  var u = oQ(k3(t, CLICK - .95, CLICK - .5)), press = k3(t, CLICK - .1, CLICK)*(1 - k3(t, CLICK + .08, CLICK + .26)), gone = ioC(k3(t, CLICK + .08, CLICK + .26));
   v3Fill(c, 0, 0, 100, H, "#050505", u);
   if(gone < 1){
     var bw = w*(1 - .05*press), bh = h*(1 - .05*press), a = u*(1 - gone);
@@ -350,8 +349,8 @@ function buttonScene(c, G, t){
   }
   /* adressen tar knappens plats */
   var T2 = CLICK + END_T2, T3 = CLICK + END_T3, ts2 = G.is9 ? 6.4 : 4.6;
-  var aA = ioC(k3(t, CLICK + .45, CLICK + .9))*(1 - ioC(k3(t, T2 - .3, T2)));
-  if(aA > 0) v3Text(c, subText(IDX.url), cx, cy + ts2*.34 - (1 - ioC(k3(t, CLICK + .45, CLICK + .9)))*-1.2 - ioC(k3(t, T2 - .3, T2))*1.2, {size:ts2, weight:500, f:"sans", sp:.01, color:"#fff", align:"c", alpha:aA});
+  var aA = ioC(k3(t, CLICK + .2, CLICK + .5))*(1 - ioC(k3(t, T2 - .3, T2)));
+  if(aA > 0) v3Text(c, subText(IDX.url), cx, cy + ts2*.34 + (1 - ioC(k3(t, CLICK + .2, CLICK + .5)))*1.2 - ioC(k3(t, T2 - .3, T2))*1.2, {size:ts2, weight:500, f:"sans", sp:.01, color:"#fff", align:"c", alpha:aA});
   var aB = ioC(k3(t, T2, T2 + .45))*(1 - ioC(k3(t, T3 - .3, T3)));
   if(aB > 0) v3Text(c, subText(IDX.tag), cx, cy + ts2*.3 + (1 - ioC(k3(t, T2, T2 + .45)))*1.2 - ioC(k3(t, T3 - .3, T3))*1.2, {size:ts2*.8, weight:500, f:"sans", sp:.01, color:"#fff", align:"c", alpha:aB});
   if(t >= T3) endLogo(c, G, t, t - T3);
@@ -385,7 +384,7 @@ function draw(c, G, t, o){
     FX.finish(c, G, t, {vig:.62});
   [3.3, 4.5, 5.8, 7.6, 12.9, 17.7].forEach(function(h){ FX.flash(c, G, t, h, .4, .12) });
   SHOWT.forEach(function(h, k){ if(k > 0 && k < SHOWT.length - 1) FX.flash(c, G, t, h, .12, k % 3 === 0 ? .16 : .08) });
-  FX.flash(c, G, t, CLICK, .35, .1); FX.flash(c, G, t, CLICK + END_T3 + .8, .5, .1);
+ 
   subtitles(c, G, t);
 }
 
@@ -448,8 +447,12 @@ function mix(ctx, comp){
     [1, .5, .26, .13, .07].forEach(function(a, k){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr*(k + 1); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + .007); g.gain.setTargetAtTime(0, t + .01, dd/(1 + k*.9)/3.2); o.connect(g); g.connect(b); o.start(t); o.stop(t + dd + .3) }) };
   var rumble = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .2); var f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 130; var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd*.6); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
   var whoosh = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 1.1; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(3600, t + dd); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd*.7); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1, .1)); n.start(t) };
-  var uiClick = function(t, v){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(1600, t); o.frequency.exponentialRampToValueAtTime(650, t + .028); var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .045); o.connect(g); g.connect(bus(1)); o.start(t); o.stop(t + .06);
+  var uiClickOld = function(t, v){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(1600, t); o.frequency.exponentialRampToValueAtTime(650, t + .028); var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .045); o.connect(g); g.connect(bus(1)); o.start(t); o.stop(t + .06);
     var n = ctx.createBufferSource(); n.buffer = nb(.012); var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 3500; var g2 = ctx.createGain(); g2.gain.setValueAtTime(v*.5, t); g2.gain.exponentialRampToValueAtTime(.001, t + .01); n.connect(hp); hp.connect(g2); g2.connect(bus(1)); n.start(t) };
+  var mouseTick = function(t, v, tone){ var n = ctx.createBufferSource(); n.buffer = nb(.02); var bp = ctx.createBiquadFilter(); bp.type = "bandpass"; bp.frequency.value = tone; bp.Q.value = .9; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .012); n.connect(bp); bp.connect(g); g.connect(bus(1)); n.start(t);
+    var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(260, t); o.frequency.exponentialRampToValueAtTime(120, t + .018); var g2 = ctx.createGain(); g2.gain.setValueAtTime(v*.55, t); g2.gain.exponentialRampToValueAtTime(.001, t + .025); o.connect(g2); g2.connect(bus(1)); o.start(t); o.stop(t + .03) };
+  /* ett klassiskt datormusklick: tryck ner, och en lite lättare släpp strax efter */
+  var uiClick = function(t, v, up){ mouseTick(t, v, 3200); if(up !== false) mouseTick(t + .075, v*.55, 4200) };
   var camShot = function(t, v){ shutter(t, v); var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(2600, t); o.frequency.exponentialRampToValueAtTime(1800, t + .05); var g = ctx.createGain(); g.gain.setValueAtTime(v*.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .07); o.connect(g); g.connect(bus(1, .15)); o.start(t); o.stop(t + .08) };
   var burst = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2400; f.Q.value = .5; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
   burst(0, .5, .22); drone(0, 6.0, .05);
@@ -459,9 +462,9 @@ function mix(ctx, comp){
   for(i = 0; i < 4; i++){ thud(12.9 + i*.9, .17); thud(12.9 + i*.9 + .2, .11) }
   riser(15.4, 2.3, .07); impact(17.7, .4);
   SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ var r = k/(SHOWT.length - 1); whoosh(h - .1, .1, .12 + .12*r); camShot(h, .55 + .4*r); thud(h, .34 + .16*r) } });
-  uiClick(SHOWT[SHOWT.length - 1] + .05, .3);
+  
   drone(24.3, CLICK - 24.3, .09); riser(29.0, 2.3, .04);
-  uiClick(CLICK, .6); uiClick(CLICK + .45, .35); uiClick(CLICK + END_T2, .35); uiClick(CLICK + END_T3, .4);
+  uiClick(CLICK, .8); uiClick(CLICK + .2, .5, false); uiClick(CLICK + END_T2, .5, false); uiClick(CLICK + END_T3, .5, false);
 }
 
 /* ---------- komposition ---------- */
