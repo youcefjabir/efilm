@@ -13,9 +13,9 @@
 var FX = window.BR_FX, DARK = "#050505", CLICK = 31.9, DUR = 39.5;
 
 /* ---------- media ---------- */
-var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan"};
+var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan", f_palme1:"filmPalme1", f_mays:"filmMays", f_palme2:"filmPalme2", f_jobs:"filmJobs"};
 Object.keys(IMG).forEach(function(k){ V3_KEYS[k] = IMG[k] });
-V3_POS.f_ali = [.55, .5]; V3_POS.f_jordan = [.72, .45]; V3_POS.f_maradona = [.45, .4]; V3_POS.f_malcolm = [.62, .45]; V3_POS.f_astro = [.58, .5];
+V3_POS.f_ali = [.55, .5]; V3_POS.f_jordan = [.72, .45]; V3_POS.f_maradona = [.45, .4]; V3_POS.f_malcolm = [.62, .45]; V3_POS.f_astro = [.58, .5]; V3_POS.f_palme1 = [.5, .4]; V3_POS.f_mays = [.28, .5]; V3_POS.f_palme2 = [.5, .3]; V3_POS.f_jobs = [.5, .4];
 var VIDS = {tv:"media/tv.webm", earth1:"media/earth1.webm", earth2:"media/earth2.webm", rocket:"media/rocket.webm", eye:"media/eye.webm", ct:"media/ct.webm", engine:"media/engine.webm"};
 var VEL = {}, MEDIA_P = null; window.__v6dbg = {VEL:VEL};
 function vel(n){
@@ -213,7 +213,7 @@ function neuronLayer(c, G, t, s, a0){
 
 /* ---------- ikonerna, tryckta på kopior av sig själva, och bildspelet ---------- */
 var ICONN = 4;
-var ICONS = [["f_ali", [.55, .5], 1], ["f_jordan", [.85, .65], 1.4], ["f_maradona", [.45, .4], 1], ["f_malcolm", [.62, .45], 1], ["f_astro", [.56, .5], 1]];
+var ICONS = [["f_ali", [.55, .5], 1], ["f_jordan", [.85, .65], 1.4], ["f_maradona", [.45, .4], 1], ["f_malcolm", [.62, .45], 1], ["f_astro", [.56, .5], 1], ["f_palme1", [.5, .4], 1], ["f_mays", [.28, .5], 1], ["f_palme2", [.5, .3], 1], ["f_jobs", [.5, .4], 1]];
 /* ett foto med vit kant, centrerat i cx, cy; k skalar storleken */
 function cardPrint(c, G, i, o){
   var H = G.H, s = ICONS[i], key = s[0], f = fit(key, 86*o.k, Math.min(G.is9 ? 112 : 96, H - 8)*o.k);
@@ -239,7 +239,7 @@ function iconScene(c, G, t, s){
 }
 var SHOWT = (function(){ var a = 17.7, b = 23.1, n = 16, r = .86, arr = [], k; for(k = 0; k <= n; k++) arr.push(a + (b - a)*(1 - Math.pow(r, k))/(1 - Math.pow(r, n))); return arr })();
 /* bildspelet: foton och korta klipp om vartannat, tätare och tätare */
-var SHOWQ = [0, 2, 4, 1, "engine", 3, 0, 2, "rocket", 4, 1, "earth2", 3, 0, 4, 2];
+var SHOWQ = [6, 0, 5, 2, "engine", 8, 1, 7, "rocket", 3, 6, "earth2", 5, 4, 7, 8];
 var SHOWSRC = {engine:[.3, 1], rocket:[0, .5], earth2:[1, 1]};
 SHOWQ.forEach(function(q, k){ if(typeof q === "string") SHOWCLIPS.push({v:q, a:SHOWT[k], b:SHOWT[k + 1] + .12, from:SHOWSRC[q][0], speed:SHOWSRC[q][1]}) });
 var PILE = [[-17, -30, -.07], [19, -34, .06], [-22, 27, .05], [23, 31, -.06], [-3, -44, .03], [-27, -2, -.05], [27, 3, .07], [2, 45, -.04]];
@@ -393,7 +393,7 @@ function draw(c, G, t, o){
 var V6 = {music:null, musicName:"", vo:[], voReady:null};
 var VO_FILES = VO.map(function(v){ return ["media/vo3/" + v[0] + ".mp3", v[1]] });
 var MUSIC_OFFSET = 10.6;
-var MUSIC_DIPS = [[16.75, 17.65, .25, .95], [23.0, 24.1, .2, .55]];
+var MUSIC_DIPS = [[16.75, 17.65, .25, .95], [17.75, 22.95, .62, .62], [23.0, 24.1, .2, .55]];
 var OUTRO_AT = 42.68, OUTRO_DELAY = .85;
 function ctxAudio(){ var AC = window.AudioContext || window.webkitAudioContext; return window.__v6ac || (window.__v6ac = new AC()) }
 function decode(ab){ return new Promise(function(res, rej){ var p = ctxAudio().decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej) }) }
@@ -447,17 +447,21 @@ function mix(ctx, comp){
   var piano = function(t, midi, vel, dd){ var fr = 440*Math.pow(2, (midi - 69)/12), b = ctx.createGain(); b.gain.value = vel*.34; var tf = ctx.createBiquadFilter(); tf.type = "lowpass"; tf.frequency.value = Math.min(7000, 1400 + fr*5); b.connect(tf); tf.connect(bus(1, .45));
     [1, .5, .26, .13, .07].forEach(function(a, k){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr*(k + 1); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + .007); g.gain.setTargetAtTime(0, t + .01, dd/(1 + k*.9)/3.2); o.connect(g); g.connect(b); o.start(t); o.stop(t + dd + .3) }) };
   var rumble = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .2); var f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 130; var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd*.6); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
+  var whoosh = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.Q.value = 1.1; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(3600, t + dd); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd*.7); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1, .1)); n.start(t) };
+  var uiClick = function(t, v){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(1600, t); o.frequency.exponentialRampToValueAtTime(650, t + .028); var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + .045); o.connect(g); g.connect(bus(1)); o.start(t); o.stop(t + .06);
+    var n = ctx.createBufferSource(); n.buffer = nb(.012); var hp = ctx.createBiquadFilter(); hp.type = "highpass"; hp.frequency.value = 3500; var g2 = ctx.createGain(); g2.gain.setValueAtTime(v*.5, t); g2.gain.exponentialRampToValueAtTime(.001, t + .01); n.connect(hp); hp.connect(g2); g2.connect(bus(1)); n.start(t) };
+  var camShot = function(t, v){ shutter(t, v); var o = ctx.createOscillator(); o.type = "sine"; o.frequency.setValueAtTime(2600, t); o.frequency.exponentialRampToValueAtTime(1800, t + .05); var g = ctx.createGain(); g.gain.setValueAtTime(v*.35, t); g.gain.exponentialRampToValueAtTime(.001, t + .07); o.connect(g); g.connect(bus(1, .15)); o.start(t); o.stop(t + .08) };
   var burst = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2400; f.Q.value = .5; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
   burst(0, .5, .22); drone(0, 6.0, .05);
   shutter(3.3, .22); shutter(4.5, .12);
   rumble(5.2, 2.4, .35); thud(5.8, .3);
-  for(i = 0; i < ICONN; i++) shutter(7.6 + i*((12.4 - 7.6)/ICONN), .2);
+  for(i = 0; i < ICONN; i++){ whoosh(7.6 + i*((12.4 - 7.6)/ICONN) - .14, .16, .09); camShot(7.6 + i*((12.4 - 7.6)/ICONN), .38) }
   for(i = 0; i < 4; i++){ thud(12.9 + i*.9, .17); thud(12.9 + i*.9 + .2, .11) }
   riser(15.4, 2.3, .07); impact(17.7, .4);
-  SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ shutter(h, .12 + .16*k/SHOWT.length); if(k % 4 === 0) thud(h, .2) } });
+  SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ var r = k/(SHOWT.length - 1); whoosh(h - .1, .1, .12 + .12*r); camShot(h, .55 + .4*r); thud(h, .34 + .16*r) } });
+  uiClick(SHOWT[SHOWT.length - 1] + .05, .3);
   drone(24.3, CLICK - 24.3, .09); riser(29.0, 2.3, .04);
-  click(CLICK, .26); thud(CLICK, .35);
-  tick(CLICK + .45, .05); tick(CLICK + END_T2, .05); thud(CLICK + END_T3, .14); impact(CLICK + END_T3 + .8, .22);
+  uiClick(CLICK, .6); uiClick(CLICK + .45, .35); uiClick(CLICK + END_T2, .35); uiClick(CLICK + END_T3, .4);
 }
 
 /* ---------- komposition ---------- */
@@ -473,7 +477,7 @@ window.V3_FILM2 = [];
 
 /* ---------- sidan ---------- */
 var SLOTS = [["tv", "Månlandningen på TV (klipp)", "vid"], ["f_astro", "Bildspelets femte bild", "img"], ["rocket", "Raket som lyfter (klipp)", "vid"], ["earth1", "Jorden som reser sig (klipp)", "vid"], ["earth2", "Jorden med solen (klipp)", "vid"], ["eye", "Öga i närbild (klipp)", "vid"], ["ct", "Hjärnskanning (klipp)", "vid"],
-  ["f_ali", "Ikon 1 (bild)", "img"], ["f_jordan", "Ikon 2 (bild)", "img"], ["f_maradona", "Ikon 3 (bild)", "img"], ["f_malcolm", "Ikon 4 (bild)", "img"], ["engine", "Raketen i närbild (klipp)", "vid"]];
+  ["f_ali", "Ikon 1 (bild)", "img"], ["f_palme1", "Bildspel: bild 6", "img"], ["f_mays", "Bildspel: bild 7", "img"], ["f_palme2", "Bildspel: bild 8", "img"], ["f_jobs", "Bildspel: bild 9", "img"], ["f_jordan", "Ikon 2 (bild)", "img"], ["f_maradona", "Ikon 3 (bild)", "img"], ["f_malcolm", "Ikon 4 (bild)", "img"], ["engine", "Raketen i närbild (klipp)", "vid"]];
 function slots(){
   return '<details class="a3det a3cust" open><summary>Byt bilder och klipp</summary><p class="a3hint">Välj en egen fil för en plats. Bilden eller klippet får samma bildbehandling och samma rörelse automatiskt. Filerna stannar i din webbläsare.</p><div class="a3hxs">'
     + SLOTS.map(function(s){ return '<label class="a3f"><span>' + esc(s[1]) + '</span><input type="file" accept="' + (s[2] === "img" ? "image/*" : "video/*") + '" data-a3slot="' + s[0] + '" data-kind="' + s[2] + '"></label>' }).join("") + '</div></details>';
