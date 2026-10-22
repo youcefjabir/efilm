@@ -12188,7 +12188,7 @@ window.secBrand = function(){
    vid 39 s, i tystnaden före bildspelet.
    ===================================================================== */
 (function(){
-var FX = window.BR_FX, DARK = "#050505", CLICK = 29.9, DUR = 34.5;
+var FX = window.BR_FX, DARK = "#050505", CLICK = 31.9, DUR = 37.7;
 
 /* ---------- media ---------- */
 var IMG = {f_ali:"filmAli", f_astro:"filmAstro", f_malcolm:"filmMalcolm", f_maradona:"filmMaradona", f_jordan:"filmJordan"};
@@ -12222,12 +12222,15 @@ function seek(e, t){
 /* var klipp visas, från vilken sekund i klippet, i vilken fart, och hur länge sista bilden hålls */
 /* bildspåret: a–b är när skottet syns, from/speed är var i klippet och hur fort det spelas, z är inzoomningen, zw skalar den för 16:9 */
 var SHOTS = [
-  {k:"tv", a:0, b:5.2, v:"tv", from:0, speed:1, z:[2.1, 1.3]},
-  {k:"icons", a:5.6, b:10.4},
-  {k:"clip", a:10.9, b:14.9, v:"eye", from:.3, speed:1, z:[1, 1.1], pos:[.46, .5], out:.2},
-  {k:"show", a:15.7, b:21.2},
-  {k:"clip", a:22.1, b:26.6, v:"earth1", from:.6, speed:1, z:[1, 1.05], pos:[.5, .6], dim:true, out:.4, color:true},
-  {k:"ui", a:25.3, b:28.1}
+  {k:"tv", a:0, b:3.4, v:"tv", from:0, speed:1, z:[2.1, 1.3]},
+  {k:"astro", a:3.3, b:4.6},
+  {k:"clip", a:4.5, b:5.9, v:"engine", from:.3, speed:1, z:[1, 1.08], pos:[.5, .6]},
+  {k:"clip", a:5.8, b:7.4, v:"rocket", from:0, speed:1, z:[1.05, 1.12], pos:[.5, .5], out:.2},
+  {k:"icons", a:7.6, b:12.4},
+  {k:"clip", a:12.9, b:16.9, v:"eye", from:.3, speed:1, z:[1, 1.1], pos:[.46, .5], out:.2},
+  {k:"show", a:17.7, b:23.2},
+  {k:"clip", a:24.1, b:28.6, v:"earth1", from:.6, speed:1, z:[1, 1.05], pos:[.5, .6], dim:true, out:.4, color:true},
+  {k:"ui", a:27.3, b:30.1}
 ];
 var SHOWCLIPS = [];
 function clipTime(c, t){ return c.from + Math.max(0, Math.min(t, c.b) - c.a)*c.speed }
@@ -12290,15 +12293,14 @@ function fit(key, maxW, maxH){
 /* rösten: fil, start, längd och text. Klippt i de verkliga pauserna mellan meningarna */
 var VO = [
   ["w02", 1.4, 3.74, "Hundratals miljoner människor håller andan."],
-  ["w04", 5.6, 4.91, "Genom historien har det alltid funnits människor som vågat drömma större."],
-  ["w05", 10.9, 3.89, "Som ser möjligheter där andra ser begränsningar."],
-  ["w08", 15.8, 2.43, "Det är så gränser flyttas."],
-  ["w09", 18.55, 2.43, "Och människor gör skillnad."],
-  ["w10", 22.3, 4.55, "Men ingen har någonsin förverkligat sina största drömmar…"],
-  ["w11a", 27.9, 1.28, "Utan rätt"],
+  ["w04", 7.6, 4.91, "Genom historien har det alltid funnits människor som vågat drömma större."],
+  ["w05", 12.9, 3.89, "Som ser möjligheter där andra ser begränsningar."],
+  ["w08", 17.8, 2.43, "Det är så gränser flyttas."],
+  ["w09", 20.55, 2.43, "Och människor gör skillnad."],
+  ["w10", 24.3, 4.55, "Men ingen har någonsin förverkligat sina största drömmar…"],
+  ["w11a", 29.9, 1.28, "Utan rätt"],
   ["w11b", CLICK - .11, 1.07, "verktyg."]];
 var SUBS = VO.map(function(v){ return {t0:v[1], d:v[2], txt:v[3]} }).concat([
-  {t0:.1, d:1.6, txt:"1969", year:1},
   {t0:0, d:0, txt:"Upptäck verktygen", btn:1},
   {t0:0, d:0, txt:"viewly.se", url:1}]);
 var SX = {};
@@ -12322,7 +12324,7 @@ function chunks(txt){
 function subtitles(c, G, t){
   var i, s, ch, tot, acc, k, y = G.H - G.bot - (G.is9 ? 3.2 : 4.6);
   for(i = 0; i < SUBS.length; i++){
-    s = SUBS[i]; if(s.btn || s.url || s.year || t < s.t0 || t >= s.t0 + s.d + .25) continue;
+    s = SUBS[i]; if(s.btn || s.url || t < s.t0 || t >= s.t0 + s.d + .25) continue;
     ch = chunks(subText(i)); if(!ch.length) continue;
     tot = ch.join("").length; acc = 0;
     for(k = 0; k < ch.length; k++){
@@ -12386,35 +12388,60 @@ function neuronLayer(c, G, t, s, a0){
 }
 
 /* ---------- ikonerna, tryckta på kopior av sig själva, och bildspelet ---------- */
+var ICONN = 4;
 var ICONS = [["f_ali", [.55, .5], 1], ["f_jordan", [.85, .65], 1.4], ["f_maradona", [.45, .4], 1], ["f_malcolm", [.62, .45], 1], ["f_astro", [.56, .5], 1]];
-function iconCard(c, G, i, rot, sc, zoom, bgA){
-  var H = G.H, s = ICONS[i], key = s[0], cyy = G.is9 ? H/2 - 3 : H/2, f = fit(key, 86, Math.min(G.is9 ? 112 : 96, H - 8));
-  blurBg(c, G, key, bgA);
-  c.save(); c.translate(50, cyy); c.scale(sc, sc); c.translate(-50, -cyy);
-  print(c, [(100 - f[0])/2, cyy - f[1]/2, f[0], f[1]], 2.1, rot, function(x, y, w, h){ v3Photo(c, key, x, y, w, h, {pos:s[1], scale:s[2]*zoom}) });
+/* ett foto med vit kant, centrerat i cx, cy; k skalar storleken */
+function cardPrint(c, G, i, o){
+  var H = G.H, s = ICONS[i], key = s[0], f = fit(key, 86*o.k, Math.min(G.is9 ? 112 : 96, H - 8)*o.k);
+  c.save(); c.globalAlpha = c.globalAlpha*(o.a == null ? 1 : o.a); c.translate(o.cx, o.cy); c.scale(o.sc, o.sc); c.translate(-o.cx, -o.cy);
+  print(c, [o.cx - f[0]/2, o.cy - f[1]/2, f[0], f[1]], 2.1*o.k, o.rot, function(x, y, w, h){ v3Photo(c, key, x, y, w, h, {pos:s[1], scale:s[2]*o.zoom}) });
   c.restore();
 }
-function iconScene(c, G, t, s){
-  var n = ICONS.length, per = (s.b - s.a)/n, k = Math.min(n - 1, Math.floor((t - s.a)/per)), t0 = s.a + k*per, u = k3(t, t0, t0 + per), land = oQ(k3(t, t0, t0 + .24));
-  v3Fill(c, 0, 0, 100, G.H, DARK);
-  if(t < s.b) iconCard(c, G, k, ((k*7) % 5 - 2)*.006, lerp(1.14, 1, land), lerp(1, 1.08, u), .5*land + .1);
+function iconCard(c, G, i, rot, sc, zoom, bgA){
+  var H = G.H;
+  blurBg(c, G, ICONS[i][0], bgA);
+  cardPrint(c, G, i, {cx:50, cy:G.is9 ? H/2 - 3 : H/2, sc:sc, rot:rot, zoom:zoom, k:1});
 }
-/* bildspelet: tätare och tätare, ett slutarklick per bild */
-var SHOWT = (function(){ var a = 15.7, b = 21.1, n = 16, r = .86, arr = [], k; for(k = 0; k <= n; k++) arr.push(a + (b - a)*(1 - Math.pow(r, k))/(1 - Math.pow(r, n))); return arr })();
+/* månlandarens foto landar som en polaroid */
+function astroShot(c, G, t, s){
+  v3Fill(c, 0, 0, 100, G.H, DARK);
+  var land = oBack(k3(t, s.a, s.a + .3));
+  iconCard(c, G, 4, lerp(-.05, -.008, land), lerp(1.2, 1, Math.min(1, land)), lerp(1, 1.07, k3(t, s.a, s.b)), .55);
+}
+function iconScene(c, G, t, s){
+  var n = ICONN, per = (s.b - s.a)/n, k = Math.min(n - 1, Math.floor((t - s.a)/per)), t0 = s.a + k*per, u = k3(t, t0, t0 + per), land = oBack(k3(t, t0, t0 + .3));
+  v3Fill(c, 0, 0, 100, G.H, DARK);
+  if(t < s.b) iconCard(c, G, k, lerp(((k*7) % 5 - 2)*.03, ((k*7) % 5 - 2)*.006, Math.min(1, land)), lerp(1.22, 1, Math.min(1, land)), lerp(1, 1.08, u), .5*oQ(k3(t, t0, t0 + .24)) + .1);
+}
+var SHOWT = (function(){ var a = 17.7, b = 23.1, n = 16, r = .86, arr = [], k; for(k = 0; k <= n; k++) arr.push(a + (b - a)*(1 - Math.pow(r, k))/(1 - Math.pow(r, n))); return arr })();
 /* bildspelet: foton och korta klipp om vartannat, tätare och tätare */
 var SHOWQ = [0, 2, 4, 1, "engine", 3, 0, 2, "rocket", 4, 1, "earth2", 3, 0, 4, 2];
 var SHOWSRC = {engine:[.3, 1], rocket:[0, .5], earth2:[1, 1]};
 SHOWQ.forEach(function(q, k){ if(typeof q === "string") SHOWCLIPS.push({v:q, a:SHOWT[k], b:SHOWT[k + 1] + .12, from:SHOWSRC[q][0], speed:SHOWSRC[q][1]}) });
+var PILE = [[-17, -30, -.07], [19, -34, .06], [-22, 27, .05], [23, 31, -.06], [-3, -44, .03], [-27, -2, -.05], [27, 3, .07], [2, 45, -.04]];
 function showScene(c, G, t, s){
   v3Fill(c, 0, 0, 100, G.H, DARK);
   var k = 0; while(k < SHOWT.length - 2 && t >= SHOWT[k + 1]) k++;
-  var q = SHOWQ[k], u = k3(t, SHOWT[k], SHOWT[k + 1]);
+  var q = SHOWQ[k], u = k3(t, SHOWT[k], SHOWT[k + 1]), H = G.H;
   if(t >= s.b) return;
+  /* varje klipp slår till: en kort inzoomning och en liten skakning */
+  var pu = Math.pow(1 - k3(t, SHOWT[k], SHOWT[k] + .16), 2), shx = Math.sin(k*91.7)*1.3*pu, shy = Math.cos(k*53.3)*1.3*pu, ps = 1 + .07*pu;
+  c.save(); c.translate(50 + shx, H/2 + shy); c.scale(ps, ps); c.translate(-50, -H/2);
   if(typeof q === "string"){
-    var cl = SHOWCLIPS.filter(function(x){ return x.v === q })[0];
-    vcover(c, q, 0, 0, 100, G.H, {scale:lerp(1.04, 1.12, u), pos:q === "earth2" ? [.35, .5] : [.5, .55]});
-    var vg = c.createRadialGradient(50, G.H/2, G.H*.2, 50, G.H/2, G.H*.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.6)"); c.fillStyle = vg; c.fillRect(0, 0, 100, G.H);
-  } else iconCard(c, G, q, (q - 2)*.008, lerp(1.03, 1, oQ(k3(t, SHOWT[k], SHOWT[k] + .1))), lerp(1.02, 1.07, u), .45);
+    vcover(c, q, 0, 0, 100, H, {scale:lerp(1.04, 1.12, u), pos:q === "earth2" ? [.35, .5] : [.5, .55]});
+    var vg = c.createRadialGradient(50, H/2, H*.2, 50, H/2, H*.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0,.6)"); c.fillStyle = vg; c.fillRect(0, 0, 100, H);
+  } else {
+    blurBg(c, G, ICONS[q][0], .45);
+    /* korten från tidigare klipp ligger kvar som en växande hög bakom */
+    var d, j, kx = G.is9 ? 1 : 1.7, ky = G.is9 ? 1 : .32, cy0 = G.is9 ? H/2 - 3 : H/2, nPile = k < 5 ? 0 : Math.min(7, k - 3);
+    for(d = nPile; d >= 1; d--){
+      j = k - d; if(j < 0 || typeof SHOWQ[j] === "string") continue;
+      var pp = PILE[j % 8];
+      cardPrint(c, G, SHOWQ[j], {cx:50 + pp[0]*kx, cy:cy0 + pp[1]*ky, sc:1, rot:pp[2], zoom:1.02, k:G.is9 ? .5 : .45, a:.82});
+    }
+    cardPrint(c, G, q, {cx:50, cy:cy0, sc:lerp(1.03, 1, oQ(k3(t, SHOWT[k], SHOWT[k] + .1))), rot:(q - 2)*.008, zoom:lerp(1.02, 1.07, u), k:1});
+  }
+  c.restore();
 }
 
 /* ---------- inne i systemet: en lugn gränssnittsrörelse ---------- */
@@ -12473,7 +12500,9 @@ function buttonScene(c, G, t){
   c.fillStyle = bg; btnPath(c, cx, cy, bw, bh); c.fill(); c.restore();
   c.save(); btnPath(c, cx, cy, bw, bh); c.clip();
   v3Text(c, subText(SUBS.length - 2), cx, cy + ts*.34 - swap*h*.4, {size:ts, weight:500, f:"sans", sp:.02, color:"#0a0a0a", align:"c", alpha:u*(1 - swap)});
-  v3Text(c, subText(SUBS.length - 1), cx, cy + ts*.34 + (1 - swap)*h*.4, {size:ts, weight:500, f:"sans", sp:.02, color:"#0a0a0a", align:"c", alpha:swap});
+  var ur = subText(SUBS.length - 1), mh = h*.6, mw = mh*858.6/756.3, gp = h*.28, lw = v3Measure(c, ur, {size:ts, weight:500, f:"sans", sp:.02}), x0 = cx - (mw + gp + lw)/2, yo = (1 - swap)*h*.4;
+  v3Mark(c, x0, cy + yo - mh/2, mh, "#0a0a0a", C3.oli, {reveal:ioC(k3(t, CLICK + .3, CLICK + .95)), dot:oBack(k3(t, CLICK + .85, CLICK + 1.2)), alpha:swap});
+  v3Text(c, ur, x0 + mw + gp, cy + ts*.34 + yo, {size:ts, weight:500, f:"sans", sp:.02, color:"#0a0a0a", alpha:swap});
   c.restore();
   var cp = ioC(k3(t, CLICK - .8, CLICK - .08)), curX = lerp(106, cx + w*.21, cp), curY = lerp(H - (G.is9 ? 20 : 8), cy + h*.33, cp) - Math.sin(cp*Math.PI)*4;
   v3Cursor(c, curX, curY, press, k3(t, CLICK - .8, CLICK - .55)*(1 - k3(t, CLICK + .5, CLICK + .8)));
@@ -12496,6 +12525,7 @@ function draw(c, G, t, o){
       if(s.k === "clip" && (s.v === "eye" || s.v === "rocket" || s.v === "engine")){ var vg = c.createRadialGradient(50, H/2, H*.2, 50, H/2, H*.75); vg.addColorStop(0, "rgba(0,0,0,0)"); vg.addColorStop(1, "rgba(0,0,0," + (.55*a) + ")"); c.fillStyle = vg; c.fillRect(0, 0, 100, H) }
     }
     else if(s.k === "tv") tvShot(c, G, t, s, a);
+    else if(s.k === "astro") astroShot(c, G, t, s);
     else if(s.k === "icons") iconScene(c, G, t, s);
     else if(s.k === "show") showScene(c, G, t, s);
     else if(s.k === "ui") uiScene(c, G, t, s);
@@ -12505,20 +12535,18 @@ function draw(c, G, t, o){
   SHOTS.forEach(function(s){ if(t >= s.a && t < s.b + .35 && !s.color && s.k !== "ui") bwA = Math.max(bwA, s.k === "icons" || s.k === "show" ? 1 : shotAlpha(t, s)) });
   FX.tone(c, G, Math.min(1, bwA), .12);
     FX.finish(c, G, t, {vig:.62});
-  [5.6, 10.9, 15.7].forEach(function(h){ FX.flash(c, G, t, h, .4, .12) });
-  SHOWT.forEach(function(h, k){ if(k > 0 && k < SHOWT.length - 1) FX.flash(c, G, t, h, .12, .08) });
+  [3.3, 4.5, 5.8, 7.6, 12.9, 17.7].forEach(function(h){ FX.flash(c, G, t, h, .4, .12) });
+  SHOWT.forEach(function(h, k){ if(k > 0 && k < SHOWT.length - 1) FX.flash(c, G, t, h, .12, k % 3 === 0 ? .16 : .08) });
   FX.flash(c, G, t, CLICK, .35, .1);
-  var yi = SUBS.length - 3, ya = ioC(k3(t, .1, .45))*(1 - ioC(k3(t, 1.4, 1.75)));
-  if(ya > 0){ var yz = lerp(1.08, 1, oQ(k3(t, .1, .7))); c.save(); c.translate(50, G.is9 ? 70 : H*.5); c.scale(yz, yz); v3Text(c, subText(yi), 0, 0, {size:G.is9 ? 27 : 18, weight:300, color:"#fff", align:"c", shadow:true, alpha:ya}); c.restore() }
   subtitles(c, G, t);
 }
 
 /* ---------- ljudet: din låt, rösten, och ljudeffekterna ---------- */
 var V6 = {music:null, musicName:"", vo:[], voReady:null};
 var VO_FILES = VO.map(function(v){ return ["media/vo3/" + v[0] + ".mp3", v[1]] });
-var MUSIC_OFFSET = 12.6;
-var MUSIC_DIPS = [[14.75, 15.65, .25, .95], [21.0, 22.1, .2, .55]];
-var OUTRO_AT = 42.68;
+var MUSIC_OFFSET = 10.6;
+var MUSIC_DIPS = [[16.75, 17.65, .25, .95], [23.0, 24.1, .2, .55]];
+var OUTRO_AT = 42.68, OUTRO_DELAY = .85;
 function ctxAudio(){ var AC = window.AudioContext || window.webkitAudioContext; return window.__v6ac || (window.__v6ac = new AC()) }
 function decode(ab){ return new Promise(function(res, rej){ var p = ctxAudio().decodeAudioData(ab, res, rej); if(p && p.then) p.then(res, rej) }) }
 function loadAudio(){
@@ -12529,8 +12557,8 @@ function loadAudio(){
   return Promise.all([V6.voReady, V6.musicReady]);
 }
 function mix(ctx, comp){
-  var master = ctx.createGain(); master.gain.value = .72;
-  var cmp = ctx.createDynamicsCompressor(); cmp.threshold.value = -14; cmp.ratio.value = 3; cmp.attack.value = .005; cmp.release.value = .2;
+  var master = ctx.createGain(); master.gain.value = .5;
+  var cmp = ctx.createDynamicsCompressor(); cmp.threshold.value = -14; cmp.ratio.value = 2.2; cmp.attack.value = .005; cmp.release.value = .2;
   var lim = ctx.createDynamicsCompressor(); lim.threshold.value = -3; lim.ratio.value = 20; lim.attack.value = .001; lim.release.value = .08; lim.knee.value = 0;
   var fade = ctx.createGain(); fade.gain.setValueAtTime(1, Math.max(0, DUR - 1.6)); fade.gain.linearRampToValueAtTime(0, DUR);
   master.connect(cmp); cmp.connect(lim); lim.connect(fade); fade.connect(ctx.destination);
@@ -12550,8 +12578,8 @@ function mix(ctx, comp){
     MUSIC_DIPS.forEach(function(d){ mg.gain.setTargetAtTime(d[2], d[0], .1); mg.gain.setTargetAtTime(d[3], d[1], .04) });
     mg.gain.setValueAtTime(.95, CLICK - .14); mg.gain.linearRampToValueAtTime(0, CLICK + .05);
     ms.connect(mg); mg.connect(master); ms.start(0, MUSIC_OFFSET); ms.stop(CLICK + .06);
-    var mo = ctx.createBufferSource(); mo.buffer = V6.music; var og = ctx.createGain(); og.gain.setValueAtTime(0, CLICK - .005); og.gain.linearRampToValueAtTime(1, CLICK + .02); 
-    mo.connect(og); og.connect(master); mo.start(CLICK - .005, OUTRO_AT); mo.stop(DUR);
+    var mo = ctx.createBufferSource(); mo.buffer = V6.music; var og = ctx.createGain(); og.gain.setValueAtTime(0, CLICK + OUTRO_DELAY - .005); og.gain.linearRampToValueAtTime(1, CLICK + OUTRO_DELAY + .02); 
+    mo.connect(og); og.connect(master); mo.start(CLICK + OUTRO_DELAY - .005, OUTRO_AT); mo.stop(DUR);
   }
   /* rösten */
   var vg = bus(1.7, .12);
@@ -12572,12 +12600,14 @@ function mix(ctx, comp){
     [1, .5, .26, .13, .07].forEach(function(a, k){ var o = ctx.createOscillator(); o.type = "sine"; o.frequency.value = fr*(k + 1); var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(a, t + .007); g.gain.setTargetAtTime(0, t + .01, dd/(1 + k*.9)/3.2); o.connect(g); g.connect(b); o.start(t); o.stop(t + dd + .3) }) };
   var rumble = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .2); var f = ctx.createBiquadFilter(); f.type = "lowpass"; f.frequency.value = 130; var g = ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + dd*.6); g.gain.linearRampToValueAtTime(0, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
   var burst = function(t, dd, v){ var n = ctx.createBufferSource(); n.buffer = nb(dd + .1); var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = 2400; f.Q.value = .5; var g = ctx.createGain(); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.001, t + dd); n.connect(f); f.connect(g); g.connect(bus(1)); n.start(t) };
-  burst(0, .5, .22); drone(0, 5.2, .05);
-  for(i = 0; i < 5; i++) shutter(5.6 + i*((10.4 - 5.6)/5), .2);
-  for(i = 0; i < 4; i++){ thud(10.9 + i*.9, .17); thud(10.9 + i*.9 + .2, .11) }
-  riser(13.4, 2.3, .07); impact(15.7, .4);
+  burst(0, .5, .22); drone(0, 6.0, .05);
+  shutter(3.3, .22); shutter(4.5, .12);
+  rumble(5.2, 2.4, .35); thud(5.8, .3);
+  for(i = 0; i < ICONN; i++) shutter(7.6 + i*((12.4 - 7.6)/ICONN), .2);
+  for(i = 0; i < 4; i++){ thud(12.9 + i*.9, .17); thud(12.9 + i*.9 + .2, .11) }
+  riser(15.4, 2.3, .07); impact(17.7, .4);
   SHOWT.forEach(function(h, k){ if(k < SHOWT.length - 1){ shutter(h, .12 + .16*k/SHOWT.length); if(k % 4 === 0) thud(h, .2) } });
-  drone(22.3, CLICK - 22.3, .09); riser(27.0, 2.3, .04);
+  drone(24.3, CLICK - 24.3, .09); riser(29.0, 2.3, .04);
   click(CLICK, .26); thud(CLICK, .35);
 }
 
@@ -12601,7 +12631,7 @@ function slots(){
 }
 function subEd(){
   return '<details class="a3det a3cust" open><summary>Ändra undertexterna och knappen</summary><p class="a3hint">Undertexterna följer rösten, två–tre ord i taget. Rösten ändras inte av texten, så ändrar du en rad behöver rösten spelas in på nytt.</p><div class="a3hxs">'
-    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.year ? "Årtalet i öppningen" : s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
+    + SUBS.map(function(s, i){ return '<label class="a3f"><span>' + (s.btn ? "Knappens text" : s.url ? "Adressen efter klicket" : "Replik " + (i + 1) + " · " + s.t0.toFixed(1).replace(".", ",") + " s") + '</span><input type="text" value="' + esc(subText(i)) + '" data-a3fx="' + i + '"></label>' }).join("")
     + '</div></details>';
 }
 function outroEd(){
@@ -12631,7 +12661,7 @@ window.secFilm = function(){
     + '<details class="a3det"><summary>Underlag, rättigheter och vad som inte är klart</summary><div class="a3und"><div><b>Musiken</b><p>Over (Drake, 2010) är en kommersiell låt. Den laddas upp av dig i webbläsaren och följer inte med sidan. För publicering krävs licens från skivbolag och förlag, eller ett annat spår.</p></div>'
     + '<div><b>Rösten</b><p>Arthur är en AI-röst. Jag har inte hört om uttalet håller som svenska, och en riktig röst kan ersätta raderna.</p></div>'
     + '<div><b>Bilderna</b><p>Bilderna på Ali, Jordan, Maradona och Malcolm X, och månlandningsbilden, kommer från dig. Rättigheter för bilderna och för personernas bild i en annons måste klaras. Jordan-bilden visar sponsorer i bakgrunden. Jordklippen är renderade.</p></div>'
-    + '<div><b>Slutet</b><p>När knappen trycks spelas låten från ' + String(OUTRO_AT).replace('.', ',') + ' s i ljudfilen. Det är en siffra att ändra om du vill börja någon annanstans.</p></div></div></details></div>';
+    + '<div><b>Slutet</b><p>När knappen trycks tystnar musiken en stund, och sedan spelas låten från ' + String(OUTRO_AT).replace('.', ',') + ' s i ljudfilen. Det är en siffra att ändra om du vill börja någon annanstans.</p></div></div></details></div>';
 };
 
 /* ---------- händelser: ladda upp låt, byt bild eller klipp, ändra text ---------- */
