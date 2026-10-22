@@ -348,10 +348,10 @@ var KINDS = ["o", "g", "e"], TS5 = [7.4, 9.6, 11.6];
 function adSkane(c, G, t){
   var H = G.H, S = SG(G), i;
   v3Fill(c, 0, 0, 100, H, DARK);
-  var bg = [P.chair, P.dining, P.kitchen, P.bed], step = 1.1, k = Math.min(3, Math.max(0, Math.floor((t - .3)/step))), a;
+  var bg = [P.chair, P.dining, P.statue, P.bed], step = 1.1, k = Math.min(3, Math.max(0, Math.floor((t - .3)/step))), a;
   for(i = 0; i < 4; i++){
     a = i === k ? 1 : 0;
-    if(a > 0) v3Photo(c, bg[i], 0, 0, 100, H, {scale:lerp(1.06, 1.16, k3(t, .3 + i*step, 7)), pos:V3_POS[bg[i]], alpha:a});
+    if(a > 0) v3Photo(c, bg[i], 0, 0, 100, H, {scale:lerp(1.04, 1.12, k3(t, .3 + i*step, 7)), pos:bg[i] === P.statue ? [.5, .2] : V3_POS[bg[i]], alpha:a});
   }
   var dim = rev(t, 4.6, .8);
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", .30 + .46*dim);
