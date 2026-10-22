@@ -79,3 +79,30 @@
 .a3hxb{border:1px solid var(--line2);border-radius:6px;padding:12px 14px;background:var(--raise)}
 .a3hxh{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
 .a3f textarea{font:inherit;font-size:13px;color:var(--ink);background:var(--bg,#fff);border:1px solid var(--line2);border-radius:4px;padding:8px 10px;resize:vertical;line-height:1.45}
+
+/* ============ MOBIL: gemensamma korrigeringar (alla sidor) ============ */
+.shell>*{min-width:0}
+.sec{min-width:0;max-width:100%}
+.sec img,.sec svg,.sec canvas,.sec video{max-width:100%}
+.sec table{display:block;max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.a3seg,.a3tab,.a3mini,.a3play{touch-action:manipulation}
+@media(max-width:900px){
+  .a3head{margin-bottom:16px}.a3head h2{font-size:26px}.a3head p{font-size:13.5px}
+  /* förhandsvisningen ligger kvar överst medan man väljer annons, variant och format */
+  .a3work{display:block}
+  .a3stagewrap{position:sticky;top:0;z-index:20;background:var(--g);padding:8px 0 10px;margin-bottom:14px;box-shadow:0 10px 12px -12px rgba(0,0,0,.35)}
+  .a3stagewrap.w916,.a3stagewrap.w45,.a3stagewrap.w169{max-width:100%}
+  .a3stagewrap .a3stage{margin-left:auto;margin-right:auto}
+  .a3stagewrap.w916 .a3stage{width:min(100%,31dvh)}
+  .a3stagewrap.w45 .a3stage{width:min(100%,44dvh)}
+  .a3ctl2{margin-top:10px;gap:10px}
+  .a3play{width:46px;height:46px}
+  .a3panel{position:static}
+  .a3segs.col{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .a3seg{min-height:44px;padding:10px 10px;font-size:13px;display:flex;align-items:center}
+  .a3segs:not(.col):not(.row) .a3seg{justify-content:center;white-space:nowrap}
+  .a3segs.col .a3seg.dl{grid-column:1/-1}
+  .a3det{margin-top:14px;padding-top:6px}
+  .a3det summary{padding:10px 0;min-height:44px}
+  .a3und{grid-template-columns:1fr}
+}

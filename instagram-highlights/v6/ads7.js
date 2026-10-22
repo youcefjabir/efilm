@@ -152,6 +152,7 @@ function postBox(c, x, y, w, ar, prog, o, style, phase, photo, name){
 function endSeq(c, G, t, e0, cta){
   var u0 = t - e0; if(u0 < 0) return;
   var kb = cta ? "a7.btn2" : "a7.btn", ku = cta ? "a7.url2" : "a7.url", kt = cta ? "a7.tag2" : "a7.tag";
+  if(cta && cta.b){ kb = cta.b; ku = cta.u || "a7.url"; kt = cta.t || "a7.tag" }
   var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 58, h = G.is9 ? 10.4 : 9, ts = h*.3;
   var bgA = ioC(k3(u0, 0, .5)), ap = oQ(k3(u0, .3, .8)), press = k3(u0, E_CLICK - .1, E_CLICK)*(1 - k3(u0, E_CLICK + .08, E_CLICK + .26)), gone = ioC(k3(u0, E_CLICK + .08, E_CLICK + .26));
   v3Fill(c, 0, 0, 100, H, "#050505", bgA);
@@ -267,8 +268,9 @@ function ad3(c, G, t, Lx, sh){
     c.save(); c.globalAlpha = dark; v3Photo(c, ph(0), 0, 0, 100, H, {scale:lerp(1.05, 1.16, k3(t, 0, 3.8)), pos:V3_POS[ph(0)]}); c.restore();
     v3Fill(c, 0, 0, 100, H, "#0c0a0a", .55*dark);
     var s = G.is9 ? 10.4 : (H > 110 ? 8.6 : 7.4), B = box(G), y = B.y0 + B.h*.42;
-    v3Text(c, hook("fotograf", 0), 50, y, {size:s, color:"#fff", align:"c", alpha:dark, p:oQ(k3(t, .5, 1.8)), rise:2, shadow:true});
-    v3Text(c, hook("fotograf", 1), 50, y + s*1.2, {size:s, italic:true, color:C3.cream, align:"c", alpha:dark, p:oQ(k3(t, 1.5, 2.8)), rise:2, shadow:true});
+    var ta = 1 - ioC(k3(t, 3.0, 3.5));
+    v3Text(c, hook("fotograf", 0), 50, y, {size:s, color:"#fff", align:"c", alpha:ta, p:oQ(k3(t, .5, 1.8)), rise:2, shadow:true});
+    v3Text(c, hook("fotograf", 1), 50, y + s*1.2, {size:s, italic:true, color:C3.cream, align:"c", alpha:ta, p:oQ(k3(t, 1.5, 2.8)), rise:2, shadow:true});
   }
   headBlock(c, G, t, 4.3, Lx || L3, T("a7.k3s1"), T("a7.k3s2"));
   if(t < 3.9) return;
@@ -372,7 +374,7 @@ function snd5(H){
    ===================================================================== */
 var L6 = 8.6, CITIES = ["Malmö", "Lund", "Landskrona", "Helsingborg"];
 function ad6(c, G, t){
-  var H = G.H, B = box(G), fin = ioC(k3(t, 5.6, 6.2));
+  var H = G.H, B = box(G), fin = ioC(k3(t, 5.6, 6.2)), outT = ioC(k3(t, 5.2, 5.6)), inT = ioC(k3(t, 5.75, 6.3));
   v3Fill(c, 0, 0, 100, H, DARK);
   var bg = [ph(0), ph(1), ph(2), ph(3)], k = Math.min(3, Math.floor(Math.max(0, t - .5)/1.25)), t0 = .5 + k*1.25, kk, a;
   for(kk = 0; kk < 4; kk++){
@@ -382,14 +384,14 @@ function ad6(c, G, t){
   }
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", .42 + .2*fin);
   var s = G.is9 ? 12 : 9.6, cy = B.y0 + B.h*.46;
-  v3Text(c, T("a7.k6a"), 50, cy - s*1.15, {size:1.9, weight:500, f:"sans", sp:.3, color:"#fff", align:"c", alpha:.9*ioC(k3(t, .3, .9))*(1 - fin)});
+  v3Text(c, T("a7.k6a"), 50, cy - s*1.15, {size:1.9, weight:500, f:"sans", sp:.3, color:"#fff", align:"c", alpha:.9*ioC(k3(t, .3, .9))*(1 - outT)});
   CITIES.forEach(function(ci, i){
-    var s0 = .5 + i*1.25, va = ioC(k3(t, s0, s0 + .25))*(1 - ioC(k3(t, s0 + 1.0, s0 + 1.25)))*(1 - fin); if(i === 3) va = ioC(k3(t, s0, s0 + .25))*(1 - fin);
+    var s0 = .5 + i*1.25, va = ioC(k3(t, s0, s0 + .25))*(1 - ioC(k3(t, s0 + 1.0, s0 + 1.25)))*(1 - fin); if(i === 3) va = ioC(k3(t, s0, s0 + .25))*(1 - outT);
     if(va > 0) v3Text(c, ci, 50, cy, {size:s, color:"#fff", align:"c", alpha:va, p:oQ(k3(t, s0, s0 + .5)), rise:2, shadow:true});
   });
-  if(fin > 0){
-    v3Text(c, hook("skane", 0), 50, cy, {size:s, color:"#fff", align:"c", alpha:fin, p:oQ(k3(t, 5.7, 6.5)), rise:2, shadow:true});
-    v3Text(c, T("a7.k6s2"), 50, cy + s*.95, {size:s*.58, italic:true, color:C3.cream, align:"c", alpha:fin, p:oQ(k3(t, 6.1, 7.0)), rise:2, shadow:true});
+  if(inT > 0){
+    v3Text(c, hook("skane", 0), 50, cy, {size:s, color:"#fff", align:"c", alpha:inT, p:oQ(k3(t, 5.8, 6.6)), rise:2, shadow:true});
+    v3Text(c, T("a7.k6s2"), 50, cy + s*.95, {size:s*.58, italic:true, color:C3.cream, align:"c", alpha:inT, p:oQ(k3(t, 6.2, 7.0)), rise:2, shadow:true});
   }
 }
 function snd6(H){
@@ -574,6 +576,15 @@ window.secAds7 = function(){
     + '<div><b>Ljud</b><p>Riktiga inspelade ljud, CC0 (Kenney.nl): musklick, korta tick, en mjuk bekräftelse. Licensen följer med i assets/sfx.</p></div>'
     + '<div><b>Kanaler</b><p>Facebook och Instagram: Reels och Stories 9:16, flöde 4:5 och 1:1. Märk med viewly.se och spåra klick separat per annons och variant.</p></div></div></details></div>';
 };
+/* delar som sida 16 (Magasin) återanvänder */
+function loadVo(names, dir){
+  var AC = window.AudioContext || window.webkitAudioContext, ctx = window.__a7ac || (window.__a7ac = new AC());
+  return Promise.all(names.map(function(n){
+    return fetch(dir + n + ".mp3").then(function(r){ return r.arrayBuffer() }).then(function(ab){ return new Promise(function(res, rej){ var q = ctx.decodeAudioData(ab, res, rej); if(q && q.then) q.then(res, rej) }) }).then(function(b){ VOB[n] = b }).catch(function(){});
+  }));
+}
+window.A7K = {A7:A7, ph:ph, PH:PH, endSeq:endSeq, makeMix:makeMix, loadVo:loadVo, box:box, hsz:hsz, rr:rr, MX:MX, GAP:GAP, END_L:END_L,
+  rawReg:function(n, x, y, w, h, o){ if(DBG) DBG.push({n:n, x:x, y:y, w:w, h:h, o:o || {}}) }, dbg:function(){ return DBG }};
 document.addEventListener("click", function(e){
   var b = e.target.closest("[data-a7var]"); if(!b) return;
   A7.v = b.dataset.a7var; V3S.playing = false; v3StopSound(); render();

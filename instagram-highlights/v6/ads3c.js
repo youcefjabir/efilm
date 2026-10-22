@@ -433,7 +433,7 @@ function v3Painter(spec){
 }
 function v3Mount(){
   var cvs = document.querySelectorAll("canvas[data-v3]");
-  if(!cvs.length) return;
+  if(!cvs.length && !document.getElementById("v3stage")) return;
   v3Load().then(function(){
     cvs.forEach(function(cv){
       var p = v3Painter(cv.dataset.v3), wpx = +(cv.dataset.w || 540), c = v3Begin(cv, wpx, Math.round(wpx*p.ar));
