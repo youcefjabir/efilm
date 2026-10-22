@@ -322,7 +322,7 @@ window.secAds8 = function(){
   if(V3S.fmt !== "916" && V3S.fmt !== "45" && V3S.fmt !== "11") V3S.fmt = "916";
   var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : V3S.fmt === "45" ? "4:5 · 1080 × 1350" : "1:1 · 1080 × 1080";
   setTimeout(v3Mount, 0);
-  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 16</div><h2>Magasin</h2>'
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 16 · bygge 46</div><h2>Magasin</h2>'
     + '<p>Sex annonser med tidningskänsla för mäklaren på Facebook och Instagram, två av dem även med svensk röst. Omslag, innehåll, citat, uppslag, register och steg. Alla i A, B och C. Alla slutar med knappen <b>Boka fotografering</b>. Bara era egna bilder, inga erbjudanden, ingen musik. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'

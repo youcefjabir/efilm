@@ -556,7 +556,7 @@ window.secAds7 = function(){
   if(V3S.fmt !== "916" && V3S.fmt !== "45" && V3S.fmt !== "11") V3S.fmt = "916";
   var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : V3S.fmt === "45" ? "4:5 · 1080 × 1350" : "1:1 · 1080 × 1080";
   setTimeout(v3Mount, 0);
-  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 15</div><h2>Annonsbyggare</h2>'
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 15 · bygge 46</div><h2>Annonsbyggare</h2>'
     + '<p>Åtta annonser för den enskilda mäklaren på Facebook och Instagram, var och en i tre varianter: A (stolen och tavlorna först), B (matplatsen först) och C (detaljerna först). Målet är att de ska få veta att Viewly finns och bli nyfikna, inte att boka. Bara era egna bilder, få och diskreta ljud. Varje annons slutar som varumärkesfilmen. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
