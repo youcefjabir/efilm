@@ -12,7 +12,7 @@
    ===================================================================== */
 
 function v3Geo(fmt){
-  var is9 = fmt === "916", H = is9 ? 177.78 : 125, top = is9 ? 26 : 8, bot = is9 ? 31.5 : 8;
+  var is9 = fmt === "916", w169 = fmt === "169", H = is9 ? 177.78 : w169 ? 56.25 : 125, top = is9 ? 26 : w169 ? 4 : 8, bot = is9 ? 31.5 : w169 ? 4 : 8;
   var g = {is9:is9, H:H, top:top, bot:bot, cy:(top + H - bot)/2, fmt:fmt};
   g.CW = is9 ? 78 : 68; g.CH = g.CW*1.25; g.CX = (100 - g.CW)/2; g.CY = g.cy - g.CH/2;
   /* leveranssidan */
