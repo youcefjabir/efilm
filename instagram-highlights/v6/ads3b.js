@@ -34,6 +34,7 @@ function v3DarkBg(c, G, a, t){
   c.restore();
 }
 function v3Cursor(c, x, y, press, a){
+  if(a != null && a <= .004) return;
   c.save(); c.globalAlpha = a == null ? 1 : a; c.translate(x, y); var s = (1 - press*.14)*.26; c.scale(s, s);
   c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 6; c.shadowOffsetY = 2;
   c.beginPath(); c.moveTo(2, 2); c.lineTo(2, 28); c.lineTo(9, 21.4); c.lineTo(13.6, 31.8); c.lineTo(17.8, 29.9); c.lineTo(13.2, 19.7); c.lineTo(23, 19.4); c.closePath();

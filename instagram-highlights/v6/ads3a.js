@@ -97,8 +97,12 @@ function v3Text(c, s, x, y, o){
   var w = v3Measure(c, s, o), al = o.align || "l";
   var x0 = al === "c" ? x - w/2 : al === "r" ? x - w : x;
   var p = o.p == null ? 1 : o.p; if(p <= 0) return w;
+  var al = (o.alpha == null ? 1 : o.alpha)*Math.min(1, p*4);
+  if(window.__v3TextHook) window.__v3TextHook(s, x0, y, w, o, al, p);
+  /* Safari ritar text med skugga i full styrka även när alfa är 0, så osynlig text ritas inte alls */
+  if(al <= .004) return w;
   c.save();
-  c.globalAlpha = (o.alpha == null ? 1 : o.alpha)*Math.min(1, p*4);
+  c.globalAlpha = al;
   if(o.rise) c.translate(0, (1 - p)*o.rise);
   if(p < 1){ c.beginPath(); c.rect(x0 - 2, y - o.size*1.2, (w + 4)*p, o.size*1.9); c.clip() }
   if(o.shadow){ c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = o.size*.5; c.shadowOffsetY = o.size*.05 }
@@ -129,6 +133,7 @@ var V3_PATH = null;
 function v3Mark(c, x, y, h, ink, dot, o){
   if(!V3_PATH) V3_PATH = new Path2D(GEO.limb);
   o = o || {};
+  if(o.alpha != null && o.alpha <= .004) return;
   var s = h/756.3;
   c.save(); c.globalAlpha = (o.alpha == null ? 1 : o.alpha);
   c.translate(x, y); c.scale(s, s);
@@ -198,6 +203,10 @@ function v3Step(prog, a, b){ return oQ(k3(prog, a, b)) }
    uppgifterna medan prog går 0→1. o.place = vad som är utplacerat i
    mallredigeraren. */
 function v3Post(c, style, phase, name, x, y, w, ar, prog, o){
+  window.__v3InPost = (window.__v3InPost || 0) + 1;
+  try { return v3PostInner(c, style, phase, name, x, y, w, ar, prog, o) } finally { window.__v3InPost-- }
+}
+function v3PostInner(c, style, phase, name, x, y, w, ar, prog, o){
   o = o || {};
   var H = 100*ar, p = prog == null ? 1 : prog, tall = ar > 1.5, pl = o.place || null;
   var tokMode = o.skel !== undefined && o.skel !== 0 && o.skel !== false;

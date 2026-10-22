@@ -214,9 +214,9 @@ function ad1(c, G, t0, Lx){
   stage(c, G, function(){
     var inA = ioC(k3(t, .3, 1.0)), dock = ioC(k3(t, 2.4, 3.1)), i;
     var hi = [0, 1, 2, 3, 4, 5].map(function(j){ return ioC(k3(t, 5.7 + j*.1, 6.0 + j*.1))*(1 - ioC(k3(t, 6.9, 7.3))) });
-    var stripA = dock*(1 - ioC(k3(t, 7.5, 8.0)));
+    var stripA = ioC(k3(t, 2.75, 3.15))*(1 - ioC(k3(t, 7.5, 8.0)));
     var fieldPos = bookStrip(c, 8, 0, stripA, hi);
-    if(dock < .98) bookCard(c, 8, lerp(23 + (1 - inA)*4, 8, dock), inA*(1 - dock), null);
+    if(dock < .98) bookCard(c, 8, lerp(23 + (1 - inA)*4, 8, dock), inA*(1 - ioC(k3(t, 2.4, 2.8))), null);
     /* tre bilder, rad för rad med samma avstånd */
     var ta = ioC(k3(t, 2.8, 3.4))*(1 - ioC(k3(t, 5.7, 6.1))), sel = ioC(k3(t, 3.9, 4.15)), keys = [ph(1), ph(0), ph(2)];
     for(i = 0; i < 3; i++) thumb(c, keys[i], 8 + i*29, 15 + (1 - ta)*3, 26, 31, ta*(i === 1 ? 1 : 1 - .55*sel), i === 1 ? sel : 0);

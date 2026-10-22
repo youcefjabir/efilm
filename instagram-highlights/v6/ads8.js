@@ -120,7 +120,7 @@ function adPlatt(c, G, t){
   lab(c, "MÄKLARPORTALEN", 100 - MX, S.y0 + 2.9, q, {size:1.7, align:"r", weight:500, sp:.24});
   v3Line(c, MX, 100 - MX, S.y0 + 6.6, C3.uil, .2, oQ(k3(t, .2, 1.1)), 1);
   reg("topp", MX, S.y0, 84, 7);
-  var st = t < ST2[1] ? 0 : t < ST2[2] ? 1 : t < ST2[3] ? 2 : 3, fin = rev(t, 10.3, .8);
+  var st = t < ST2[1] ? 0 : t < ST2[2] ? 1 : t < ST2[3] ? 2 : 3, fin = rev(t, 10.0, .4), fin2 = rev(t, 10.7, .8);
   /* förlopp: fyra punkter på en linje */
   var py = S.y0 + 12.4, px0 = MX + 3, px1 = 100 - MX - 3, pr = ioC(k3(t, ST2[0] - .3, ST2[0] + .5));
   v3Line(c, px0, px1, py, "rgba(28,28,30,.2)", .3, 1, pr*(1 - fin));
@@ -181,15 +181,15 @@ function adPlatt(c, G, t){
       if(aa > .5) reg("kanal", x0, yy, pw, ph, {child:1});
     }
   });
-  /* slutrad */
-  if(fin > .02){
+  /* slutrad: kommer först när steget har tonat ut */
+  if(fin2 > .02){
     var fs = G.is9 ? 10 : 8.2, f1 = T("a8.pl.f1"), f2 = T("a8.pl.f2"), y = S.y0 + S.h*.46, ff = Math.min(fs, fz(c, f1, {size:fs, weight:300}, 84), fz(c, f2, {size:fs, weight:300, italic:true}, 84));
-    v3Text(c, f1, 50, y, {size:ff, color:INK, align:"c", alpha:fin, p:oQ(k3(t, 10.3, 11.3)), rise:2});
-    v3Text(c, f2, 50, y + ff*1.2, {size:ff, italic:true, color:OLI, align:"c", alpha:fin*rev(t, 10.8, .6), p:oQ(k3(t, 10.8, 11.8)), rise:2});
-    if(fin > .5) reg("rubrik", 8, y - ff*.85, 84, ff*2.3, {head:1});
+    v3Text(c, f1, 50, y, {size:ff, color:INK, align:"c", alpha:fin2, p:oQ(k3(t, 10.7, 11.7)), rise:2});
+    v3Text(c, f2, 50, y + ff*1.2, {size:ff, italic:true, color:OLI, align:"c", alpha:fin2*rev(t, 11.2, .6), p:oQ(k3(t, 11.2, 12.2)), rise:2});
+    if(fin2 > .5) reg("rubrik", 8, y - ff*.85, 84, ff*2.3, {head:1});
   }
 }
-function sndPlatt(H){ ST2.forEach(function(s, i){ H.s("tick1", s + .55, .2) }); [0, 1, 2].forEach(function(j){ H.s("tick1", ST2[1] + .55 + j*.44, .12) }); H.s("shutter", ST2[1] + .5, .4); H.s("thunk", ST2[2] + .6, .4); H.s("thunk", 10.4, .45) }
+function sndPlatt(H){ ST2.forEach(function(s, i){ H.s("tick1", s + .55, .2) }); [0, 1, 2].forEach(function(j){ H.s("tick1", ST2[1] + .55 + j*.44, .12) }); H.s("shutter", ST2[1] + .5, .4); H.s("thunk", ST2[2] + .6, .4); H.s("thunk", 10.8, .45) }
 
 /* =====================================================================
    3 · TIDEN — det som tar din tid   (ljus, typografisk, listan som blir en leverans)
@@ -215,23 +215,23 @@ function adTid(c, G, t){
     if(a > .5) reg("uppgift", MX, y + .4, 84, rh - .8);
   }
   /* listan blir en leverans */
-  var fa = rev(t, 8.9, .8);
+  var fa = rev(t, 9.3, .8);
   if(fa > .02){
-    var cw = 76, chh = G.is9 ? 34 : 28, cx = 50 - cw/2, cy = S.y0 + S.h*.34, sc = lerp(.94, 1, oQ(k3(t, 8.9, 9.7)));
+    var cw = 76, chh = G.is9 ? 34 : 28, cx = 50 - cw/2, cy = S.y0 + S.h*.34, sc = lerp(.94, 1, oQ(k3(t, 9.3, 10.1)));
     c.save(); c.translate(50, cy + chh/2); c.scale(sc, sc); c.translate(-50, -cy - chh/2);
     rrect(c, cx, cy, cw, chh, 2.6, "#fff", fa, 7);
     dot(c, cx + 9, cy + chh/2, 3.2, INK, fa); c.restore();
-    tickC(c, 50 - cw/2 + 9.3, cy + chh/2 - .2, 2.8, k3(t, 9.5, 10.0), "#fff");
+    tickC(c, 50 - cw/2 + 9.3, cy + chh/2 - .2, 2.8, k3(t, 9.9, 10.4), "#fff");
     var f1 = T("a8.ti.f1"), fs = Math.min(G.is9 ? 7.4 : 6.2, fz(c, f1, {size:G.is9 ? 7.4 : 6.2, weight:400}, 52));
-    v3Text(c, f1, cx + 16, cy + chh/2 - .4, {size:fs, color:INK, alpha:fa, p:oQ(k3(t, 9.0, 9.9))});
-    lab(c, "FOTON OCH FÄRDIGA INLÄGG", cx + 16, cy + chh/2 + 4.6, rev(t, 9.6, .6), {size:1.45, color:MUT});
+    v3Text(c, f1, cx + 16, cy + chh/2 - .4, {size:fs, color:INK, alpha:fa, p:oQ(k3(t, 9.4, 10.3))});
+    lab(c, "FOTON OCH FÄRDIGA INLÄGG", cx + 16, cy + chh/2 + 4.6, rev(t, 10.0, .6), {size:1.45, color:MUT});
     if(fa > .5) reg("leverans", cx, cy, cw, chh);
     var g2 = T("a8.ti.f2"), gs = Math.min(G.is9 ? 8 : 6.6, fz(c, g2, {size:G.is9 ? 8 : 6.6, italic:true, weight:300}, 84)), gy = cy + chh + 12;
-    v3Text(c, g2, 50, gy + gs*.8, {size:gs, italic:true, color:OLI, align:"c", alpha:rev(t, 10.3, .8), p:oQ(k3(t, 10.3, 11.4)), rise:2});
-    if(t > 10.9) reg("rubrik", 8, gy, 84, gs*1.2, {head:1});
+    v3Text(c, g2, 50, gy + gs*.8, {size:gs, italic:true, color:OLI, align:"c", alpha:rev(t, 10.7, .8), p:oQ(k3(t, 10.7, 11.8)), rise:2});
+    if(t > 11.3) reg("rubrik", 8, gy, 84, gs*1.2, {head:1});
   }
 }
-function sndTid(H){ for(var i = 0; i < 8; i++) H.s("tick1", 1.7 + i*.4, .1); for(var j = 0; j < 8; j++) H.s("tick1", 6.1 + j*.14, .08); H.s("thunk", 9.0, .45) }
+function sndTid(H){ for(var i = 0; i < 8; i++) H.s("tick1", 1.7 + i*.4, .1); for(var j = 0; j < 8; j++) H.s("tick1", 6.1 + j*.14, .08); H.s("thunk", 9.4, .45) }
 
 /* =====================================================================
    4 · INTAGSMÖTET — innan säljaren ringer   (mörk, telefon, flödet fylls)
@@ -241,10 +241,10 @@ function adMote(c, G, t){
   var H = G.H, S = SG(G), i;
   v3Fill(c, 0, 0, 100, H, "#0c0b0b");
   v3Grad(c, 0, 0, 100, H, [[0, "rgba(46,52,44,.5)"], [.55, "rgba(12,11,11,0)"], [1, "rgba(30,34,28,.35)"]]);
-  var swap = rev(t, 7.0, .6);
+  var swap = rev(t, 6.7, .5);
   lab(c, "VIEWLY", MX, S.y0 + 2, rev(t, .1, .6), {size:1.9, color:"#fff", weight:600, sp:.34});
   var h1 = line2(c, G, t, .3, S.y0 + 5, T("a8.in.h1"), T("a8.in.h2"), {c1:"#fff", c2:C3.olil, size:G.is9 ? 8 : 6.8, a:1 - swap});
-  line2(c, G, t, 7.3, S.y0 + 5, T("a8.in.g1"), T("a8.in.g2"), {c1:"#fff", c2:C3.olil, size:G.is9 ? 8.6 : 7.2, a:1});
+  line2(c, G, t, 7.4, S.y0 + 5, T("a8.in.g1"), T("a8.in.g2"), {c1:"#fff", c2:C3.olil, size:G.is9 ? 8.6 : 7.2, a:1});
   var hb = S.y0 + 5 + (G.is9 ? 8 : 6.8)*2.3;
   /* telefonen */
   var pw = G.is9 ? 46 : 42, px = 50 - pw/2, py = hb + 5, ph = S.y1 - py + 40, pa = rev(t, .8, .9), dy = (1 - oQ(k3(t, .8, 1.8)))*5;
@@ -274,7 +274,7 @@ function adMote(c, G, t){
   v3Grad(c, 0, S.y1 - 16, 100, 16, [[0, "rgba(12,11,11,0)"], [1, "rgba(12,11,11,1)"]], pa);
   v3Fill(c, 0, S.y1, 100, H - S.y1, "#0c0b0b", 1);
 }
-function sndMote(H){ for(var i = 0; i < 9; i++) H.s(i % 3 === 0 ? "shutter2" : "tick1", 2.0 + i*.5, i % 3 === 0 ? .3 : .13); H.s("thunk", 7.3, .4) }
+function sndMote(H){ for(var i = 0; i < 9; i++) H.s(i % 3 === 0 ? "shutter2" : "tick1", 2.0 + i*.5, i % 3 === 0 ? .3 : .13); H.s("thunk", 7.5, .4) }
 
 /* =====================================================================
    5 · SKÅNE — din bostadsfotograf, och allt efter   (foto, lokal)
