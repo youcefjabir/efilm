@@ -40,7 +40,7 @@ function v3DrawComp(canvas, wpx, compId, fmt, t){
   c.clearRect(0, 0, 100, G.H);
   V3_COMPS[compId].draw(c, G, t, v3O());
 }
-function v3Dims(fmt){ return fmt === "916" ? [1080, 1920] : fmt === "169" ? [1920, 1080] : [1080, 1350] }
+function v3Dims(fmt){ return fmt === "916" ? [1080, 1920] : fmt === "169" ? [1920, 1080] : fmt === "11" ? [1080, 1080] : [1080, 1350] }
 
 /* ---------------------------------------------------------------------
    LJUD — ett litet piano och diskreta ljudeffekter, syntetiserat i
@@ -364,7 +364,7 @@ async function v3ExportVideo(btn){
     if(!r) throw new Error("Webbläsaren kunde inte koda videon.");
     var blob = v3MuxAV(W, H, V3_FPS, r.kod, r.samples, au);
     if(!(await verifyClip(blob, comp.dur))) throw new Error("Filen gick inte att läsa tillbaka, så ingen fil lämnas ut.");
-    var name = "viewly-" + V3S.comp + "-" + (fmt === "916" ? "9x16" : fmt === "169" ? "16x9" : "4x5") + ".mp4";
+    var name = "viewly-" + V3S.comp + "-" + (fmt === "916" ? "9x16" : fmt === "169" ? "16x9" : fmt === "11" ? "1x1" : "4x5") + ".mp4";
     btn.textContent = "Sparar…"; v3Say("Sparar " + name + "…", 0);
     var ok = await v3Save(blob, name);
     v3Say(ok ? "Klart: " + name + " · " + comp.dur.toFixed(0) + " s · " + (blob.size/1048576).toFixed(1).replace(".", ",") + " MB · "
