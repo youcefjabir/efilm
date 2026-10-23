@@ -158,43 +158,44 @@ function chk(c, cx, cy, r, p, col, lw){ if(p <= 0) return; c.save(); c.strokeSty
   var p1 = Math.min(1, p*2); c.lineTo(lerp(a[0], b[0], p1), lerp(a[1], b[1], p1)); if(p > .5){ var p2 = (p - .5)*2; c.lineTo(lerp(b[0], d[0], p2), lerp(b[1], d[1], p2)) } c.stroke(); c.restore() }
 /* ett kontor, tre mallar: samma färger, samma typsnitt, samma sidfot. Bara layouten byter med skedet. */
 function tplB(c, kind, x, y, w, prog, d){
-  var f = function(a, b){ return k3(prog, a, b) }, CR = "#F3EFE7";
+  var f = function(a, b){ return k3(prog, a, b) }, st = function(a, b){ return d.stat ? 1 : f(a, b) }, CR = "#F3EFE7";
   c.save(); c.translate(x, y); c.scale(w/100, w/100); c.beginPath(); rr(c, 0, 0, 100, 125, 2.4); c.clip();
   v3Photo(c, d.photo, 0, 0, 100, 125, {scale:1.1, pos:[.5, .5]});
   v3Grad(c, 0, 0, 100, 36, [[0, "rgba(8,16,11,.5)"], [1, "rgba(8,16,11,0)"]]);
   v3Grad(c, 0, kind === "sald" ? 0 : 52, 100, kind === "sald" ? 125 : 73, kind === "sald" ? [[0, "rgba(8,16,11,.5)"], [1, "rgba(8,16,11,.6)"]] : [[0, "rgba(8,16,11,0)"], [1, "rgba(8,16,11,.82)"]]);
-  /* samma kontor i alla: monogram uppe till vänster */
-  var ma = f(0, .3); c.save(); c.globalAlpha = ma; c.fillStyle = CR; c.beginPath(); c.arc(11, 11, 4.8, 0, 7); c.fill(); c.restore();
-  v3Text(c, "ER", 11, 12.4, {size:3.6, weight:700, f:"sans", color:BR_G, align:"c", alpha:ma});
-  v3Text(c, "Er Mäklarbyrå", 18.4, 12.2, {size:3.6, weight:500, f:"sans", color:CR, alpha:ma});
+  /* kontorets logga, fast placerad i mallen (inte en profil): bokstäver, tunn linje, ordmärke */
+  var la = st(0, .3);
+  v3Text(c, "ER", 50, 16, {size:7.4, color:CR, align:"c", sp:.34, alpha:la});
+  v3Fill(c, 44, 18.6, 12, .28, CR, .8*la);
+  v3Text(c, "MÄKLARBYRÅ", 50, 24, {size:2.5, weight:500, f:"sans", sp:.44, color:CR, align:"c", alpha:la*.9});
   var sub = d.city.toUpperCase() + "  ·  " + d.facts.toUpperCase();
   if(d.slot > .02){
     var bx = kind === "salu" ? [[8, 88, 52, 15], [8, 105.2, 66, 7]] : kind === "visning" ? [[25, 85, 50, 11], [18, 97.6, 64, 6.6]] : [[25, 81, 50, 11], [18, 93, 64, 6.6]], sa1 = d.slot*(1 - f(.12, .3)), sa2 = d.slot*(1 - f(.38, .55));
     [[bx[0], sa1], [bx[1], sa2]].forEach(function(q){ if(q[1] <= .02) return; c.save(); c.globalAlpha = q[1]; c.fillStyle = "rgba(243,239,231,.2)"; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.fill(); c.strokeStyle = "rgba(255,255,255,.5)"; c.lineWidth = .3; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.stroke(); c.restore() });
   }
   if(kind === "salu"){
-    v3Text(c, "TILL SALU", 8, 82, {size:3.6, weight:600, f:"sans", sp:.3, color:CR, alpha:f(0, .25), p:f(0, .3)});
-    v3Line(c, 8, 12, 87, CR, .4, f(.2, .45), .8);
+    v3Text(c, "TILL SALU", 8, 82, {size:3.6, weight:600, f:"sans", sp:.3, color:CR, alpha:st(0, .25), p:st(0, .3)});
+    v3Line(c, 8, 20, 86.4, CR, .4, st(.2, .45), .8);
     v3Text(c, d.addr, 8, 101, {size:14, color:CR, alpha:f(.1, .4), p:f(.1, .45)});
     v3Text(c, sub, 8, 109.4, {size:3.2, weight:500, f:"sans", sp:.16, color:"rgba(243,239,231,.88)", alpha:f(.35, .65)});
-    v3Text(c, d.agent, 8, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", alpha:f(.55, .85)});
+    v3Text(c, d.agent, 8, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", alpha:st(.55, .85)});
   } else if(kind === "visning"){
-    v3Text(c, "VISNING", 50, 58, {size:3.6, weight:600, f:"sans", sp:.34, color:CR, align:"c", alpha:f(0, .25), p:f(0, .3)});
-    v3Text(c, "Sön 14:00 – 14:45", 50, 72, {size:11, italic:true, color:CR, align:"c", alpha:f(.1, .4), p:f(.1, .45)});
-    v3Line(c, 44, 12, 80, CR, .4, f(.3, .55), .8);
+    v3Text(c, "VISNING", 50, 58, {size:3.6, weight:600, f:"sans", sp:.34, color:CR, align:"c", alpha:st(0, .25), p:st(0, .3)});
+    v3Text(c, "Sön 14:00 – 14:45", 50, 72, {size:11, italic:true, color:CR, align:"c", alpha:st(.1, .4), p:st(.1, .45)});
+    v3Line(c, 44, 56, 78, CR, .4, st(.3, .55), .8);
     v3Text(c, d.addr, 50, 94, {size:8.4, color:CR, align:"c", alpha:f(.3, .6)});
     v3Text(c, sub, 50, 101.4, {size:3.1, weight:500, f:"sans", sp:.16, color:"rgba(243,239,231,.88)", align:"c", alpha:f(.45, .75)});
-    v3Text(c, d.agent, 50, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", align:"c", alpha:f(.6, .9)});
+    v3Text(c, d.agent, 50, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", align:"c", alpha:st(.6, .9)});
   } else {
-    v3Text(c, "Såld", 50, 62, {size:24, italic:true, color:CR, align:"c", alpha:f(.05, .3), p:f(.05, .4)});
-    v3Line(c, 44, 12, 72, CR, .4, f(.4, .6), .8);
+    v3Text(c, "Såld", 50, 62, {size:24, italic:true, color:CR, align:"c", alpha:st(.05, .3), p:st(.05, .4)});
+    v3Line(c, 44, 56, 70, CR, .4, st(.4, .6), .8);
     v3Text(c, d.addr, 50, 90, {size:8.4, color:CR, align:"c", alpha:f(.3, .55)});
     v3Text(c, sub, 50, 97.4, {size:3.1, weight:500, f:"sans", sp:.16, color:"rgba(243,239,231,.88)", align:"c", alpha:f(.45, .7)});
-    v3Text(c, d.agent, 50, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", align:"c", alpha:f(.6, .9)});
+    v3Text(c, d.agent, 50, 118, {size:3.4, f:"sans", color:"rgba(243,239,231,.7)", align:"c", alpha:st(.6, .9)});
   }
   c.restore();
 }
-function DO(i, ph, slot){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", photo:ph, slot:slot || 0} }
+function DO(i, ph, slot, stat){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", photo:ph, slot:slot || 0, stat:stat || 0} }
 /* en scen i fönstret: mjuk in och ut, utan hårda klipp */
 function scn(t, s0, s1){ var i = rev(t, s0 - .05, .6), o = rev(t, s1 - .55, .45); return {a:i*(1 - o), dy:(1 - i)*2.6 - o*1.6} }
 function adResa(c, G, t){
@@ -204,7 +205,6 @@ function adResa(c, G, t){
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .6 ? ioC(k3(t, 0, .6)) : 1});
   var OFF = 1.9, mid = rev(t, 3.8, 1.2)*(1 - rev(t, WIN6[1] + OFF - .8, .6)), fin = rev(t, WIN6[1] + OFF - .8, .6);
   if(mid > .01) v3Photo(c, "rs_dusk1", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, 3.8, WIN6[1] + OFF + .8)), pos:V3_POS.rs_dusk1, alpha:mid});
-  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, WIN6[1] + OFF - .8, L6)), pos:V3_POS.rs_dusk2, alpha:fin});
   var dim = (.30 + .30*rev(t, 1.0, .6))*(1 - rev(t, 3.8, .9)) + .72*rev(t, 3.8, .9)*(1 - fin) + .80*fin;
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", dim);
   v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
@@ -391,7 +391,7 @@ function adSalu(c, G, t, v){
   var H = G.H, S = SG(G), i, j, O7 = v ? OFF7 + .7 : OFF7, Lx = v ? L7 + .7 : L7;
   v3Fill(c, 0, 0, 100, H, DARK);
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
-  var wend = O7 + WEND7, mid = rev(t, O7 - .5, 1.2)*(1 - rev(t, wend - .8, .6)), fin = rev(t, wend - .8, .6);
+  var wend = O7 + WEND7, mid = rev(t, O7 - .5, 1.2), fin = rev(t, wend - .8, .6);
   if(mid > .01) v3Photo(c, P.chair, 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, O7 - .5, wend)), pos:V3_POS.rs_chair, alpha:mid});
   if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, wend - .8, Lx)), pos:V3_POS.rs_dusk2, alpha:fin});
   var dim = (.46 + .14*rev(t, 1.0, .6))*(1 - rev(t, O7 - .5, .9)) + .76*rev(t, O7 - .5, .9)*(1 - fin) + .80*fin;
@@ -453,11 +453,11 @@ function adSalu(c, G, t, v){
       sTx(c, "VÄLJ VILKA MALLAR SOM SKA INGÅ", x0, yc + 2, lbl1, {size:2.4, weight:600, sp:.2});
       sTx(c, "KAMPANJEN SKAPAS", x0, yc + 2, lbl2, {size:2.4, weight:600, sp:.2});
       sTx(c, "KAMPANJEN ÄR KLAR", x0, yc + 2, lbl3, {size:2.4, weight:600, sp:.2});
-      var slotA = rev(tr, 8.95, .5)*(1 - rev(tr, 12.6, .4)), SL = [[[38, 96], [36, 108.5]], [[50, 90.5], [50, 100.9]], [[50, 86.5], [50, 96.3]]];
+      var slotA = rev(tr, 5.9, .5), SL = [[[38, 96], [36, 108.5]], [[50, 90.5], [50, 100.9]], [[50, 86.5], [50, 96.3]]];
       for(i = 0; i < 3; i++){
         var mx = x0 + i*(mw + 2.4), ma = rev(tr, 5.7 + i*.2, .6)*k.a, selT = 6.5 + i*.45, sel = clamp(k3(tr, selT, selT + .3), 0, 1), prog = clamp(k3(tr, 9.95 + i*.6, 11.45 + i*.6), 0, 1);
         sCard(c, mx - .6, my - .6, mw + 1.2, mh + 1.2, ma, 1.8, "#fff", 3, sel > .5 && tr < 8.8 ? SYS.ink : null);
-        if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, prog, DO(i, ph7[i], slotA)); c.restore() }
+        if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, prog, DO(i, ph7[i], slotA, 1)); c.restore() }
         sTx(c, LABS[i], mx + .6, my + mh + 5.4, ma, {size:2.9, weight:600});
         if(sel > .02){ var br = 2.1*oBack(sel); c.save(); c.globalAlpha = ma; c.fillStyle = SYS.grn; c.beginPath(); c.arc(mx + mw - 2.4, my + mh + 4.4, Math.max(.01, br), 0, 7); c.fill(); c.restore(); chk(c, mx + mw - 2.4, my + mh + 4.4, 1.6, k3(tr, selT + .1, selT + .4), "#fff", .4) }
       }
