@@ -2105,7 +2105,8 @@ var SECTIONS=[
  {id:"brand",    n:"Varumärke",    num:"13", f:secBrand},
  {id:"film2",    n:"Varumärkesfilm", num:"14", f:secFilm},
  {id:"ads7",     n:"Annonsserie",  num:"15", f:secAds7},
- {id:"ads8",     n:"Magasin",      num:"16", f:secAds8}
+ {id:"ads8",     n:"Magasin",      num:"16", f:secAds8},
+ {id:"ads9",     n:"Lansering",    num:"17", f:secAds9}
 ];
 
 /* =====================================================================
