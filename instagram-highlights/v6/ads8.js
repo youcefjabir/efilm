@@ -42,6 +42,7 @@ var TX = {
   "a8.re.s5a":["Inläggen", "2 · inlägg, rad 1"], "a8.re.s5b":["av era levererade bilder.", "2 · inlägg, rad 2"],
   "a8.re.f1":["Spara tid.", "2 · slutsats, del 1"], "a8.re.f2":["Få bättre resultat.", "2 · slutsats, del 2"],
   "a8.sa.l1":["Ditt nästa objekt.", "4 · rubrik, rad 1"], "a8.sa.l2":["Som tre färdiga inlägg.", "4 · rubrik, rad 2"], "a8.sa.f1":["Från leverans.", "4 · slutsats, del 1"], "a8.sa.f2":["Till färdiga inlägg.", "4 · slutsats, del 2"],
+  "a8.sb.l1":["Bilder blir", "5 · rubrik, rad 1"], "a8.sb.l2":["inlägg.", "5 · rubrik, rad 2"],
   "a8.sk.l":["BOSTADSFOTOGRAFI I", "5 · liten rad"], "a8.sk.h1":["Din bostadsfotograf", "5 · rubrik, rad 1"], "a8.sk.h2":["i Skåne.", "5 · rubrik, rad 2"], "a8.sk.cap":["UPPGIFTERNA HÄMTAS FRÅN BOKNINGEN", "5 · rad över bokningen"]
 };
 Object.keys(TX).forEach(function(k){ V3_TXD[k] = TX[k][0] });
@@ -332,10 +333,31 @@ function adResa(c, G, t){
 var L7 = 25.6, OFF7 = 3.9, WEND7 = 17.6;
 var SR7 = [[.2, 5.2], [5.2, 8.8], [8.8, 12.9], [12.9, 17.6]], SEL7 = [0, 2, 4], SELT7 = [1.6, 2.3, 3.0];
 var GRID7 = ["rs_dusk1", P.dining, P.bed, P.kitchen, "rs_dusk2", P.chair];
-function miniLogo(c, G, S, a){
-  if(a <= .02) return; var cy = Math.min(S.y1 + 8.5, G.H - 7), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2;
-  v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:1, dot:1, alpha:a*.85});
-  v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:a*.85});
+function miniLogo(c, G, S, a, bright){
+  if(a <= .02) return; bright = bright || 0; var cy = Math.min(S.y1 + 14, G.H - 8), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2;
+  if(bright < .98){ v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:1, dot:1, alpha:a*.85*(1 - bright)}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:a*.85*(1 - bright)}) }
+  if(bright > .02){ v3Mark(c, x0, cy - mh/2, mh, SYS.ink, C3.oli, {reveal:1, dot:1, alpha:a*.85*bright}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:SYS.ink, alpha:a*.85*bright}) }
+}
+/* variant B: leveransens bilder slår om till färdiga inlägg, ljust och med innehåll i första bildrutan */
+function hookGrid(c, G, S, t){
+  var fq = G.is9 ? 1 : .84, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .35 : .33), out = rev(t, 3.0, .5), ph7 = [GRID7[0], GRID7[2], GRID7[4]], POST = {0:0, 2:1, 4:2}, i;
+  var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 9.2 : 7.8;
+  v3Text(c, T("a8.sb.l1"), 50, S.y0 + S.h*.07 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
+  v3Text(c, T("a8.sb.l2"), 50, S.y0 + S.h*.07 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, .1, .3), p:oQ(k3(t, .1, .7))});
+  for(i = 0; i < 6; i++){
+    var col = i % 3, row = Math.floor(i/3), cx0 = left + col*(cw + gp), cy0 = top + row*(chh + gp), pi = POST[i], pulse = 1.03 - .03*oQ(k3(t, 0, .5));
+    if(pi === undefined){
+      var a = (1 - ioC(k3(t, .55, 1.15)))*(1 - out); if(a <= .02) continue;
+      var sc = lerp(1, .9, ioC(k3(t, .55, 1.15)))*pulse; c.save(); c.translate(cx0 + cw/2, cy0 + chh/2); c.scale(sc, sc); sCard(c, -cw/2 - .4, -chh/2 - .4, cw + .8, chh + .8, a, 1.6, "#fff", 3); sPh(c, GRID7[i], -cw/2, -chh/2, cw, chh, a, 1.4, 1.14); c.restore();
+    } else {
+      var e = ioC(k3(t, 1.35, 2.35)), tx = lerp(cx0 + cw/2, 50 + (pi - 1)*31*fq, e), ty = lerp(cy0 + chh/2, top + chh + gp/2 - 1, e), w = lerp(cw, 29*fq, e), h = w*1.25, pa = rev(t, .55, .35), a2 = (1 - out), sc2 = (t < .55 ? pulse : 1);
+      if(a2 <= .02) continue;
+      c.save(); c.translate(tx, ty + out*4); c.scale(sc2, sc2); c.globalAlpha = a2;
+      if(pa < 1){ sCard(c, -cw/2 - .4, -chh/2 - .4, cw + .8, chh + .8, 1 - pa, 1.6, "#fff", 3); sPh(c, GRID7[i], -cw/2, -chh/2, cw, chh, 1 - pa, 1.4, 1.14) }
+      if(pa > .02){ c.save(); c.globalAlpha = a2*pa; c.shadowColor = "rgba(30,25,20,.35)"; c.shadowBlur = 8; c.shadowOffsetY = 2; c.fillStyle = "#000"; rr(c, -w/2, -h/2, w, h, w*.025); c.fill(); c.shadowColor = "transparent"; tplB(c, KB[pi], -w/2, -h/2, w, k3(t, .6 + pi*.15, 1.9 + pi*.15), DO(pi, ph7[pi])); c.restore() }
+      c.restore();
+    }
+  }
 }
 /* krok: tre färdiga inlägg faller på plats, rubriken säger att det är ditt nästa objekt */
 function hookPosts(c, G, S, t){
@@ -348,7 +370,7 @@ function hookPosts(c, G, S, t){
     tplB(c, KB[i], -pw/2, -ph/2, pw, prog, DO(i, ph7[i])); c.restore();
   });
 }
-function adSalu(c, G, t){
+function adSalu(c, G, t, v){
   var H = G.H, S = SG(G), i, j;
   v3Fill(c, 0, 0, 100, H, DARK);
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
@@ -361,10 +383,11 @@ function adSalu(c, G, t){
   v3Frame(c, 4, 4, 92, H - 8, WHITE, .26, oQ(k3(t, .2, 1.8)), .5);
   /* kroken: ditt nästa objekt, som tre färdiga inlägg */
   var l1 = T("a8.sa.l1"), l2 = T("a8.sa.l2"), sH = G.is9 ? 9.4 : 8, sHero = Math.min(sH, fz(c, l1, {size:sH, weight:300}, 84), fz(c, l2, {size:sH, weight:300, italic:true}, 84));
-  twoPart(c, t, .1, 3.2, l1, l2, sHero, S.y0 + S.h*.19);
-  hookPosts(c, G, S, t);
+  var bright = v ? 1 - rev(t, 3.0, .7) : 0;
+  if(v){ if(bright > .01) v3Fill(c, 0, 0, 100, H, SYS.bg, bright); hookGrid(c, G, S, t) }
+  else { twoPart(c, t, .1, 3.2, l1, l2, sHero, S.y0 + S.h*.19); hookPosts(c, G, S, t) }
   /* varumärket, litet och diskret under kortet, så att även den som inte ser hela filmen ser det */
-  miniLogo(c, G, S, rev(t, .8, .8)*(1 - rev(t, wend + 1.0, .5)));
+  miniLogo(c, G, S, (v ? 1 : rev(t, .8, .8))*(1 - rev(t, wend + 1.0, .5)), bright);
   var tr = t - OFF7, wa = rev(tr, -.1, .8)*(1 - rev(tr, WEND7, .6));
   if(wa > .02){
     var wy = S.y0, wh = S.h + 1, wx = 7, ww = 86, x0 = 13, cw = 74, k;
@@ -439,6 +462,9 @@ function adSalu(c, G, t){
   }
   if(t >= wend + .3) twoPart(c, t, wend + .3, L7 + .05, T("a8.sa.f1"), T("a8.sa.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
+function adSaluA(c, G, t){ adSalu(c, G, t, 0) }
+function adSaluB(c, G, t){ adSalu(c, G, t, 1) }
+function sndSaluB(H){ sndSalu(H); H.s("shutter", .55, .5) }
 function sndSalu(H){ var O = OFF7; H.s("shutter", .1, .6);
   SELT7.forEach(function(s){ H.click(s + O, .32) }); H.click(4.45 + O, .4);
   [6.5, 6.95, 7.4].forEach(function(s){ H.click(s + O, .26) }); H.click(8.2 + O, .4);
@@ -586,7 +612,8 @@ function reg8(id, n, d, L, fn, thumb, sched, over){
 reg8("a8_ny", "1 · Bostadsfoto. Och lite till.", "Fotografering och allt som ingår i presentationen.", L1, adNy, 9.6, sndNy);
 reg8("a8_resa", "2 · Ett objekt. Hela vägen.", "Ett objekt följs från intag och bokning till leverans, annonstext och inlägg.", L6, adResa, 16.0, sndResa, true);
 reg8("a8_skane", "3 · Din bostadsfotograf i Skåne", "Orterna, och ett inlägg som byter mall medan uppgifterna ligger kvar.", L5, adSkane, 12.4, sndSkane);
-reg8("a8_salu", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "Välj bilder, välj mallar, kampanjen skapas med uppgifterna ifyllda, ladda ner alla tre.", L7, adSalu, 14.0, sndSalu, true);
+reg8("a8_salu", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "Välj bilder, välj mallar, kampanjen skapas med uppgifterna ifyllda, ladda ner alla tre.", L7, adSaluA, 14.0, sndSalu, true);
+reg8("a8_salub", "5 · Bilder blir inlägg (variant B av 4)", "Samma film som 4, men med en annan öppning: leveransens bilder slår om till färdiga inlägg.", L7, adSaluB, 2.0, sndSaluB, true);
 
 /* ---------- annonsplan ---------- */
 var PLAN = [
@@ -621,7 +648,7 @@ window.secAds8 = function(){
     + '<p class="a3lede">En kampanj med målet kännedom (räckvidd och videovisningar) mot mäklare i Skåne, med alla fyra annonser i samma annonsgrupp. Annonserna är olika på riktigt (olika vinst, upplägg och bild), eftersom Meta visar lika annonser mot varandra i stället för att nå fler. Ett andra steg riktas mot dem som sett minst hälften av en annons, med annons 2, 3 och 4.</p>'
     + '<div class="a3copy">' + PLAN.map(function(p){ return '<div><b>' + esc(p.t) + '</b><p>' + esc(p.syfte) + '</p><b>Steg i tratten</b><p>' + esc(p.steg) + '</p><b>Primärtext</b><p>' + esc(p.prim) + '</p><b>Rubrik · knapp</b><p>' + esc(p.rub) + ' · ' + esc(p.cta) + '</p><b>Mäts på</b><p>' + esc(p.mal) + '</p></div>' }).join("") + '</div>'
     + '<details class="a3det a3cust"><summary>Slutet, knappens text</summary><div class="a3hxs">' + ["a7.btnB", "a7.url", "a7.tag"].map(function(k){ return v3TxField(k, k === "a7.btnB" ? "Slutet · knappens text" : k === "a7.url" ? "Slutet · adressen" : "Slutet · raden efter adressen") }).join("") + '</div></details>'
-    + ["ny", "re", "sa", "sk"].map(function(p, i){ return txEd("a8." + p + ".", ["1 · Bostadsfoto. Och lite till.", "2 · Ett objekt. Hela vägen.", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "3 · Din bostadsfotograf i Skåne"][i]) }).join("")
+    + ["ny", "re", "sa", "sb", "sk"].map(function(p, i){ return txEd("a8." + p + ".", ["1 · Bostadsfoto. Och lite till.", "2 · Ett objekt. Hela vägen.", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "5 · Bilder blir inlägg (variant B)", "3 · Din bostadsfotograf i Skåne"][i]) }).join("")
     + '<details class="a3det"><summary>Underlag: vad som är kontrollerat och vad som inte är det</summary><div class="a3und">'
     + '<div><b>Metas säkra yta (kontrollerat)</b><p>Metas annonsguide rekommenderar att cirka 14 % överst, 35 % nederst och 6 % på sidorna lämnas fria från text och logotyper i Reels. Allt i 9:16 ligger därför i mitten. Slutkortet är litet och centrerat. Se <a href="https://www.facebook.com/business/ads-guide/update/image/instagram-reels" target="_blank" rel="noopener">Metas annonsguide för Reels</a>.</p></div>'
     + '<div><b>Olika annonser (delvis kontrollerat)</b><p>Flera branschkällor skriver att Meta slår ihop och konkurrerar ut annonser som liknar varandra. Det kommer från byråer och inte från Meta själv.</p></div>'
