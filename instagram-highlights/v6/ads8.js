@@ -347,13 +347,13 @@ var L7 = 18.4, OFF7 = 3.9, WEND7 = 12.2;
 var SR7 = [[.2, 4.3], [4.3, 7.2], [7.2, 10.3], [10.3, 12.2]], SEL7 = [0, 2, 5], SELT7 = [1.2, 1.7, 2.2];
 var GRID7 = ["rs_dusk1", P.dining, P.bed, P.kitchen, "rs_dusk2", P.chair];
 function miniLogo(c, G, S, a, bright){
-  if(a <= .02) return; bright = bright || 0; var cy = Math.min(S.y1 + 12, G.H - 11), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2, ty = cy + mh/2 + 3.6;
+  if(a <= .02) return; bright = bright || 0; var cy = Math.min(S.y1 + 17, G.H - 9), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2, ty = cy + mh/2 + 3.6;
   if(bright < .98){ var wa = a*.85*(1 - bright); v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:1, dot:1, alpha:wa}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:wa}); v3Text(c, "BOSTADSFOTOGRAFERING", 50, ty, {size:1.75, weight:500, f:"sans", sp:.34, color:"#fff", align:"c", alpha:wa*.7}) }
   if(bright > .02){ var wb = a*.85*bright; v3Mark(c, x0, cy - mh/2, mh, SYS.ink, C3.oli, {reveal:1, dot:1, alpha:wb}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:SYS.ink, alpha:wb}); v3Text(c, "BOSTADSFOTOGRAFERING", 50, ty, {size:1.75, weight:500, f:"sans", sp:.34, color:SYS.mut, align:"c", alpha:wb*.9}) }
 }
 /* variant B: leveransens bilder slår om till färdiga inlägg, ljust och med innehåll i första bildrutan */
 function hookGrid(c, G, S, t){
-  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = ioC(k3(t, 3.6, 4.4)), ph7 = [GRID7[0], GRID7[2], GRID7[5]], POST = {0:0, 2:1, 5:2}, i;
+  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = ioC(k3(t, 3.0, 3.7)), ph7 = [GRID7[0], GRID7[2], GRID7[5]], POST = {0:0, 2:1, 5:2}, i;
   var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 8.6 : 7.4, ty0 = S.y0 + S.h*.115;
   v3Text(c, T("a8.sb.l1"), 50, ty0 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
   v3Text(c, T("a8.sb.l2"), 50, ty0 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, 1.7, .3), p:oQ(k3(t, 1.7, 2.3))});
@@ -381,7 +381,7 @@ function hookGrid(c, G, S, t){
 }
 /* krok: tre färdiga inlägg faller på plats, rubriken säger att det är ditt nästa objekt */
 function hookPosts(c, G, S, t){
-  var pw = 27, ph = pw*1.25, cy = S.y0 + S.h*.64, ph7 = [GRID7[0], GRID7[2], GRID7[5]], out = ioC(k3(t, 3.0, 3.8));
+  var pw = 27, ph = pw*1.25, cy = S.y0 + S.h*.64, ph7 = [GRID7[0], GRID7[2], GRID7[5]], out = ioC(k3(t, 2.6, 3.3));
   [[0, -25, -6, 3], [2, 25, 6, 3], [1, 0, 0, -1]].forEach(function(o){
     var i = o[0], t0 = .12 + [0, .3, .15][[0, 2, 1].indexOf(i)], a = rev(t, t0, .5)*(1 - out); if(a <= .02) return;
     var ent = 1 - oBack(k3(t, t0, t0 + .8)), prog = k3(t, t0 + .35, t0 + 1.5), fl = Math.sin(t*1.3 + i)*.5;
@@ -397,7 +397,7 @@ function flyChip(c, txt, fx, fy, tx, ty, tr, t0, dur, a){
   sCard(c, P0[0] - w/2, P0[1] - 2.6, w, 5.2, al, 2.6, "#fff", 4, "#2f6a3a"); sTx(c, txt, P0[0], P0[1] + 1.0, al, {size:2.4, weight:600, color:SYS.ink, align:"c"});
 }
 function adSalu(c, G, t, v, w){
-  var H = G.H, S = SG(G), i, j, O7 = v ? OFF7 + .7 : OFF7, Lx = w ? OFF7 + .7 + WEND7 + .2 : (v ? L7 + .7 : L7);
+  var H = G.H, S = SG(G), i, j, O7 = v ? OFF7 + .2 : OFF7, Lx = w ? OFF7 + .2 + WEND7 + .2 : (v ? L7 + .2 : L7);
   v3Fill(c, 0, 0, 100, H, DARK);
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
   var wend = O7 + WEND7, mid = rev(t, O7 - .5, 1.2), fin = rev(t, wend - .8, .6);
@@ -408,15 +408,15 @@ function adSalu(c, G, t, v, w){
   v3Frame(c, 4, 4, 92, H - 8, WHITE, .26, oQ(k3(t, .2, 1.8)), .5);
   /* kroken: ditt nästa objekt, som tre färdiga inlägg */
   var l1 = T("a8.sa.l1"), l2 = T("a8.sa.l2"), sH = G.is9 ? 9.4 : 8, sHero = Math.min(sH, fz(c, l1, {size:sH, weight:300}, 84), fz(c, l2, {size:sH, weight:300, italic:true}, 84));
-  var bright = v ? 1 - rev(t, O7 - .8, .7) : 0;
+  var bright = v ? 1 - rev(t, O7 - 1.1, .7) : 0;
   if(v){ if(bright > .01) v3Fill(c, 0, 0, 100, H, SYS.bg, bright); hookGrid(c, G, S, t) }
-  else { twoPart(c, t, .1, 3.2, l1, l2, sHero, S.y0 + S.h*.19); hookPosts(c, G, S, t) }
+  else { twoPart(c, t, .1, 2.8, l1, l2, sHero, S.y0 + S.h*.19); hookPosts(c, G, S, t) }
   /* varumärket, litet och diskret under kortet, så att även den som inte ser hela filmen ser det */
   miniLogo(c, G, S, (v ? 1 : rev(t, .8, .8))*(1 - rev(t, w ? wend - .3 : wend + 1.0, w ? .4 : .5)), bright);
-  var tr = t - O7, wa = rev(tr, -.5, .8)*(1 - rev(tr, WEND7, .6));
+  var tr = t - O7, wa = rev(tr, -.75, .7)*(1 - rev(tr, WEND7, .6));
   if(wa > .02){
     var wy = S.y0, wh = S.h + 1, wx = 7, ww = 86, x0 = 13, cw = 74, k;
-    var slide = (1 - oQ(k3(tr, -.5, .9)))*7 + rev(tr, WEND7, .6)*5, yc = wy + 23;
+    var slide = (1 - oQ(k3(tr, -.75, .8)))*7 + rev(tr, WEND7, .6)*5, yc = wy + 23;
     c.save(); c.translate(0, slide);
     sCard(c, wx, wy, ww, wh, wa, 3.2, SYS.bg, 12);
     /* stegindikatorn */
@@ -426,21 +426,21 @@ function adSalu(c, G, t, v, w){
       sCard(c, sx, wy + 5.5, sw, .7, wa, .35, "rgba(28,26,25,.14)", 0); if(pr > 0) sCard(c, sx, wy + 5.5, sw*pr, .7, wa, .35, SYS.ink, 0);
     }
     /* leveransen: adressen, bostadsuppgifterna och statusen syns hela tiden */
-    var ha = wa*rev(tr, .1, .6), pulse = (tr > 7.3 && tr < 10.0) ? .5 + .5*Math.sin((tr - 7.3)*5) : 0;
-    v3Text(c, T("a8.re.addr"), x0, wy + 15, {size:7.2, color:SYS.ink, alpha:ha, p:oQ(k3(tr, .1, .9))});
+    var ha = wa*rev(tr, -.5, .5), pulse = (tr > 7.3 && tr < 10.0) ? .5 + .5*Math.sin((tr - 7.3)*5) : 0;
+    v3Text(c, T("a8.re.addr"), x0, wy + 15, {size:7.2, color:SYS.ink, alpha:ha, p:oQ(k3(tr, -.5, .5))});
     sTx(c, (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase(), x0, wy + 20, ha, {size:2.7, weight:600, color:pulse > 0 ? "#2f6a3a" : SYS.mut, sp:.14});
     var pw3 = 24; sCard(c, x0 + cw - pw3, wy + 10.2, pw3, 5.8, ha, 2.9, "#dfeedd", 0); sTx(c, "LEVERERAD", x0 + cw - pw3/2, wy + 14.1, ha, {size:2.3, weight:600, color:"#2f6a3a", align:"c", sp:.14});
     /* 1 · välj bilder ur leveransen */
-    k = scn(tr, .2, 4.3);
+    k = scn(tr, -.2, 4.3);
     if(k.a > .02){
       var tw = (cw - 2*2.4)/3, th = tw*.62, gh = 2*th + 2.4, nsel = 0;
       c.save(); c.translate(0, k.dy);
       for(i = 0; i < 3; i++) if(tr >= SELT7[i]) nsel++;
-      sTx(c, "KAMPANJ AV LEVERANSEN", x0, yc + 2, k.a*rev(tr, .4, .4), {size:2.4, weight:600, sp:.2});
-      sTx(c, nsel + " / 3 VALDA", x0 + cw, yc + 2, k.a*rev(tr, .4, .4), {size:2.4, color:SYS.mut, align:"r", sp:.16});
+      sTx(c, "KAMPANJ AV LEVERANSEN", x0, yc + 2, k.a*rev(tr, -.1, .4), {size:2.4, weight:600, sp:.2});
+      sTx(c, nsel + " / 3 VALDA", x0 + cw, yc + 2, k.a*rev(tr, -.1, .4), {size:2.4, color:SYS.mut, align:"r", sp:.16});
       var gy = yc + 5.4;
       for(i = 0; i < 6; i++){
-        var gx2 = x0 + (i % 3)*(tw + 2.4), gy2 = gy + Math.floor(i/3)*(th + 2.4), ga = rev(tr, .5 + i*.07, .35)*k.a;
+        var gx2 = x0 + (i % 3)*(tw + 2.4), gy2 = gy + Math.floor(i/3)*(th + 2.4), ga = rev(tr, .05 + i*.07, .35)*k.a;
         sCard(c, gx2 - .4, gy2 - .4, tw + .8, th + .8, ga, 1.4, "#fff", 2); sPh(c, GRID7[i], gx2, gy2, tw, th, ga, 1.2, 1.14);
         var si = SEL7.indexOf(i);
         if(si >= 0 && tr >= SELT7[si]){
@@ -496,7 +496,7 @@ function adSaluA(c, G, t){ adSalu(c, G, t, 0) }
 function adSaluB(c, G, t){ adSalu(c, G, t, 1) }
 function adSaluC(c, G, t){ adSalu(c, G, t, 1, 1) }
 function sndSaluA(H){ sndSalu(H) }
-function sndSaluB(H){ sndSalu(H, OFF7 + .7, true); for(var q = 0; q < 6; q++) H.s("shutter", q*.14, .26); H.s("tick2", .95, .07); H.s("shutter", 1.4, .3) }
+function sndSaluB(H){ sndSalu(H, OFF7 + .2, true); for(var q = 0; q < 6; q++) H.s("shutter", q*.14, .26); H.s("tick2", .95, .07); H.s("shutter", 1.4, .3) }
 function sndSalu(H, off, skipOpen){ var O = off == null ? OFF7 : off; if(!skipOpen) H.s("shutter", .1, .5);
   SELT7.forEach(function(s){ H.click(s + O, .18) }); H.click(3.4 + O, .26);
   H.click(6.8 + O, .26); H.s("tick2", 10.0 + O, .08) }
@@ -506,9 +506,9 @@ function sndSalu(H, off, skipOpen){ var O = off == null ? OFF7 : off; if(!skipOp
    Fokus på att bostadsuppgifterna fylls i automatiskt: adress, ort, rum och yta
    lyfts ur leveransen och landar i mallens fält.
    ===================================================================== */
-var L8 = 16.4, O8 = 3.6, WEND8 = 10.6;
+var L8 = 16.0, O8 = 3.2, WEND8 = 10.6;
 function hookGrid1(c, G, S, t){
-  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = ioC(k3(t, 2.8, 3.5)), i;
+  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = ioC(k3(t, 2.4, 3.1)), i;
   var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 8.6 : 7.4, ty0 = S.y0 + S.h*.115;
   v3Text(c, T("a8.sc.l1"), 50, ty0 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
   v3Text(c, T("a8.sc.l2"), 50, ty0 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, 1.5, .3), p:oQ(k3(t, 1.5, 2.1))});
@@ -547,10 +547,10 @@ function adInlagg(c, G, t){
   if(bright > .01) v3Fill(c, 0, 0, 100, H, SYS.bg, bright);
   hookGrid1(c, G, S, t);
   miniLogo(c, G, S, (1 - rev(t, wend + 1.0, .5)), bright);
-  var tr = t - O8, wa = rev(tr, -.5, .8)*(1 - rev(tr, WEND8, .6));
+  var tr = t - O8, wa = rev(tr, -.75, .7)*(1 - rev(tr, WEND8, .6));
   if(wa > .02){
     var wy = S.y0, wh = S.h + 1, wx = 7, ww = 86, x0 = 13, cw = 74, k, yc = wy + 23;
-    var slide = (1 - oQ(k3(tr, -.5, .9)))*7 + rev(tr, WEND8, .6)*5;
+    var slide = (1 - oQ(k3(tr, -.75, .8)))*7 + rev(tr, WEND8, .6)*5;
     c.save(); c.translate(0, slide);
     sCard(c, wx, wy, ww, wh, wa, 3.2, SYS.bg, 12);
     var SR = [[.2, 3.0], [3.0, 5.5], [5.5, 9.0], [9.0, 10.6]], sw = (cw - 3*1.6)/4;
@@ -559,12 +559,12 @@ function adInlagg(c, G, t){
       sCard(c, sx, wy + 5.5, sw, .7, wa, .35, "rgba(28,26,25,.14)", 0); if(pr > 0) sCard(c, sx, wy + 5.5, sw*pr, .7, wa, .35, SYS.ink, 0);
     }
     /* leveransen: adress, bostadsuppgifter och status syns hela tiden */
-    var ha = wa*rev(tr, .1, .6), pulse = (tr > 6.0 && tr < 8.6) ? .5 + .5*Math.sin((tr - 6.0)*5) : 0;
-    v3Text(c, T("a8.re.addr"), x0, wy + 15, {size:7.2, color:SYS.ink, alpha:ha, p:oQ(k3(tr, .1, .9))});
+    var ha = wa*rev(tr, -.5, .5), pulse = (tr > 6.0 && tr < 8.6) ? .5 + .5*Math.sin((tr - 6.0)*5) : 0;
+    v3Text(c, T("a8.re.addr"), x0, wy + 15, {size:7.2, color:SYS.ink, alpha:ha, p:oQ(k3(tr, -.5, .5))});
     sTx(c, (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase(), x0, wy + 20, ha, {size:2.7, weight:600, color:pulse > 0 ? "#2f6a3a" : SYS.mut, sp:.14});
     var pw3 = 24; sCard(c, x0 + cw - pw3, wy + 10.2, pw3, 5.8, ha, 2.9, "#dfeedd", 0); sTx(c, "LEVERERAD", x0 + cw - pw3/2, wy + 14.1, ha, {size:2.3, weight:600, color:"#2f6a3a", align:"c", sp:.14});
     /* 1 · välj en bild ur leveransen */
-    k = scn(tr, .2, 3.0);
+    k = scn(tr, -.2, 3.0);
     if(k.a > .02){
       var tw = (cw - 2*2.4)/3, th = tw*.62, gh = 2*th + 2.4, nsel = tr >= 1.0 ? 1 : 0;
       c.save(); c.translate(0, k.dy);
@@ -572,7 +572,7 @@ function adInlagg(c, G, t){
       sTx(c, nsel + " / 1 VALD", x0 + cw, yc + 2, k.a*rev(tr, .5, .5), {size:2.4, color:SYS.mut, align:"r", sp:.16});
       var gy = yc + 5.4;
       for(i = 0; i < 6; i++){
-        var gx2 = x0 + (i % 3)*(tw + 2.4), gy2 = gy + Math.floor(i/3)*(th + 2.4), ga = rev(tr, .5 + i*.07, .4)*k.a;
+        var gx2 = x0 + (i % 3)*(tw + 2.4), gy2 = gy + Math.floor(i/3)*(th + 2.4), ga = rev(tr, .05 + i*.07, .35)*k.a;
         sCard(c, gx2 - .4, gy2 - .4, tw + .8, th + .8, ga, 1.4, "#fff", 2); sPh(c, GRID7[i], gx2, gy2, tw, th, ga, 1.2, 1.14);
         if(i === 0 && tr >= 1.0){
           var sp = oBack(k3(tr, 1.0, 1.3));
@@ -771,8 +771,8 @@ reg8("a8_ny", "1 · Bostadsfoto. Och lite till.", "Fotografering och allt som in
 reg8("a8_resa", "2 · Ett objekt. Hela vägen.", "Ett objekt följs från intag och bokning till leverans, annonstext och inlägg.", L6, adResa, 16.0, sndResa, true);
 reg8("a8_skane", "3 · Din bostadsfotograf i Skåne", "Orterna, och ett inlägg som byter mall medan uppgifterna ligger kvar.", L5, adSkane, 12.4, sndSkane);
 reg8("a8_salu", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "Välj bilder, välj mallar, kampanjen skapas med uppgifterna ifyllda, ladda ner alla tre.", L7, adSaluA, 14.0, sndSaluA, true);
-reg8("a8_salub", "5 · Bilder blir inlägg (variant B av 4)", "Samma film som 4, men med en annan öppning: leveransens bilder slår om till färdiga inlägg.", L7 + .7, adSaluB, 2.0, sndSaluB, true);
-reg8("a8_salud", "7 · Bilder blir inlägg (logga och rad)", "Som 5, men utan slutrad: loggan kommer, och raden För mäklare som vill mer. animeras in under den.", OFF7 + .7 + WEND7 + .2, adSaluC, 2.0, sndSaluB, 2);
+reg8("a8_salub", "5 · Bilder blir inlägg (variant B av 4)", "Samma film som 4, men med en annan öppning: leveransens bilder slår om till färdiga inlägg.", L7 + .2, adSaluB, 2.0, sndSaluB, true);
+reg8("a8_salud", "7 · Bilder blir inlägg (logga och rad)", "Som 5, men utan slutrad: loggan kommer, och raden För mäklare som vill mer. animeras in under den.", OFF7 + .2 + WEND7 + .2, adSaluC, 2.0, sndSaluB, 2);
 reg8("a8_inlagg", "6 · En bild blir ett inlägg", "Kortare: välj en bild och en mall, och adress, ort, rum och yta fylls i automatiskt.", L8, adInlagg, 2.0, sndInlagg, true);
 
 /* ---------- annonsplan ---------- */
