@@ -501,6 +501,7 @@ function makeMix(sched){
     var H = {};
     H.s = function(name, t, v, rate){ var b = SND[name]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; if(rate) src.playbackRate.value = rate; var g = ctx.createGain(); g.gain.value = v == null ? 1 : v; src.connect(g); g.connect(master); src.start(Math.max(0, t)) };
     H.click = function(t, v){ H.s("down", t, v); H.s("up", t + .085, v*.75) };
+    H.soft = function(name, t, v, rate, fc){ var b = SND[name]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; src.playbackRate.value = rate || .92; var lp = ctx.createBiquadFilter(); lp.type = "lowpass"; lp.frequency.value = fc || 1900; lp.Q.value = .5; var g = ctx.createGain(); g.gain.value = v == null ? 1 : v; src.connect(lp); lp.connect(g); g.connect(master); src.start(Math.max(0, t)) };
     (comp.vo || []).forEach(function(l){ var b = VOB[l[0]]; if(!b) return; var src = ctx.createBufferSource(); src.buffer = b; var g = ctx.createGain(); g.gain.value = 1.15; src.connect(g); g.connect(master); src.start(Math.max(0, l[1] < 0 ? comp.dur + l[1] : l[1])) });
     sched(H, comp);
     if(comp.logo){ H.s("sting", comp.L + .55 - .02, .8); return }

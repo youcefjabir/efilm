@@ -771,6 +771,40 @@ function reelLay(x, y, w, h, v, by, k){
   return o;
 }
 function lcol(a, b, p){ var q = function(h, i){ return parseInt(h.substr(1 + i*2, 2), 16) }, r = [0, 1, 2].map(function(i){ return Math.round(q(a, i) + (q(b, i) - q(a, i))*p) }); return "rgb(" + r.join(",") + ")" }
+/* tre mallar, tre kontor (påhittade namn och märken): Kommande, Till salu, Såld. Egna färger, egen layout, egen logga. */
+var TPL8 = [
+  {lab:"KOMMANDE", bg:"#F5F0E6", fg:"#1E3B2E", acc:"#B08D57", pill:"line", brand:"SOLVARA", mark:0},
+  {lab:"TILL SALU", bg:"#14233A", fg:"#F3EFE7", acc:"#D9B56C", pill:"fill", brand:"HAVSVIK", mark:1},
+  {lab:"SÅLD", bg:"#A4472A", fg:"#F7EEE4", acc:"#F1C9A8", pill:"fill", brand:"LINDÖ", mark:2}
+];
+function tplMark(c, m, x, y, r, col, bg){
+  c.save(); c.strokeStyle = col; c.fillStyle = col; c.lineWidth = r*.16; c.lineCap = "round";
+  if(m === 0){ c.beginPath(); c.arc(x, y, r, 0, 7); c.stroke(); c.beginPath(); c.arc(x + r*.28, y - r*.22, r*.34, 0, 7); c.fill() }
+  else if(m === 1){ c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); c.strokeStyle = bg; c.lineWidth = r*.14; [-.3, .22].forEach(function(dy){ c.beginPath(); c.moveTo(x - r*.62, y + r*dy); c.quadraticCurveTo(x - r*.31, y + r*dy - r*.3, x, y + r*dy); c.quadraticCurveTo(x + r*.31, y + r*dy + r*.3, x + r*.62, y + r*dy); c.stroke() }) }
+  else { rr(c, x - r, y - r, r*2, r*2, r*.28); c.stroke(); c.restore(); v3Text(c, "L", x, y + r*.42, {size:r*1.5, color:col, align:"c"}); return }
+  c.restore();
+}
+function tplCard(c, i, cx, cy, cw, ch, f, a, D, f1, f2, pop){
+  if(a <= .02) return; var T8 = TPL8[i], px = cx + 4.2*f, ix = cx + cw - 4.2*f, bar = function(x0, y0, w0, h0){ c.save(); c.globalAlpha = a*.2; c.fillStyle = T8.fg; rr(c, x0, y0, w0, h0, h0*.3); c.fill(); c.restore() };
+  c.save(); c.globalAlpha = a; if(pop && pop !== 1){ c.translate(cx + cw/2, cy + ch/2); c.scale(pop, pop); c.translate(-cx - cw/2, -cy - ch/2) }
+  c.shadowColor = "rgba(0,0,0,.42)"; c.shadowBlur = 7; c.shadowOffsetY = 1.4; c.fillStyle = T8.bg; rr(c, cx, cy, cw, ch, 2.2*f); c.fill(); c.shadowColor = "transparent";
+  if(i === 1){ c.strokeStyle = T8.acc; c.globalAlpha = a*.55; c.lineWidth = .22*f; rr(c, cx + 1.5*f, cy + 1.5*f, cw - 3*f, ch - 3*f, 1.4*f); c.stroke(); c.globalAlpha = a }
+  /* logga överst, status i andra hörnet */
+  tplMark(c, T8.mark, px + 2.2*f, cy + 6.3*f, 2.2*f, T8.acc, T8.bg);
+  v3Text(c, T8.brand, px + 6*f, cy + 7.1*f, {size:1.85*f, weight:600, f:"sans", sp:.36, color:T8.fg, alpha:.9});
+  var pw = v3Measure(c, T8.lab, {size:1.7*f, weight:600, f:"sans", sp:.28}) + 5*f, pxx = ix - pw, py = cy + 3.4*f;
+  if(T8.pill === "fill"){ c.fillStyle = T8.acc; rr(c, pxx, py, pw, 5.4*f, 2.7*f); c.fill(); v3Text(c, T8.lab, pxx + pw/2, py + 3.7*f, {size:1.7*f, weight:700, f:"sans", sp:.28, color:T8.bg, align:"c"}) }
+  else { c.strokeStyle = T8.acc; c.lineWidth = .24*f; rr(c, pxx, py, pw, 5.4*f, 2.7*f); c.stroke(); v3Text(c, T8.lab, pxx + pw/2, py + 3.7*f, {size:1.7*f, weight:700, f:"sans", sp:.28, color:T8.acc, align:"c"}) }
+  /* adress */
+  if(f1 < 1) bar(px, cy + 12.2*f, 46*f, 7*f);
+  v3Text(c, D.addr, px, cy + 19*f, {size:7.4*f, color:T8.fg, alpha:f1, italic:i === 2});
+  /* uppgifter i tre kolumner */
+  c.save(); c.globalAlpha = a*.3; c.fillStyle = T8.fg; c.fillRect(px, cy + 22.4*f, cw - 8.4*f, .22*f); c.restore();
+  if(f2 < 1) bar(px, cy + 25.8*f, 56*f, 3*f);
+  var cols = [D.city.toUpperCase(), D.facts[0].toUpperCase(), D.facts[1].toUpperCase()], inner = cw - 8.4*f, offs = [0, .5, .78];
+  cols.forEach(function(s, q){ v3Text(c, s, px + offs[q]*inner, cy + 28.4*f, {size:1.85*f, weight:600, f:"sans", sp:.1, color:T8.fg, alpha:f2*.9}); if(q){ c.save(); c.globalAlpha = a*f2*.3; c.fillStyle = T8.fg; c.fillRect(px + offs[q]*inner - 1.9*f, cy + 25.2*f, .2*f, 4.2*f); c.restore() } });
+  c.restore();
+}
 function reelFrame(c, x, y, w, h, tr, o){
   o = o || {};
   var ph = o.ph || [GRID7[0], GRID7[1], GRID7[5]], seg = o.seg || 1.5, fd = .5, v = o.v || 0, i, by = o.by == null ? y + h*.8 : o.by, a = o.a == null ? 1 : o.a;
@@ -784,22 +818,10 @@ function reelFrame(c, x, y, w, h, tr, o){
   }
   v3Grad(c, x, y + h*.5, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.55)"]]);
   v3Grad(c, x, y, w, h*.22, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
-  var addr = T("a8.re.addr"), cf = (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase();
-  var TP = [{bg:"#F3EFE7", fg:"#1F4B39", acc:"#a9743a"}, {bg:"#1F4B39", fg:"#F3EFE7", acc:"#c8cfc0"}, {bg:"#F2681C", fg:"#ffffff", acc:"#ffe2cf"}], SW = [3.2, 4.8];
-  var ti = tr < SW[0] ? 0 : tr < SW[1] ? 1 : 2, tp = ti === 0 ? 1 : k3(tr, SW[ti - 1], SW[ti - 1] + .5), T0 = TP[Math.max(0, ti - 1)], T1 = TP[ti];
-  var bgc = lcol(T0.bg, T1.bg, tp), fgc = lcol(T0.fg, T1.fg, tp), acc = lcol(T0.acc, T1.acc, tp), pop = ti ? 1 - .04*Math.sin(Math.min(1, tp)*Math.PI) : 1;
-  var cw = w*.77, ch = 32*f, cx = x + w*.05, cy = y + h*.60 + (1 - ia)*3*f, px = cx + 4*f;
-  c.save(); c.globalAlpha = a*ia; c.translate(cx + cw/2, cy + ch/2); c.scale(pop, pop); c.translate(-cx - cw/2, -cy - ch/2);
-  c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 6; c.shadowOffsetY = 1.2; c.fillStyle = bgc; rr(c, cx, cy, cw, ch, 2.4*f); c.fill(); c.shadowColor = "transparent";
-  c.fillStyle = acc; rr(c, px, cy + 4.6*f, 3*f, .5*f, .25*f); c.fill();
-  v3Text(c, o.label || "TILL SALU", px + 4.6*f, cy + 6*f, {size:2.0*f, weight:600, f:"sans", sp:.3, color:acc});
-  if(f1 < 1){ c.globalAlpha = a*ia*(1 - f1)*.2; c.fillStyle = fgc; rr(c, px, cy + 9*f, 46*f, 7.2*f, 1.2*f); c.fill(); c.globalAlpha = a*ia }
-  if(f2 < 1){ c.globalAlpha = a*ia*(1 - f2)*.2; c.fillStyle = fgc; rr(c, px, cy + 21.4*f, 56*f, 3*f, .8*f); c.fill(); c.globalAlpha = a*ia }
-  v3Text(c, addr, px, cy + 16.2*f, {size:7.4*f, color:fgc, alpha:f1});
-  c.globalAlpha = a*ia*.28; c.fillStyle = fgc; c.fillRect(px, cy + 19*f, cw - 8*f, .25*f); c.globalAlpha = a*ia;
-  v3Text(c, cf, px, cy + 24*f, {size:2.2*f, weight:600, f:"sans", sp:.16, color:fgc, alpha:f2*.85});
-  v3Text(c, "ER  ·  MÄKLARBYRÅ", px, cy + 28.6*f, {size:1.7*f, weight:500, f:"sans", sp:.3, color:fgc, alpha:.55});
-  c.restore();
+  var SW = [3.2, 4.8], ti = tr < SW[0] ? 0 : tr < SW[1] ? 1 : 2, tp = ti === 0 ? 1 : ioC(k3(tr, SW[ti - 1], SW[ti - 1] + .5));
+  var cw = w*.78, ch = 33*f, cx = x + w*.05, cy = y + h*.585 + (1 - ia)*3*f, D = {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts").split(" · ")};
+  if(ti > 0) tplCard(c, ti - 1, cx, cy, cw, ch, f, a*ia*(1 - tp), D, 1, 1);
+  tplCard(c, ti, cx, cy, cw, ch, f, a*ia*(ti ? tp : 1), D, f1, f2, ti ? 1 - .03*Math.sin(tp*Math.PI) : 1);
   c.restore();
 }
 /* iPhone: svart kropp, ö, och Reel-gränssnitt (Reels, hjärta, kommentar, dela, konto) så att man förstår att det är en Reel */
@@ -867,10 +889,9 @@ function adReel(c, G, t){
   if(t >= PH_OUT + .5) twoPartFast(c, t, PH_OUT + .5, LR + .05, T("a8.rl.f1"), T("a8.rl.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
 function sndReel(H){
-  [.3, .45, .6, .75].forEach(function(q){ H.s("shutter", q, .26) });
-  H.click(2.35, .26);
-  [0, 1, 2, 3].forEach(function(i){ H.s("shutter", PH0 + i*RSEG + (i ? 0 : .05), .4) });
-  H.s("tick2", PH0 + 3.25, .07); H.s("tick2", PH0 + 4.85, .07);
+  [.3, .45, .6, .75].forEach(function(q){ H.soft("shutter", q, .2) });
+  H.soft("down", 2.35, .22); H.soft("up", 2.435, .16);
+  [0, 1, 2, 3].forEach(function(i){ H.soft("shutter", PH0 + i*RSEG + (i ? 0 : .05), .26) });
 }
 
 /* ---------- komponera ---------- */
