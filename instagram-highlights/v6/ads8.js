@@ -170,7 +170,7 @@ function tplB(c, kind, x, y, w, prog, d){
   var sub = d.city.toUpperCase() + "  ·  " + d.facts.toUpperCase();
   if(d.slot > .02){
     var bx = kind === "salu" ? [[8, 88, 52, 15], [8, 105.2, 66, 7]] : kind === "visning" ? [[25, 85, 50, 11], [18, 97.6, 64, 6.6]] : [[25, 81, 50, 11], [18, 93, 64, 6.6]], sa1 = d.slot*(1 - f(.12, .3)), sa2 = d.slot*(1 - f(.38, .55));
-    [[bx[0], sa1], [bx[1], sa2]].forEach(function(q){ if(q[1] <= .02) return; c.save(); c.globalAlpha = q[1]; c.fillStyle = "rgba(243,239,231,.26)"; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.fill(); c.strokeStyle = "rgba(255,255,255,.98)"; c.lineWidth = .7; c.setLineDash([1.8, 1.4]); c.lineDashOffset = -prog*30; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.stroke(); c.restore() });
+    [[bx[0], sa1], [bx[1], sa2]].forEach(function(q){ if(q[1] <= .02) return; c.save(); c.globalAlpha = q[1]; c.fillStyle = "rgba(243,239,231,.2)"; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.fill(); c.strokeStyle = "rgba(255,255,255,.5)"; c.lineWidth = .3; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.stroke(); c.restore() });
   }
   if(kind === "salu"){
     v3Text(c, "TILL SALU", 8, 82, {size:3.6, weight:600, f:"sans", sp:.3, color:CR, alpha:f(0, .25), p:f(0, .3)});
@@ -344,12 +344,12 @@ function miniLogo(c, G, S, a, bright){
 }
 /* variant B: leveransens bilder slår om till färdiga inlägg, ljust och med innehåll i första bildrutan */
 function hookGrid(c, G, S, t){
-  var fq = .83, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .33 : .35), out = rev(t, 3.9, .5), ph7 = [GRID7[0], GRID7[2], GRID7[4]], POST = {0:0, 2:1, 4:2}, i;
-  var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 9.2 : 7.8, ty0 = S.y0 + S.h*.095;
+  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = rev(t, 3.9, .5), ph7 = [GRID7[0], GRID7[2], GRID7[4]], POST = {0:0, 2:1, 4:2}, i;
+  var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 8.6 : 7.4, ty0 = S.y0 + S.h*.115;
   v3Text(c, T("a8.sb.l1"), 50, ty0 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
   v3Text(c, T("a8.sb.l2"), 50, ty0 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, .35, .3), p:oQ(k3(t, .35, .9))});
   /* diskret status: fotograferas, sedan levererad när den sjätte bilden landat */
-  var sa = rev(t, -.2, .25)*(1 - out), lev = rev(t, .95, .25), s1 = "FOTOGRAFERAS", s2 = "LEVERERAD", sw1 = v3Measure(c, s1, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw2 = v3Measure(c, s2, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw = lerp(sw1, sw2, lev), sy = S.y0 + 2.2;
+  var sa = rev(t, -.2, .25)*(1 - out), lev = rev(t, .95, .25), s1 = "FOTOGRAFERAS", s2 = "LEVERERAD", sw1 = v3Measure(c, s1, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw2 = v3Measure(c, s2, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw = lerp(sw1, sw2, lev), sy = S.y0 + .6;
   sCard(c, 50 - sw/2, sy, sw, 5.6, sa, 2.8, "#fff", 0, SYS.line);
   dot(c, 50 - sw/2 + 3.4, sy + 2.8, .95, lev > .5 ? "#2f6a3a" : "#b9822c", sa);
   sTx(c, s1, 50 - sw/2 + 6, sy + 3.8, sa*(1 - lev), {size:2.1, weight:600, color:SYS.mut, sp:.2});
@@ -384,7 +384,6 @@ function hookPosts(c, G, S, t){
 function flyChip(c, txt, fx, fy, tx, ty, tr, t0, dur, a){
   var p = (tr - t0)/dur; if(p <= 0 || p >= 1) return; var q;
   var pos = function(e){ return [lerp(fx, tx, e), lerp(fy, ty, e) - Math.sin(e*Math.PI)*8] }, e = ioC(p), P0 = pos(e);
-  for(q = 1; q <= 4; q++){ var pq = pos(Math.max(0, e - q*.055)); dot(c, pq[0], pq[1], 1.1 - q*.18, "#2f6a3a", a*(.45 - q*.09)*(1 - clamp((p - .85)/.15, 0, 1))) }
   var al = a*Math.min(1, p*7)*(1 - clamp((p - .86)/.14, 0, 1)), w = v3Measure(c, txt, {size:2.4, weight:600, f:"sans"}) + 5;
   sCard(c, P0[0] - w/2, P0[1] - 2.6, w, 5.2, al, 2.6, "#fff", 4, "#2f6a3a"); sTx(c, txt, P0[0], P0[1] + 1.0, al, {size:2.4, weight:600, color:SYS.ink, align:"c"});
 }
@@ -456,23 +455,21 @@ function adSalu(c, G, t, v){
       sTx(c, "KAMPANJEN ÄR KLAR", x0, yc + 2, lbl3, {size:2.4, weight:600, sp:.2});
       var slotA = rev(tr, 8.95, .5)*(1 - rev(tr, 12.6, .4)), SL = [[[38, 96], [36, 108.5]], [[50, 90.5], [50, 100.9]], [[50, 86.5], [50, 96.3]]];
       for(i = 0; i < 3; i++){
-        var mx = x0 + i*(mw + 2.4), ma = rev(tr, 5.7 + i*.2, .6)*k.a, selT = 6.5 + i*.45, sel = clamp(k3(tr, selT, selT + .3), 0, 1), prog = clamp(k3(tr, 10.0 + i*.5, 11.4 + i*.5), 0, 1);
+        var mx = x0 + i*(mw + 2.4), ma = rev(tr, 5.7 + i*.2, .6)*k.a, selT = 6.5 + i*.45, sel = clamp(k3(tr, selT, selT + .3), 0, 1), prog = clamp(k3(tr, 9.95 + i*.6, 11.45 + i*.6), 0, 1);
         sCard(c, mx - .6, my - .6, mw + 1.2, mh + 1.2, ma, 1.8, "#fff", 3, sel > .5 && tr < 8.8 ? SYS.ink : null);
         if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, prog, DO(i, ph7[i], slotA)); c.restore() }
         sTx(c, LABS[i], mx + .6, my + mh + 5.4, ma, {size:2.9, weight:600});
         if(sel > .02){ var br = 2.1*oBack(sel); c.save(); c.globalAlpha = ma; c.fillStyle = SYS.grn; c.beginPath(); c.arc(mx + mw - 2.4, my + mh + 4.4, Math.max(.01, br), 0, 7); c.fill(); c.restore(); chk(c, mx + mw - 2.4, my + mh + 4.4, 1.6, k3(tr, selT + .1, selT + .4), "#fff", .4) }
       }
       /* bostadsuppgifterna lyfts ur leveransen och landar i mallens fält */
-      var dg = rev(tr, 9.1, .4)*(1 - rev(tr, 12.2, .5))*k.a;
-      if(dg > .02){ c.save(); c.globalAlpha = dg*(.55 + .45*Math.sin((tr - 9.1)*5)); c.strokeStyle = "#2f6a3a"; c.lineWidth = .45; c.setLineDash([1.6, 1.2]); rr(c, x0 - 1.6, wy + 8.4, cw*.7, 12.6, 2); c.stroke(); c.restore() }
       for(i = 0; i < 3; i++){
         var mx2 = x0 + i*(mw + 2.4), pxy = function(q){ return [mx2 + q[0]*mw/100, my + q[1]*mw/100] };
-        flyChip(c, T("a8.re.addr"), x0 + 11, wy + 13.2, pxy(SL[i][0])[0], pxy(SL[i][0])[1], tr, 9.5 + i*.5, .75, k.a);
-        flyChip(c, T("a8.re.facts"), x0 + 16, wy + 19.2, pxy(SL[i][1])[0], pxy(SL[i][1])[1], tr, 9.85 + i*.5, .75, k.a);
+        flyChip(c, T("a8.re.addr"), x0 + 11, wy + 13.2, pxy(SL[i][0])[0], pxy(SL[i][0])[1], tr, 9.4 + i*.6, .85, k.a);
+        flyChip(c, T("a8.re.facts"), x0 + 16, wy + 19.2, pxy(SL[i][1])[0], pxy(SL[i][1])[1], tr, 9.8 + i*.6, .85, k.a);
       }
       var zy = my + mh + 9.5;
       sBtn(c, 50, zy + 1.5, 52, 8.2, "SKAPA KAMPANJ  ›", rev(tr, 7.5, .5)*k.a*(1 - rev(tr, 8.5, .4)), k3(tr, 8.15, 8.45));
-      var pa = rev(tr, 9.0, .5)*k.a*(1 - rev(tr, 12.6, .4)), pp = k3(tr, 9.3, 12.0);
+      var pa = rev(tr, 9.0, .5)*k.a*(1 - rev(tr, 12.6, .4)), pp = k3(tr, 9.3, 12.2);
       if(pa > .02){
         sCard(c, x0, zy + 1.4, cw, .7, pa, .35, "rgba(28,26,25,.14)", 0); sCard(c, x0, zy + 1.4, Math.max(.4, cw*pp), .7, pa, .35, "#2f6a3a", 0);
         sTx(c, "MALLARNA FYLLS I AUTOMATISKT", 50, zy + 8, pa, {size:2.7, weight:600, color:SYS.ink, align:"c", sp:.16});
@@ -491,12 +488,11 @@ function adSalu(c, G, t, v){
 }
 function adSaluA(c, G, t){ adSalu(c, G, t, 0) }
 function adSaluB(c, G, t){ adSalu(c, G, t, 1) }
-function sndSaluB(H){ sndSalu(H, OFF7 + .7, true); for(var q = 0; q < 6; q++) H.s("shutter", q*.14, .5); H.s("tick2", .95, .1); H.s("shutter", 1.4, .5) }
-function sndSalu(H, off, skipOpen){ var O = off == null ? OFF7 : off; if(!skipOpen) H.s("shutter", .1, .6);
-  SELT7.forEach(function(s){ H.click(s + O, .32) }); H.click(4.45 + O, .4);
-  [6.5, 6.95, 7.4].forEach(function(s){ H.click(s + O, .26) }); H.click(8.2 + O, .4);
-  [10.2, 10.7, 11.2, 10.55, 11.05, 11.55].forEach(function(s){ H.s("tick1", s + O, .05) });
-  H.s("tick2", 12.0 + O, .1); H.click(15.45 + O, .4); H.s("tick2", 15.6 + O, .12) }
+function sndSaluB(H){ sndSalu(H, OFF7 + .7, true); for(var q = 0; q < 6; q++) H.s("shutter", q*.14, .26); H.s("tick2", .95, .07); H.s("shutter", 1.4, .3) }
+function sndSalu(H, off, skipOpen){ var O = off == null ? OFF7 : off; if(!skipOpen) H.s("shutter", .1, .5);
+  SELT7.forEach(function(s){ H.click(s + O, .18) }); H.click(4.45 + O, .26);
+  H.click(8.2 + O, .26);
+  H.s("tick2", 12.2 + O, .07); H.click(15.45 + O, .26); H.s("tick2", 15.6 + O, .09) }
 
 function DOBJ(){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", ph:{o:"rs_dusk1", g:P.dining, e:"rs_dusk2"}} }
 function sndResa(H){ var O = 1.9; H.s("shutter", .1, .6); [7.05, 12.45, 15.5, 19.05, 21.75].forEach(function(s){ H.s("tick1", s + O, .06) }); [8.85, 10.7].forEach(function(s){ H.s("tick2", s + O, .1) }) }
