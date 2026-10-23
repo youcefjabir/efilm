@@ -45,7 +45,7 @@ var TX = {
   "a8.sb.l1":["Bilder blir", "5 · rubrik, rad 1"], "a8.sb.l2":["inlägg.", "5 · rubrik, rad 2"], "a8.sb.f1":["Från leverans.", "5 · slutsats, del 1"], "a8.sb.f2":["Till färdiga inlägg.", "5 · slutsats, del 2"],
   "a8.sc.l1":["En bild blir", "6 · rubrik, rad 1"], "a8.sc.l2":["ett inlägg.", "6 · rubrik, rad 2"], "a8.sc.f1":["Från leverans.", "6 · slutsats, del 1"], "a8.sc.f2":["Till färdigt inlägg.", "6 · slutsats, del 2"],
   "a8.sd.tag":["För mäklare som vill mer.", "7 · raden under loggan"],
-  "a8.rl.h":["Bilderna blir en Reel.", "8 · rubrik över mobilen"], "a8.rl.f1":["Från leverans.", "8 · slutsats, del 1"], "a8.rl.f2":["Till färdig Reel.", "8 · slutsats, del 2"],
+  "a8.rl.h":["Bilderna blir en Reel.", "8 · rubrik över mobilen"], "a8.rl.h2":["I era egna mallar och färger.", "8 · rubrik, när mallen byter"], "a8.rl.f1":["Från leverans.", "8 · slutsats, del 1"], "a8.rl.f2":["Till färdig Reel.", "8 · slutsats, del 2"],
   "a8.sk.l":["BOSTADSFOTOGRAFI I", "5 · liten rad"], "a8.sk.h1":["Din bostadsfotograf", "5 · rubrik, rad 1"], "a8.sk.h2":["i Skåne.", "5 · rubrik, rad 2"], "a8.sk.cap":["UPPGIFTERNA HÄMTAS FRÅN BOKNINGEN", "5 · rad över bokningen"]
 };
 Object.keys(TX).forEach(function(k){ V3_TXD[k] = TX[k][0] });
@@ -770,6 +770,7 @@ function reelLay(x, y, w, h, v, by, k){
   else { o.ax = x + w/2; o.al = "c"; o.ly = y + 10*f; o.ay = by; o.cy = by + 5.2*f; o.ky = by + 10.6*f }
   return o;
 }
+function lcol(a, b, p){ var q = function(h, i){ return parseInt(h.substr(1 + i*2, 2), 16) }, r = [0, 1, 2].map(function(i){ return Math.round(q(a, i) + (q(b, i) - q(a, i))*p) }); return "rgb(" + r.join(",") + ")" }
 function reelFrame(c, x, y, w, h, tr, o){
   o = o || {};
   var ph = o.ph || [GRID7[0], GRID7[1], GRID7[5]], seg = o.seg || 1.5, fd = .5, v = o.v || 0, i, by = o.by == null ? y + h*.8 : o.by, a = o.a == null ? 1 : o.a;
@@ -781,15 +782,24 @@ function reelFrame(c, x, y, w, h, tr, o){
     var s0 = i*seg, pa = i === 0 ? 1 : clamp((tr - s0)/fd, 0, 1); if(pa <= .01) continue;
     v3Photo(c, ph[i], x, y, w, h, {scale:lerp(1.05, 1.15, k3(tr, s0, s0 + seg + fd)), pos:V3_POS[ph[i]], alpha:ioC(pa)});
   }
-  v3Grad(c, x, y + h*.42, w, h*.58, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.82)"]]);
+  v3Grad(c, x, y + h*.5, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.55)"]]);
   v3Grad(c, x, y, w, h*.22, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
-  var addr = T("a8.re.addr"), cf = (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase(), rise = (1 - ia)*1.4*f;
-  v3Text(c, (o.label || "TILL SALU"), L.ax, L.ly, {size:2.1*f, weight:600, f:"sans", sp:.3, color:"#dfe3d4", align:L.al, alpha:ia});
-  if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*ia; c.fillStyle = "rgba(255,255,255,.3)"; var bw = 44*f; rr(c, L.al === "l" ? L.ax : L.ax - bw/2, L.ay - 7*f, bw, 7.4*f, 1.2*f); c.fill(); c.restore() }
-  if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*ia; c.fillStyle = "rgba(255,255,255,.3)"; var bw2 = 56*f; rr(c, L.al === "l" ? L.ax : L.ax - bw2/2, L.cy - 2.4*f, bw2, 3.2*f, .8*f); c.fill(); c.restore() }
-  v3Text(c, addr, L.ax, L.ay + rise, {size:8.6*f, color:W, align:L.al, alpha:ia*f1});
-  v3Text(c, cf, L.ax, L.cy + rise, {size:2.5*f, weight:500, f:"sans", sp:.18, color:"#e6e2d8", align:L.al, alpha:ia*f2});
-  v3Text(c, "ER  ·  MÄKLARBYRÅ", L.ax, L.ky, {size:1.9*f, weight:500, f:"sans", sp:.3, color:"#cfcabf", align:L.al, alpha:ia*.7});
+  var addr = T("a8.re.addr"), cf = (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase();
+  var TP = [{bg:"#F3EFE7", fg:"#1F4B39", acc:"#a9743a"}, {bg:"#1F4B39", fg:"#F3EFE7", acc:"#c8cfc0"}, {bg:"#F2681C", fg:"#ffffff", acc:"#ffe2cf"}], SW = [3.2, 4.8];
+  var ti = tr < SW[0] ? 0 : tr < SW[1] ? 1 : 2, tp = ti === 0 ? 1 : k3(tr, SW[ti - 1], SW[ti - 1] + .5), T0 = TP[Math.max(0, ti - 1)], T1 = TP[ti];
+  var bgc = lcol(T0.bg, T1.bg, tp), fgc = lcol(T0.fg, T1.fg, tp), acc = lcol(T0.acc, T1.acc, tp), pop = ti ? 1 - .04*Math.sin(Math.min(1, tp)*Math.PI) : 1;
+  var cw = w*.77, ch = 32*f, cx = x + w*.05, cy = y + h*.60 + (1 - ia)*3*f, px = cx + 4*f;
+  c.save(); c.globalAlpha = a*ia; c.translate(cx + cw/2, cy + ch/2); c.scale(pop, pop); c.translate(-cx - cw/2, -cy - ch/2);
+  c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 6; c.shadowOffsetY = 1.2; c.fillStyle = bgc; rr(c, cx, cy, cw, ch, 2.4*f); c.fill(); c.shadowColor = "transparent";
+  c.fillStyle = acc; rr(c, px, cy + 4.6*f, 3*f, .5*f, .25*f); c.fill();
+  v3Text(c, o.label || "TILL SALU", px + 4.6*f, cy + 6*f, {size:2.0*f, weight:600, f:"sans", sp:.3, color:acc});
+  if(f1 < 1){ c.globalAlpha = a*ia*(1 - f1)*.2; c.fillStyle = fgc; rr(c, px, cy + 9*f, 46*f, 7.2*f, 1.2*f); c.fill(); c.globalAlpha = a*ia }
+  if(f2 < 1){ c.globalAlpha = a*ia*(1 - f2)*.2; c.fillStyle = fgc; rr(c, px, cy + 21.4*f, 56*f, 3*f, .8*f); c.fill(); c.globalAlpha = a*ia }
+  v3Text(c, addr, px, cy + 16.2*f, {size:7.4*f, color:fgc, alpha:f1});
+  c.globalAlpha = a*ia*.28; c.fillStyle = fgc; c.fillRect(px, cy + 19*f, cw - 8*f, .25*f); c.globalAlpha = a*ia;
+  v3Text(c, cf, px, cy + 24*f, {size:2.2*f, weight:600, f:"sans", sp:.16, color:fgc, alpha:f2*.85});
+  v3Text(c, "ER  ·  MÄKLARBYRÅ", px, cy + 28.6*f, {size:1.7*f, weight:500, f:"sans", sp:.3, color:fgc, alpha:.55});
+  c.restore();
   c.restore();
 }
 /* iPhone: svart kropp, ö, och Reel-gränssnitt (Reels, hjärta, kommentar, dela, konto) så att man förstår att det är en Reel */
@@ -848,7 +858,8 @@ function adReel(c, G, t){
   if(pa > .02){
     var top = S.y0 + 8.5, ph = G.is9 ? 98 : Math.min(S.y1 - top, 92), pw = ph/2.05, px = 50 - pw/2, py = top + (1 - oQ(k3(t, PH0 - .6, PH0 + .2)))*8 + pout*6;
     var ha = rev(t, PH0 - .2, .5)*(1 - rev(t, PH_OUT - .3, .4));
-    v3Text(c, T("a8.rl.h"), 50, S.y0 + 4.4, {size:5.2, color:WHITE, align:"c", alpha:ha});
+    v3Text(c, T("a8.rl.h"), 50, S.y0 + 4.4, {size:5.2, color:WHITE, align:"c", alpha:ha*(1 - rev(t, PH0 + 3.0, .4))});
+    v3Text(c, T("a8.rl.h2"), 50, S.y0 + 4.4, {size:4.9, color:WHITE, align:"c", alpha:rev(t, PH0 + 3.3, .5)*(1 - rev(t, PH_OUT - .3, .4))});
     var sc = phoneBody(c, px, py, pw, ph, pa), rt = Math.max(0, t - PH0);
     reelFrame(c, sc.x, sc.y, sc.w, sc.h, rt, {v:0, a:pa, r:sc.r, seg:RSEG, k:1.5, ph:[GRID7[0], GRID7[1], GRID7[5], GRID7[4]], by:sc.y + sc.h*.63, f1:ioC(k3(rt, .5, 1.1)), f2:ioC(k3(rt, 1.0, 1.6))});
     reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5));
@@ -859,7 +870,7 @@ function sndReel(H){
   [.3, .45, .6, .75].forEach(function(q){ H.s("shutter", q, .26) });
   H.click(2.35, .26);
   [0, 1, 2, 3].forEach(function(i){ H.s("shutter", PH0 + i*RSEG + (i ? 0 : .05), .4) });
-  H.s("tick2", PH0 + 1.7, .07);
+  H.s("tick2", PH0 + 3.25, .07); H.s("tick2", PH0 + 4.85, .07);
 }
 
 /* ---------- komponera ---------- */
