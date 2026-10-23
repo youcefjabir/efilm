@@ -42,7 +42,7 @@ var TX = {
   "a8.re.s5a":["Inläggen", "2 · inlägg, rad 1"], "a8.re.s5b":["av era levererade bilder.", "2 · inlägg, rad 2"],
   "a8.re.f1":["Spara tid.", "2 · slutsats, del 1"], "a8.re.f2":["Få bättre resultat.", "2 · slutsats, del 2"],
   "a8.sa.l1":["Ditt nästa objekt.", "4 · rubrik, rad 1"], "a8.sa.l2":["Som tre färdiga inlägg.", "4 · rubrik, rad 2"], "a8.sa.f1":["Från leverans.", "4 · slutsats, del 1"], "a8.sa.f2":["Till färdiga inlägg.", "4 · slutsats, del 2"],
-  "a8.sb.l1":["Bilder blir", "5 · rubrik, rad 1"], "a8.sb.l2":["inlägg.", "5 · rubrik, rad 2"],
+  "a8.sb.l1":["Bilder blir", "5 · rubrik, rad 1"], "a8.sb.l2":["inlägg.", "5 · rubrik, rad 2"], "a8.sb.f1":["Från leverans.", "5 · slutsats, del 1"], "a8.sb.f2":["Till färdiga inlägg.", "5 · slutsats, del 2"],
   "a8.sk.l":["BOSTADSFOTOGRAFI I", "5 · liten rad"], "a8.sk.h1":["Din bostadsfotograf", "5 · rubrik, rad 1"], "a8.sk.h2":["i Skåne.", "5 · rubrik, rad 2"], "a8.sk.cap":["UPPGIFTERNA HÄMTAS FRÅN BOKNINGEN", "5 · rad över bokningen"]
 };
 Object.keys(TX).forEach(function(k){ V3_TXD[k] = TX[k][0] });
@@ -484,7 +484,7 @@ function adSalu(c, G, t, v){
     }
     c.restore();
   }
-  if(t >= wend + .3) twoPart(c, t, wend + .3, Lx + .05, T("a8.sa.f1"), T("a8.sa.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
+  if(t >= wend + .3) twoPart(c, t, wend + .3, Lx + .05, T(v ? "a8.sb.f1" : "a8.sa.f1"), T(v ? "a8.sb.f2" : "a8.sa.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
 function adSaluA(c, G, t){ adSalu(c, G, t, 0) }
 function adSaluB(c, G, t){ adSalu(c, G, t, 1) }
