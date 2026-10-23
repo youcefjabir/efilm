@@ -152,7 +152,7 @@ function postBox(c, x, y, w, ar, prog, o, style, phase, photo, name){
 /* ---------- slutet, som i varumärkesfilmen ---------- */
 function endSeq(c, G, t, e0, cta){
   var u0 = t - e0; if(u0 < 0) return;
-  if(cta && cta.logo){ v3Fill(c, 0, 0, 100, G.H, "#050505", ioC(k3(u0, 0, .7))); if(u0 >= .55) endLogo(c, G, u0 - .55); return }
+  if(cta && cta.logo){ v3Fill(c, 0, 0, 100, G.H, "#050505", ioC(k3(u0, 0, .7))); if(u0 >= .55) endLogo(c, G, u0 - .55); if(cta.tag){ var tgA = ioC(k3(u0, 2.55, 3.2)), tgS = G.is9 ? 3.7 : 3.4; if(tgA > 0) v3Text(c, T(cta.tag), 50, G.cy + (G.is9 ? 12.5 : 11) + tgS*.34 + (1 - tgA)*1.2, {size:tgS, weight:500, f:"sans", sp:.03, color:"#e9eadf", align:"c", alpha:tgA*.9}) } return }
   var kb = cta ? "a7.btn2" : "a7.btn", ku = cta ? "a7.url2" : "a7.url", kt = cta ? "a7.tag2" : "a7.tag";
   if(cta && cta.b){ kb = cta.b; ku = cta.u || "a7.url"; kt = cta.t || "a7.tag" }
   var H = G.H, cx = 50, cy = G.cy, w = G.is9 ? 66 : 58, h = G.is9 ? 10.4 : 9, ts = h*.3;
