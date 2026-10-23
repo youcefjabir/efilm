@@ -533,7 +533,7 @@ function hookGrid1(c, G, S, t){
     }
   }
 }
-function adInlagg(c, G, t){
+function adInlagg(c, G, t, noEnd){
   var H = G.H, S = SG(G), i;
   v3Fill(c, 0, 0, 100, H, DARK);
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
@@ -624,7 +624,7 @@ function adInlagg(c, G, t){
     }
     c.restore();
   }
-  if(t >= wend + .1) twoPartFast(c, t, wend + .1, L8 + .05, T("a8.sc.f1"), T("a8.sc.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
+  if(!noEnd && t >= wend + .1) twoPartFast(c, t, wend + .1, L8 + .05, T("a8.sc.f1"), T("a8.sc.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
 function sndInlagg(H){ var O = O8; for(var q = 0; q < 6; q++) H.s("shutter", q*.14, .26); H.s("tick2", .95, .07); H.s("shutter", 1.0, .3);
   H.click(1.0 + O, .18); H.click(2.5 + O, .26); H.click(3.9 + O, .18); H.click(5.1 + O, .26); H.s("tick2", 8.8 + O, .08) }
@@ -820,5 +820,5 @@ window.secAds8 = function(){
     + '<div><b>Mallarna i annons 2 och 3</b><p>Orange, grön och editorial är egna nyanser och egna layouter som kan påminna om olika kontor. Inga namn, märken eller kedjornas egna mallar. Använd bara kontorets egna material med kontorets tillåtelse.</p></div>'
     + '<div><b>Bilder och ljud</b><p>Bara era egna bilder (sida 15 och sängen från Såld). Riktiga ljud, CC0. Ingen musik. De små bilderna för skymningsbild, planritning, solbana och karta är ritade illustrationer, inga riktiga leveranser.</p></div></div></details></div>';
 };
-window.A8K = {SYS:SYS, sTx:sTx, sCard:sCard, sPh:sPh, sBtn:sBtn, chk:chk, tplB:tplB, DO:DO, KB:KB, LABS:LABS, P:P, rev:rev, fz:fz, clamp:clamp, flyChip:flyChip, GRID7:GRID7, BR_G:BR_G, SG:SG};
+window.A8K = {twoPart:twoPart, twoPartFast:twoPartFast, adInlagg:adInlagg, O8:O8, WEND8:WEND8, L8:L8, SYS:SYS, sTx:sTx, sCard:sCard, sPh:sPh, sBtn:sBtn, chk:chk, tplB:tplB, DO:DO, KB:KB, LABS:LABS, P:P, rev:rev, fz:fz, clamp:clamp, flyChip:flyChip, GRID7:GRID7, BR_G:BR_G, SG:SG};
 })();
