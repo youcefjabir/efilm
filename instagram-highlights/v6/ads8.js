@@ -890,7 +890,7 @@ function adReel(c, G, t, V){
   v3Frame(c, 4, 4, 92, H - 8, WHITE, .26, oQ(k3(t, .2, 1.8)), .5);
   miniLogo(c, G, S, rev(t, .5, .4)*(1 - rev(t, tap + .3, .4)), 0);
   /* 1 · leveransen: bilderna och bostadsuppgifterna finns redan från fotograferingen */
-  var cw = 80, cx = 10, chh = 63, cy0 = S.y0 + (S.h - chh)/2 + 1, x0 = cx + 6, cex = ioC(k3(t, tap + .4, tap + .85)), ca = rev(t, .0, .35)*(1 - cex), cy = cy0 - cex*3;
+  var cw = 80, cx = 10, chh = 69, cy0 = S.y0 + (S.h - chh)/2 + 1, x0 = cx + 6, cex = ioC(k3(t, tap + .4, tap + .85)), ca = rev(t, .0, .35)*(1 - cex), cy = cy0 - cex*3;
   var tw = (cw - 12 - 3*2)/4, th = tw*1.15, ty = cy + 32, THS = [GRID7[0], GRID7[1], GRID7[5], GRID7[4]];
   var cstr = (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase(), cop = {size:2.6, weight:600, f:"sans", sp:.14};
   var P0 = T("a8.re.facts").split(" · ");
