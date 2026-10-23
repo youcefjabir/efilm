@@ -335,7 +335,7 @@ function adResa(c, G, t){
    fylls i automatiskt, sedan laddas alla tre ner. Ett kontor, en profil.
    ===================================================================== */
 var L7 = 25.6, OFF7 = 3.9, WEND7 = 17.6;
-var SR7 = [[.2, 5.2], [5.2, 8.8], [8.8, 12.9], [12.9, 17.6]], SEL7 = [0, 2, 4], SELT7 = [1.6, 2.3, 3.0];
+var SR7 = [[.2, 5.2], [5.2, 8.8], [8.8, 12.9], [12.9, 17.6]], SEL7 = [0, 2, 5], SELT7 = [1.6, 2.3, 3.0];
 var GRID7 = ["rs_dusk1", P.dining, P.bed, P.kitchen, "rs_dusk2", P.chair];
 function miniLogo(c, G, S, a, bright){
   if(a <= .02) return; bright = bright || 0; var cy = Math.min(S.y1 + 12, G.H - 11), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2, ty = cy + mh/2 + 3.6;
@@ -344,10 +344,10 @@ function miniLogo(c, G, S, a, bright){
 }
 /* variant B: leveransens bilder slår om till färdiga inlägg, ljust och med innehåll i första bildrutan */
 function hookGrid(c, G, S, t){
-  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = rev(t, 3.9, .5), ph7 = [GRID7[0], GRID7[2], GRID7[4]], POST = {0:0, 2:1, 4:2}, i;
+  var fq = .8, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .345 : .36), out = rev(t, 3.9, .5), ph7 = [GRID7[0], GRID7[2], GRID7[5]], POST = {0:0, 2:1, 5:2}, i;
   var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 8.6 : 7.4, ty0 = S.y0 + S.h*.115;
   v3Text(c, T("a8.sb.l1"), 50, ty0 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
-  v3Text(c, T("a8.sb.l2"), 50, ty0 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, .35, .3), p:oQ(k3(t, .35, .9))});
+  v3Text(c, T("a8.sb.l2"), 50, ty0 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, 1.7, .3), p:oQ(k3(t, 1.7, 2.3))});
   /* diskret status: fotograferas, sedan levererad när den sjätte bilden landat */
   var sa = rev(t, -.2, .25)*(1 - out), lev = rev(t, .95, .25), s1 = "FOTOGRAFERAS", s2 = "LEVERERAD", sw1 = v3Measure(c, s1, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw2 = v3Measure(c, s2, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw = lerp(sw1, sw2, lev), sy = S.y0 + .6;
   sCard(c, 50 - sw/2, sy, sw, 5.6, sa, 2.8, "#fff", 0, SYS.line);
@@ -372,7 +372,7 @@ function hookGrid(c, G, S, t){
 }
 /* krok: tre färdiga inlägg faller på plats, rubriken säger att det är ditt nästa objekt */
 function hookPosts(c, G, S, t){
-  var pw = 27, ph = pw*1.25, cy = S.y0 + S.h*.64, ph7 = [GRID7[0], GRID7[2], GRID7[4]], out = rev(t, 3.2, .5);
+  var pw = 27, ph = pw*1.25, cy = S.y0 + S.h*.64, ph7 = [GRID7[0], GRID7[2], GRID7[5]], out = rev(t, 3.2, .5);
   [[0, -25, -6, 3], [2, 25, 6, 3], [1, 0, 0, -1]].forEach(function(o){
     var i = o[0], t0 = .12 + [0, .3, .15][[0, 2, 1].indexOf(i)], a = rev(t, t0, .5)*(1 - out); if(a <= .02) return;
     var ent = 1 - oBack(k3(t, t0, t0 + .8)), prog = k3(t, t0 + .35, t0 + 1.5), fl = Math.sin(t*1.3 + i)*.5;
@@ -447,7 +447,7 @@ function adSalu(c, G, t, v){
     /* 2–4 · mallar, kampanjen skapas, klart: samma mallar ligger kvar hela vägen */
     k = scn(tr, 5.2, WEND7);
     if(k.a > .02){
-      var mw = (cw - 2*2.4)/3, mh = mw*1.25, my = yc + 6, ph7 = [GRID7[0], GRID7[2], GRID7[4]];
+      var mw = (cw - 2*2.4)/3, mh = mw*1.25, my = yc + 6, ph7 = [GRID7[0], GRID7[2], GRID7[5]];
       c.save(); c.translate(0, k.dy);
       var l8 = rev(tr, 8.7, .5), lbl1 = k.a*rev(tr, 5.5, .6)*(1 - l8), lbl2 = k.a*l8*(1 - rev(tr, 12.8, .4)), lbl3 = k.a*rev(tr, 13.0, .5);
       sTx(c, "VÄLJ VILKA MALLAR SOM SKA INGÅ", x0, yc + 2, lbl1, {size:2.4, weight:600, sp:.2});
