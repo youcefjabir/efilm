@@ -206,6 +206,7 @@ function adResa(c, G, t){
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .6 ? ioC(k3(t, 0, .6)) : 1});
   var OFF = 1.9, mid = rev(t, 3.8, 1.2)*(1 - rev(t, WIN6[1] + OFF - .8, .6)), fin = rev(t, WIN6[1] + OFF - .8, .6);
   if(mid > .01) v3Photo(c, "rs_dusk1", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, 3.8, WIN6[1] + OFF + .8)), pos:V3_POS.rs_dusk1, alpha:mid});
+  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, WIN6[1] + OFF - .8, L6)), pos:V3_POS.rs_dusk2, alpha:fin});
   var dim = (.30 + .30*rev(t, 1.0, .6))*(1 - rev(t, 3.8, .9)) + .72*rev(t, 3.8, .9)*(1 - fin) + .80*fin;
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", dim);
   v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
@@ -394,7 +395,6 @@ function adSalu(c, G, t, v){
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
   var wend = O7 + WEND7, mid = rev(t, O7 - .5, 1.2), fin = rev(t, wend - .8, .6);
   if(mid > .01) v3Photo(c, P.chair, 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, O7 - .5, wend)), pos:V3_POS.rs_chair, alpha:mid});
-  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, wend - .8, Lx)), pos:V3_POS.rs_dusk2, alpha:fin});
   var dim = (.46 + .14*rev(t, 1.0, .6))*(1 - rev(t, O7 - .5, .9)) + .76*rev(t, O7 - .5, .9)*(1 - fin) + .80*fin;
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", dim);
   v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
