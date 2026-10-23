@@ -168,6 +168,10 @@ function tplB(c, kind, x, y, w, prog, d){
   v3Text(c, "ER", 11, 12.4, {size:3.6, weight:700, f:"sans", color:BR_G, align:"c", alpha:ma});
   v3Text(c, "Er Mäklarbyrå", 18.4, 12.2, {size:3.6, weight:500, f:"sans", color:CR, alpha:ma});
   var sub = d.city.toUpperCase() + "  ·  " + d.facts.toUpperCase();
+  if(d.slot > .02){
+    var bx = kind === "salu" ? [[8, 88, 52, 15], [8, 105.2, 66, 7]] : kind === "visning" ? [[25, 85, 50, 11], [18, 97.6, 64, 6.6]] : [[25, 81, 50, 11], [18, 93, 64, 6.6]], sa1 = d.slot*(1 - f(.12, .3)), sa2 = d.slot*(1 - f(.38, .55));
+    [[bx[0], sa1], [bx[1], sa2]].forEach(function(q){ if(q[1] <= .02) return; c.save(); c.globalAlpha = q[1]; c.fillStyle = "rgba(243,239,231,.26)"; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.fill(); c.strokeStyle = "rgba(255,255,255,.98)"; c.lineWidth = .7; c.setLineDash([1.8, 1.4]); c.lineDashOffset = -prog*30; rr(c, q[0][0], q[0][1], q[0][2], q[0][3], 1.6); c.stroke(); c.restore() });
+  }
   if(kind === "salu"){
     v3Text(c, "TILL SALU", 8, 82, {size:3.6, weight:600, f:"sans", sp:.3, color:CR, alpha:f(0, .25), p:f(0, .3)});
     v3Line(c, 8, 12, 87, CR, .4, f(.2, .45), .8);
@@ -190,7 +194,7 @@ function tplB(c, kind, x, y, w, prog, d){
   }
   c.restore();
 }
-function DO(i, ph){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", photo:ph} }
+function DO(i, ph, slot){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", photo:ph, slot:slot || 0} }
 /* en scen i fönstret: mjuk in och ut, utan hårda klipp */
 function scn(t, s0, s1){ var i = rev(t, s0 - .05, .6), o = rev(t, s1 - .55, .45); return {a:i*(1 - o), dy:(1 - i)*2.6 - o*1.6} }
 function adResa(c, G, t){
@@ -334,27 +338,34 @@ var L7 = 25.6, OFF7 = 3.9, WEND7 = 17.6;
 var SR7 = [[.2, 5.2], [5.2, 8.8], [8.8, 12.9], [12.9, 17.6]], SEL7 = [0, 2, 4], SELT7 = [1.6, 2.3, 3.0];
 var GRID7 = ["rs_dusk1", P.dining, P.bed, P.kitchen, "rs_dusk2", P.chair];
 function miniLogo(c, G, S, a, bright){
-  if(a <= .02) return; bright = bright || 0; var cy = Math.min(S.y1 + 14, G.H - 8), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2;
-  if(bright < .98){ v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:1, dot:1, alpha:a*.85*(1 - bright)}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:a*.85*(1 - bright)}) }
-  if(bright > .02){ v3Mark(c, x0, cy - mh/2, mh, SYS.ink, C3.oli, {reveal:1, dot:1, alpha:a*.85*bright}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:SYS.ink, alpha:a*.85*bright}) }
+  if(a <= .02) return; bright = bright || 0; var cy = Math.min(S.y1 + 12, G.H - 11), mh = 4.4, mw = mh*858.6/756.3, fs = 2.6, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2.2 + ww, x0 = 50 - tot/2, ty = cy + mh/2 + 3.6;
+  if(bright < .98){ var wa = a*.85*(1 - bright); v3Mark(c, x0, cy - mh/2, mh, "#fff", C3.dotL, {reveal:1, dot:1, alpha:wa}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:wa}); v3Text(c, "BOSTADSFOTOGRAFERING", 50, ty, {size:1.75, weight:500, f:"sans", sp:.34, color:"#fff", align:"c", alpha:wa*.7}) }
+  if(bright > .02){ var wb = a*.85*bright; v3Mark(c, x0, cy - mh/2, mh, SYS.ink, C3.oli, {reveal:1, dot:1, alpha:wb}); v3Text(c, "VIEWLY", x0 + mw + 2.2, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:SYS.ink, alpha:wb}); v3Text(c, "BOSTADSFOTOGRAFERING", 50, ty, {size:1.75, weight:500, f:"sans", sp:.34, color:SYS.mut, align:"c", alpha:wb*.9}) }
 }
 /* variant B: leveransens bilder slår om till färdiga inlägg, ljust och med innehåll i första bildrutan */
 function hookGrid(c, G, S, t){
-  var fq = G.is9 ? 1 : .84, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .35 : .33), out = rev(t, 3.0, .5), ph7 = [GRID7[0], GRID7[2], GRID7[4]], POST = {0:0, 2:1, 4:2}, i;
-  var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 9.2 : 7.8;
-  v3Text(c, T("a8.sb.l1"), 50, S.y0 + S.h*.07 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
-  v3Text(c, T("a8.sb.l2"), 50, S.y0 + S.h*.07 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, .1, .3), p:oQ(k3(t, .1, .7))});
+  var fq = .83, cw = 27*fq, chh = 33.75*fq, gp = 2.2, gw = 3*cw + 2*gp, left = (100 - gw)/2, top = S.y0 + S.h*(G.is9 ? .33 : .35), out = rev(t, 3.9, .5), ph7 = [GRID7[0], GRID7[2], GRID7[4]], POST = {0:0, 2:1, 4:2}, i;
+  var ink = SYS.ink, ta = rev(t, -.25, .3)*(1 - out), ts = G.is9 ? 9.2 : 7.8, ty0 = S.y0 + S.h*.095;
+  v3Text(c, T("a8.sb.l1"), 50, ty0 + ts*.8, {size:ts, color:ink, align:"c", alpha:ta, p:oQ(k3(t, -.35, .35))});
+  v3Text(c, T("a8.sb.l2"), 50, ty0 + ts*1.95, {size:ts, italic:true, color:BR_G, align:"c", alpha:ta*rev(t, .35, .3), p:oQ(k3(t, .35, .9))});
+  /* diskret status: fotograferas, sedan levererad när den sjätte bilden landat */
+  var sa = rev(t, -.2, .25)*(1 - out), lev = rev(t, .95, .25), s1 = "FOTOGRAFERAS", s2 = "LEVERERAD", sw1 = v3Measure(c, s1, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw2 = v3Measure(c, s2, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw = lerp(sw1, sw2, lev), sy = S.y0 + 2.2;
+  sCard(c, 50 - sw/2, sy, sw, 5.6, sa, 2.8, "#fff", 0, SYS.line);
+  dot(c, 50 - sw/2 + 3.4, sy + 2.8, .95, lev > .5 ? "#2f6a3a" : "#b9822c", sa);
+  sTx(c, s1, 50 - sw/2 + 6, sy + 3.8, sa*(1 - lev), {size:2.1, weight:600, color:SYS.mut, sp:.2});
+  sTx(c, s2, 50 - sw/2 + 6, sy + 3.8, sa*lev, {size:2.1, weight:600, color:"#2f6a3a", sp:.2});
   for(i = 0; i < 6; i++){
-    var col = i % 3, row = Math.floor(i/3), cx0 = left + col*(cw + gp), cy0 = top + row*(chh + gp), pi = POST[i], pulse = 1.03 - .03*oQ(k3(t, 0, .5));
+    var col = i % 3, row = Math.floor(i/3), cx0 = left + col*(cw + gp), cy0 = top + row*(chh + gp), pi = POST[i], t0 = i*.14, pop = rev(t, t0, .2), pscale = lerp(.84, 1, oBack(k3(t, t0, t0 + .35)));
+    if(pop <= .01) continue;
     if(pi === undefined){
-      var a = (1 - ioC(k3(t, .55, 1.15)))*(1 - out); if(a <= .02) continue;
-      var sc = lerp(1, .9, ioC(k3(t, .55, 1.15)))*pulse; c.save(); c.translate(cx0 + cw/2, cy0 + chh/2); c.scale(sc, sc); sCard(c, -cw/2 - .4, -chh/2 - .4, cw + .8, chh + .8, a, 1.6, "#fff", 3); sPh(c, GRID7[i], -cw/2, -chh/2, cw, chh, a, 1.4, 1.14); c.restore();
+      var a = pop*(1 - ioC(k3(t, 1.4, 2.0)))*(1 - out); if(a <= .02) continue;
+      var sc = pscale*lerp(1, .9, ioC(k3(t, 1.4, 2.0))); c.save(); c.translate(cx0 + cw/2, cy0 + chh/2); c.scale(sc, sc); sCard(c, -cw/2 - .4, -chh/2 - .4, cw + .8, chh + .8, a, 1.6, "#fff", 3); sPh(c, GRID7[i], -cw/2, -chh/2, cw, chh, a, 1.4, 1.14); c.restore();
     } else {
-      var e = ioC(k3(t, 1.35, 2.35)), tx = lerp(cx0 + cw/2, 50 + (pi - 1)*31*fq, e), ty = lerp(cy0 + chh/2, top + chh + gp/2 - 1, e), w = lerp(cw, 29*fq, e), h = w*1.25, pa = rev(t, .55, .35), a2 = (1 - out), sc2 = (t < .55 ? pulse : 1);
+      var e = ioC(k3(t, 2.1, 3.1)), tw = G.is9 ? 27 : 24, tx = lerp(cx0 + cw/2, 50 + (pi - 1)*(tw + 2.2), e), ty = lerp(cy0 + chh/2, top + chh + gp/2 - 1, e), w = lerp(cw, tw, e), h = w*1.25, pa = rev(t, 1.4, .35), a2 = pop*(1 - out), sc2 = (t < 1.4 ? pscale : 1);
       if(a2 <= .02) continue;
       c.save(); c.translate(tx, ty + out*4); c.scale(sc2, sc2); c.globalAlpha = a2;
       if(pa < 1){ sCard(c, -cw/2 - .4, -chh/2 - .4, cw + .8, chh + .8, 1 - pa, 1.6, "#fff", 3); sPh(c, GRID7[i], -cw/2, -chh/2, cw, chh, 1 - pa, 1.4, 1.14) }
-      if(pa > .02){ c.save(); c.globalAlpha = a2*pa; c.shadowColor = "rgba(30,25,20,.35)"; c.shadowBlur = 8; c.shadowOffsetY = 2; c.fillStyle = "#000"; rr(c, -w/2, -h/2, w, h, w*.025); c.fill(); c.shadowColor = "transparent"; tplB(c, KB[pi], -w/2, -h/2, w, k3(t, .6 + pi*.15, 1.9 + pi*.15), DO(pi, ph7[pi])); c.restore() }
+      if(pa > .02){ c.save(); c.globalAlpha = a2*pa; c.shadowColor = "rgba(30,25,20,.35)"; c.shadowBlur = 8; c.shadowOffsetY = 2; c.fillStyle = "#000"; rr(c, -w/2, -h/2, w, h, w*.025); c.fill(); c.shadowColor = "transparent"; tplB(c, KB[pi], -w/2, -h/2, w, k3(t, 1.45 + pi*.15, 2.7 + pi*.15), DO(pi, ph7[pi])); c.restore() }
       c.restore();
     }
   }
@@ -370,25 +381,32 @@ function hookPosts(c, G, S, t){
     tplB(c, KB[i], -pw/2, -ph/2, pw, prog, DO(i, ph7[i])); c.restore();
   });
 }
+function flyChip(c, txt, fx, fy, tx, ty, tr, t0, dur, a){
+  var p = (tr - t0)/dur; if(p <= 0 || p >= 1) return; var q;
+  var pos = function(e){ return [lerp(fx, tx, e), lerp(fy, ty, e) - Math.sin(e*Math.PI)*8] }, e = ioC(p), P0 = pos(e);
+  for(q = 1; q <= 4; q++){ var pq = pos(Math.max(0, e - q*.055)); dot(c, pq[0], pq[1], 1.1 - q*.18, "#2f6a3a", a*(.45 - q*.09)*(1 - clamp((p - .85)/.15, 0, 1))) }
+  var al = a*Math.min(1, p*7)*(1 - clamp((p - .86)/.14, 0, 1)), w = v3Measure(c, txt, {size:2.4, weight:600, f:"sans"}) + 5;
+  sCard(c, P0[0] - w/2, P0[1] - 2.6, w, 5.2, al, 2.6, "#fff", 4, "#2f6a3a"); sTx(c, txt, P0[0], P0[1] + 1.0, al, {size:2.4, weight:600, color:SYS.ink, align:"c"});
+}
 function adSalu(c, G, t, v){
-  var H = G.H, S = SG(G), i, j;
+  var H = G.H, S = SG(G), i, j, O7 = v ? OFF7 + .7 : OFF7, Lx = v ? L7 + .7 : L7;
   v3Fill(c, 0, 0, 100, H, DARK);
   v3Photo(c, P.bed, 0, 0, 100, H, {scale:lerp(1.05, 1.13, k3(t, 0, 6)), pos:V3_POS.bedroom, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
-  var wend = OFF7 + WEND7, mid = rev(t, 3.4, 1.2)*(1 - rev(t, wend - .8, .6)), fin = rev(t, wend - .8, .6);
-  if(mid > .01) v3Photo(c, P.chair, 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, 3.4, wend)), pos:V3_POS.rs_chair, alpha:mid});
-  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, wend - .8, L7)), pos:V3_POS.rs_dusk2, alpha:fin});
-  var dim = (.46 + .14*rev(t, 1.0, .6))*(1 - rev(t, 3.4, .9)) + .76*rev(t, 3.4, .9)*(1 - fin) + .80*fin;
+  var wend = O7 + WEND7, mid = rev(t, O7 - .5, 1.2)*(1 - rev(t, wend - .8, .6)), fin = rev(t, wend - .8, .6);
+  if(mid > .01) v3Photo(c, P.chair, 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, O7 - .5, wend)), pos:V3_POS.rs_chair, alpha:mid});
+  if(fin > .01) v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, wend - .8, Lx)), pos:V3_POS.rs_dusk2, alpha:fin});
+  var dim = (.46 + .14*rev(t, 1.0, .6))*(1 - rev(t, O7 - .5, .9)) + .76*rev(t, O7 - .5, .9)*(1 - fin) + .80*fin;
   v3Fill(c, 0, 0, 100, H, "#0c0a0a", dim);
   v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
   v3Frame(c, 4, 4, 92, H - 8, WHITE, .26, oQ(k3(t, .2, 1.8)), .5);
   /* kroken: ditt nästa objekt, som tre färdiga inlägg */
   var l1 = T("a8.sa.l1"), l2 = T("a8.sa.l2"), sH = G.is9 ? 9.4 : 8, sHero = Math.min(sH, fz(c, l1, {size:sH, weight:300}, 84), fz(c, l2, {size:sH, weight:300, italic:true}, 84));
-  var bright = v ? 1 - rev(t, 3.0, .7) : 0;
+  var bright = v ? 1 - rev(t, O7 - .8, .7) : 0;
   if(v){ if(bright > .01) v3Fill(c, 0, 0, 100, H, SYS.bg, bright); hookGrid(c, G, S, t) }
   else { twoPart(c, t, .1, 3.2, l1, l2, sHero, S.y0 + S.h*.19); hookPosts(c, G, S, t) }
   /* varumärket, litet och diskret under kortet, så att även den som inte ser hela filmen ser det */
   miniLogo(c, G, S, (v ? 1 : rev(t, .8, .8))*(1 - rev(t, wend + 1.0, .5)), bright);
-  var tr = t - OFF7, wa = rev(tr, -.1, .8)*(1 - rev(tr, WEND7, .6));
+  var tr = t - O7, wa = rev(tr, -.1, .8)*(1 - rev(tr, WEND7, .6));
   if(wa > .02){
     var wy = S.y0, wh = S.h + 1, wx = 7, ww = 86, x0 = 13, cw = 74, k;
     var slide = (1 - oQ(k3(tr, -.1, 1.1)))*12 + rev(tr, WEND7, .6)*5, yc = wy + 23;
@@ -436,20 +454,29 @@ function adSalu(c, G, t, v){
       sTx(c, "VÄLJ VILKA MALLAR SOM SKA INGÅ", x0, yc + 2, lbl1, {size:2.4, weight:600, sp:.2});
       sTx(c, "KAMPANJEN SKAPAS", x0, yc + 2, lbl2, {size:2.4, weight:600, sp:.2});
       sTx(c, "KAMPANJEN ÄR KLAR", x0, yc + 2, lbl3, {size:2.4, weight:600, sp:.2});
+      var slotA = rev(tr, 8.95, .5)*(1 - rev(tr, 12.6, .4)), SL = [[[38, 96], [36, 108.5]], [[50, 90.5], [50, 100.9]], [[50, 86.5], [50, 96.3]]];
       for(i = 0; i < 3; i++){
-        var mx = x0 + i*(mw + 2.4), ma = rev(tr, 5.7 + i*.2, .6)*k.a, selT = 6.5 + i*.45, sel = clamp(k3(tr, selT, selT + .3), 0, 1), prog = clamp(k3(tr, 9.4 + i*.55, 10.9 + i*.55), 0, 1);
+        var mx = x0 + i*(mw + 2.4), ma = rev(tr, 5.7 + i*.2, .6)*k.a, selT = 6.5 + i*.45, sel = clamp(k3(tr, selT, selT + .3), 0, 1), prog = clamp(k3(tr, 10.0 + i*.5, 11.4 + i*.5), 0, 1);
         sCard(c, mx - .6, my - .6, mw + 1.2, mh + 1.2, ma, 1.8, "#fff", 3, sel > .5 && tr < 8.8 ? SYS.ink : null);
-        if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, prog, DO(i, ph7[i])); c.restore() }
+        if(ma > .02){ c.save(); c.globalAlpha = ma; tplB(c, KB[i], mx, my, mw, prog, DO(i, ph7[i], slotA)); c.restore() }
         sTx(c, LABS[i], mx + .6, my + mh + 5.4, ma, {size:2.9, weight:600});
         if(sel > .02){ var br = 2.1*oBack(sel); c.save(); c.globalAlpha = ma; c.fillStyle = SYS.grn; c.beginPath(); c.arc(mx + mw - 2.4, my + mh + 4.4, Math.max(.01, br), 0, 7); c.fill(); c.restore(); chk(c, mx + mw - 2.4, my + mh + 4.4, 1.6, k3(tr, selT + .1, selT + .4), "#fff", .4) }
+      }
+      /* bostadsuppgifterna lyfts ur leveransen och landar i mallens fält */
+      var dg = rev(tr, 9.1, .4)*(1 - rev(tr, 12.2, .5))*k.a;
+      if(dg > .02){ c.save(); c.globalAlpha = dg*(.55 + .45*Math.sin((tr - 9.1)*5)); c.strokeStyle = "#2f6a3a"; c.lineWidth = .45; c.setLineDash([1.6, 1.2]); rr(c, x0 - 1.6, wy + 8.4, cw*.7, 12.6, 2); c.stroke(); c.restore() }
+      for(i = 0; i < 3; i++){
+        var mx2 = x0 + i*(mw + 2.4), pxy = function(q){ return [mx2 + q[0]*mw/100, my + q[1]*mw/100] };
+        flyChip(c, T("a8.re.addr"), x0 + 11, wy + 13.2, pxy(SL[i][0])[0], pxy(SL[i][0])[1], tr, 9.5 + i*.5, .75, k.a);
+        flyChip(c, T("a8.re.facts"), x0 + 16, wy + 19.2, pxy(SL[i][1])[0], pxy(SL[i][1])[1], tr, 9.85 + i*.5, .75, k.a);
       }
       var zy = my + mh + 9.5;
       sBtn(c, 50, zy + 1.5, 52, 8.2, "SKAPA KAMPANJ  ›", rev(tr, 7.5, .5)*k.a*(1 - rev(tr, 8.5, .4)), k3(tr, 8.15, 8.45));
       var pa = rev(tr, 9.0, .5)*k.a*(1 - rev(tr, 12.6, .4)), pp = k3(tr, 9.3, 12.0);
       if(pa > .02){
-        sCard(c, x0, zy + 2, cw, .7, pa, .35, "rgba(28,26,25,.14)", 0); sCard(c, x0, zy + 2, Math.max(.4, cw*pp), .7, pa, .35, "#2f6a3a", 0);
-        sTx(c, "SAMMA BILDER. SAMMA ADRESS, RUM OCH YTA.", 50, zy + 8.5, pa, {size:2.5, weight:600, color:SYS.ink, align:"c", sp:.14});
-        sTx(c, pp >= 1 ? "✓ 3 av 3 klara" : Math.floor(pp*3) + " av 3 klara", 50, zy + 13.6, pa, {size:2.5, weight:500, color:pp >= 1 ? "#2f6a3a" : SYS.mut, align:"c"});
+        sCard(c, x0, zy + 1.4, cw, .7, pa, .35, "rgba(28,26,25,.14)", 0); sCard(c, x0, zy + 1.4, Math.max(.4, cw*pp), .7, pa, .35, "#2f6a3a", 0);
+        sTx(c, "MALLARNA FYLLS I AUTOMATISKT", 50, zy + 8, pa, {size:2.7, weight:600, color:SYS.ink, align:"c", sp:.16});
+        sTx(c, "Adress, rum och yta kommer från leveransen", 50, zy + 13.3, pa, {size:2.5, weight:500, color:SYS.mut, align:"c"});
       }
       var ca = rev(tr, 13.8, .5)*k.a, fx = x0, done = tr >= 15.45;
       ["4:5", "1:1", "9:16"].forEach(function(s, q){ var w = v3Measure(c, s, {size:2.6, weight:500, f:"sans"}) + 6.4; sCard(c, fx, zy - 1.2, w, 5.4, ca*rev(tr, 14.0 + q*.12, .4), 2.7, "#fff", 0, SYS.line); sTx(c, s, fx + w/2, zy + 2.4, ca*rev(tr, 14.0 + q*.12, .4), {size:2.6, weight:500, color:SYS.mut, align:"c"}); fx += w + 1.6 });
@@ -460,15 +487,15 @@ function adSalu(c, G, t, v){
     }
     c.restore();
   }
-  if(t >= wend + .3) twoPart(c, t, wend + .3, L7 + .05, T("a8.sa.f1"), T("a8.sa.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
+  if(t >= wend + .3) twoPart(c, t, wend + .3, Lx + .05, T("a8.sa.f1"), T("a8.sa.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
 }
 function adSaluA(c, G, t){ adSalu(c, G, t, 0) }
 function adSaluB(c, G, t){ adSalu(c, G, t, 1) }
-function sndSaluB(H){ sndSalu(H); H.s("shutter", .55, .5) }
-function sndSalu(H){ var O = OFF7; H.s("shutter", .1, .6);
+function sndSaluB(H){ sndSalu(H, OFF7 + .7, true); for(var q = 0; q < 6; q++) H.s("shutter", q*.14, .5); H.s("tick2", .95, .1); H.s("shutter", 1.4, .5) }
+function sndSalu(H, off, skipOpen){ var O = off == null ? OFF7 : off; if(!skipOpen) H.s("shutter", .1, .6);
   SELT7.forEach(function(s){ H.click(s + O, .32) }); H.click(4.45 + O, .4);
   [6.5, 6.95, 7.4].forEach(function(s){ H.click(s + O, .26) }); H.click(8.2 + O, .4);
-  [9.4, 9.95, 10.5].forEach(function(s){ H.s("tick1", s + O, .05) });
+  [10.2, 10.7, 11.2, 10.55, 11.05, 11.55].forEach(function(s){ H.s("tick1", s + O, .05) });
   H.s("tick2", 12.0 + O, .1); H.click(15.45 + O, .4); H.s("tick2", 15.6 + O, .12) }
 
 function DOBJ(){ return {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts"), agent:"Anna Lindqvist", ph:{o:"rs_dusk1", g:P.dining, e:"rs_dusk2"}} }
@@ -613,7 +640,7 @@ reg8("a8_ny", "1 · Bostadsfoto. Och lite till.", "Fotografering och allt som in
 reg8("a8_resa", "2 · Ett objekt. Hela vägen.", "Ett objekt följs från intag och bokning till leverans, annonstext och inlägg.", L6, adResa, 16.0, sndResa, true);
 reg8("a8_skane", "3 · Din bostadsfotograf i Skåne", "Orterna, och ett inlägg som byter mall medan uppgifterna ligger kvar.", L5, adSkane, 12.4, sndSkane);
 reg8("a8_salu", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "Välj bilder, välj mallar, kampanjen skapas med uppgifterna ifyllda, ladda ner alla tre.", L7, adSaluA, 14.0, sndSalu, true);
-reg8("a8_salub", "5 · Bilder blir inlägg (variant B av 4)", "Samma film som 4, men med en annan öppning: leveransens bilder slår om till färdiga inlägg.", L7, adSaluB, 2.0, sndSaluB, true);
+reg8("a8_salub", "5 · Bilder blir inlägg (variant B av 4)", "Samma film som 4, men med en annan öppning: leveransens bilder slår om till färdiga inlägg.", L7 + .7, adSaluB, 2.0, sndSaluB, true);
 
 /* ---------- annonsplan ---------- */
 var PLAN = [
