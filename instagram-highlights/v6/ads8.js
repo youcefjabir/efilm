@@ -820,7 +820,7 @@ function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo){
     if(f2 < 1) bar(g.mx - 28*f, g.dy - 2.4*f, 56*f, 3*f, 1 - f2);
     v3Text(c, cols.join("  ·  "), g.mx, g.dy, {size:1.8*f, weight:600, f:"sans", sp:.1, color:T8.fg, align:"c", alpha:f2*.9});
   } else {
-    v3Grad(c, x, y + h*.38, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.62)"]]);
+    v3Grad(c, x, y + h*.38, w, h*.62 + 1, [[0, "rgba(8,7,7,0)"], [.8, "rgba(8,7,7,.62)"], [1, "rgba(8,7,7,.66)"]]);
     tplMark(c, 2, g.px + 2.2*f, g.sy - 21.6*f, 2.2*f, T8.fg, T8.bg);
     v3Text(c, T8.brand, g.px + 6.2*f, g.sy - 20.8*f, {size:1.85*f, weight:600, f:"sans", sp:.36, color:T8.fg, alpha:.9});
     v3Text(c, "Såld", g.px, g.sy, {size:17*f, italic:true, color:T8.fg});
