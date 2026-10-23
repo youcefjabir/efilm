@@ -45,6 +45,7 @@ var TX = {
   "a8.sb.l1":["Bilder blir", "5 · rubrik, rad 1"], "a8.sb.l2":["inlägg.", "5 · rubrik, rad 2"], "a8.sb.f1":["Från leverans.", "5 · slutsats, del 1"], "a8.sb.f2":["Till färdiga inlägg.", "5 · slutsats, del 2"],
   "a8.sc.l1":["En bild blir", "6 · rubrik, rad 1"], "a8.sc.l2":["ett inlägg.", "6 · rubrik, rad 2"], "a8.sc.f1":["Från leverans.", "6 · slutsats, del 1"], "a8.sc.f2":["Till färdigt inlägg.", "6 · slutsats, del 2"],
   "a8.sd.tag":["För mäklare som vill mer.", "7 · raden under loggan"],
+  "a8.rl.pill":["NYTT  ·  REEL STUDIO", "8 · etikett överst"], "a8.rl.f1":["Från leverans.", "8 · slutsats, del 1"], "a8.rl.f2":["Till färdig Reel.", "8 · slutsats, del 2"],
   "a8.sk.l":["BOSTADSFOTOGRAFI I", "5 · liten rad"], "a8.sk.h1":["Din bostadsfotograf", "5 · rubrik, rad 1"], "a8.sk.h2":["i Skåne.", "5 · rubrik, rad 2"], "a8.sk.cap":["UPPGIFTERNA HÄMTAS FRÅN BOKNINGEN", "5 · rad över bokningen"]
 };
 Object.keys(TX).forEach(function(k){ V3_TXD[k] = TX[k][0] });
@@ -756,6 +757,139 @@ function adSkane(c, G, t){
 }
 function sndSkane(H){ [0, 1, 2, 3].forEach(function(i){ H.s("shutter", i === 0 ? .08 : .3 + i*1.1, .6) }); H.s("tick1", 7.0, .07) }
 
+
+/* =====================================================================
+   8 · REEL STUDIO   (som Content Studio, men rörligt: mjuka övertoningar, lugna rörelser, kameraljud)
+   Öppnar direkt i en färdig Reel, visar sedan de tre stegen: mall, bilder, skapa.
+   ===================================================================== */
+var OR = 4.6, WENDR = 9.0, LR = OR + WENDR + 3.6;
+function reelLay(x, y, w, h, v, by){
+  var f = w/100, o = {f:f, v:v};
+  if(v === 0){ o.ax = x + 7*f; o.al = "l"; o.ly = by - 11*f; o.ay = by; o.cy = by + 5.2*f; o.ky = by + 10.6*f }
+  else if(v === 1){ o.ax = x + w/2; o.al = "c"; o.ly = by - 12*f; o.ay = by; o.cy = by + 5.2*f; o.ky = by + 10.6*f }
+  else { o.ax = x + w/2; o.al = "c"; o.ly = y + 10*f; o.ay = by; o.cy = by + 5.2*f; o.ky = by + 10.6*f }
+  return o;
+}
+function reelFrame(c, x, y, w, h, tr, o){
+  o = o || {};
+  var f = w/100, ph = o.ph || [GRID7[0], GRID7[1], GRID7[5]], seg = o.seg || 1.5, fd = .5, v = o.v || 0, i, by = o.by == null ? y + h*.8 : o.by, a = o.a == null ? 1 : o.a;
+  var f1 = o.f1 == null ? 1 : o.f1, f2 = o.f2 == null ? 1 : o.f2, ia = o.noIn ? 1 : rev(tr, .25, .6), L = reelLay(x, y, w, h, v, by), W = "#f4f1ea";
+  if(a <= .02) return;
+  c.save(); c.globalAlpha = a; rr(c, x, y, w, h, o.r || 0); c.clip();
+  v3Fill(c, x, y, w, h, DARK);
+  for(i = 0; i < ph.length; i++){
+    var s0 = i*seg, pa = i === 0 ? 1 : clamp((tr - s0)/fd, 0, 1); if(pa <= .01) continue;
+    v3Photo(c, ph[i], x, y, w, h, {scale:lerp(1.05, 1.15, k3(tr, s0, s0 + seg + fd)), pos:V3_POS[ph[i]], alpha:ioC(pa)});
+  }
+  v3Grad(c, x, y + h*.42, w, h*.58, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.82)"]]);
+  v3Grad(c, x, y, w, h*.22, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
+  if(v === 2) v3Frame(c, x + 4*f, y + 4*f, w - 8*f, h - 8*f, "#fff", .34*ia, 1, .4);
+  var addr = T("a8.re.addr"), cf = (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase(), rise = (1 - ia)*1.4*f;
+  v3Text(c, (o.label || "TILL SALU"), L.ax, L.ly, {size:2.1*f, weight:600, f:"sans", sp:.3, color:"#dfe3d4", align:L.al, alpha:ia});
+  if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*ia; c.fillStyle = "rgba(255,255,255,.3)"; var bw = 44*f; rr(c, L.al === "l" ? L.ax : L.ax - bw/2, L.ay - 7*f, bw, 7.4*f, 1.2*f); c.fill(); c.restore() }
+  if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*ia; c.fillStyle = "rgba(255,255,255,.3)"; var bw2 = 56*f; rr(c, L.al === "l" ? L.ax : L.ax - bw2/2, L.cy - 2.4*f, bw2, 3.2*f, .8*f); c.fill(); c.restore() }
+  v3Text(c, addr, L.ax, L.ay + rise, {size:8.6*f, color:W, align:L.al, alpha:ia*f1});
+  v3Text(c, cf, L.ax, L.cy + rise, {size:2.5*f, weight:500, f:"sans", sp:.18, color:"#e6e2d8", align:L.al, alpha:ia*f2});
+  v3Text(c, "ER  ·  MÄKLARBYRÅ", L.ax, L.ky, {size:1.9*f, weight:500, f:"sans", sp:.3, color:"#cfcabf", align:L.al, alpha:ia*.7});
+  c.restore();
+}
+function adReel(c, G, t){
+  var H = G.H, S = SG(G), i, wend = OR + WENDR;
+  var bright = rev(t, OR - .5, .7)*(1 - rev(t, wend - .8, .6));
+  if(t < OR + .4) reelFrame(c, 0, 0, 100, H, t, {v:0, by:S.y1 - 12});
+  else { v3Fill(c, 0, 0, 100, H, DARK); v3Photo(c, P.chair, 0, 0, 100, H, {scale:lerp(1.05, 1.1, k3(t, OR, LR)), pos:V3_POS.rs_chair}); v3Fill(c, 0, 0, 100, H, "#0c0a0a", .8) }
+  if(t < OR + .4){
+    var pa = rev(t, .5, .5)*(1 - rev(t, OR - .6, .5)), pt = T("a8.rl.pill"), pw = v3Measure(c, pt, {size:2.2, weight:600, f:"sans", sp:.3}) + 9, py = S.y0 + .6;
+    if(pa > .02){ c.save(); c.globalAlpha = pa; c.fillStyle = "rgba(10,8,8,.42)"; rr(c, 50 - pw/2, py, pw, 6, 3); c.fill(); c.strokeStyle = "rgba(255,255,255,.55)"; c.lineWidth = .3; rr(c, 50 - pw/2, py, pw, 6, 3); c.stroke(); c.restore();
+      v3Text(c, pt, 50, py + 3.9, {size:2.2, weight:600, f:"sans", sp:.3, color:"#fff", align:"c", alpha:pa}) }
+  }
+  v3Frame(c, 4, 4, 92, H - 8, WHITE, .26*(1 - bright), oQ(k3(t, .2, 1.8)), .5);
+  if(bright > .01) v3Fill(c, 0, 0, 100, H, SYS.bg, bright);
+  miniLogo(c, G, S, rev(t, OR - .2, .4)*(1 - rev(t, wend + 1.0, .5)), bright);
+  var tr = t - OR, wa = rev(tr, -.75, .7)*(1 - rev(tr, WENDR, .6));
+  if(wa > .02){
+    var wy = S.y0, wh = S.h + 1, wx = 7, ww = 86, x0 = 13, cw = 74, k, yc = wy + 23;
+    var slide = (1 - oQ(k3(tr, -.75, .8)))*7 + rev(tr, WENDR, .6)*5;
+    c.save(); c.translate(0, slide);
+    sCard(c, wx, wy, ww, wh, wa, 3.2, SYS.bg, 12);
+    var SR = [[.2, 2.4], [2.4, 5.2], [5.2, 9.0]], sw = (cw - 2*1.6)/3;
+    for(i = 0; i < 3; i++){
+      var pr = clamp((tr - SR[i][0])/(SR[i][1] - SR[i][0]), 0, 1), sx = x0 + i*(sw + 1.6);
+      sCard(c, sx, wy + 5.5, sw, .7, wa, .35, "rgba(28,26,25,.14)", 0); if(pr > 0) sCard(c, sx, wy + 5.5, sw*pr, .7, wa, .35, SYS.ink, 0);
+    }
+    var ha = wa*rev(tr, -.5, .5);
+    sTx(c, "REEL STUDIO", x0, wy + 10.4, ha, {size:2.3, weight:600, sp:.26, color:SYS.mut});
+    v3Text(c, T("a8.re.addr"), x0, wy + 17, {size:6.4, color:SYS.ink, alpha:ha, p:oQ(k3(tr, -.5, .5))});
+    sTx(c, (T("a8.re.city") + "  ·  " + T("a8.re.facts")).toUpperCase(), x0, wy + 21.4, ha, {size:2.5, weight:600, color:SYS.mut, sp:.14});
+    var pw3 = 24; sCard(c, x0 + cw - pw3, wy + 11.8, pw3, 5.6, ha, 2.8, "#dfeedd", 0); sTx(c, "LEVERERAD", x0 + cw - pw3/2, wy + 15.6, ha, {size:2.2, weight:600, color:"#2f6a3a", align:"c", sp:.14});
+    yc = wy + 24.5;
+    /* 1 · välj en mall: tre Reels som rör sig */
+    k = scn(tr, -.2, 2.4);
+    if(k.a > .02){
+      var mw = (cw - 2*2.4)/3, mh = mw*1.5, my = yc + 5.4, sel0 = clamp(k3(tr, .8, 1.05), 0, 1);
+      c.save(); c.translate(0, k.dy);
+      sTx(c, "VÄLJ EN MALL", x0, yc + 2, k.a*rev(tr, .2, .4), {size:2.4, weight:600, sp:.2});
+      for(i = 0; i < 3; i++){
+        var mx = x0 + i*(mw + 2.4), ma = rev(tr, .05 + i*.1, .4)*k.a;
+        sCard(c, mx - .6, my - .6, mw + 1.2, mh + 1.2, ma, 1.8, "#fff", 3, i === 0 && sel0 > .5 ? SYS.ink : null);
+        reelFrame(c, mx, my, mw, mh, tr + i*.5, {v:i, a:ma, r:1.2, label:LABS[i].toUpperCase(), seg:1.1, ph:[GRID7[i*2 % 6], GRID7[(i*2 + 1) % 6], GRID7[(i*2 + 2) % 6]], by:my + mh*.78, noIn:1});
+        sTx(c, LABS[i], mx + .6, my + mh + 5.4, ma, {size:2.9, weight:600});
+      }
+      if(sel0 > .02){ var mx0 = x0 + mw - 2.4, br = 2.1*oBack(sel0); c.save(); c.globalAlpha = k.a; c.fillStyle = SYS.grn; c.beginPath(); c.arc(mx0, my + mh + 4.4, Math.max(.01, br), 0, 7); c.fill(); c.restore(); chk(c, mx0, my + mh + 4.4, 1.6, k3(tr, .9, 1.15), "#fff", .4) }
+      sBtn(c, 50, my + mh + 9.4, 46, 7.6, "FORTSÄTT  ›", rev(tr, 1.2, .4)*k.a, k3(tr, 1.9, 2.15));
+      c.restore();
+    }
+    /* 2 · välj bilder: tre numrerade */
+    k = scn(tr, 2.4, 5.2);
+    if(k.a > .02){
+      var tw = (cw - 2*2.4)/3, th = tw*.62, gh = 2*th + 2.4, SEL = [[0, 3.0], [1, 3.5], [5, 4.0]], n = 0;
+      SEL.forEach(function(q){ if(tr >= q[1]) n++ });
+      c.save(); c.translate(0, k.dy);
+      sTx(c, "VÄLJ BILDER", x0, yc + 2, k.a*rev(tr, 2.7, .4), {size:2.4, weight:600, sp:.2});
+      sTx(c, n + " / 6 VALDA", x0 + cw, yc + 2, k.a*rev(tr, 2.7, .4), {size:2.4, color:SYS.mut, align:"r", sp:.16});
+      var gy = yc + 5.4;
+      for(i = 0; i < 6; i++){
+        var gx2 = x0 + (i % 3)*(tw + 2.4), gy2 = gy + Math.floor(i/3)*(th + 2.4), ga = rev(tr, 2.5 + i*.06, .35)*k.a;
+        sCard(c, gx2 - .4, gy2 - .4, tw + .8, th + .8, ga, 1.4, "#fff", 2); sPh(c, GRID7[i], gx2, gy2, tw, th, ga, 1.2, 1.14);
+        SEL.forEach(function(q, qi){
+          if(q[0] !== i || tr < q[1]) return;
+          var sp = oBack(k3(tr, q[1], q[1] + .3));
+          c.save(); c.globalAlpha = k.a; c.strokeStyle = SYS.ink; c.lineWidth = .6; rr(c, gx2 - .9, gy2 - .9, tw + 1.8, th + 1.8, 1.6); c.stroke(); c.fillStyle = SYS.ink; c.beginPath(); c.arc(gx2 + 3.4, gy2 + 3.4, 2.4*Math.max(.01, sp), 0, 7); c.fill(); c.restore();
+          if(sp > .6) sTx(c, String(qi + 1), gx2 + 3.4, gy2 + 4.4, k.a, {size:2.6, weight:600, color:"#fff", align:"c"});
+        });
+      }
+      sBtn(c, 50, gy + gh + 5.5, 46, 7.8, "SKAPA REEL  ›", rev(tr, 4.2, .4)*k.a, k3(tr, 4.8, 5.05));
+      c.restore();
+    }
+    /* 3 · Reelen skapas: mallen fylls i med uppgifterna, sedan spelas den */
+    k = scn(tr, 5.2, WENDR);
+    if(k.a > .02){
+      var BW = G.is9 ? 27 : 24, bh = BW*1.78, bx = 50 - BW/2, by2 = yc + 3.2, rt = tr - 5.3, bT = by2 + bh*.8;
+      c.save(); c.translate(0, k.dy);
+      var l1a = k.a*rev(tr, 5.4, .4)*(1 - rev(tr, 8.0, .3)), l2a = k.a*rev(tr, 8.2, .4);
+      sTx(c, "REELEN SKAPAS", x0, yc + 1.4, l1a, {size:2.4, weight:600, sp:.2});
+      sTx(c, "REELEN ÄR KLAR", x0, yc + 1.4, l2a, {size:2.4, weight:600, sp:.2, color:"#2f6a3a"});
+      var fp1 = ioC(k3(tr, 6.5, 6.9)), fp2 = ioC(k3(tr, 7.5, 7.9)), fa = rev(tr, 5.3, .5)*k.a;
+      c.save(); c.shadowColor = "rgba(30,25,20,.35)"; c.shadowBlur = 8; c.shadowOffsetY = 2; c.fillStyle = "#000"; c.globalAlpha = fa; rr(c, bx, by2, BW, bh, 1.8); c.fill(); c.restore();
+      reelFrame(c, bx, by2, BW, bh, Math.max(0, rt), {v:0, a:fa, r:1.8, seg:1.4, by:bT, f1:fp1, f2:fp2});
+      var LY = reelLay(bx, by2, BW, bh, 0, bT), facts = T("a8.re.facts").split(" · ");
+      flyChip(c, T("a8.re.addr"), x0 + 11, wy + 15.4, LY.ax + 12*LY.f, LY.ay - 3*LY.f, tr, 6.0, .7, k.a);
+      [T("a8.re.city"), facts[0], facts[1]].forEach(function(s, q){ flyChip(c, s, x0 + 12 + q*10, wy + 20.4, LY.ax + (8 + q*14)*LY.f, LY.cy, tr, 6.6 + q*.35, .7, k.a) });
+      var ky = by2 + bh + 5.2, ca = rev(tr, 6.0, .4)*k.a*(1 - rev(tr, 8.0, .3)), da = rev(tr, 8.2, .4)*k.a;
+      sTx(c, "ADRESS, RUM OCH YTA FYLLS I AUTOMATISKT", 50, ky, ca, {size:2.6, weight:600, color:SYS.ink, align:"c", sp:.14});
+      sTx(c, "✓ MED RÖRELSE, I ER EGEN MALL", 50, ky, da, {size:2.6, weight:600, color:"#2f6a3a", align:"c", sp:.14});
+      c.restore();
+    }
+    c.restore();
+  }
+  if(t >= wend + .1) twoPartFast(c, t, wend + .1, LR + .05, T("a8.rl.f1"), T("a8.rl.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);
+}
+function sndReel(H){
+  H.s("shutter", .1, .5); H.s("shutter", 1.5, .4); H.s("shutter", 3.0, .4);
+  var O = OR; H.click(O + .8, .18); H.click(O + 1.9, .26); H.click(O + 3.0, .18); H.click(O + 3.5, .18); H.click(O + 4.0, .18); H.click(O + 4.8, .26);
+  H.s("shutter", O + 6.7, .22); H.s("shutter", O + 8.1, .22); H.s("tick2", O + 8.2, .08);
+}
+
 /* ---------- komponera ---------- */
 var BOOK = {b:"a7.btnB"}, BOVER = {logo:true}, BOVER2 = {logo:true, tag:"a8.sd.tag"};
 window.V3_ADS8 = [];
@@ -773,6 +907,7 @@ reg8("a8_skane", "3 · Din bostadsfotograf i Skåne", "Orterna, och ett inlägg 
 reg8("a8_salu", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "Välj bilder, välj mallar, kampanjen skapas med uppgifterna ifyllda, ladda ner alla tre.", L7, adSaluA, 14.0, sndSaluA, true);
 reg8("a8_salub", "5 · Bilder blir inlägg (variant B av 4)", "Samma film som 4, men med en annan öppning: leveransens bilder slår om till färdiga inlägg.", L7 + .2, adSaluB, 2.0, sndSaluB, true);
 reg8("a8_salud", "7 · Bilder blir inlägg (logga och rad)", "Som 5, men utan slutrad: loggan kommer, och raden För mäklare som vill mer. animeras in under den.", OFF7 + .2 + WEND7 + .2, adSaluC, 2.0, sndSaluB, 2);
+reg8("a8_reel", "8 · Reel Studio", "Som Content Studio, fast för Reels: välj mall och bilder, så blir leveransen en Reel med rörelse och bostadsuppgifterna ifyllda.", LR, adReel, 2.2, sndReel, 2);
 reg8("a8_inlagg", "6 · En bild blir ett inlägg", "Kortare: välj en bild och en mall, och adress, ort, rum och yta fylls i automatiskt.", L8, adInlagg, 2.0, sndInlagg, true);
 
 /* ---------- annonsplan ---------- */
@@ -780,6 +915,7 @@ var PLAN = [
   {t:"1 · Bostadsfoto. Och lite till.", syfte:"Kännedom. Ny aktör inom bostadsfotografering, och fotografering är kärnan. \"Lite till\" visar allt som ingår.", steg:"Överst i tratten. Kall målgrupp.", prim:"Bostadsfoto. Och lite till. Foto, skymningsbild, film, planritning, solbana och karta, i en bokning.", rub:"Ny aktör inom bostadsfotografering", cta:"Läs mer", mal:"Räckvidd, ThruPlay."},
   {t:"2 · Ett objekt. Hela vägen.", syfte:"Förståelse. Ett objekt följs genom hela flödet: intag, bokning, leverans, annonstext och inlägg. Sparar tid och ger bättre resultat.", steg:"Mitten. Visas efter annons 1.", prim:"Ett objekt. Hela vägen. Från intagsmötet och bokningen till leverans i mäklarportalen, annonstext och färdiga inlägg, allt i kontorets utseende.", rub:"Ett objekt. Hela vägen.", cta:"Boka fotografering", mal:"Visningstid, klick."},
   {t:"6 · En bild blir ett inlägg", syfte:"Kortare version. Fokus på att bostadsuppgifterna fylls i automatiskt: en bild, en mall, ett inlägg med adress, ort, rum och yta.", steg:"Mitten. Alternativ till annons 4.", prim:"En bild blir ett inlägg. Välj en bild ur leveransen och en mall, så fylls adress, ort, rum och yta i automatiskt, i kontorets utseende.", rub:"Från leverans till färdigt inlägg", cta:"Läs mer", mal:"Visningstid, klick."},
+  {t:"8 · Reel Studio", syfte:"Nyfikenhet och förståelse. Öppnar direkt i en färdig Reel med rörelse, och visar sedan hur den skapas: välj mall, välj bilder, uppgifterna fylls i automatiskt.", steg:"Överst i tratten. Kall målgrupp, eftersom rörelsen stoppar scrollen.", prim:"Reels direkt från leveransen. Välj en mall och bilderna, så blir leveransen en Reel med adress, rum och yta ifyllda, i kontorets utseende.", rub:"Från leverans till färdig Reel", cta:"Läs mer", mal:"Visningstid, klick."},
   {t:"3 · Din bostadsfotograf i Skåne", syfte:"Lokalt. Foto är kärnan, och inlägget byter mall medan uppgifterna ligger kvar.", steg:"Botten. Retargeting mot dem som sett minst hälften av en annons.", prim:"Din bostadsfotograf i Skåne. Ett inlägg, ditt kontors utseende, uppgifterna från bokningen. Boka fotografering på viewly.se.", rub:"Din bostadsfotograf i Skåne", cta:"Boka fotografering", mal:"Bokningar, kostnad per klick."},
   {t:"4 · Ditt nästa objekt. Som tre färdiga inlägg.", syfte:"Förståelse och nyfikenhet. Visar hur leveransen blir tre färdiga inlägg: välj bilder, välj mallar, uppgifterna fylls i automatiskt.", steg:"Mitten. Visas efter annons 1.", prim:"Ditt nästa objekt. Som tre färdiga inlägg. Välj bilder från leveransen, välj mallar, och kampanjen skapas med adress, ort, rum och yta ifyllda. I kontorets utseende.", rub:"Från leverans till färdiga inlägg", cta:"Läs mer", mal:"Visningstid, klick."}
 ];
@@ -809,7 +945,7 @@ window.secAds8 = function(){
     + '<p class="a3lede">En kampanj med målet kännedom (räckvidd och videovisningar) mot mäklare i Skåne, med alla fyra annonser i samma annonsgrupp. Annonserna är olika på riktigt (olika vinst, upplägg och bild), eftersom Meta visar lika annonser mot varandra i stället för att nå fler. Ett andra steg riktas mot dem som sett minst hälften av en annons, med annons 2, 3 och 4.</p>'
     + '<div class="a3copy">' + PLAN.map(function(p){ return '<div><b>' + esc(p.t) + '</b><p>' + esc(p.syfte) + '</p><b>Steg i tratten</b><p>' + esc(p.steg) + '</p><b>Primärtext</b><p>' + esc(p.prim) + '</p><b>Rubrik · knapp</b><p>' + esc(p.rub) + ' · ' + esc(p.cta) + '</p><b>Mäts på</b><p>' + esc(p.mal) + '</p></div>' }).join("") + '</div>'
     + '<details class="a3det a3cust"><summary>Slutet, knappens text</summary><div class="a3hxs">' + ["a7.btnB", "a7.url", "a7.tag"].map(function(k){ return v3TxField(k, k === "a7.btnB" ? "Slutet · knappens text" : k === "a7.url" ? "Slutet · adressen" : "Slutet · raden efter adressen") }).join("") + '</div></details>'
-    + ["ny", "re", "sa", "sb", "sd", "sc", "sk"].map(function(p, i){ return txEd("a8." + p + ".", ["1 · Bostadsfoto. Och lite till.", "2 · Ett objekt. Hela vägen.", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "5 · Bilder blir inlägg (variant B)", "7 · Bilder blir inlägg (logga och rad)", "6 · En bild blir ett inlägg", "3 · Din bostadsfotograf i Skåne"][i]) }).join("")
+    + ["ny", "re", "sa", "sb", "sd", "sc", "rl", "sk"].map(function(p, i){ return txEd("a8." + p + ".", ["1 · Bostadsfoto. Och lite till.", "2 · Ett objekt. Hela vägen.", "4 · Ditt nästa objekt. Som tre färdiga inlägg.", "5 · Bilder blir inlägg (variant B)", "7 · Bilder blir inlägg (logga och rad)", "6 · En bild blir ett inlägg", "8 · Reel Studio", "3 · Din bostadsfotograf i Skåne"][i]) }).join("")
     + '<details class="a3det"><summary>Underlag: vad som är kontrollerat och vad som inte är det</summary><div class="a3und">'
     + '<div><b>Metas säkra yta (kontrollerat)</b><p>Metas annonsguide rekommenderar att cirka 14 % överst, 35 % nederst och 6 % på sidorna lämnas fria från text och logotyper i Reels. Allt i 9:16 ligger därför i mitten. Slutkortet är litet och centrerat. Se <a href="https://www.facebook.com/business/ads-guide/update/image/instagram-reels" target="_blank" rel="noopener">Metas annonsguide för Reels</a>.</p></div>'
     + '<div><b>Olika annonser (delvis kontrollerat)</b><p>Flera branschkällor skriver att Meta slår ihop och konkurrerar ut annonser som liknar varandra. Det kommer från byråer och inte från Meta själv.</p></div>'
