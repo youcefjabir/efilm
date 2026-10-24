@@ -775,7 +775,7 @@ function adReel2i(c, G, t){
   }
   logoEnd(c, G, t, R2.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], "url");
 }
-function schedReel2(H){ H.click(R2.TAP, .4); H.click(R2.TCL, .4); H.soft("swish", R2.PH0 + .1, .1, .95, 1200) }
+function schedReel2(H){ H.click(R2.TAP, .4); H.click(R2.TCL, .4) }
 /* ---- Content Studio, välj bild och mall ---- */
 var C2 = {TAP:1.9, G0:2.55, GCL:4.65, TL0:5.85, TCL:7.95, PO0:9.35, FA:11.35, FC:12.15, FD:12.85, END:15.15, LOGO:15.65, DUR:20.25};
 var GRIDK = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
@@ -809,7 +809,7 @@ function adContent2(c, G, t){
   }
   logoEnd(c, G, t, C2.LOGO, [["Content", 0], ["Studio.", 1]], "url");
 }
-function schedContent2(H){ H.click(C2.TAP, .4); H.click(C2.GCL, .35); H.click(C2.TCL, .4); H.soft("swish", C2.PO0, .1, .95, 1200) }
+function schedContent2(H){ H.click(C2.TAP, .4); H.click(C2.GCL, .35); H.click(C2.TCL, .4) }
 
 
 /* låsskärmens bakgrundsbild: ett jordklot som stiger upp ur mörkret, med blå atmosfär och stadsljus */
