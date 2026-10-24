@@ -403,17 +403,17 @@ var HL = [
     är tagna ur en skärminspelning av studion (2026-10-24). Inga löften om tid
     eller antal: att det går fort framgår av att bilderna och uppgifterna
     redan finns. */
- {glyph:"reel", id:"reelstudio", num:"19", name:"REEL STUDIO", label:"Reel Studio", cover:"dining",
+ {glyph:"reel", id:"reelstudio", num:"19", name:"REEL STUDIO", label:"Reel Studio", cover:"rsChair",
   q:"Kan jag göra Reels av leveransen?",
   why:"Nytt kapitel. Förklarar vad Reel Studio är och hur den fungerar, med skärmbilder ur själva verktyget.",
   st:[
-   {p:"mark", m:"dining", k:"REEL STUDIO", h:"Reels direkt från leveransen.", s:"Som Content Studio, fast i rörelse."},
+   {p:"mark", m:"rsChair", k:"REEL STUDIO", h:"Reels direkt från leveransen.", s:"Som Content Studio, fast i rörelse."},
    {p:"quiet", h:"Bilderna finns redan.", em:"Uppgifterna också.", s:"Mallen fylls i åt dig.", k:"19 — Reel Studio"},
-   {p:"studio", sc:"overview", m:"kitchen", k:"Så ser den ut", h:"Mall, bilder och rörelse på ett ställe.", s:"Välj bilderna ur leveransen, så får Reelen kontorets mall."},
+   {p:"studio", sc:"overview", m:"rsDusk1", k:"Så ser den ut", h:"Mall, bilder och rörelse på ett ställe.", s:"Välj bilderna ur leveransen, så får Reelen kontorets mall."},
    {p:"system", k:"Mallen", h:"Fylls i av sig själv.", items:["Adress","Ort","Rum och yta","Mäklare"], s:"Uppgifterna hämtas från leveransen. Inget att skriva."},
-   {p:"studio", sc:"text", m:"dining", k:"Text", h:"Gör den till din.", s:"Skriv direkt i bilden. Typsnitt, storlek, färg och kopplade fält."},
-   {p:"studio", sc:"brand", m:"living", k:"Varumärket", h:"Kontorets färger.", s:"Former, linjer och ramar i varumärkets färger, med ett klick."},
-   {p:"studio", sc:"motion", m:"dining", k:"Rörelse", h:"Varje element rör sig.", s:"Tona in och ut. Välj start, slut och hur mjukt det går."},
+   {p:"studio", sc:"text", m:"rsDusk2", k:"Text", h:"Gör den till din.", s:"Skriv direkt i bilden. Typsnitt, storlek, färg och kopplade fält."},
+   {p:"studio", sc:"brand", m:"rsDining", k:"Varumärket", h:"Kontorets färger.", s:"Former, linjer och ramar i varumärkets färger, med ett klick."},
+   {p:"studio", sc:"motion", m:"rsDining", k:"Rörelse", h:"Varje element rör sig.", s:"Tona in och ut. Välj start, slut och hur mjukt det går."},
    {p:"cta", h:"Din Reel.", s:"I ditt varumärke.", k:"19 — Reel Studio"}
   ]}
 ];

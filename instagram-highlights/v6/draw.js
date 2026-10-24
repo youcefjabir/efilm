@@ -317,7 +317,7 @@ function stDesign(sc, P, s, dcls){
     var ch = ['Adress','Ort','Rum','Yta','Mäklare'].map(function(x, j){ return pill(x, j===0, 'font-size:2cqw') }).join('');
     return card(tb
       +'<div style="display:flex;gap:2.6cqw;padding:3cqw 2.6cqw 3.4cqw;align-items:flex-start">'
-        +photo(34, 60, '', handles(10,40,80,16)+'<div class="'+dcls+'" style="position:absolute;left:14%;top:44%;font-size:5.2cqw;color:#fff">Storgatan 15</div>'+'<div style="position:absolute;left:12%;top:60%;'+F+'font-size:1.5cqw;font-weight:600;letter-spacing:.12em;color:#fff;opacity:.9">HELSINGBORG · 3 RUM · 74 M²</div>')
+        +photo(34, 60, '', '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.62))"></div>'+handles(10,40,80,16)+'<div class="'+dcls+'" style="position:absolute;left:14%;top:44%;font-size:5.2cqw;color:#fff">Storgatan 15</div>'+'<div style="position:absolute;left:12%;top:60%;'+F+'font-size:1.5cqw;font-weight:600;letter-spacing:.12em;color:#fff;opacity:.9">HELSINGBORG · 3 RUM · 74 M²</div>')
         +'<div style="flex:1;display:flex;flex-direction:column;gap:2.2cqw;padding-top:1cqw">'
           +lab('Kopplat fält')+'<div style="display:flex;flex-wrap:wrap;gap:1.2cqw">'+ch+'</div>'
           +'<div style="'+F+'font-size:2.1cqw;line-height:1.45;color:'+P.mut+'">Texten hämtar sitt innehåll från leveransen. Byts objekt följer uppgifterna med.</div>'
@@ -327,11 +327,11 @@ function stDesign(sc, P, s, dcls){
   if(sc === 'brand'){
     var cols = ['#0F3D2E','#F3EFE7','#B08D57','#1C1C1E','#A4472A'].map(function(x){ return '<span style="width:9.4cqw;height:9.4cqw;border-radius:50%;background:'+x+';border:1px solid '+P.line+'"></span>' }).join('');
     var shp = ['<span style="width:7cqw;height:4.6cqw;border:1.5px solid '+P.ink+';border-radius:.6cqw"></span>','<span style="width:5.6cqw;height:5.6cqw;border:1.5px solid '+P.ink+';border-radius:.6cqw"></span>','<span style="width:5.8cqw;height:5.8cqw;border:1.5px solid '+P.ink+';border-radius:50%"></span>','<svg viewBox="0 0 10 9" style="width:6cqw"><path d="M5 1 L9 8 H1 Z" fill="none" stroke="'+P.ink+'" stroke-width=".8"/></svg>','<span style="width:7cqw;height:0;border-top:1.5px solid '+P.ink+'"></span>'].map(function(x){ return '<span style="width:10.4cqw;height:10.4cqw;border-radius:1.6cqw;border:1px solid '+P.line+';display:grid;place-items:center">'+x+'</span>' }).join('');
-    var mini = function(bgc, fgc, accc, l2, ph){ return '<div style="flex:1;position:relative;height:36cqw;border-radius:1.8cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg(s.m, sid(s))+'"></div>'+tplCard(bgc,fgc,accc,l2,8,52,86)+'</div>' };
+    var mini = function(bgc, fgc, accc, l2, ph){ return '<div style="flex:1;position:relative;height:36cqw;border-radius:1.8cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg(ph)+'"></div>'+tplCard(bgc,fgc,accc,l2,8,52,86)+'</div>' };
     return card('<div style="padding:3cqw 3cqw 3.4cqw;display:flex;flex-direction:column;gap:2.6cqw">'
       +lab('Varumärkets färger')+'<div style="display:flex;gap:2cqw">'+cols+'</div>'
       +lab('Former')+'<div style="display:flex;gap:1.8cqw">'+shp+'</div>'
-      +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini('#F5F0E6','#1E3B2E','#B08D57','KOMMANDE')+mini('#14233A','#F3EFE7','#D9B56C','TILL SALU')+mini('#A4472A','#F7EEE4','#F1C9A8','SÅLD')+'</div>'
+      +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini('#F5F0E6','#1E3B2E','#B08D57','KOMMANDE','rsDusk1')+mini('#14233A','#F3EFE7','#D9B56C','TILL SALU','rsDining')+mini('#A4472A','#F7EEE4','#F1C9A8','SÅLD','rsChair')+'</div>'
       +'</div>', 'width:100%;overflow:hidden');
   }
   /* motion */
