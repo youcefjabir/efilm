@@ -194,7 +194,14 @@ function adReel1(c, G, t){
 }
 
 /* inga kameraljud och inga tick per element: bara knappklicket, rösten och loggans korta ton */
-function sched1(H){ H.click(TAP, .4) }
+function sched1(H){
+  H.soft("tick1", 1.75, .09);
+  [3.1, 3.9, 4.18, 4.46].forEach(function(q){ H.soft("tick2", q + .5, .07) });
+  H.click(TAP, .4);
+  H.soft("tick1", PH_IN + .3, .08);
+  for(var i = 0; i < 4; i++) H.soft("tick2", 9.0 + i*.14 + .95, .06);
+  SWT.forEach(function(q){ H.soft("tick1", RT0 + q, .08) });
+}
 
 
 /* ---------- annons 2: så fungerar Reel Studio (förklaringsvideo, utan röst) ---------- */
@@ -430,9 +437,9 @@ function sched3(H){ H.click(CX.CL1, .35); H.click(CX.CL2, .35) }
 
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
-function loadAudio10(){ return Promise.all([v3SfxLoad(), K.loadVo(VO.map(function(v){ return v[0] }), "")]) }
+function loadAudio10(){ return v3SfxLoad() }
 function reg10(id, n, d, fn, sched, thumb){
-  var comp = {n:n, d:d, group:"ads10", id:id, v:{id:id}, dur:DUR, thumb:thumb, L:LOGO_AT - .53, logo:true, vo:VO};
+  var comp = {n:n, d:d, group:"ads10", id:id, v:{id:id}, dur:DUR, thumb:thumb, L:LOGO_AT - .53, logo:true, vo:[]};
   comp.draw = function(c, G, t){ fn(c, G, t) };
   comp.mix = K.makeMix(sched); comp.loadAudio = loadAudio10;
   V3_COMPS[id] = comp; V3_ADS10.push(id);
