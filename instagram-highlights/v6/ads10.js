@@ -12,7 +12,7 @@
    ===================================================================== */
 (function(){
 var A8 = window.A8K, K = window.A7K, SYS = A8.SYS, sTx = A8.sTx, sCard = A8.sCard, sPh = A8.sPh, sBtn = A8.sBtn, rev = A8.rev, clamp = A8.clamp, SG = A8.SG, GRID7 = A8.GRID7, rr = A8.rr;
-var tplMark = A8.tplMark;
+var tplMark = A8.tplMark, END10 = K.END_L;
 V3_KEYS.lockMag = "lockMag"; V3_POS.lockMag = [.36, .55];
 var BG = "#070606", INK = "#1C1C1E", MUT = "#6f6a65", GRN = "#2f3a2d", LIN = "#e9eadf";
 
@@ -756,7 +756,7 @@ function heads(c, t, Y0, list){
   });
 }
 /* ---- Reel Studio, välj mall först ---- */
-var R2 = {TAP:1.9, TL0:2.55, TCL:4.85, PH0:6.05, RT0:6.75, CUTS:[0, 2.0, 4.0, 6.0, 7.8], FA:8.75, FC:9.55, FD:10.25, PHO:15.05, LOGO:15.55, DUR:20.15};
+var R2 = {TAP:1.9, TL0:2.55, TCL:4.85, PH0:6.05, RT0:6.75, CUTS:[0, 2.0, 4.0, 6.0, 7.8], FA:8.75, FC:9.55, FD:10.25, PHO:15.05, LOGO:99, DUR:20.15};
 var RPH2 = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor"];
 function adReel2(c, G, t){ TSTYLE = "card"; try { adReel2i(c, G, t) } finally { TSTYLE = "ed" } }
 function adReel2i(c, G, t){
@@ -777,7 +777,7 @@ function adReel2i(c, G, t){
 }
 function schedReel2(H){ H.click(R2.TAP, .4); H.click(R2.TCL, .4) }
 /* ---- Content Studio, välj bild och mall ---- */
-var C2 = {TAP:1.9, G0:2.55, GCL:4.65, TL0:5.85, TCL:7.95, PO0:9.35, FA:11.35, FC:12.15, FD:12.85, END:15.15, LOGO:15.65, DUR:20.25};
+var C2 = {TAP:1.9, G0:2.55, GCL:4.65, TL0:5.85, TCL:7.95, PO0:9.35, FA:11.35, FC:12.15, FD:12.85, END:15.15, LOGO:99, DUR:20.25};
 var GRIDK = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
 function adContent2(c, G, t){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
@@ -884,11 +884,12 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
 })();
 
 (function(){
-  var NF = FL.NOF;
-  var defs = [["a10_reel2", "1c · Reel Studio, notis och välj mall först", "iPhone-notis (Dina foton är klara), 25 bilder, Skapa Reel, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv i Reelen.", withNotis(adReel2, NF), notisSched(schedReel2, NF), R2.DUR + NF, R2.LOGO + NF, 2.0],
-              ["a10_cs2", "3b · Content Studio, notis, välj bild och mall", "iPhone-notis (Dina foton är klara), 25 bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv.", withNotis(adContent2, NF), notisSched(schedContent2, NF), C2.DUR + NF, C2.LOGO + NF, 2.0]];
+  var NF = FL.NOF, BOOK10 = {b:"a7.btnB"}, LR = R2.PHO + .9, LC = C2.END + .9;
+  var withBook = function(fn, Lc){ var inner = withNotis(fn, NF); return function(c, G, t){ inner(c, G, Math.min(t, NF + Lc)); if(t >= NF + Lc) K.endSeq(c, G, t, NF + Lc, BOOK10) } };
+  var defs = [["a10_reel2", "1c · Reel Studio, notis och välj mall först", "iPhone-notis (Dina foton är klara), 25 bilder, Skapa Reel, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv i Reelen. Slutar på Boka fotografering som blir Viewly.", withBook(adReel2, LR), notisSched(schedReel2, NF), NF + LR + END10, NF + LR, 2.0],
+              ["a10_cs2", "3b · Content Studio, notis, välj bild och mall", "iPhone-notis (Dina foton är klara), 25 bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv. Slutar på Boka fotografering som blir Viewly.", withBook(adContent2, LC), notisSched(schedContent2, NF), NF + LC + END10, NF + LC, 2.0]];
   defs.forEach(function(d){
-    var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6] - .53, logo:true, vo:[]};
+    var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6], vo:[]};
     comp.draw = function(c, G, t){ d[3](c, G, t) };
     comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
     V3_COMPS[d[0]] = comp; V3_ADS10.push(d[0]);
