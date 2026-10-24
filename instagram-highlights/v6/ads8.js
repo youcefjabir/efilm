@@ -772,9 +772,9 @@ Object.keys(RV).forEach(function(k){ var V = RV[k]; V.PH0 = V.tap + .9; V.PO = V
 var RPH = [GRID7[0], GRID7[1], GRID7[4], GRID7[2], GRID7[3], GRID7[5]];
 /* tre mallar, tre kontor (påhittade namn och märken) och tre olika layouter: Kommande, Till salu, Såld */
 var TPL8 = [
-  {lab:"KOMMANDE", right:"KOMMER SNART", acc:"#D2B07A", brand:"SOLVARA", mark:0},
-  {lab:"TILL SALU", right:"VISNING SÖN 13–14", acc:"#C8CFC0", brand:"HAVSVIK", mark:1},
-  {lab:"SÅLD", right:"TACK FÖR FÖRTROENDET", acc:"#F1C9A8", brand:"LINDÖ", mark:2}
+  {lab:"KOMMANDE", right:"KOMMER SNART", plate:"#F3EFE7", fg:"#1C2B22", acc:"#B08D57", brand:"SOLVARA", mark:0},
+  {lab:"TILL SALU", right:"VISNING SÖN 13–14", plate:"#11151B", fg:"#F3EFE7", acc:"#C8CFC0", brand:"HAVSVIK", mark:1},
+  {lab:"SÅLD", right:"TACK FÖR FÖRTROENDET", plate:"#8F3A22", fg:"#F7EEE4", acc:"#F1C9A8", brand:"LINDÖ", mark:2}
 ];
 function tplMark(c, m, x, y, r, col, bg){
   c.save(); c.strokeStyle = col; c.fillStyle = col; c.lineWidth = r*.16; c.lineCap = "round";
@@ -783,38 +783,38 @@ function tplMark(c, m, x, y, r, col, bg){
   else { rr(c, x - r, y - r, r*2, r*2, r*.28); c.stroke(); c.restore(); v3Text(c, "L", x, y + r*.42, {size:r*1.5, color:col, align:"c"}); return }
   c.restore();
 }
-function tplGeo(i, x, y, w, h, f, yk){
-  yk = yk || 1; var g = {};
-  g.Bt = y + h*.5*yk; g.px = x + w*.07; g.inner = w*.86; g.ax = g.px; g.ay = g.Bt + 13.6*f; g.dy = g.Bt + 27*f;
+function tplGeo(i, x, y, w, h, f, yb){
+  yb = yb || .97; var g = {};
+  g.Bt = y + h*yb - 44.6*f; g.px = x + w*.07; g.inner = w*.86; g.ax = g.px; g.ay = g.Bt + 13.6*f; g.dy = g.Bt + 27*f;
   g.col = [g.px, g.px + g.inner*.36 + 3*f, g.px + g.inner*.67 + 3*f]; g.cityX = x + w - w*.07; g.cityY = g.Bt + 4*f;
   g.tgt = [[g.px + 14*f, g.ay - 3.4*f], [g.cityX - 8*f, g.cityY - 1*f], [g.col[0] + 2.5*f, g.dy - 2.4*f], [g.col[1] + 3.5*f, g.dy - 2.4*f]];
   return g;
 }
-/* mallarna: ett fotografi, en mjuk toning nedåt, öppen typografi med hårfina linjer. Kontorets logga längst ner. */
-function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo, yk){
+/* mallarna: en platta i kontorets färg längst ner på fotografiet, öppen typografi med hårfina linjer och kontorets logga */
+function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo, yb){
   if(a <= .02) return;
-  var T8 = TPL8[i], g = tplGeo(i, x, y, w, h, f, yk), Bt = g.Bt, R = g.px + g.inner, W = "#fff", rows = [[D.facts[0].split(" ")[0], "RUM"], [D.facts[1].split(" ")[0], "KVADRATMETER"], ["1964", "BYGGÅR"]];
+  var T8 = TPL8[i], g = tplGeo(i, x, y, w, h, f, yb), Bt = g.Bt, R = g.px + g.inner, W = T8.fg, rows = [[D.facts[0].split(" ")[0], "RUM"], [D.facts[1].split(" ")[0], "KVADRATMETER"], ["1964", "BYGGÅR"]];
   var hr = function(yy, k){ c.save(); c.globalAlpha = a*k; c.fillStyle = W; c.fillRect(g.px, yy, g.inner, .2*f); c.restore() };
   c.save(); c.globalAlpha = a; c.translate(0, dyo || 0);
-  v3Grad(c, x, Bt - 16*f, w, (y + h) - (Bt - 16*f) + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.76)"]]);
-  v3Text(c, T8.lab, g.px, Bt + 4*f, {size:1.65*f, weight:600, f:"sans", sp:.3, color:W, alpha:.84});
-  v3Text(c, D.city.toUpperCase(), R, Bt + 4*f, {size:1.65*f, weight:600, f:"sans", sp:.3, color:W, align:"r", alpha:.84*f2});
-  if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*.24; c.fillStyle = W; rr(c, g.px, Bt + 7.4*f, 44*f, 7*f, 1.1*f); c.fill(); c.restore() }
+  c.save(); c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = 8; c.shadowOffsetY = 1.4; c.fillStyle = T8.plate; rr(c, x + w*.035, Bt - .6*f, w*.93, 45.2*f, 1.8*f); c.fill(); c.restore();
+  v3Text(c, T8.lab, g.px, Bt + 4*f, {size:1.65*f, weight:600, f:"sans", sp:.3, color:W, alpha:.86});
+  v3Text(c, D.city.toUpperCase(), R, Bt + 4*f, {size:1.65*f, weight:600, f:"sans", sp:.3, color:W, align:"r", alpha:.86*f2});
+  if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*.2; c.fillStyle = W; rr(c, g.px, Bt + 7.4*f, 44*f, 7*f, 1.1*f); c.fill(); c.restore() }
   v3Text(c, D.addr, g.px, g.ay, {size:7.2*f, color:W, alpha:f1});
-  hr(Bt + 17.4*f, .3);
+  hr(Bt + 17.4*f, .28);
   if(i === 2){
     v3Text(c, "Såld", g.px, Bt + 30.6*f, {size:11*f, italic:true, color:W, alpha:f2});
   } else {
-    if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*.22; c.fillStyle = W; rr(c, g.px, Bt + 21*f, 56*f, 7*f, 1.1*f); c.fill(); c.restore() }
+    if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*.18; c.fillStyle = W; rr(c, g.px, Bt + 21*f, 56*f, 7*f, 1.1*f); c.fill(); c.restore() }
     rows.forEach(function(r, k){
       var cx0 = g.col[k];
       v3Text(c, r[0], cx0, g.dy, {size:5.2*f, color:W, alpha:f2});
       v3Text(c, r[1], cx0, Bt + 30.8*f, {size:1.2*f, weight:600, f:"sans", sp:.22, color:W, alpha:.62*f2});
-      if(k){ c.save(); c.globalAlpha = a*f2*.3; c.fillStyle = W; c.fillRect(cx0 - 3*f, Bt + 19.4*f, .2*f, 13.4*f); c.restore() }
+      if(k){ c.save(); c.globalAlpha = a*f2*.28; c.fillStyle = W; c.fillRect(cx0 - 3*f, Bt + 19.4*f, .2*f, 13.4*f); c.restore() }
     });
   }
-  hr(Bt + 34.8*f, .3);
-  tplMark(c, T8.mark, g.px + 1.9*f, Bt + 40.4*f, 1.9*f, T8.acc, "#101010");
+  hr(Bt + 34.8*f, .28);
+  tplMark(c, T8.mark, g.px + 1.9*f, Bt + 40.4*f, 1.9*f, T8.acc, T8.plate);
   v3Text(c, T8.brand, g.px + 5.6*f, Bt + 41.2*f, {size:1.6*f, weight:600, f:"sans", sp:.34, color:W, alpha:.94});
   v3Text(c, T8.right, R, Bt + 41.2*f, {size:1.45*f, weight:600, f:"sans", sp:.2, color:W, align:"r", alpha:.78});
   c.restore();
@@ -832,8 +832,8 @@ function reelFrame(c, x, y, w, h, tr, o){
   v3Grad(c, x, y + h*.5, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.5)"]]);
   v3Grad(c, x, y, w, h*.22, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
   var D = {addr:T("a8.re.addr"), city:T("a8.re.city"), facts:T("a8.re.facts").split(" · ")}, ti = Math.min(o.ntp - 1, Math.floor(Math.max(0, tr)/TSW)), tpp = ti ? ioC(k3(tr - ti*TSW, 0, .7)) : 1;
-  if(ti > 0 && tpp < 1) tplDraw(c, ti - 1, x, y, w, h, f, a*ia*(1 - tpp), D, 1, 1, tpp*3*f);
-  tplDraw(c, ti, x, y, w, h, f, a*ia*(ti ? tpp : 1), D, ti ? 1 : f1, ti ? 1 : f2, (1 - tpp)*-4*f + (ti ? 0 : (1 - ia)*3*f));
+  if(ti > 0 && tpp < 1) tplDraw(c, ti - 1, x, y, w, h, f, a*ia*(1 - tpp), D, 1, 1, tpp*3*f, .745);
+  tplDraw(c, ti, x, y, w, h, f, a*ia*(ti ? tpp : 1), D, ti ? 1 : f1, ti ? 1 : f2, (1 - tpp)*-4*f + (ti ? 0 : (1 - ia)*3*f), .745);
   c.restore();
 }
 /* iPhone: svart kropp, ö, och Reel-gränssnitt (Reels, hjärta, kommentar, dela, konto) så att man förstår att det är en Reel */

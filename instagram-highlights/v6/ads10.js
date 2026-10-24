@@ -168,7 +168,7 @@ function adReel1(c, G, t){
   var pcy = Y0 + 25.5, phh = G.is9 ? 94 : Math.min(S.y1 - pcy + 4, 80), pww = phh/2.05, pxx = 50 - pww/2;
   if(pa > .02){
     var py = pcy + (1 - pin)*24 + pout*10, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.07);
-    var yk = .72, rt = Math.max(0, t - RT0);
+    var yk = .745, rt = Math.max(0, t - RT0);
     var f1 = ioC(k3(t, 9.55, 9.9)), f2 = ioC(k3(t, 9.8, 10.25));
     reelL(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, f1, f2, RPH, yk);
     A8.reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5));
@@ -236,7 +236,7 @@ function adExplain(c, G, t){
   var pin = oQ(k3(t, EX.T2 - .1, EX.T2 + .8)), pout = ioC(k3(t, EX.T5 - .5, EX.T5 + .1)), pa = rev(t, EX.T2 - .1, .4)*(1 - pout);
   var up = ioC(k3(t, EX.T3 - .1, EX.T3 + .55)), top2 = Y0 + 34, top3 = Y0 + 14, shrink = ioC(k3(t, EX.T4 - .1, EX.T4 + .55));
   var phh = (G.is9 ? 92 : 78)*lerp(1, .62, shrink), pww = phh/2.05, pxx = 50 - pww/2, pcy = lerp(top2, top3, up);
-  var yk = lerp(.62, .7, up);
+  var yk = .745;
   if(pa > .02){
     var py = pcy + (1 - pin)*20 + pout*8, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.06), rt = Math.max(0, t - EX.RT0);
     var f1 = ioC(k3(t, 5.2, 5.55)), f2 = ioC(k3(t, 5.45, 5.9));
@@ -298,7 +298,7 @@ function drawPost(c, x, y, w, h, ti, key, a, f1, f2, yk){
   c.save(); c.globalAlpha = a; rr(c, x, y, w, h, 1.6); c.clip(); v3Photo(c, key, x, y, w, h, {pos:V3_POS[key]});
   v3Grad(c, x, y + h*.5, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.45)"]]);
   var D = {addr:v3t("a8.re.addr"), city:v3t("a8.re.city"), facts:v3t("a8.re.facts").split(" · ")};
-  A8.tplDraw(c, ti, x, y, w, h, Math.min(w/100*1.7, .9), a, D, f1 == null ? 1 : f1, f2 == null ? 1 : f2, 0, (yk || 1)*.9);
+  A8.tplDraw(c, ti, x, y, w, h, Math.min(w/100*1.7, h/60), a, D, f1 == null ? 1 : f1, f2 == null ? 1 : f2, 0, (yk || .97));
   c.restore();
 }
 function adContent(c, G, t){
@@ -353,7 +353,7 @@ function adContent(c, G, t){
     v3Text(c, addr, 15.6, dy + 9.2, {size:5.8, color:INK, alpha:dk}); sTx(c, cstr, 15.6, dy + 14.2, dk, {size:2.0, weight:600, color:MUT, sp:.14});
     var f1 = ioC(k3(t, CX.T3 + 1.9, CX.T3 + 2.25)), f2 = ioC(k3(t, CX.T3 + 2.15, CX.T3 + 2.6));
     drawPost(c, px, py, pw, ph, 1, GRID7[1], pa3, f1, f2, 1);
-    var ff = Math.min(pw/100*1.7, .9), g1 = A8.tplGeo(1, px, py, pw, ph, ff, .9), lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
+    var ff = Math.min(pw/100*1.7, ph/60), g1 = A8.tplGeo(1, px, py, pw, ph, ff, .97), lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
     var SRC = [[xs + v3Measure(c, addr, {size:5.8})/2, ay - 2.2], [xs + v3Measure(c, city.toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[0].toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  " + F[0].toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[1].toUpperCase(), lb2)/2, cl - .6]];
     var TXT = [addr, city, F[0], F[1]], TGT = g1.tgt;
     for(i = 0; i < 4; i++) link(c, TXT[i], SRC[i][0], SRC[i][1], TGT[i][0], TGT[i][1], t, CX.T3 + .9 + i*.14, .95, (i - 1.5)*5);

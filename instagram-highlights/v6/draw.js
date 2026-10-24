@@ -292,24 +292,24 @@ function stDesign(sc, P, s, dcls){
      +'<div style="'+F+'font-size:'+(1.02*k)+'cqw;font-weight:600;letter-spacing:.05em;opacity:.85;white-space:nowrap">HELSINGBORG · 3 RUM · 74 M²</div></div>' };
   /* mallar i HTML: samma fyra layouter som i videorna, med egna (påhittade) loggor. w = postens bredd i cqw. */
   var tplHtml = function(i, w){
-    var u = w/40, X = function(v){ return (v*u).toFixed(2)+'cqw' }, ser = 'class="'+dcls+'"', mono = F, W = '#fff';
-    var OFF = [['SOLVARA','#D2B07A',0,'KOMMANDE','KOMMER SNART'],['HAVSVIK','#C8CFC0',1,'TILL SALU','VISNING SÖN 13–14'],['LINDÖ','#F1C9A8',2,'SÅLD','TACK FÖR FÖRTROENDET'],['BERGVIK','#C8CFC0',3,'VISNING','VÄLKOMMEN']][i];
+    var u = w/40, X = function(v){ return (v*u).toFixed(2)+'cqw' }, ser = 'class="'+dcls+'"', mono = F;
+    var OFF = [['SOLVARA','#B08D57',0,'KOMMANDE','KOMMER SNART','#F3EFE7','#1C2B22'],['HAVSVIK','#C8CFC0',1,'TILL SALU','VISNING SÖN 13–14','#11151B','#F3EFE7'],['LINDÖ','#F1C9A8',2,'SÅLD','TACK FÖR FÖRTROENDET','#8F3A22','#F7EEE4'],['BERGVIK','#C8CFC0',3,'VISNING','VÄLKOMMEN','#1F4B39','#F3EFE7']][i];
+    var W = OFF[6], PL = OFF[5], line = 'rgba('+(i===0?'28,43,34':'255,255,255')+',.3)';
     var mk = function(m, col, r){ var sz = r*2*u; var inner = m===0 ? '<circle cx="12" cy="12" r="9" fill="none" stroke="'+col+'" stroke-width="2"/><circle cx="15" cy="9.4" r="3.4" fill="'+col+'"/>'
-      : m===1 ? '<circle cx="12" cy="12" r="11" fill="'+col+'"/><path d="M5 10.5 Q8.5 7.5 12 10.5 T19 10.5 M5 15 Q8.5 12 12 15 T19 15" fill="none" stroke="#101010" stroke-width="1.5" stroke-linecap="round"/>'
+      : m===1 ? '<circle cx="12" cy="12" r="11" fill="'+col+'"/><path d="M5 10.5 Q8.5 7.5 12 10.5 T19 10.5 M5 15 Q8.5 12 12 15 T19 15" fill="none" stroke="'+PL+'" stroke-width="1.5" stroke-linecap="round"/>'
       : m===2 ? '<rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="'+col+'" stroke-width="2"/><text x="12" y="17.2" font-size="13" text-anchor="middle" fill="'+col+'" font-family="Georgia,serif">L</text>'
       : '<circle cx="12" cy="12" r="10" fill="none" stroke="'+col+'" stroke-width="2"/><path d="M12 6.5 L17.6 16.5 H6.4 Z" fill="'+col+'"/>';
       return '<svg viewBox="0 0 24 24" style="width:'+sz.toFixed(2)+'cqw;height:'+sz.toFixed(2)+'cqw;flex:0 0 auto">'+inner+'</svg>' };
     var sm = function(t, o, ex){ return '<span style="'+mono+'font-size:'+X(o)+';font-weight:600;letter-spacing:.28em;color:'+W+';'+(ex||'')+'">'+t+'</span>' };
-    var hr = '<div style="height:1px;background:rgba(255,255,255,.3);margin:'+X(1)+' 0"></div>';
-    var stat = function(n, l, first){ return '<div style="flex:1;'+(first?'':'border-left:1px solid rgba(255,255,255,.3);padding-left:'+X(1.3)+';')+'"><div '+ser+' style="font-size:'+X(3.6)+';line-height:1.05">'+n+'</div><div style="'+mono+'font-size:'+X(.8)+';font-weight:600;letter-spacing:.2em;opacity:.64;margin-top:'+X(.3)+'">'+l+'</div></div>' };
+    var hr = '<div style="height:1px;background:'+line+';margin:'+X(1)+' 0"></div>';
+    var stat = function(n, l, first){ return '<div style="flex:1;'+(first?'':'border-left:1px solid '+line+';padding-left:'+X(1.3)+';')+'"><div '+ser+' style="font-size:'+X(3.6)+';line-height:1.05">'+n+'</div><div style="'+mono+'font-size:'+X(.8)+';font-weight:600;letter-spacing:.2em;opacity:.64;margin-top:'+X(.3)+'">'+l+'</div></div>' };
     var mid;
     if(i === 2) mid = '<div '+ser+' style="font-size:'+X(7.6)+';line-height:1;font-style:italic;margin:'+X(.2)+' 0">Såld</div>';
     else if(i === 3) mid = '<div style="display:flex;align-items:baseline;gap:'+X(1.6)+'"><div '+ser+' style="font-size:'+X(5.6)+';line-height:1.05">13–14</div>'+sm('SÖNDAG',.9,'opacity:.8')+'</div>';
     else mid = '<div style="display:flex">'+stat('3','RUM',1)+stat('74','KVADRATMETER')+stat('1964','BYGGÅR')+'</div>';
-    return '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,7,7,0) 36%,rgba(8,7,7,.78))"></div>'
-      +'<div style="position:absolute;left:7%;right:7%;bottom:5%;color:'+W+'">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'+sm(OFF[3],.92,'opacity:.84')+sm('HELSINGBORG',.92,'opacity:.84')+'</div>'
-      +'<div '+ser+' style="font-size:'+X(4.8)+';line-height:1.05;margin:'+X(1.2)+' 0 '+X(.4)+';white-space:nowrap">Storgatan 15</div>'
+    return '<div style="position:absolute;left:3.5%;right:3.5%;bottom:3.5%;background:'+PL+';color:'+W+';border-radius:'+X(1.1)+';padding:'+X(1.7)+' '+X(1.7)+' '+X(1.6)+';box-sizing:border-box;box-shadow:0 '+X(.6)+' '+X(2)+' rgba(0,0,0,.42)">'
+      +'<div style="display:flex;justify-content:space-between;align-items:center">'+sm(OFF[3],.92,'opacity:.86')+sm('HELSINGBORG',.92,'opacity:.86')+'</div>'
+      +'<div '+ser+' style="font-size:'+X(4.8)+';line-height:1.05;margin:'+X(1)+' 0 '+X(.2)+';white-space:nowrap">Storgatan 15</div>'
       +hr+mid+hr
       +'<div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:'+X(1.1)+'">'+mk(OFF[2],OFF[1],1.05)+sm(OFF[0],.9,'letter-spacing:.34em')+'</div>'+sm(OFF[4],.8,'letter-spacing:.2em;opacity:.78')+'</div></div>';
   };
