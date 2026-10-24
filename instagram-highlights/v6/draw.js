@@ -616,6 +616,9 @@ var PICTO = {
 
   /* Ditt hem: huset med tänt fönster. */
   /* Navet — ekosystemets motiv, i de aldre systemens skala */
+  reel:function(P){ return '<rect x="33" y="18" width="34" height="64" rx="7" fill="'+P.t2+'"/>'
+             +'<rect x="37" y="23" width="26" height="54" rx="4" fill="'+P.bg+'"/>'
+             +'<path d="M46 41 L58 50 L46 59 Z" fill="'+P.t1+'"/>' },
   orbitmark:function(P){
     var out = '<circle cx="50" cy="50" r="13" fill="'+P.t2+'"/>';
     for(var i = 0; i < 6; i++){
@@ -709,6 +712,7 @@ var LINE = {
   people:  function(P){ return ln2("M50 24 A11 11 0 1 1 49.9 24 Z", P.t2)
              +ln2("M26 80 V72 A24 24 0 0 1 74 72 V80", P.t2)
              +'<rect x="40" y="56" width="20" height="13" fill="'+P.t3+'"/>' },
+  reel:function(P){ return ln2("M34 18 H66 V82 H34 Z", P.t2)+ln2("M46 41 L58 50 L46 59 Z", P.t2) },
   orbitmark:function(P){
     var out = '<circle cx="50" cy="50" r="13" fill="none" stroke="'+P.t2+'" stroke-width="3"/>';
     for(var i = 0; i < 6; i++){
@@ -745,6 +749,7 @@ var GLYPHS = {
   lines:{n:"Dokumentet", d:"Text med rubrik"},formats:{n:"Formaten", d:"9:16, 4:5, 1:1"},
   spine:{n:"Portalen", d:"Fyra ytor, en tänd"},gable:{n:"Plåtarna", d:"Tre kort på varandra"},
   people:{n:"Fotografen", d:"Person med kamera"}, door:{n:"Huset", d:"Hem med tänt fönster"},
+  reel:{n:"Reelen", d:"Mobil med play"},
   orbitmark:{n:"Navet", d:"Mitten och det som hänger ihop"},
   plan:{n:"Planen", d:"Rum, möbel och mått"},
   topview:{n:"Soffan uppifrån", d:"Möbel sedd rakt ovanifrån"},
@@ -899,6 +904,10 @@ var SIGN = {
   },
   /* Ekosystemet — navet och det som hänger ihop med det. Systemet har
      rutnätet; de två får inte dela märke. */
+  reel: function(P){
+    return '<rect x="39" y="30" width="22" height="40" rx="4.4" fill="none" stroke="'+P.ink+'" stroke-width="2.4"/>'
+      +'<path d="M46 44 L56 50 L46 56 Z" fill="'+P.ink+'"/>';
+  },
   orbitmark: function(P){
     var s = '<circle cx="50" cy="50" r="6.6" fill="'+P.ink+'"/>';
     for(var i = 0; i < 6; i++){

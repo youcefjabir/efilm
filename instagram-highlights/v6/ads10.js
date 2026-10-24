@@ -78,17 +78,18 @@ function phone2(c, x, y, w, h, a, rot){
 }
 
 /* ---------- Reelen i mobilen: bilder med mjuka övertoningar, mallar som byter layout ---------- */
-function reelL(c, x, y, w, h, rt, a, r, f1, f2, ph, yk){
+function reelL(c, x, y, w, h, rt, a, r, f1, f2, ph, yk, cuts, swt){
+  cuts = cuts || CUTS; swt = swt || SWT;
   var f = w/100*1.5, i, ia = rev(rt, .25, .6), D = {addr:v3t("a8.re.addr"), city:v3t("a8.re.city"), facts:v3t("a8.re.facts").split(" · ")};
   if(a <= .02) return;
   c.save(); c.globalAlpha = a; rr(c, x, y, w, h, r || 0); c.clip(); v3Fill(c, x, y, w, h, "#000");
   for(i = 0; i < ph.length; i++){
-    var s0 = CUTS[i], s1 = CUTS[i + 1] == null ? s0 + 3 : CUTS[i + 1], pa = i === 0 ? 1 : k3(rt, s0, s0 + .45); if(pa <= .01) continue;
+    var s0 = cuts[i], s1 = cuts[i + 1] == null ? s0 + 3 : cuts[i + 1], pa = i === 0 ? 1 : k3(rt, s0, s0 + .45); if(pa <= .01) continue;
     v3Photo(c, ph[i], x, y, w, h, {scale:lerp(1.05, 1.15, k3(rt, s0, s1 + .5)), pos:V3_POS[ph[i]], alpha:ioC(pa)});
   }
   v3Grad(c, x, y + h*.5, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.5)"]]);
   v3Grad(c, x, y, w, h*.22, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
-  var ti = rt >= SWT[1] ? 2 : rt >= SWT[0] ? 1 : 0, tp = ti ? ioC(k3(rt - SWT[ti - 1], 0, .7)) : 1;
+  var ti = rt >= swt[1] ? 2 : rt >= swt[0] ? 1 : 0, tp = ti ? ioC(k3(rt - swt[ti - 1], 0, .7)) : 1;
   if(ti > 0 && tp < 1) A8.tplDraw(c, ti - 1, x, y, w, h, f, a*ia*(1 - tp), D, 1, 1, tp*3*f, yk);
   A8.tplDraw(c, ti, x, y, w, h, f, a*ia*(ti ? tp : 1), D, ti ? 1 : f1, ti ? 1 : f2, (1 - tp)*-4*f + (ti ? 0 : (1 - ia)*3*f), yk);
   c.restore();
@@ -204,6 +205,106 @@ function sched1(H){
   for(i = 0; i < 4; i++) H.soft("tick2", 9.0 + i*.14 + .95, .05);
 }
 
+
+/* ---------- annons 2: så fungerar Reel Studio (förklaringsvideo, utan röst) ---------- */
+var EX = {RT0:3.7, CUTS:[0, 1.7, 3.4, 5.1, 6.8, 8.5], SWT:[5.3, 7.3], T2:3.6, T3:7.4, T4:11.2, T5:14.8, DUR:19.0, LOGO:15.2};
+var RPH6 = [GRID7[0], GRID7[1], GRID7[4], GRID7[2], GRID7[3], GRID7[5]];
+function adExplain(c, G, t){
+  var H = G.H, S = SG(G), i, oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+  var addr = v3t("a8.re.addr"), city = v3t("a8.re.city"), F = v3t("a8.re.facts").split(" · "), cstr = (city + "  ·  " + F[0] + "  ·  " + F[1]).toUpperCase();
+  bgLight(c, G, t, k3(t, EX.LOGO - .3, EX.LOGO + .6));
+  var hs = 6.6, hy = Y0 + 7;
+  kline(c, [["Välj", 0], ["dina", 0], ["bilder.", 1]], hy, hs, t, .15, EX.T2 - .15);
+  kline(c, [["Mallen", 0], ["fyller", 0], ["i", 0], ["sig", 1], ["själv.", 1]], hy, hs, t, EX.T2 + .25, EX.T3 - .15);
+  kline(c, [["Gör", 0], ["den", 0], ["till", 0], ["din.", 1]], hy, hs, t, EX.T3 + .25, EX.T4 - .15);
+  kline(c, [["Varje", 0], ["element", 0], ["rör", 0], ["sig.", 1]], hy, hs, t, EX.T4 + .25, EX.T5 - .15);
+  /* 1 · välj bilder: sex bilder, tre väljs, Skapa Reel */
+  var ga = Math.min(1, rev(t, .1, .4))*(1 - k3(t, EX.T2 - .25, EX.T2 + .15)), enter = oQ(k3(t, 0, .8));
+  if(ga > .02){
+    var cw = 80, cx = 10, ch = 56, cy = Y0 + 16 + (1 - enter)*12 - k3(t, EX.T2 - .25, EX.T2 + .15)*3;
+    fcard(c, cx, cy, cw, ch, ga, 3.2, "#fff", 0);
+    var x0 = cx + 6, tw = (cw - 12 - 2*2.4)/3, th = tw*.7, n = 0, SEL = [[0, 1.0], [1, 1.35], [5, 1.7]];
+    SEL.forEach(function(q){ if(t >= q[1]) n++ });
+    sTx(c, "VÄLJ BILDER", x0, cy + 6.4, ga*rev(t, .3, .4), {size:2.4, weight:700, sp:.2});
+    sTx(c, n + " / 6 VALDA", cx + cw - 6, cy + 6.4, ga*rev(t, .3, .4), {size:2.4, weight:600, color:MUT, align:"r", sp:.16});
+    for(i = 0; i < 6; i++){
+      var gx = x0 + (i % 3)*(tw + 2.4), gy = cy + 10 + Math.floor(i/3)*(th + 2.4), a2 = rev(t, .25 + i*.08, .3)*ga;
+      sCard(c, gx - .4, gy - .4, tw + .8, th + .8, a2, 1.4, "#fff", 2); sPh(c, GRID7[i], gx, gy, tw, th, a2, 1.2, 1.14);
+      SEL.forEach(function(q, qi){
+        if(q[0] !== i || t < q[1]) return; var sp = oBack(k3(t, q[1], q[1] + .3));
+        c.save(); c.globalAlpha = ga; c.strokeStyle = GRN; c.lineWidth = .6; rr(c, gx - .9, gy - .9, tw + 1.8, th + 1.8, 1.6); c.stroke(); c.fillStyle = GRN; c.beginPath(); c.arc(gx + 3.4, gy + 3.4, 2.4*Math.max(.01, sp), 0, 7); c.fill(); c.restore();
+        if(sp > .6) sTx(c, String(qi + 1), gx + 3.4, gy + 4.4, ga, {size:2.6, weight:700, color:"#fff", align:"c"});
+      });
+    }
+    var bw = 52, by = cy + ch - 14, bp = k3(t, 3.0, 3.22), ba = rev(t, 2.3, .4)*ga;
+    if(ba > .02){ c.save(); c.translate(50, by + 4); var bs = 1 - .05*Math.sin(bp*Math.PI); c.scale(bs, bs); c.translate(-50, -by - 4); fcard(c, 50 - bw/2, by, bw, 8, ba, 4, GRN, 0); sTx(c, "SKAPA REEL  ›", 50, by + 5.2, ba, {size:2.9, weight:700, color:"#fff", align:"c", sp:.14}); c.restore();
+      var cx1 = lerp(80, 54, ioC(k3(t, 2.45, 3.0))), cy1 = lerp(by + 22, by + 5.5, ioC(k3(t, 2.45, 3.0)));
+      cursor(c, cx1, cy1, ba*(1 - k3(t, 3.25, 3.5)), bp*(1 - k3(t, 3.25, 3.45)));
+    }
+  }
+  /* 2–4 · mobilen, med ett datakort som kopplas in i scen 2 */
+  var pin = oQ(k3(t, EX.T2 - .1, EX.T2 + .8)), pout = ioC(k3(t, EX.T5 - .5, EX.T5 + .1)), pa = rev(t, EX.T2 - .1, .4)*(1 - pout);
+  var up = ioC(k3(t, EX.T3 - .1, EX.T3 + .55)), top2 = Y0 + 34, top3 = Y0 + 14, shrink = ioC(k3(t, EX.T4 - .1, EX.T4 + .55));
+  var phh = (G.is9 ? 92 : 78)*lerp(1, .62, shrink), pww = phh/2.05, pxx = 50 - pww/2, pcy = lerp(top2, top3, up);
+  var yk = lerp(.62, .7, up);
+  if(pa > .02){
+    var py = pcy + (1 - pin)*20 + pout*8, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.06), rt = Math.max(0, t - EX.RT0);
+    var f1 = ioC(k3(t, 5.2, 5.55)), f2 = ioC(k3(t, 5.45, 5.9));
+    reelL(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, f1, f2, RPH6, yk, EX.CUTS, EX.SWT);
+    A8.reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5)*(1 - shrink));
+    /* scen 2: datakortet och kopplingarna */
+    var dk = k3(t, EX.T2 + .2, EX.T2 + .7)*(1 - k3(t, EX.T3 - .5, EX.T3 - .1));
+    if(dk > .02){
+      var dy = Y0 + 14;
+      fcard(c, 10, dy, 80, 17.5, dk, 3.2, "#fff", 0);
+      sCard(c, 10 + 80 - 5 - 24, dy + 3.6, 24, 5.2, dk, 2.6, "#E3F0E4", 0); dotc(c, 10 + 80 - 5 - 24 + 3, dy + 6.2, .8, GRN, dk); sTx(c, "LEVERERAD", 10 + 80 - 5 - 24 + 5, dy + 7.5, dk, {size:1.9, weight:600, color:GRN, sp:.2});
+      v3Text(c, addr, 15.6, dy + 9.2, {size:5.8, color:INK, alpha:dk});
+      sTx(c, cstr, 15.6, dy + 14.2, dk, {size:2.0, weight:600, color:MUT, sp:.14});
+      var lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, ff = sc.w/100*1.5, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
+      var SRC = [[xs + v3Measure(c, addr, {size:5.8})/2, ay - 2.2], [xs + v3Measure(c, city.toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[0].toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  " + F[0].toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[1].toUpperCase(), lb2)/2, cl - .6]];
+      var TXT = [addr, city, F[0], F[1]], TGT = [[g0.ax + 12*ff, g0.ay - 3.2*ff], [g0.px + 5.5*ff, g0.dy - 1.2*ff], [g0.px + .5*inn + 4*ff, g0.dy - 1.2*ff], [g0.px + .78*inn + 4*ff, g0.dy - 1.2*ff]];
+      for(i = 0; i < 4; i++) link(c, TXT[i], SRC[i][0], SRC[i][1], TGT[i][0], TGT[i][1], t, 4.5 + i*.14, .95, (i - 1.5)*5);
+    }
+    /* scen 3: verktygen svävar runt mobilen */
+    var pills = [["Text", 9, 0], ["Element", 91, 1], ["Varumärke", 9, 2], ["Rörelse", 91, 3]], pm = (1 - k3(t, EX.T4 - .4, EX.T4 - .05));
+    pills.forEach(function(q, k){
+      var t0 = EX.T3 + .5 + k*.35, pp = ioC(k3(t, t0, t0 + .45))*pm, al = pp; if(al <= .02) return;
+      var px2 = q[1] < 50 ? 8 : 92, ww = v3Measure(c, q[0], {size:2.8, weight:700, f:"sans"}) + 8, py2 = pcy + phh*(.22 + k*.17) + Math.sin(t*1.4 + k)*.6, tx = q[1] < 50 ? px2 : px2 - ww, ex = q[1] < 50 ? sc.x - .5 : sc.x + sc.w + .5;
+      c.save(); c.globalAlpha = al*.7; c.strokeStyle = GRN; c.lineWidth = .3; c.setLineDash([.7, 1.3]); c.beginPath(); c.moveTo(q[1] < 50 ? tx + ww : tx, py2 + 2.8); c.lineTo(ex, py2 + 2.8); c.stroke(); c.setLineDash([]); dotc(c, ex, py2 + 2.8, .9, GRN, 1); c.restore();
+      fcard(c, tx + (1 - pp)*(q[1] < 50 ? -6 : 6), py2, ww, 5.6, al, 2.8, "#fff", 0); sTx(c, q[0], tx + (1 - pp)*(q[1] < 50 ? -6 : 6) + ww/2, py2 + 3.8, al, {size:2.8, weight:700, color:INK, align:"c"});
+    });
+    /* scen 4: tidslinje med spår */
+    var tl = k3(t, EX.T4 + .35, EX.T4 + .95)*(1 - k3(t, EX.T5 - .5, EX.T5 - .1));
+    if(tl > .02){
+      var ty = pcy + phh + 4, tx0 = 10, tw2 = 80, rows = [["Platta", 0, .75], ["Text", .12, .85], ["Uppgifter", .24, .95]];
+      fcard(c, tx0, ty, tw2, 25, tl, 3, "#fff", 0);
+      rows.forEach(function(r, k){
+        var ry = ty + 4.6 + k*6.4, bx = tx0 + 24, bwf = (tw2 - 30), p0 = ioC(k3(t, EX.T4 + .6 + k*.3, EX.T4 + 1.3 + k*.3));
+        sTx(c, r[0].toUpperCase(), tx0 + 6, ry + 3.2, tl, {size:2.0, weight:700, color:MUT, sp:.2});
+        c.save(); c.globalAlpha = tl; c.fillStyle = "rgba(28,26,25,.07)"; rr(c, bx, ry, bwf, 4.2, 2.1); c.fill(); c.fillStyle = GRN; rr(c, bx + bwf*r[1], ry, bwf*(r[2] - r[1])*p0, 4.2, 2.1); c.fill(); c.restore();
+      });
+      var ph2 = k3(t, EX.T4 + 1.8, EX.T5 - .6), phx = tx0 + 24 + (tw2 - 30)*ph2;
+      c.save(); c.globalAlpha = tl*rev(t, EX.T4 + 1.6, .3); c.fillStyle = INK; c.fillRect(phx - .12, ty + 3, .24, 19.6); c.restore();
+    }
+  }
+  /* slut */
+  var ea = k3(t, EX.LOGO - .1, EX.LOGO + .5);
+  if(ea > .01){
+    var cy2 = H*.4, mh = 15, mw = mh*858.6/756.3, fs = 7.2, ww2 = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 3.4 + ww2, lx = 50 - tot/2, lp = k3(t, EX.LOGO, EX.LOGO + .8);
+    v3Mark(c, lx, cy2 - mh/2, mh, INK, C3.oli, {reveal:lp, dot:1, alpha:ea});
+    v3Text(c, "VIEWLY", lx + mw + 3.4, cy2 + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:INK, alpha:ea*k3(t, EX.LOGO + .15, EX.LOGO + .7)});
+    kline(c, [["Reel", 1], ["Studio.", 1]], cy2 + 21, 6.2, t, EX.LOGO + .55, 99);
+    kline(c, [["Reels", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]], cy2 + 30, 3.9, t, EX.LOGO + 1.0, 99);
+  }
+}
+function sched2(H){
+  [1.0, 1.35, 1.7].forEach(function(q){ H.soft("tick2", q, .12) });
+  H.soft("down", 3.0, .22); H.soft("up", 3.085, .16);
+  EX.CUTS.forEach(function(q, k){ H.soft("shutter", EX.RT0 + q + (k ? 0 : .05), .22) });
+  for(var i = 0; i < 4; i++){ H.soft("tick2", 4.5 + i*.14 + .95, .05); H.soft("tick2", EX.T3 + .5 + i*.35 + .2, .08) }
+  [0, 1, 2].forEach(function(k){ H.soft("tick2", EX.T4 + .6 + k*.3 + .3, .07) });
+}
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return Promise.all([v3SfxLoad(), K.loadVo(VO.map(function(v){ return v[0] }), "")]) }
@@ -214,6 +315,13 @@ function reg10(id, n, d, fn, sched, thumb){
   V3_COMPS[id] = comp; V3_ADS10.push(id);
 }
 reg10("a10_reel", "1 · Reel Studio", "Leveransen finns redan. Skapa Reel, mallen fyller i sig själv, Reelen i ert eget varumärke.", adReel1, sched1, 9.8);
+
+(function(){
+  var comp = {n:"2 · Så fungerar Reel Studio", d:"Förklaringsvideo utan röst: välj bilder, mallen fyller i sig själv, gör den till din, rörelse per element.", group:"ads10", id:"a10_how", v:{id:"a10_how"}, dur:EX.DUR, thumb:8.2, L:EX.LOGO - .53, logo:true};
+  comp.draw = function(c, G, t){ adExplain(c, G, t) };
+  comp.mix = K.makeMix(sched2); comp.loadAudio = function(){ return v3SfxLoad() };
+  V3_COMPS.a10_how = comp; V3_ADS10.push("a10_how");
+})();
 
 var SCRIPT = [
   ["Bilderna är redan levererade.", "Rubrik: Bilderna är redan levererade. Kortet visar leveransen med fyra bilder."],

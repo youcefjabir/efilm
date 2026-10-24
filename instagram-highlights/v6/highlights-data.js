@@ -396,5 +396,24 @@ var HL = [
     s:"Tre led som brukar ligga hos tre leverantörer. Här är de ett."},
 
    {p:"cta", h:"Ett objekt.", s:"Hela marknadsföringen.", k:"18 — Ekosystemet"}
-  ]},
+  ]}
+ ,
+
+ /* 19 — REEL STUDIO. Verktyget som skapar Reels ur leveransen. Skärmbilderna
+    är tagna ur en skärminspelning av studion (2026-10-24). Inga löften om tid
+    eller antal: att det går fort framgår av att bilderna och uppgifterna
+    redan finns. */
+ {glyph:"reel", id:"reelstudio", num:"19", name:"REEL STUDIO", label:"Reel Studio", cover:"dining",
+  q:"Kan jag göra Reels av leveransen?",
+  why:"Nytt kapitel. Förklarar vad Reel Studio är och hur den fungerar, med skärmbilder ur själva verktyget.",
+  st:[
+   {p:"mark", m:"dining", k:"REEL STUDIO", h:"Reels direkt från leveransen.", s:"Som Content Studio, fast i rörelse."},
+   {p:"quiet", h:"Bilderna finns redan.", em:"Uppgifterna också.", s:"Mallen fylls i åt dig.", k:"19 — Reel Studio"},
+   {p:"product", m:"rsUiEditor", k:"Så ser den ut", h:"Mall, bilder och rörelse på ett ställe.", s:"Välj bilderna ur leveransen, så får Reelen kontorets mall."},
+   {p:"system", k:"Mallen", h:"Fylls i av sig själv.", items:["Adress","Ort","Rum och yta","Mäklare"], s:"Uppgifterna hämtas från leveransen. Inget att skriva."},
+   {p:"product", m:"rsUiText", k:"Text", h:"Gör den till din.", s:"Skriv direkt i bilden. Typsnitt, storlek, färg och kopplade fält."},
+   {p:"product", m:"rsUiElement", k:"Varumärket", h:"Kontorets färger.", s:"Former, linjer och ramar i varumärkets färger, med ett klick."},
+   {p:"product", m:"rsUiRorelse", k:"Rörelse", h:"Varje element rör sig.", s:"Tona in och ut. Välj start, slut och hur mjukt det går."},
+   {p:"cta", h:"Din Reel.", s:"I ditt varumärke.", k:"19 — Reel Studio"}
+  ]}
 ];
