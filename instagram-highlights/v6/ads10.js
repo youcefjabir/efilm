@@ -192,8 +192,8 @@ function adReel1(c, G, t){
   }
 }
 
-/* inga kameraljud och inga klickljud: bara rösten och loggans korta ton */
-function sched1(H){}
+/* inga kameraljud och inga tick per element: bara knappklicket, rösten och loggans korta ton */
+function sched1(H){ H.click(TAP, .4) }
 
 
 /* ---------- annons 2: så fungerar Reel Studio (förklaringsvideo, utan röst) ---------- */
@@ -287,7 +287,7 @@ function adExplain(c, G, t){
     kline(c, [["Reels", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]], cy2 + 30.5, 3.3, t, EX.LOGO + 1.0, 99);
   }
 }
-function sched2(H){}
+function sched2(H){ H.click(3.0, .4) }
 
 
 /* ---------- annons 3: så fungerar Content Studio (förklaringsvideo, utan röst och utan ljud) ---------- */
@@ -380,7 +380,7 @@ function adContent(c, G, t){
     kline(c, [["Inlägg", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]], cy2 + 30.5, 3.3, t, CX.LOGO + 1.0, 99);
   }
 }
-function sched3(H){}
+function sched3(H){ H.click(1.35, .35); H.click(CX.T2 + 1.75, .35) }
 
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
