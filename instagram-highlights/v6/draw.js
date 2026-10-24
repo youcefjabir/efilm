@@ -507,7 +507,7 @@ B.studio = function(s,i,n){
   return B.shell(
     B.kick(s.k)
    +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+9)+'cqw"><div class="b-d" style="'+dsize(s.h,8.4,SERIF)+'">'+esc(s.h)+'</div></div>'
-   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+27)+'cqw">'+stDesign(s.sc, P, s, 'b-d')+'</div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+31)+'cqw">'+stDesign(s.sc, P, s, 'b-d')+'</div>'
    +(s.s?'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+7)+'cqw"><div class="b-b" style="font-size:2.6cqw">'+esc(s.s)+'</div></div>':'')
    + B.foot(i,n));
 };
