@@ -584,7 +584,7 @@ window.secAds7 = function(){
 function loadVo(names, dir){
   var AC = window.AudioContext || window.webkitAudioContext, ctx = window.__a7ac || (window.__a7ac = new AC());
   return Promise.all(names.map(function(n){
-    return fetch(dir + n + ".mp3").then(function(r){ return r.arrayBuffer() }).then(function(ab){ return new Promise(function(res, rej){ var q = ctx.decodeAudioData(ab, res, rej); if(q && q.then) q.then(res, rej) }) }).then(function(b){ VOB[n] = b }).catch(function(){});
+    return fetch(window.VMEDIA && VMEDIA["vo_" + n] ? VMEDIA["vo_" + n] : dir + n + ".mp3").then(function(r){ return r.arrayBuffer() }).then(function(ab){ return new Promise(function(res, rej){ var q = ctx.decodeAudioData(ab, res, rej); if(q && q.then) q.then(res, rej) }) }).then(function(b){ VOB[n] = b }).catch(function(){});
   }));
 }
 window.A7K = {A7:A7, ph:ph, PH:PH, endSeq:endSeq, makeMix:makeMix, loadVo:loadVo, box:box, hsz:hsz, rr:rr, MX:MX, GAP:GAP, END_L:END_L,

@@ -783,16 +783,16 @@ function tplMark(c, m, x, y, r, col, bg){
   else { rr(c, x - r, y - r, r*2, r*2, r*.28); c.stroke(); c.restore(); v3Text(c, "L", x, y + r*.42, {size:r*1.5, color:col, align:"c"}); return }
   c.restore();
 }
-function tplGeo(i, x, y, w, h, f){
-  var g = {};
-  if(i === 0){ g.cx = x - 4*f; g.cy = y + h*.55; g.cw = w*.80 + 4*f; g.ch = 36*f; g.px = x + 4.4*f; g.ax = g.px; g.ay = g.cy + 25*f; g.as = 7.8; g.al = "l"; g.dy = g.cy + 32.6*f; g.inner = g.cw - 12.8*f }
-  else if(i === 1){ g.mx = x + w*.43; g.cw = w*.72; g.cx = g.mx - g.cw/2; g.cy = y + h*.5; g.ch = 41*f; g.ax = g.mx; g.ay = g.cy + 30.4*f; g.as = 6.8; g.al = "c"; g.dy = g.cy + 36.4*f }
-  else { g.px = x + 6*f; g.sy = y + h*.58; g.ax = g.px + 3.4*f; g.ay = g.sy + 11.8*f; g.as = 5.4; g.al = "l"; g.dy = g.sy + 21*f }
+function tplGeo(i, x, y, w, h, f, yk){
+  var g = {}; yk = yk || 1;
+  if(i === 0){ g.cx = x - 4*f; g.cy = y + h*.55*yk; g.cw = w*.80 + 4*f; g.ch = 36*f; g.px = x + 4.4*f; g.ax = g.px; g.ay = g.cy + 25*f; g.as = 7.8; g.al = "l"; g.dy = g.cy + 32.6*f; g.inner = g.cw - 12.8*f }
+  else if(i === 1){ g.mx = x + w*.43; g.cw = w*.72; g.cx = g.mx - g.cw/2; g.cy = y + h*.5*yk; g.ch = 41*f; g.ax = g.mx; g.ay = g.cy + 30.4*f; g.as = 6.8; g.al = "c"; g.dy = g.cy + 36.4*f }
+  else { g.px = x + 6*f; g.sy = y + h*.58*yk; g.ax = g.px + 3.4*f; g.ay = g.sy + 11.8*f; g.as = 5.4; g.al = "l"; g.dy = g.sy + 21*f }
   return g;
 }
-function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo){
+function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo, yk){
   if(a <= .02) return;
-  var T8 = TPL8[i], g = tplGeo(i, x, y, w, h, f), cols = [D.city.toUpperCase(), D.facts[0].toUpperCase(), D.facts[1].toUpperCase()];
+  var T8 = TPL8[i], g = tplGeo(i, x, y, w, h, f, yk), cols = [D.city.toUpperCase(), D.facts[0].toUpperCase(), D.facts[1].toUpperCase()];
   var bar = function(x0, y0, w0, h0, k){ c.save(); c.globalAlpha = a*k*.22; c.fillStyle = T8.fg; rr(c, x0, y0, w0, h0, h0*.3); c.fill(); c.restore() };
   c.save(); c.globalAlpha = a; c.translate(0, dyo || 0);
   if(i === 0){
@@ -820,7 +820,7 @@ function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo){
     if(f2 < 1) bar(g.mx - 28*f, g.dy - 2.4*f, 56*f, 3*f, 1 - f2);
     v3Text(c, cols.join("  ·  "), g.mx, g.dy, {size:1.8*f, weight:600, f:"sans", sp:.1, color:T8.fg, align:"c", alpha:f2*.9});
   } else {
-    v3Grad(c, x, y + h*.38, w, h*.62 + 1, [[0, "rgba(8,7,7,0)"], [.8, "rgba(8,7,7,.62)"], [1, "rgba(8,7,7,.66)"]]);
+    v3Grad(c, x, y + h*.38*(yk || 1), w, h - h*.38*(yk || 1) + 1, [[0, "rgba(8,7,7,0)"], [.8, "rgba(8,7,7,.62)"], [1, "rgba(8,7,7,.66)"]]);
     tplMark(c, 2, g.px + 2.2*f, g.sy - 21.6*f, 2.2*f, T8.fg, T8.bg);
     v3Text(c, T8.brand, g.px + 6.2*f, g.sy - 20.8*f, {size:1.85*f, weight:600, f:"sans", sp:.36, color:T8.fg, alpha:.9});
     v3Text(c, "Såld", g.px, g.sy, {size:17*f, italic:true, color:T8.fg});
@@ -1015,5 +1015,5 @@ window.secAds8 = function(){
     + '<div><b>Mallarna i annons 2 och 3</b><p>Orange, grön och editorial är egna nyanser och egna layouter som kan påminna om olika kontor. Inga namn, märken eller kedjornas egna mallar. Använd bara kontorets egna material med kontorets tillåtelse.</p></div>'
     + '<div><b>Bilder och ljud</b><p>Bara era egna bilder (sida 15 och sängen från Såld). Riktiga ljud, CC0. Ingen musik. De små bilderna för skymningsbild, planritning, solbana och karta är ritade illustrationer, inga riktiga leveranser.</p></div></div></details></div>';
 };
-window.A8K = {twoPart:twoPart, twoPartFast:twoPartFast, adInlagg:adInlagg, O8:O8, WEND8:WEND8, L8:L8, SYS:SYS, sTx:sTx, sCard:sCard, sPh:sPh, sBtn:sBtn, chk:chk, tplB:tplB, DO:DO, KB:KB, LABS:LABS, P:P, rev:rev, fz:fz, clamp:clamp, flyChip:flyChip, GRID7:GRID7, BR_G:BR_G, SG:SG};
+window.A8K = {twoPart:twoPart, twoPartFast:twoPartFast, adInlagg:adInlagg, O8:O8, WEND8:WEND8, L8:L8, SYS:SYS, sTx:sTx, sCard:sCard, sPh:sPh, sBtn:sBtn, chk:chk, tplB:tplB, DO:DO, KB:KB, LABS:LABS, P:P, rev:rev, fz:fz, clamp:clamp, flyChip:flyChip, GRID7:GRID7, BR_G:BR_G, SG:SG, tplDraw:tplDraw, tplGeo:tplGeo, phoneBody:phoneBody, reelUI:reelUI, RSEG:RSEG, TPL8:TPL8, rr:rr};
 })();
