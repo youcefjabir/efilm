@@ -206,7 +206,7 @@ function sched1(H){
 
 /* ---------- annons 2: så fungerar Reel Studio (förklaringsvideo, utan röst) ---------- */
 var EX = {RT0:3.7, CUTS:[0, 1.7, 3.4, 5.1, 6.8, 8.5], SWT:[5.3, 7.3], T2:3.6, T3:7.4, T4:11.2, T5:14.8, DUR:19.0, LOGO:15.2};
-var RPH6 = [GRID7[0], GRID7[1], GRID7[4], GRID7[2], GRID7[3], GRID7[5]];
+var RPH6 = ["rs_dining", "rs_chair", "rs_kitchen", "bedroom", "rs_floor", "rs_dining"];
 function adExplain(c, G, t){
   var H = G.H, S = SG(G), i, oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
   var addr = v3t("a8.re.addr"), city = v3t("a8.re.city"), F = v3t("a8.re.facts").split(" · "), cstr = (city + "  ·  " + F[0] + "  ·  " + F[1]).toUpperCase();
@@ -248,7 +248,7 @@ function adExplain(c, G, t){
   if(pa > .02){
     var py = pcy + (1 - pin)*20 + pout*8, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.06), rt = Math.max(0, t - EX.RT0);
     var f1 = ioC(k3(t, 5.2, 5.55)), f2 = ioC(k3(t, 5.45, 5.9));
-    reelL(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, f1, f2, RPH6, yk, EX.CUTS, EX.SWT);
+    reelF(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, f1, f2, f2, RPH6, EX.CUTS, EX.SWT);
     A8.reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5)*(1 - shrink));
     /* scen 2: datakortet och kopplingarna */
     var dk = k3(t, EX.T2 + .2, EX.T2 + .7)*(1 - k3(t, EX.T3 - .5, EX.T3 - .1));
@@ -258,7 +258,7 @@ function adExplain(c, G, t){
       sCard(c, 10 + 80 - 5 - 24, dy + 3.6, 24, 5.2, dk, 2.6, "#E3F0E4", 0); dotc(c, 10 + 80 - 5 - 24 + 3, dy + 6.2, .8, "#2f6a3a", dk); sTx(c, "LEVERERAD", 10 + 80 - 5 - 24 + 5, dy + 7.5, dk, {size:1.9, weight:600, color:"#2f6a3a", sp:.2});
       v3Text(c, addr, 15.6, dy + 9.2, {size:5.8, color:INK, alpha:dk});
       sTx(c, cstr, 15.6, dy + 14.2, dk, {size:2.0, weight:600, color:MUT, sp:.14});
-      var lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, ff = sc.w/100*1.7, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
+      var lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, ff = sc.w/100*1.7, g0 = postGeo(c, 0, sc.x, sc.y, sc.w, sc.h), inn = 0, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
       var SRC = [[xs + v3Measure(c, addr, {size:5.8})/2, ay - 2.2], [xs + v3Measure(c, city.toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[0].toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  " + F[0].toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[1].toUpperCase(), lb2)/2, cl - .6]];
       var TXT = [addr, city, F[0], F[1]], TGT = g0.tgt;
       for(i = 0; i < 4; i++) link(c, TXT[i], SRC[i][0], SRC[i][1], TGT[i][0], TGT[i][1], t, 4.5 + i*.14, .95, (i - 1.5)*5);
@@ -318,44 +318,52 @@ function postGeo(c, k, x, y, w, h){
   } else g.tgt = [T(Wl/2, cy - 4.5), T(Wl/2, cy + 7), T(Wl/2 - 13, cy + 21), T(Wl/2 + 13, cy + 21)];
   return g;
 }
-function drawPost(c, k, x, y, w, h, key, a, f1, f2){
+var SHIM = 0;
+/* mallens text och ram, utan fotot. a = genomskinlighet (även för texten), f1 adress, f2 ort, f3 rum och yta (0 = tom plats, 1 = ifylld) */
+function postOverlay(c, k, x, y, w, h, a, f1, f2, f3){
   if(a <= .02) return;
   var K = PKIND[k], g = postGeo(c, k, x, y, w, h), s = g.s, Wl = g.Wl, Hl = g.Hl, cy = g.cy, W = "#fff", mx = Wl/2, F = v3t("a8.re.facts").split(" · "), addr = v3t("a8.re.addr"), city = v3t("a8.re.city");
-  f1 = f1 == null ? 1 : f1; f2 = f2 == null ? 1 : f2;
-  c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.5)"; c.shadowBlur = 14; c.shadowOffsetY = 3; c.fillStyle = "#000"; rr(c, x, y, w, h, 1.5); c.fill(); c.shadowColor = "transparent";
-  rr(c, x, y, w, h, 1.5); c.clip(); c.translate(x, y); c.scale(s, s);
-  v3Photo(c, key, 0, 0, Wl, Hl, {pos:V3_POS[key]});
-  v3Fill(c, 0, 0, Wl, Hl, "#080707", .3);
-  v3Grad(c, 0, 0, Wl, Hl, [[0, "rgba(8,7,7,.34)"], [.45, "rgba(8,7,7,.06)"], [1, "rgba(8,7,7,.66)"]]);
+  f1 = f1 == null ? 1 : f1; f2 = f2 == null ? 1 : f2; f3 = f3 == null ? f2 : f3;
+  c.save(); c.translate(x, y); c.scale(s, s);
+  v3Fill(c, 0, 0, Wl, Hl, "#080707", .4*a);
+  v3Grad(c, 0, 0, Wl, Hl, [[0, "rgba(8,7,7," + (.34*a).toFixed(3) + ")"], [.45, "rgba(8,7,7," + (.06*a).toFixed(3) + ")"], [1, "rgba(8,7,7," + (.7*a).toFixed(3) + ")"]]);
   c.save(); c.globalAlpha = a*.42; c.strokeStyle = W; c.lineWidth = .35; c.strokeRect(5, 5, Wl - 10, Hl - 10); c.restore();
-  /* kontorets märke, centrerat överst */
   var bl = {size:2.5, weight:600, f:"sans", sp:.3}, bw = v3Measure(c, K.brand, bl), tot = 6.2 + bw, lx = mx - tot/2;
-  tplMark(c, K.mark, lx + 2.4, 17, 2.4, K.acc, "#101010");
-  v3Text(c, K.brand, lx + 7, 17.9, {size:2.5, weight:600, f:"sans", sp:.3, color:W, alpha:.95});
-  v3Text(c, "MÄKLARHUS", lx + 7, 22, {size:1.5, weight:500, f:"sans", sp:.34, color:W, alpha:.6});
-  var cap = function(t, yy, sz, al, f){ v3Text(c, t, mx, yy, {size:sz, weight:600, f:"sans", sp:.32, color:W, align:"c", alpha:al}) };
-  var bar = function(w0, yy, h0, f){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.24; c.fillStyle = W; rr(c, mx - w0/2, yy, w0, h0, h0*.28); c.fill(); c.restore() };
+  c.save(); c.globalAlpha = a; tplMark(c, K.mark, lx + 2.4, 17, 2.4, K.acc, "#101010"); c.restore();
+  v3Text(c, K.brand, lx + 7, 17.9, {size:2.5, weight:600, f:"sans", sp:.3, color:W, alpha:.95*a});
+  v3Text(c, "MÄKLARHUS", lx + 7, 22, {size:1.5, weight:500, f:"sans", sp:.34, color:W, alpha:.6*a});
+  var cap = function(t, yy, sz, al, p){ v3Text(c, t, mx, yy, {size:sz, weight:600, f:"sans", sp:.32, color:W, align:"c", alpha:al*a, p:p}) };
+  var shim = function(){ return .72 + .28*Math.sin(SHIM*4.2) };
+  var bar = function(w0, yy, h0, f){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.2*shim(); c.fillStyle = W; rr(c, mx - w0/2, yy, w0, h0, h0*.5); c.fill(); c.restore() };
   var hl = function(yy, w0){ c.save(); c.globalAlpha = a*.55; c.fillStyle = W; c.fillRect(mx - w0/2, yy, w0, .3); c.restore() };
   if(k === 2){
-    v3Text(c, "Såld", mx, cy + 4, {size:34, italic:true, color:W, align:"c"});
+    v3Text(c, "Såld", mx, cy + 4, {size:34, italic:true, color:W, align:"c", alpha:a});
     hl(cy + 10.5, 10);
-    bar(60, cy + 11.8, 5.2, f1); cap(addr.toUpperCase() + "  ·  " + city.toUpperCase(), cy + 15.8, 2.6, .92*f1);
-    bar(40, cy + 19.4, 4.4, f2); cap(F[0].toUpperCase() + "  ·  " + F[1].toUpperCase(), cy + 22.9, 2.4, .78*f2);
-    v3Text(c, "Tack för förtroendet", mx, cy + 33, {size:4.4, italic:true, color:W, align:"c", alpha:.82});
+    bar(60, cy + 11.8, 5.2, f2); cap(addr.toUpperCase() + "  ·  " + city.toUpperCase(), cy + 15.8, 2.6, .92, f2);
+    bar(40, cy + 19.4, 4.4, f3); cap(F[0].toUpperCase() + "  ·  " + F[1].toUpperCase(), cy + 22.9, 2.4, .78, f3);
+    v3Text(c, "Tack för förtroendet", mx, cy + 33, {size:4.4, italic:true, color:W, align:"c", alpha:.82*a});
   } else {
     cap(k === 0 ? "KOMMANDE" : "TILL SALU", cy - 13.5, 2.3, .88);
-    bar(60, cy - 12, 12, f1); v3Text(c, addr, mx, cy, {size:13.5, color:W, align:"c", alpha:f1});
+    bar(60, cy - 12, 12, f1); v3Text(c, addr, mx, cy, {size:13.5, color:W, align:"c", alpha:a, p:f1});
     if(k === 0){
-      hl(cy + 6.6, 10); v3Text(c, "Släpps vecka 12", mx, cy + 15, {size:4.4, italic:true, color:W, align:"c", alpha:.8*f2});
+      hl(cy + 6.6, 10); bar(30, cy + 10.4, 4.6, f2); v3Text(c, "Släpps vecka 12", mx, cy + 15, {size:4.4, italic:true, color:W, align:"c", alpha:.8*a, p:f2});
     } else {
-      bar(34, cy + 3.8, 4.6, f2); cap(city.toUpperCase(), cy + 8, 2.6, .9*f2); hl(cy + 12.6, 10);
+      bar(34, cy + 3.8, 4.6, f2); cap(city.toUpperCase(), cy + 8, 2.6, .9, f2); hl(cy + 12.6, 10);
+      if(f3 < 1){ bar(18, cy + 16, 8, f3) }
       [[F[0].split(" ")[0], "RUM", -13], [F[1].split(" ")[0], "M²", 13]].forEach(function(r){
-        v3Text(c, r[0], mx + r[2], cy + 23, {size:6.8, color:W, align:"c", alpha:f2});
-        v3Text(c, r[1], mx + r[2], cy + 28, {size:1.9, weight:600, f:"sans", sp:.3, color:W, align:"c", alpha:.64*f2});
+        v3Text(c, r[0], mx + r[2], cy + 23, {size:6.8, color:W, align:"c", alpha:a, p:f3});
+        v3Text(c, r[1], mx + r[2], cy + 28, {size:1.9, weight:600, f:"sans", sp:.3, color:W, align:"c", alpha:.64*a*f3});
       });
     }
   }
   c.restore();
+}
+function drawPost(c, k, x, y, w, h, key, a, f1, f2, f3){
+  if(a <= .02) return;
+  c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.5)"; c.shadowBlur = 14; c.shadowOffsetY = 3; c.fillStyle = "#000"; rr(c, x, y, w, h, 1.5); c.fill(); c.shadowColor = "transparent";
+  rr(c, x, y, w, h, 1.5); c.clip(); v3Photo(c, key, x, y, w, h, {pos:V3_POS[key]});
+  c.restore();
+  c.save(); rr(c, x, y, w, h, 1.5); c.clip(); postOverlay(c, k, x, y, w, h, a, f1, f2, f3); c.restore();
 }
 function adContent(c, G, t){
   var H = G.H, S = SG(G), i, oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
@@ -476,16 +484,282 @@ function schedNotis(H){
   sched1(Hs);
 }
 
+
+/* =====================================================================
+   FLÖDET (annons 1 och 1b): kort med levererade bilder, Skapa Reel, hämtar mallar och uppgifter, Reelen fyller i sig själv
+   ===================================================================== */
+var FL = {TAPF:3.25, CEX0:6.1, PH0:6.3, RT0:7.0, CUTS:[0, 1.8, 3.6, 5.4, 7.0], SWT:[3.6, 5.4], FA:8.0, FC:8.7, FD:9.4, PHO:15.4, LOGO:15.9, DUR:20.6, NOF:2.7};
+var RPHF = ["rs_dining", "rs_chair", "rs_kitchen", "bedroom", "rs_floor"], THF = ["rs_dining", "rs_chair", "rs_kitchen"];
+function reelF(c, x, y, w, h, rt, a, r, fa, fc, fd, ph, cuts, swt, tk){
+  var i, ia = rev(rt, .1, .5), fixed = tk != null;
+  if(a <= .02) return;
+  c.save(); c.globalAlpha = a; rr(c, x, y, w, h, r || 0); c.clip(); v3Fill(c, x, y, w, h, "#000");
+  for(i = 0; i < ph.length; i++){
+    var s0 = cuts[i], s1 = cuts[i + 1] == null ? s0 + 3 : cuts[i + 1], pa = i === 0 ? 1 : k3(rt, s0, s0 + .55); if(pa <= .01) continue;
+    v3Photo(c, ph[i], x, y, w, h, {scale:lerp(1.05, 1.15, k3(rt, s0, s1 + .5)), pos:V3_POS[ph[i]], alpha:ioC(pa)});
+  }
+  var ti = fixed ? tk : (rt >= swt[1] ? 2 : rt >= swt[0] ? 1 : 0), tp = (fixed || !ti) ? 1 : ioC(k3(rt - swt[ti - 1], 0, .7)), fil = fixed || !ti;
+  SHIM = rt;
+  if(!fixed && ti > 0 && tp < 1) postOverlay(c, ti - 1, x, y, w, h, a*ia*(1 - tp), 1, 1, 1);
+  postOverlay(c, ti, x, y, w, h, a*ia*(fil ? 1 : tp), fil ? fa : 1, fil ? fc : 1, fil ? fd : 1);
+  c.restore();
+}
+function logoEnd(c, G, t, at, h1, h2){
+  var H = G.H, ea = k3(t, at - .1, at + .5);
+  if(ea <= .01) return;
+  var cy = H*.4, mh = 15, mw = mh*858.6/756.3, fs = 7.2, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 3.4 + ww, lx = 50 - tot/2, lp = k3(t, at, at + .8);
+  v3Mark(c, lx, cy - mh/2, mh, "#fff", C3.dotL, {reveal:lp, dot:1, alpha:ea});
+  v3Text(c, "VIEWLY", lx + mw + 3.4, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:ea*k3(t, at + .15, at + .7)});
+  kline(c, h1, cy + 22, 5.6, t, at + .55, 99);
+  kline(c, h2, cy + 30.5, 3.3, t, at + 1.0, 99);
+}
+function adFlow(c, G, t){
+  var H = G.H, S = SG(G), i, oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+  var addr = v3t("a8.re.addr"), city = v3t("a8.re.city"), F = v3t("a8.re.facts").split(" · "), cstr = (city + "  ·  " + F[0] + "  ·  " + F[1]).toUpperCase();
+  bgLight(c, G, t);
+  var hs = 6.6, hy1 = Y0 + 6, hy2 = Y0 + 13.4;
+  kline(c, [["Bilderna", 0], ["är", 0], ["redan", 0]], hy1, hs, t, .15, FL.TAPF - .3);
+  kline(c, [["levererade.", 1]], hy2, hs, t, .45, FL.TAPF - .3);
+  kline(c, [["Hämtar", 0], ["mall", 0], ["och", 0]], hy1, hs, t, FL.TAPF + .5, FL.CEX0 - .1);
+  kline(c, [["uppgifter.", 1]], hy2, hs, t, FL.TAPF + .75, FL.CEX0 - .1);
+  kline(c, [["Resten", 0], ["fyller", 0]], hy1, hs, t, FL.RT0 + .9, FL.RT0 + 5.6);
+  kline(c, [["sig", 1], ["själv.", 1]], hy2, hs, t, FL.RT0 + 1.15, FL.RT0 + 5.6);
+  kline(c, [["En", 0], ["Reel", 0], ["i", 0], ["ditt", 0]], hy1, hs, t, FL.RT0 + 5.8, FL.PHO - .2);
+  kline(c, [["eget", 1], ["varumärke.", 1]], hy2, hs, t, FL.RT0 + 6.05, FL.PHO - .2);
+  var cw0 = 80, cx0 = 10, ch0 = 70, cy0 = Y0 + 19, x0 = cx0 + 6, cex = ioC(k3(t, FL.CEX0, FL.CEX0 + .6));
+  var cin = Math.min(1, rev(t, .05, .5))*(1 - k3(t, FL.RT0 + .45, FL.RT0 + .85)), enter = oQ(k3(t, 0, .9)), cyy = lerp(cy0, Y0 + .5, cex), chh = lerp(ch0, 17.5, cex), bob = Math.sin(t*1.2)*.4*(1 - cex);
+  var lbl = {size:2.6, weight:600, f:"sans", sp:.14};
+  if(cin > .02){
+    var cyd = cyy + (1 - enter)*14 + bob;
+    fcard(c, cx0, cyd, cw0, chh, cin, 3.2, "#fff", cex*6);
+    var big = cin*(1 - cex*1.4 > 0 ? 1 - cex*1.4 : 0), sm = cin*k3(t, FL.CEX0 + .45, FL.CEX0 + .95);
+    if(big > .02){
+      var chipW = v3Measure(c, "LEVERERAD", {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sy0 = cyd + 5;
+      sCard(c, x0, sy0, chipW, 5.6, big, 2.8, "#E3F0E4", 0); dotc(c, x0 + 3.4, sy0 + 2.8, .95, "#2f6a3a", big);
+      sTx(c, "LEVERERAD", x0 + 6, sy0 + 3.8, big, {size:2.1, weight:600, color:"#2f6a3a", sp:.2});
+      var nb = "25 BILDER", nbw = v3Measure(c, nb, {size:2.1, weight:700, f:"sans", sp:.2}) + 9, nba = big*rev(t, .5, .4);
+      sCard(c, cx0 + cw0 - 6 - nbw, sy0, nbw, 5.6, nba, 2.8, "#1C1C1E", 0); sTx(c, nb, cx0 + cw0 - 6 - nbw/2, sy0 + 3.8, nba, {size:2.1, weight:700, color:"#fff", align:"c", sp:.2});
+      v3Text(c, addr, x0, cyd + 22, {size:8.4, color:INK, alpha:big*rev(t, .25, .45), p:oQ(k3(t, .25, .85))});
+      sTx(c, cstr, x0, cyd + 27.8, big*rev(t, .45, .4), lbl);
+      var tw = (cw0 - 12 - 3*2)/4, th = tw*.8, ty = cyd + 32.5, contentFade = 1 - k3(t, FL.TAPF + .1, FL.TAPF + .5);
+      for(i = 0; i < 4; i++){
+        var t0 = .6 + i*.18, ta = rev(t, t0, .35)*big*contentFade, tx = x0 + i*(tw + 2), sc = lerp(.9, 1, oQ(k3(t, t0, t0 + .5))), ty2 = ty + (1 - oQ(k3(t, t0, t0 + .5)))*1.6;
+        c.save(); c.translate(tx + tw/2, ty2 + th/2); c.scale(sc, sc);
+        sCard(c, -tw/2 - .4, -th/2 - .4, tw + .8, th + .8, ta, 1.4, "#fff", 2);
+        if(i < 3) sPh(c, THF[i], -tw/2, -th/2, tw, th, ta, 1.2, 1.14); else { sCard(c, -tw/2, -th/2, tw, th, ta, 1.2, "#1C1C1E", 0); v3Text(c, "+22", 0, 1.8, {size:5.2, color:"#fff", align:"c", alpha:ta}) }
+        c.restore();
+      }
+      /* knappen glider in mjukt, en bit in i kortet */
+      var bw = 52, bh = 8.6, by = ty + th + 6.5, bin = oQ(k3(t, 1.6, 2.4)), ba = rev(t, 1.6, .6)*big*contentFade, press = k3(t, FL.TAPF, FL.TAPF + .22);
+      if(ba > .02){
+        c.save(); var by2 = by + (1 - bin)*4; c.translate(50, by2 + bh/2); var bs = 1 - .05*Math.sin(press*Math.PI); c.scale(bs, bs); c.translate(-50, -by2 - bh/2);
+        fcard(c, 50 - bw/2, by2, bw, bh, ba, bh/2, GRN, 0); sTx(c, "SKAPA REEL  ›", 50, by2 + 5.5, ba, {size:3, weight:700, color:"#fff", align:"c", sp:.14}); c.restore();
+        var rp = k3(t, FL.TAPF, FL.TAPF + .7); if(rp > 0 && rp < 1){ c.save(); c.globalAlpha = big*(1 - rp)*.45; c.strokeStyle = GRN; c.lineWidth = .35; rr(c, 50 - bw/2 - rp*4, by - rp*4, bw + rp*8, bh + rp*8, bh/2 + rp*4); c.stroke(); c.restore() }
+        var cm = ioC(k3(t, 2.35, FL.TAPF - .1));
+        cursor(c, lerp(80, 56, cm), lerp(by + 26, by + 6, cm), rev(t, 2.3, .3)*(1 - k3(t, FL.TAPF + .35, FL.TAPF + .7)), press*(1 - k3(t, FL.TAPF + .2, FL.TAPF + .45)));
+      }
+      /* hämtar kontorets mallar och bostadens uppgifter */
+      var rows = [["Hämtar kontorets mallar", FL.TAPF + .5, FL.TAPF + 1.7], ["Hämtar bostadens uppgifter", FL.TAPF + 1.2, FL.TAPF + 2.4]];
+      rows.forEach(function(r, k){
+        var ra = rev(t, r[1], .45)*big, ry = ty + 2 + k*10.5 + (1 - oQ(k3(t, r[1], r[1] + .6)))*2, done = k3(t, r[2], r[2] + .35);
+        if(ra <= .02) return;
+        sCard(c, x0, ry, cw0 - 12, 8.6, ra, 4.3, "#F4F1EA", 0, "rgba(28,26,25,.1)");
+        var icx = x0 + 5.2, icy = ry + 4.3;
+        if(done < 1){ c.save(); c.globalAlpha = ra*(1 - done); c.strokeStyle = "#2f6a3a"; c.lineWidth = .6; c.lineCap = "round"; c.beginPath(); var ang = t*5; c.arc(icx, icy, 1.9, ang, ang + 4.2); c.stroke(); c.restore() }
+        if(done > 0){ c.save(); c.globalAlpha = ra*done; c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(icx, icy, 2.2*oBack(done), 0, 7); c.fill(); c.restore(); A8.chk(c, icx, icy + .1, 1.7, done, "#fff", .5) }
+        sTx(c, r[0], x0 + 10.4, ry + 5.4, ra, {size:2.9, weight:600, color:INK});
+      });
+    }
+    if(sm > .02){
+      var lv = "LEVERERAD", lw = v3Measure(c, lv, {size:1.9, weight:600, f:"sans", sp:.2}) + 8, px0 = cx0 + cw0 - 5 - lw;
+      sCard(c, px0, cyy + 3.6, lw, 5.2, sm, 2.6, "#E3F0E4", 0); dotc(c, px0 + 3, cyy + 6.2, .8, "#2f6a3a", sm); sTx(c, lv, px0 + 5, cyy + 7.5, sm, {size:1.9, weight:600, color:"#2f6a3a", sp:.2});
+      v3Text(c, addr, x0 - .4, cyy + 9.2, {size:5.8, color:INK, alpha:sm}); sTx(c, cstr, x0 - .4, cyy + 14.2, sm, {size:2.0, weight:600, color:MUT, sp:.14});
+    }
+  }
+  /* mobilen med Reelen */
+  var pin = oQ(k3(t, FL.PH0, FL.PH0 + .9)), pout = ioC(k3(t, FL.PHO, FL.PHO + .6)), pa = rev(t, FL.PH0, .4)*(1 - pout);
+  var pcy = Y0 + 25.5, phh = G.is9 ? 94 : Math.min(S.y1 - pcy + 4, 80), pww = phh/2.05, pxx = 50 - pww/2;
+  if(pa > .02){
+    var py = pcy + (1 - pin)*24 + pout*10, sc2 = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.07), rt = Math.max(0, t - FL.RT0);
+    reelF(c, sc2.x, sc2.y, sc2.w, sc2.h, rt, pa, sc2.r, ioC(k3(t, FL.FA, FL.FA + .7)), ioC(k3(t, FL.FC, FL.FC + .6)), ioC(k3(t, FL.FD, FL.FD + .7)), RPHF, FL.CUTS, FL.SWT);
+    A8.reelUI(c, sc2.x, sc2.y, sc2.w, sc2.h, pa, rev(rt, .3, .5));
+  }
+  logoEnd(c, G, t, FL.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], [["viewly.se", 0]]);
+}
+function schedFlow(H){
+  H.click(FL.TAPF, .4);
+  H.soft("swish", FL.PH0 + .1, .1, .95, 1200);
+}
+/* variant 1b: öppnar med en iPhone-notis, kort så att man snabbt fattar */
+function adFlowNotis(c, G, t){
+  var H = G.H, S = SG(G), tf = t - FL.NOF;
+  if(t >= FL.NOF - .3) adFlow(c, G, Math.max(0, tf));
+  var ia = 1 - k3(t, FL.NOF - .3, FL.NOF);
+  if(ia <= .01) return;
+  c.save(); c.globalAlpha = ia;
+  v3Fill(c, 0, 0, 100, H, "#070606");
+  v3Photo(c, "rs_dining", 0, 0, 100, H, {scale:lerp(1.08, 1.14, k3(t, 0, 3)), pos:V3_POS.rs_dining, alpha:ioC(k3(t, 0, .3))});
+  v3Fill(c, 0, 0, 100, H, "#0c0a0a", .55);
+  v3Grad(c, 0, 0, 100, H*.4, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
+  var ca = rev(t, .05, .4), ty = S.y0 + 8;
+  v3Text(c, "Lördag 24 oktober", 50, ty, {size:3.3, weight:500, f:"sans", color:"#fff", align:"c", alpha:.85*ca});
+  v3Text(c, "9:41", 50, ty + 15, {size:15, weight:300, f:"sans", color:"#fff", align:"c", alpha:.95*ca});
+  var nin = oQ(k3(t, .25, .8)), tap = k3(t, 1.75, 1.93), pr = 1 - .035*Math.sin(tap*Math.PI), nw = 88, nx = 6, nh = 21.5, ny = lerp(-26, S.y0 + 31, nin);
+  if(nin > .01){
+    c.save(); c.translate(50, ny + nh/2); c.scale(pr, pr); c.translate(-50, -ny - nh/2);
+    c.save(); c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 9; c.shadowOffsetY = 1.4; c.fillStyle = "rgba(244,243,240,.92)"; rr(c, nx, ny, nw, nh, 5); c.fill(); c.restore();
+    c.fillStyle = "#101010"; rr(c, nx + 3.6, ny + 3.6, 8.4, 8.4, 2.2); c.fill();
+    v3Mark(c, nx + 5.6, ny + 5.5, 4.6, "#fff", C3.dotL, {reveal:1, dot:1, alpha:1});
+    v3Text(c, "VIEWLY", nx + 14.6, ny + 6.4, {size:2.6, weight:600, f:"sans", sp:.12, color:"#1c1c1e"});
+    v3Text(c, "nu", nx + nw - 4, ny + 6.4, {size:2.5, weight:400, f:"sans", color:"#6b6b70", align:"r"});
+    v3Text(c, "Dina foton är klara", nx + 14.6, ny + 11.8, {size:3.3, weight:600, f:"sans", color:"#1c1c1e"});
+    v3Text(c, "Storgatan 15, Helsingborg · 25 bilder levererade", nx + 14.6, ny + 16.4, {size:2.75, weight:400, f:"sans", color:"#3a3a3e"});
+    c.restore();
+    var cu = ioC(k3(t, 1.0, 1.7)), cxx = lerp(80, 56, cu), cyy = lerp(ny + nh + 26, ny + nh*.55, cu);
+    cursor(c, cxx, cyy, rev(t, .9, .25)*(1 - k3(t, 2.0, 2.3)), tap*(1 - k3(t, 1.93, 2.15)));
+  }
+  c.restore();
+}
+function schedFlowNotis(H){
+  var Hs = {s:function(n, t, v, r){ H.s(n, t + FL.NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + FL.NOF, v, r, f) }, click:function(t, v){ H.click(t + FL.NOF, v) }};
+  H.tone(1174.7, .32, .07, .8); H.tone(1568, .46, .06, 1.0);
+  H.click(1.75, .35);
+  schedFlow(Hs);
+}
+
+
+/* =====================================================================
+   V2: välj mall först, sedan hämtas bostadens uppgifter och mallen fyller i dem själv (Reel Studio och Content Studio)
+   ===================================================================== */
+var PRESS = function(t, t0){ return k3(t, t0 - .12, t0 + .04)*(1 - k3(t, t0 + .04, t0 + .32)) };
+function deliveredCard(c, t, Y0, btn, tap, fadeA){
+  var addr = v3t("a8.re.addr"), city = v3t("a8.re.city"), F = v3t("a8.re.facts").split(" · "), cstr = (city + "  ·  " + F[0] + "  ·  " + F[1]).toUpperCase();
+  var cw0 = 80, cx0 = 10, ch0 = 70, cy0 = Y0 + 19, x0 = cx0 + 6, cin = Math.min(1, rev(t, .05, .5))*(1 - k3(t, tap + .15, tap + .6)), enter = oQ(k3(t, 0, .9));
+  if(cin <= .02) return;
+  var cyd = cy0 + (1 - enter)*14 + Math.sin(t*1.2)*.4, lbl = {size:2.6, weight:600, f:"sans", sp:.14};
+  fcard(c, cx0, cyd, cw0, ch0, cin, 3.2, "#fff", 0);
+  var chipW = v3Measure(c, "LEVERERAD", {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sy0 = cyd + 5;
+  sCard(c, x0, sy0, chipW, 5.6, cin, 2.8, "#E3F0E4", 0); dotc(c, x0 + 3.4, sy0 + 2.8, .95, "#2f6a3a", cin); sTx(c, "LEVERERAD", x0 + 6, sy0 + 3.8, cin, {size:2.1, weight:600, color:"#2f6a3a", sp:.2});
+  var nb = "25 BILDER", nbw = v3Measure(c, nb, {size:2.1, weight:700, f:"sans", sp:.2}) + 9, nba = cin*rev(t, .5, .4);
+  sCard(c, cx0 + cw0 - 6 - nbw, sy0, nbw, 5.6, nba, 2.8, "#1C1C1E", 0); sTx(c, nb, cx0 + cw0 - 6 - nbw/2, sy0 + 3.8, nba, {size:2.1, weight:700, color:"#fff", align:"c", sp:.2});
+  v3Text(c, addr, x0, cyd + 22, {size:8.4, color:INK, alpha:cin*rev(t, .25, .45), p:oQ(k3(t, .25, .85))});
+  sTx(c, cstr, x0, cyd + 27.8, cin*rev(t, .45, .4), lbl);
+  var tw = (cw0 - 12 - 3*2)/4, th = tw*.8, ty = cyd + 32.5, i;
+  for(i = 0; i < 4; i++){
+    var t0 = .6 + i*.18, ta = rev(t, t0, .35)*cin, tx = x0 + i*(tw + 2), sc = lerp(.9, 1, oQ(k3(t, t0, t0 + .5))), ty2 = ty + (1 - oQ(k3(t, t0, t0 + .5)))*1.6;
+    c.save(); c.translate(tx + tw/2, ty2 + th/2); c.scale(sc, sc);
+    sCard(c, -tw/2 - .4, -th/2 - .4, tw + .8, th + .8, ta, 1.4, "#fff", 2);
+    if(i < 3) sPh(c, THF[i], -tw/2, -th/2, tw, th, ta, 1.2, 1.14); else { sCard(c, -tw/2, -th/2, tw, th, ta, 1.2, "#1C1C1E", 0); v3Text(c, "+22", 0, 1.8, {size:5.2, color:"#fff", align:"c", alpha:ta}) }
+    c.restore();
+  }
+  var bw = 56, bh = 8.6, by = ty + th + 6.5, bin = oQ(k3(t, 1.6, 2.4)), ba = rev(t, 1.6, .6)*cin, press = PRESS(t, tap);
+  if(ba > .02){
+    c.save(); var by2 = by + (1 - bin)*4; c.translate(50, by2 + bh/2); var bs = 1 - .05*press; c.scale(bs, bs); c.translate(-50, -by2 - bh/2);
+    fcard(c, 50 - bw/2, by2, bw, bh, ba, bh/2, GRN, 0); sTx(c, btn, 50, by2 + 5.5, ba, {size:3, weight:700, color:"#fff", align:"c", sp:.14}); c.restore();
+    var rp = k3(t, tap, tap + .7); if(rp > 0 && rp < 1){ c.save(); c.globalAlpha = cin*(1 - rp)*.45; c.strokeStyle = GRN; c.lineWidth = .35; rr(c, 50 - bw/2 - rp*4, by - rp*4, bw + rp*8, bh + rp*8, bh/2 + rp*4); c.stroke(); c.restore() }
+    var cm = ioC(k3(t, tap - .9, tap - .1));
+    cursor(c, lerp(80, 56, cm), lerp(by + 26, by + 6, cm), rev(t, tap - 1.0, .3)*(1 - k3(t, tap + .35, tap + .7)), press);
+  }
+}
+/* tre mallar att välja bland; markören väljer en och de andra tonas ned */
+function tilesStage(c, t, Y0, t0, tClick, sel, photos, labels, fadeOut){
+  var TW = 25, TH = TW*1.25, gap = 2.5, bx0 = 50 - (3*TW + 2*gap)/2, by = Y0 + 21.5, a0 = (1 - k3(t, fadeOut, fadeOut + .4)), i;
+  if(rev(t, t0, .1) <= 0 || a0 <= .02) return;
+  var dim = k3(t, tClick + .08, tClick + .5);
+  for(i = 0; i < 3; i++){
+    var ta = rev(t, t0 + .1 + i*.14, .45)*a0, rise = (1 - oQ(k3(t, t0 + .1 + i*.14, t0 + .75 + i*.14)))*5, x = bx0 + i*(TW + gap), y = by + rise, on = i === sel, sc = on ? 1 + .035*k3(t, tClick, tClick + .35) : 1 - .02*dim;
+    c.save(); c.translate(x + TW/2, y + TH/2); c.scale(sc, sc); c.translate(-x - TW/2, -y - TH/2);
+    SHIM = t; drawPost(c, i, x, y, TW, TH, photos[i], ta, 1, 1, 1);
+    if(!on && dim > 0){ c.save(); c.globalAlpha = ta*dim*.55; c.fillStyle = "#080707"; rr(c, x, y, TW, TH, 1.5); c.fill(); c.restore() }
+    if(on && t >= tClick){ var sp = oBack(k3(t, tClick, tClick + .35)); c.save(); c.globalAlpha = ta; c.strokeStyle = "#8fd6a3"; c.lineWidth = .55; rr(c, x - .9, y - .9, TW + 1.8, TH + 1.8, 2); c.stroke(); c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(x + TW - 2.6, y + 2.8, 2.3*Math.max(.01, sp), 0, 7); c.fill(); c.restore(); if(sp > .6) sTx(c, "✓", x + TW - 2.6, y + 3.8, ta, {size:2.6, weight:700, color:"#fff", align:"c"}) }
+    sTx(c, labels[i], x + TW/2, y + TH + 6.5, ta, {size:2.7, weight:700, color:"#fff", align:"c", sp:.14});
+    c.restore();
+  }
+  var sx = bx0 + sel*(TW + gap) + TW*.55, sy = by + TH*.55, cm = ioC(k3(t, tClick - 1.0, tClick - .1));
+  cursor(c, lerp(86, sx, cm), lerp(by + TH + 22, sy, cm), rev(t, tClick - 1.1, .3)*a0*(1 - k3(t, tClick + .5, tClick + .9)), PRESS(t, tClick));
+}
+function statusPill(c, t, Y0, t0, tDone, label, doneLabel, fadeOut){
+  var a = rev(t, t0, .45)*(1 - k3(t, fadeOut, fadeOut + .4)); if(a <= .02) return;
+  var done = k3(t, tDone, tDone + .35), txt = done > .5 ? doneLabel : label, w = 66, x = 50 - w/2, y = Y0 + 15.8 + (1 - oQ(k3(t, t0, t0 + .6)))*2;
+  fcard(c, x, y, w, 7.4, a, 3.7, "#fff", 0);
+  var icx = x + 5.2, icy = y + 3.7;
+  if(done < 1){ c.save(); c.globalAlpha = a*(1 - done); c.strokeStyle = "#2f6a3a"; c.lineWidth = .6; c.lineCap = "round"; c.beginPath(); c.arc(icx, icy, 1.9, t*5, t*5 + 4.2); c.stroke(); c.restore() }
+  if(done > 0){ c.save(); c.globalAlpha = a*done; c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(icx, icy, 2.3*oBack(done), 0, 7); c.fill(); c.restore(); A8.chk(c, icx, icy + .1, 1.7, done, "#fff", .5) }
+  sTx(c, txt, x + 10.4, y + 4.8, a, {size:2.9, weight:600, color:INK});
+}
+function heads(c, t, Y0, list){
+  var hs = 6.6, hy1 = Y0 + 6, hy2 = Y0 + 13.4;
+  list.forEach(function(h){
+    if(!h[1]){ kline(c, h[0].map(function(w, k){ return [w, k >= h[0].length - 1 ? 1 : 0] }), Y0 + 9.2, 5.1, t, h[2], h[3]); return }
+    var w1 = h[0].map(function(w){ return [w, 0] }), w2 = h[1].map(function(w){ return [w, 1] });
+    kline(c, w1, hy1, hs, t, h[2], h[3]); kline(c, w2, hy2, hs, t, h[2] + .25, h[3]);
+  });
+}
+/* ---- Reel Studio, välj mall först ---- */
+var R2 = {TAP:3.05, TL0:3.95, TCL:6.0, PH0:7.2, RT0:7.9, CUTS:[0, 2.0, 4.0, 6.0, 7.8], FA:9.9, FC:10.7, FD:11.4, PHO:16.2, LOGO:16.7, DUR:21.3};
+var RPH2 = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor"];
+function adReel2(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+  bgLight(c, G, t);
+  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, R2.TAP - .3], [["Välj", "en"], ["mall."], R2.TL0 + .1, R2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, R2.RT0 + .1, R2.RT0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, R2.RT0 + 2.2, R2.RT0 + 5.4], [["En", "Reel", "i", "ditt"], ["eget", "varumärke."], R2.RT0 + 5.6, R2.PHO - .2]]);
+  deliveredCard(c, t, Y0, "SKAPA REEL  ›", R2.TAP);
+  tilesStage(c, t, Y0, R2.TL0, R2.TCL, 1, ["rs_dining", "rs_chair", "bedroom"], ["Kommande", "Till salu", "Såld"], R2.PH0 - .1);
+  statusPill(c, t, Y0, R2.RT0 + .1, R2.RT0 + 1.4, "Hämtar bostadens uppgifter", "Uppgifterna är hämtade", R2.RT0 + 2.0);
+  var pin = oQ(k3(t, R2.PH0, R2.PH0 + .9)), pout = ioC(k3(t, R2.PHO, R2.PHO + .6)), pa = rev(t, R2.PH0, .4)*(1 - pout);
+  var pcy = Y0 + 25.5, phh = G.is9 ? 94 : Math.min(S.y1 - pcy + 4, 80), pww = phh/2.05, pxx = 50 - pww/2;
+  if(pa > .02){
+    var py = pcy + (1 - pin)*24 + pout*10, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.07), rt = Math.max(0, t - R2.RT0);
+    reelF(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, ioC(k3(t, R2.FA, R2.FA + .7)), ioC(k3(t, R2.FC, R2.FC + .6)), ioC(k3(t, R2.FD, R2.FD + .7)), RPH2, R2.CUTS, [99, 99], 1);
+    A8.reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5));
+  }
+  logoEnd(c, G, t, R2.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], [["viewly.se", 0]]);
+}
+function schedReel2(H){ H.click(R2.TAP, .4); H.click(R2.TCL, .4); H.soft("swish", R2.PH0 + .1, .1, .95, 1200) }
+/* ---- Content Studio, välj bild och mall ---- */
+var C2 = {TAP:3.05, G0:3.95, GCL:5.8, TL0:7.4, TCL:9.5, PO0:10.9, FA:12.9, FC:13.7, FD:14.4, END:16.7, LOGO:17.2, DUR:21.8};
+var GRIDK = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
+function adContent2(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
+  bgLight(c, G, t);
+  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, C2.TAP - .3], [["Välj", "en"], ["bild."], C2.G0 + .1, C2.GCL + .9], [["Välj", "en"], ["mall."], C2.TL0 + .1, C2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, C2.PO0 + .2, C2.PO0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, C2.PO0 + 2.2, C2.END]]);
+  deliveredCard(c, t, Y0, "SKAPA INLÄGG  ›", C2.TAP);
+  /* steg 1: välj en bild */
+  var ga = rev(t, C2.G0, .45)*(1 - k3(t, C2.GCL + .9, C2.GCL + 1.3));
+  if(ga > .02){
+    var cw = 80, cx = 10, ch = 56, cy = Y0 + 19 + (1 - oQ(k3(t, C2.G0, C2.G0 + .8)))*10, x0 = cx + 6, tw = (cw - 12 - 2*2.4)/3, th = tw*.7, sel = t >= C2.GCL;
+    fcard(c, cx, cy, cw, ch, ga, 3.2, "#fff", 0);
+    sTx(c, "VÄLJ EN BILD", x0, cy + 7, ga, {size:2.4, weight:700, sp:.2}); sTx(c, (sel ? 1 : 0) + " / 1 VALD", cx + cw - 6, cy + 7, ga, {size:2.4, weight:600, color:MUT, align:"r", sp:.16});
+    var pos = function(n){ return [x0 + (n % 3)*(tw + 2.4), cy + 11.5 + Math.floor(n/3)*(th + 2.4)] };
+    for(i = 0; i < 6; i++){
+      var q = pos(i), a2 = rev(t, C2.G0 + .15 + i*.07, .35)*ga;
+      sCard(c, q[0] - .4, q[1] - .4, tw + .8, th + .8, a2, 1.4, "#fff", 2); sPh(c, GRIDK[i], q[0], q[1], tw, th, a2, 1.2, 1.14);
+      if(i === 1 && sel){ var sp = oBack(k3(t, C2.GCL, C2.GCL + .3)); c.save(); c.globalAlpha = ga; c.strokeStyle = GRN; c.lineWidth = .6; rr(c, q[0] - .9, q[1] - .9, tw + 1.8, th + 1.8, 1.6); c.stroke(); c.fillStyle = GRN; c.beginPath(); c.arc(q[0] + 3.4, q[1] + 3.4, 2.4*Math.max(.01, sp), 0, 7); c.fill(); c.restore(); if(sp > .6) sTx(c, "✓", q[0] + 3.4, q[1] + 4.4, ga, {size:2.6, weight:700, color:"#fff", align:"c"}) }
+    }
+    var tp = pos(1), mv = ioC(k3(t, C2.GCL - 1.0, C2.GCL - .1));
+    cursor(c, lerp(80, tp[0] + tw*.55, mv), lerp(cy + ch + 4, tp[1] + th*.5, mv), ga*rev(t, C2.GCL - 1.1, .3)*(1 - k3(t, C2.GCL + .5, C2.GCL + .9)), PRESS(t, C2.GCL));
+  }
+  /* steg 2: välj en mall på den valda bilden */
+  tilesStage(c, t, Y0, C2.TL0, C2.TCL, 1, ["rs_dining", "rs_dining", "rs_dining"], ["Kommande", "Till salu", "Såld"], C2.PO0 - .1);
+  statusPill(c, t, Y0, C2.PO0 + .2, C2.PO0 + 1.5, "Hämtar bostadens uppgifter", "Uppgifterna är hämtade", C2.PO0 + 2.1);
+  var pin = oQ(k3(t, C2.PO0 - .2, C2.PO0 + .8)), pa = rev(t, C2.PO0 - .2, .4)*(1 - k3(t, C2.END, C2.END + .45));
+  if(pa > .02){
+    var pw = G.is9 ? 50 : 46, ph = pw*1.25, px = 50 - pw/2, py = Y0 + 26 + (1 - pin)*12;
+    SHIM = t; drawPost(c, 1, px, py, pw, ph, "rs_dining", pa, ioC(k3(t, C2.FA, C2.FA + .7)), ioC(k3(t, C2.FC, C2.FC + .6)), ioC(k3(t, C2.FD, C2.FD + .7)));
+  }
+  logoEnd(c, G, t, C2.LOGO, [["Content", 0], ["Studio.", 1]], [["Inlägg", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]]);
+}
+function schedContent2(H){ H.click(C2.TAP, .4); H.click(C2.GCL, .35); H.click(C2.TCL, .4); H.soft("swish", C2.PO0, .1, .95, 1200) }
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return v3SfxLoad() }
 function reg10(id, n, d, fn, sched, thumb){
-  var comp = {n:n, d:d, group:"ads10", id:id, v:{id:id}, dur:DUR, thumb:thumb, L:LOGO_AT - .53, logo:true, vo:[]};
+  var comp = {n:n, d:d, group:"ads10", id:id, v:{id:id}, dur:FL.DUR, thumb:thumb, L:FL.LOGO - .53, logo:true, vo:[]};
   comp.draw = function(c, G, t){ fn(c, G, t) };
   comp.mix = K.makeMix(sched); comp.loadAudio = loadAudio10;
   V3_COMPS[id] = comp; V3_ADS10.push(id);
 }
-reg10("a10_reel", "1 · Reel Studio", "Leveransen finns redan. Skapa Reel, mallen fyller i sig själv, Reelen i ert eget varumärke.", adReel1, sched1, 9.8);
+reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kontorets mallar och bostadens uppgifter hämtas, och Reelen fyller i sig själv.", adFlow, schedFlow, 9.8);
 
 (function(){
   var comp = {n:"2 · Så fungerar Reel Studio", d:"Förklaringsvideo utan röst: välj bilder, mallen fyller i sig själv, gör den till din, rörelse per element.", group:"ads10", id:"a10_how", v:{id:"a10_how"}, dur:EX.DUR, thumb:8.2, L:EX.LOGO - .53, logo:true};
@@ -502,10 +776,21 @@ reg10("a10_reel", "1 · Reel Studio", "Leveransen finns redan. Skapa Reel, malle
 })();
 
 (function(){
-  var comp = {n:"1b · Reel Studio med iPhone-notis", d:"Som annons 1, men öppnar med en iPhone-notis: Dina foton är klara. Utan röst, med notisljud och subtila datorklick.", group:"ads10", id:"a10_reeln", v:{id:"a10_reeln"}, dur:DUR + NOF, thumb:2.2, L:LOGO_AT - .53 + NOF, logo:true, vo:[]};
-  comp.draw = function(c, G, t){ adReelNotis(c, G, t) };
-  comp.mix = K.makeMix(schedNotis); comp.loadAudio = function(){ return v3SfxLoad() };
+  var comp = {n:"1b · Reel Studio med iPhone-notis", d:"Som annons 1, men öppnar med en iPhone-notis: Dina foton är klara. Utan röst, med ett mjukt notisljud och datorklick.", group:"ads10", id:"a10_reeln", v:{id:"a10_reeln"}, dur:FL.DUR + FL.NOF, thumb:2.0, L:FL.LOGO - .53 + FL.NOF, logo:true, vo:[]};
+  comp.draw = function(c, G, t){ adFlowNotis(c, G, t) };
+  comp.mix = K.makeMix(schedFlowNotis); comp.loadAudio = function(){ return v3SfxLoad() };
   V3_COMPS.a10_reeln = comp; V3_ADS10.splice(1, 0, "a10_reeln");
+})();
+
+(function(){
+  var defs = [["a10_reel2", "1c · Reel Studio, välj mall först", "Levererade bilder, Skapa Reel, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv i Reelen.", adReel2, schedReel2, R2.DUR, R2.LOGO, 11.2],
+              ["a10_cs2", "3b · Content Studio, välj bild och mall", "Levererade bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv.", adContent2, schedContent2, C2.DUR, C2.LOGO, 15.2]];
+  defs.forEach(function(d){
+    var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6] - .53, logo:true, vo:[]};
+    comp.draw = function(c, G, t){ d[3](c, G, t) };
+    comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
+    V3_COMPS[d[0]] = comp; V3_ADS10.push(d[0]);
+  });
 })();
 
 var SCRIPT = [
