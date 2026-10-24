@@ -408,9 +408,8 @@ var HL = [
   why:"Nytt kapitel. Förklarar vad Reel Studio är och hur den fungerar, med skärmbilder ur själva verktyget.",
   st:[
    {p:"mark", m:"rsChair", k:"REEL STUDIO", h:"Reels direkt från leveransen.", s:"Som Content Studio, fast i rörelse."},
-   {p:"quiet", h:"Publicera inte mer.", em:"Få ut mer av varje bostad.", s:"Samma leverans blir inlägg, Stories och Reels.", k:"19 — Reel Studio"},
-   {p:"quiet", h:"22 % av inläggen. Omkring 60 % av räckvidden.", em:"Så gick det för Reels.", s:"Svenska mäklarkonton på Instagram, över 2 500 inlägg. Källa: CB Media.", k:"Reels"},
-   {p:"quiet", h:"Bilderna finns redan.", em:"Uppgifterna också.", s:"Mallen fylls i åt dig.", k:"19 — Reel Studio"},
+   {p:"quiet", h:"Reels når längre.", em:"Starkare resultat av samma bostad.", s:"Rörelse stoppar tummen och når människor som inte följer dig än.", k:"19 — Reel Studio"},
+   {p:"studio", sc:"compare", m:"rsDusk1", k:"Reel Studio", h:"Det som tog tid är redan gjort.", s:"Bilderna och uppgifterna finns i leveransen. Mallen fyller i resten."},
    {p:"studio", sc:"overview", m:"rsDusk1", k:"Så ser den ut", h:"Mall, bilder och rörelse på ett ställe.", s:"Välj bilderna ur leveransen, så får Reelen kontorets mall."},
    {p:"system", k:"Mallen", h:"Fylls i av sig själv.", items:["Adress","Ort","Rum och yta","Mäklare"], s:"Uppgifterna hämtas från leveransen. Inget att skriva."},
    {p:"studio", sc:"text", m:"rsDusk2", k:"Text", h:"Gör den till din.", s:"Skriv direkt i bilden. Typsnitt, storlek, färg och kopplade fält."},

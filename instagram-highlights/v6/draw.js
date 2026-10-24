@@ -334,6 +334,13 @@ function stDesign(sc, P, s, dcls){
       +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini('#F5F0E6','#1E3B2E','#B08D57','KOMMANDE','rsDusk1')+mini('#14233A','#F3EFE7','#D9B56C','TILL SALU','rsDining')+mini('#A4472A','#F7EEE4','#F1C9A8','SÅLD','rsChair')+'</div>'
       +'</div>', 'width:100%;overflow:hidden');
   }
+  if(sc === 'compare'){
+    var rows = ['Öppna ett designprogram','Skriva in adress och uppgifter','Animera bilderna','Exportera','Anpassa för varje format'].map(function(x){
+      return '<div style="display:flex;align-items:center;gap:2cqw;padding:1.8cqw 0;border-bottom:1px solid '+P.line+'"><span style="flex:0 0 2.6cqw;height:2.6cqw;border-radius:50%;border:1.5px solid '+P.mut+'"></span><span style="'+F+'font-size:2.5cqw;color:'+P.mut+';text-decoration:line-through;text-decoration-thickness:1.5px">'+x+'</span></div>' }).join('');
+    return '<div style="display:flex;flex-direction:column;gap:2.6cqw;width:100%">'
+      +card('<div style="padding:3cqw 3.4cqw 1.6cqw">'+lab('Förut')+'<div style="margin-top:1.2cqw">'+rows+'</div></div>')
+      +'<div style="background:'+P.acc+';color:'+P.accT+';border-radius:2.4cqw;padding:3.6cqw 3.4cqw 4cqw">'+lab('Nu','color:'+P.accT+';opacity:.75')+'<div class="'+dcls+'" style="font-size:8cqw;line-height:1.05;margin-top:1.6cqw">Välj bilderna. <i>Klart.</i></div></div></div>';
+  }
   /* motion */
   var sl = function(name, val, pos){ return '<div style="display:flex;flex-direction:column;gap:1.2cqw"><div style="display:flex;justify-content:space-between">'+lab(name)+'<span style="'+F+'font-size:1.9cqw;font-weight:600;color:'+P.mut+'">'+val+'</span></div><div style="position:relative;height:.5cqw;background:'+P.line+';border-radius:1cqw"><span style="position:absolute;left:0;width:'+pos+'%;top:0;bottom:0;background:'+P.acc+';border-radius:1cqw"></span><span style="position:absolute;left:calc('+pos+'% - 1.5cqw);top:-1.25cqw;width:3cqw;height:3cqw;border-radius:50%;background:'+P.acc+'"></span></div></div>' };
   var track = function(name, l, w, on){ return '<div style="display:flex;align-items:center;gap:2cqw"><span style="'+F+'flex:0 0 14cqw;font-size:1.9cqw;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+(on?P.ink:P.mut)+'">'+name+'</span><span style="position:relative;flex:1;height:4cqw;background:'+P.soft+';border-radius:2cqw"><span style="position:absolute;left:'+l+'%;width:'+w+'%;top:0;bottom:0;background:'+(on?P.acc:P.mut)+';border-radius:2cqw;opacity:'+(on?1:.55)+'"></span></span></div>' };
