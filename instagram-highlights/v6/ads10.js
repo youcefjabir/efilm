@@ -758,16 +758,16 @@ function heads(c, t, Y0, list){
 /* ---- Reel Studio, välj mall först ---- */
 var R2 = {TAP:1.9, TL0:2.55, TCL:4.85, PH0:6.05, RT0:6.75, CUTS:[0, 2.0, 4.0, 6.0, 7.8], FA:8.75, FC:9.55, FD:10.25, PHO:15.05, LOGO:99, DUR:20.15};
 var RPH2 = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor"];
-function adReel2(c, G, t){ TSTYLE = "card"; try { adReel2i(c, G, t) } finally { TSTYLE = "ed" } }
-function adReel2i(c, G, t){
-  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+function adReel2(c, G, t){ TSTYLE = "card"; try { adReel2i(c, G, t, R2, 0) } finally { TSTYLE = "ed" } }
+function adReel2i(c, G, t, R2, yoff){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy + yoff;
   bgLight(c, G, t);
   heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, R2.TAP - .3], [["Välj", "en"], ["mall."], R2.TL0 + .1, R2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, R2.RT0 + .1, R2.RT0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, R2.RT0 + 2.2, R2.RT0 + 5.4], [["En", "Reel", "i", "ditt"], ["eget", "varumärke."], R2.RT0 + 5.6, R2.PHO - .2]]);
   deliveredCard(c, t, Y0, "SKAPA REEL  ›", R2.TAP);
   tilesStage(c, t, Y0, R2.TL0, R2.TCL, 1, ["rs_dining", "rs_chair", "rs_kitchen"], ["Kommande", "Till salu", "Såld"], R2.PH0 - .1);
   statusPill(c, t, Y0, R2.RT0 + .1, R2.RT0 + 1.4, "Hämtar bostadens uppgifter", "Uppgifterna är hämtade", R2.RT0 + 2.0);
   var pin = oQ(k3(t, R2.PH0, R2.PH0 + .9)), pout = ioC(k3(t, R2.PHO, R2.PHO + .9)), pa = rev(t, R2.PH0, .4)*(1 - pout);
-  var pcy = Y0 + 25.5, phh = G.is9 ? 94 : Math.min(S.y1 - pcy + 4, 80), pww = phh/2.05, pxx = 50 - pww/2;
+  var pcy = Y0 + 25.5, phh = G.is9 ? 94 - yoff : Math.min(S.y1 - pcy + 4, 80), pww = phh/2.05, pxx = 50 - pww/2;
   if(pa > .02){
     var py = pcy + (1 - pin)*24 - pout*5, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.07), rt = Math.max(0, t - R2.RT0);
     reelF(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, ioC(k3(t, R2.FA, R2.FA + .7)), ioC(k3(t, R2.FC, R2.FC + .6)), ioC(k3(t, R2.FD, R2.FD + .7)), RPH2, R2.CUTS, [99, 99], 1);
@@ -851,6 +851,135 @@ function notisSched(sc, NOF){ return function(H){
   H.tone(1174.7, .32, .07, .8); H.tone(1568, .46, .06, 1.0); H.click(1.75, .35); sc(Hs);
 } }
 
+
+/* =====================================================================
+   V3: tre hårda bevis (20 sekunder, obegränsat, Hampus) som annonser och statiska bilder
+   ===================================================================== */
+var HQ = {pull:"…mycket uppskattat av mina kunder.", full:["Snabb och smidig hantering genom hela", "processen, från bokning till leverans av", "färdigt material. Resultatet håller", "genomgående hög kvalitet och har varit", "mycket uppskattat av mina kunder."], name:"Hampus Nilsson", role:"Mäklare · Fastighetsbyrån Landskrona"};
+var R3 = {TAP:2.6, TL0:3.4, TCL:5.6, PH0:7.0, RT0:7.7, CUTS:[0, 2.2, 4.4, 6.6, 8.8], FA:10.4, FC:11.2, FD:11.9, PHO:20.9, STOP:20.0, LC:21.7, LOGO:99};
+function stopwatch(c, G, t, T0, STOP){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, y = S.y0 + oy + .5, v = Math.max(0, Math.min(t - T0, STOP)), done = t - T0 >= STOP, m = Math.floor(v/60), sec = Math.floor(v % 60), txt = m + ":" + (sec < 10 ? "0" : "") + sec;
+  var a = rev(t, T0, .4), w = done ? 34 : 24;
+  c.save(); c.globalAlpha = a; c.fillStyle = done ? "#2f6a3a" : "rgba(244,243,240,.94)"; rr(c, 50 - w/2, y, w, 7.4, 3.7); c.fill(); c.restore();
+  if(!done){ c.save(); c.globalAlpha = a*(.5 + .5*Math.sin(t*6)); c.fillStyle = "#c0392b"; c.beginPath(); c.arc(50 - w/2 + 4.4, y + 3.7, .9, 0, 7); c.fill(); c.restore() }
+  v3Text(c, done ? txt + "  ·  KLAR" : txt, 50 + (done ? 0 : 2), y + 5.1, {size:3.3, weight:700, f:"sans", sp:.1, color:done ? "#fff" : "#1c1c1e", align:"c", alpha:a});
+  var bw = 70, by = y + 9.4; c.save(); c.globalAlpha = a*.35; c.fillStyle = "#fff"; c.fillRect(50 - bw/2, by, bw, .5); c.globalAlpha = a; c.fillStyle = done ? "#8fd6a3" : "#fff"; c.fillRect(50 - bw/2, by, bw*Math.min(1, v/STOP), .5); c.restore();
+}
+function adT20(c, G, t){
+  TSTYLE = "card"; try { adReel2i(c, G, t, R3, 10); stopwatch(c, G, t, 0, R3.STOP) } finally { TSTYLE = "ed" }
+}
+function schedT20(H){ H.click(R3.TAP, .4); H.click(R3.TCL, .4) }
+
+/* så många du vill */
+var M2 = {TILES:16, T0:3.4, TS:7.0, END:14.6};
+var MKEYS = ["rs_dining", "rs_chair", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
+function adMany(c, G, t){
+  var H = G.H, S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
+  TSTYLE = "ed"; bgLight(c, G, t);
+  kline(c, [["Hur", 0], ["många", 0], ["inlägg", 0]], Y0 + 6, 6.6, t, .2, 2.9);
+  kline(c, [["vill", 0], ["du", 0], ["ha?", 1]], Y0 + 13.4, 6.6, t, .45, 2.9);
+  kline(c, [["Så", 0], ["många"], ["du", 0], ["vill.", 1]].map(function(w){ return [w[0], w[1] || 0] }), Y0 + 9.2, 5.6, t, 3.3, M2.END - .4);
+  var cols = G.is9 ? 4 : 8, gap = G.is9 ? 2.4 : 1.4, gw = G.is9 ? 70 : 84, tw = (gw - gap*(cols - 1))/cols, th = tw*(G.is9 ? 1.1 : 1.25), gx = (100 - gw)/2, gy = Y0 + (G.is9 ? 17 : 16), rows = M2.TILES/cols, last = 0;
+  var times = []; for(i = 0; i < M2.TILES; i++) times.push(M2.T0 + (M2.TS - M2.T0)*Math.pow(i/(M2.TILES - 1), .55));
+  var fade = 1 - k3(t, M2.END - .5, M2.END);
+  for(i = 0; i < M2.TILES; i++){
+    var ti = times[i], p = oQ(k3(t, ti, ti + .45)), a = rev(t, ti, .3)*fade;
+    if(a <= .02) continue; last = i + 1;
+    var x = gx + (i % cols)*(tw + gap), y = gy + Math.floor(i/cols)*(th + gap) + (1 - p)*3;
+    SHIM = t; drawPost(c, i % 3, x, y, tw, th, MKEYS[i % MKEYS.length], a, 1, 1, 1);
+  }
+  /* knappen som trycker i takt, och räknaren */
+  var by = gy + rows*th + (rows - 1)*gap + 6, ba = rev(t, M2.T0 - .6, .5)*fade, press = 0;
+  for(i = 0; i < M2.TILES; i++){ var d = t - times[i]; if(d > -.05 && d < .14) press = Math.max(press, Math.sin((d + .05)/.19*Math.PI)) }
+  if(ba > .02){
+    c.save(); c.translate(50, by + 4.3); c.scale(1 - .04*press, 1 - .04*press); c.translate(-50, -by - 4.3);
+    fcard(c, 50 - 24, by, 48, 8.6, ba, 4.3, GRN, 0); sTx(c, "SKAPA INLÄGG  ›", 50, by + 5.5, ba, {size:3, weight:700, color:"#fff", align:"c", sp:.14}); c.restore();
+    sTx(c, "INLÄGG SKAPADE", 50 - 24, by + 14.6, ba, {size:2.2, weight:700, color:"rgba(255,255,255,.7)", sp:.2});
+    v3Text(c, String(last), 50 + 24, by + 15.2, {size:5.4, color:"#fff", align:"r", alpha:ba});
+  }
+  v3Text(c, "Obegränsat antal inlägg. En leverans.", 50, by + 25, {size:3.4, weight:500, f:"sans", color:"#fff", align:"c", alpha:.85*k3(t, M2.TS + .6, M2.TS + 1.4)*fade});
+}
+function schedMany(H){ H.click(M2.T0, .35); H.click(M2.T0 + 1.46, .3) }
+
+/* Hampus */
+var HM = {END:9.6};
+function quoteStars(c, x, y, a, sz){ var i; for(i = 0; i < 5; i++) v3Text(c, "★", x + i*sz*1.15, y, {size:sz, weight:500, f:"sans", color:"#E8C766", alpha:a*rev(k3(a, 0, 1), 0, 1)}) }
+function adHampus(c, G, t){
+  var H = G.H, S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+  bgLight(c, G, t);
+  var cy = Y0 + 26;
+  kline(c, [["…mycket", 1], ["uppskattat", 0]], cy, 8.2, t, .3, 5.4, {st:.12});
+  kline(c, [["av", 0], ["mina", 0], ["kunder.", 1]], cy + 11.5, 8.2, t, .6, 5.4);
+  var sa = rev(t, 2.3, .5)*(1 - k3(t, 5.2, 5.6));
+  if(sa > .02){ var sw = 5*3.5*1.15; quoteStars(c, 50 - sw/2 + 1.5, cy + 24, sa, 3.5);
+    v3Text(c, HQ.name, 50, cy + 33, {size:4.6, weight:700, f:"sans", color:"#fff", align:"c", alpha:sa});
+    v3Text(c, HQ.role, 50, cy + 39.5, {size:3, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.8*sa}) }
+  var ca = rev(t, 5.7, .6)*(1 - k3(t, HM.END - .5, HM.END));
+  if(ca > .02){
+    var cw = 82, ch = 60, cx = 9, cyy = Y0 + 22;
+    fcard(c, cx, cyy, cw, ch, ca, 3.2, "#fff", 0);
+    quoteStars(c, cx + 6, cyy + 9.5, ca, 3.2);
+    HQ.full.forEach(function(l, k){ v3Text(c, (k === 0 ? "“" : "") + l + (k === 4 ? "”" : ""), cx + 6, cyy + 20 + k*6.0, {size:3.5, color:INK, alpha:ca*rev(t, 5.9 + k*.25, .4)}) });
+    sTx(c, HQ.name.toUpperCase(), cx + 6, cyy + 53, ca*rev(t, 7.0, .4), {size:2.4, weight:700, sp:.16});
+    sTx(c, HQ.role.toUpperCase(), cx + 6, cyy + 57.4, ca*rev(t, 7.0, .4), {size:1.9, weight:600, color:MUT, sp:.14});
+  }
+}
+
+/* Ett objekt. Sen bestämmer du. */
+var OB = {END:8.8};
+function adOffer(c, G, t){
+  var H = G.H, S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+  bgLight(c, G, t);
+  var cy = Y0 + 30;
+  kline(c, [["Ett", 0], ["objekt.", 0]], cy, 10, t, .3, OB.END - .6);
+  kline(c, [["Sen", 0], ["bestämmer", 1], ["du.", 1]], cy + 13.5, 10, t, 1.3, OB.END - .6);
+  var la = rev(t, 2.6, .6)*(1 - k3(t, OB.END - .5, OB.END));
+  v3Text(c, "Från 995 kr  ·  Ingen bindning", 50, cy + 28, {size:3.9, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.9*la});
+  var qa = rev(t, 4.4, .6)*(1 - k3(t, OB.END - .5, OB.END));
+  if(qa > .02){
+    var cw = 82, ch = 24, cx = 9, cyy = cy + 37;
+    fcard(c, cx, cyy, cw, ch, qa, 3.2, "#fff", 0);
+    quoteStars(c, cx + 5.5, cyy + 8, qa, 2.8);
+    v3Text(c, "“" + HQ.pull.slice(1).replace(".", "") + "”", cx + 5.5, cyy + 16.2, {size:4.4, italic:true, color:INK, alpha:qa});
+    sTx(c, (HQ.name + " · " + HQ.role).toUpperCase().replace("MÄKLARE · ", ""), cx + 5.5, cyy + 21, qa, {size:1.8, weight:600, color:MUT, sp:.1});
+  }
+}
+
+/* statiska bilder med knapp */
+function stBtn(c, G, y, a){
+  var w = 56, h = 8.8; c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 6; c.fillStyle = "#fff"; rr(c, 50 - w/2, y, w, h, h/2); c.fill(); c.restore();
+  sTx(c, "Boka fotografering  ›", 50, y + 5.6, a, {size:3.1, weight:700, color:INK, align:"c", sp:.04});
+}
+function stLogo(c, G, y){
+  var mh = 6, mw = mh*858.6/756.3, fs = 2.9, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 2 + ww, lx = 50 - tot/2;
+  v3Mark(c, lx, y - mh/2, mh, "#fff", C3.dotL, {reveal:1, dot:1, alpha:.95}); v3Text(c, "VIEWLY", lx + mw + 2, y + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:.95});
+}
+function stBase(c, G){ bgLight(c, G, 5); return G.H }
+function st20(c, G, t){
+  var H = stBase(c, G), cy = H*.43;
+  v3Text(c, "20", 50, cy + 18, {size:G.is9 ? 78 : 66, color:"#fff", align:"c"});
+  kline(c, [["sekunder", 0], ["från", 0], ["leverans", 0]], cy + 30, 5.6, 9, 0, 99);
+  kline(c, [["till", 0], ["färdig", 0], ["Reel.", 1]], cy + 38, 5.6, 9, 0, 99);
+  stBtn(c, G, cy + 54, 1); stLogo(c, G, H - G.bot - 4);
+}
+function stHampus(c, G, t){
+  var H = stBase(c, G), cy = H*.3;
+  v3Text(c, "“", 50, cy + 4, {size:22, italic:true, color:"#d6dccb", align:"c", alpha:.9});
+  kline(c, [["…mycket", 1], ["uppskattat", 0]], cy + 20, 8, 9, 0, 99);
+  kline(c, [["av", 0], ["mina", 0], ["kunder.", 1]], cy + 31, 8, 9, 0, 99);
+  quoteStars(c, 50 - 5*3.5*1.15/2 + 1.5, cy + 45, 1, 3.5);
+  v3Text(c, HQ.name, 50, cy + 54, {size:4.4, weight:700, f:"sans", color:"#fff", align:"c"});
+  v3Text(c, HQ.role, 50, cy + 60, {size:2.9, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.8});
+  stBtn(c, G, cy + 70, 1); stLogo(c, G, H - G.bot - 4);
+}
+function stOffer(c, G, t){
+  var H = stBase(c, G), cy = H*.36;
+  kline(c, [["Ett", 0], ["objekt.", 0]], cy + 8, 10, 9, 0, 99);
+  kline(c, [["Sen", 0], ["bestämmer", 1], ["du.", 1]], cy + 21.5, 10, 9, 0, 99);
+  v3Text(c, "Från 995 kr  ·  Ingen bindning", 50, cy + 36, {size:3.9, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.9});
+  stBtn(c, G, cy + 46, 1); stLogo(c, G, H - G.bot - 4);
+}
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return v3SfxLoad() }
@@ -888,6 +1017,18 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
   var withBook = function(fn, Lc){ var inner = withNotis(fn, NF); return function(c, G, t){ inner(c, G, Math.min(t, NF + Lc)); if(t >= NF + Lc) K.endSeq(c, G, t, NF + Lc, BOOK10) } };
   var defs = [["a10_reel2", "1c · Reel Studio, notis och välj mall först", "iPhone-notis (Dina foton är klara), 25 bilder, Skapa Reel, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv i Reelen. Slutar på Boka fotografering som blir Viewly.", withBook(adReel2, LR), notisSched(schedReel2, NF), NF + LR + END10, NF + LR, 2.0],
               ["a10_cs2", "3b · Content Studio, notis, välj bild och mall", "iPhone-notis (Dina foton är klara), 25 bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv. Slutar på Boka fotografering som blir Viewly.", withBook(adContent2, LC), notisSched(schedContent2, NF), NF + LC + END10, NF + LC, 2.0]];
+  var BK = {b:"a7.btnB"};
+  var withEnd = function(fn, L){ return function(c, G, t){ fn(c, G, Math.min(t, L)); if(t >= L) K.endSeq(c, G, t, L, BK) } };
+  var more = [
+    ["a10_t20", "A · Tjugo sekunder", "Stoppur från 0:00 till 0:20: leverans, Skapa Reel, välj mall, uppgifter hämtas och fylls i, Reelen klar. Slutar på Boka fotografering.", withEnd(adT20, R3.LC), schedT20, R3.LC + END10, R3.LC, 12.2],
+    ["a10_many", "B · Så många du vill", "Ett rutnät fylls med inlägg i allt snabbare takt. Obegränsat antal inlägg från en leverans. Slutar på Boka fotografering.", withEnd(adMany, M2.END), schedMany, M2.END + END10, M2.END, 8.6],
+    ["a10_hampus", "C · Hampus", "Hampus Nilssons citat, kinetisk typografi och hela citatet. Slutar på Boka fotografering.", withEnd(adHampus, HM.END), function(H){}, HM.END + END10, HM.END, 3.2],
+    ["a10_offer", "D · Ett objekt. Sen bestämmer du.", "Erbjudandet med Hampus som stöd. Slutar på Boka fotografering.", withEnd(adOffer, OB.END), function(H){}, OB.END + END10, OB.END, 4.8],
+    ["a10_s20", "Statisk · 20 sekunder", "Jättestor 20 med knapp.", st20, function(H){}, 2, 0, 1],
+    ["a10_shamp", "Statisk · Hampus", "Citatet med knapp.", stHampus, function(H){}, 2, 0, 1],
+    ["a10_soffer", "Statisk · Ett objekt", "Erbjudandet med knapp.", stOffer, function(H){}, 2, 0, 1]
+  ];
+  defs = defs.concat(more);
   defs.forEach(function(d){
     var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6], vo:[]};
     comp.draw = function(c, G, t){ d[3](c, G, t) };
