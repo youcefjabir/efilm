@@ -532,7 +532,8 @@ function logoEnd(c, G, t, at, h1, h2){
   v3Mark(c, lx, cy - mh/2, mh, "#fff", C3.dotL, {reveal:lp, dot:1, alpha:ea});
   v3Text(c, "VIEWLY", lx + mw + 3.4, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:ea*k3(t, at + .15, at + .7)});
   kline(c, h1, cy + 22, 5.6, t, at + .55, 99);
-  kline(c, h2, cy + 30.5, 3.3, t, at + 1.0, 99);
+  if(h2 === "url") v3Text(c, "viewly.se", 50, cy + 29.5, {size:3.4, weight:500, f:"sans", color:"#fff", align:"c", alpha:.82*k3(t, at + 1.0, at + 1.6)});
+  else kline(c, h2, cy + 30.5, 3.3, t, at + 1.0, 99);
 }
 function adFlow(c, G, t){
   var H = G.H, S = SG(G), i, oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
@@ -605,7 +606,7 @@ function adFlow(c, G, t){
     reelF(c, sc2.x, sc2.y, sc2.w, sc2.h, rt, pa, sc2.r, ioC(k3(t, FL.FA, FL.FA + .7)), ioC(k3(t, FL.FC, FL.FC + .6)), ioC(k3(t, FL.FD, FL.FD + .7)), RPHF, FL.CUTS, FL.SWT);
     A8.reelUI(c, sc2.x, sc2.y, sc2.w, sc2.h, pa, rev(rt, .3, .5));
   }
-  logoEnd(c, G, t, FL.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], [["viewly.se", 0]]);
+  logoEnd(c, G, t, FL.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], "url");
 }
 function schedFlow(H){
   H.click(FL.TAPF, .4);
@@ -721,19 +722,19 @@ var R2 = {TAP:3.05, TL0:3.95, TCL:6.0, PH0:7.2, RT0:7.9, CUTS:[0, 2.0, 4.0, 6.0,
 var RPH2 = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor"];
 function adReel2(c, G, t){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
-  bgGlobe(c, G, t);
+  bgLight(c, G, t);
   heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, R2.TAP - .3], [["Välj", "en"], ["mall."], R2.TL0 + .1, R2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, R2.RT0 + .1, R2.RT0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, R2.RT0 + 2.2, R2.RT0 + 5.4], [["En", "Reel", "i", "ditt"], ["eget", "varumärke."], R2.RT0 + 5.6, R2.PHO - .2]]);
   deliveredCard(c, t, Y0, "SKAPA REEL  ›", R2.TAP);
   tilesStage(c, t, Y0, R2.TL0, R2.TCL, 1, ["rs_dining", "rs_chair", "bedroom"], ["Kommande", "Till salu", "Såld"], R2.PH0 - .1);
   statusPill(c, t, Y0, R2.RT0 + .1, R2.RT0 + 1.4, "Hämtar bostadens uppgifter", "Uppgifterna är hämtade", R2.RT0 + 2.0);
-  var pin = oQ(k3(t, R2.PH0, R2.PH0 + .9)), pout = ioC(k3(t, R2.PHO, R2.PHO + .6)), pa = rev(t, R2.PH0, .4)*(1 - pout);
+  var pin = oQ(k3(t, R2.PH0, R2.PH0 + .9)), pout = ioC(k3(t, R2.PHO, R2.PHO + .9)), pa = rev(t, R2.PH0, .4)*(1 - pout);
   var pcy = Y0 + 25.5, phh = G.is9 ? 94 : Math.min(S.y1 - pcy + 4, 80), pww = phh/2.05, pxx = 50 - pww/2;
   if(pa > .02){
-    var py = pcy + (1 - pin)*24 + pout*10, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.07), rt = Math.max(0, t - R2.RT0);
+    var py = pcy + (1 - pin)*24 - pout*5, sc = phone2(c, pxx, py, pww, phh, pa, (1 - pin)*-.07), rt = Math.max(0, t - R2.RT0);
     reelF(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, ioC(k3(t, R2.FA, R2.FA + .7)), ioC(k3(t, R2.FC, R2.FC + .6)), ioC(k3(t, R2.FD, R2.FD + .7)), RPH2, R2.CUTS, [99, 99], 1);
     A8.reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5));
   }
-  logoEnd(c, G, t, R2.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], [["viewly.se", 0]]);
+  logoEnd(c, G, t, R2.LOGO, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], "url");
 }
 function schedReel2(H){ H.click(R2.TAP, .4); H.click(R2.TCL, .4); H.soft("swish", R2.PH0 + .1, .1, .95, 1200) }
 /* ---- Content Studio, välj bild och mall ---- */
@@ -741,7 +742,7 @@ var C2 = {TAP:3.05, G0:3.95, GCL:5.8, TL0:7.4, TCL:9.5, PO0:10.9, FA:12.9, FC:13
 var GRIDK = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
 function adContent2(c, G, t){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
-  bgGlobe(c, G, t);
+  bgLight(c, G, t);
   heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, C2.TAP - .3], [["Välj", "en"], ["bild."], C2.G0 + .1, C2.GCL + .9], [["Välj", "en"], ["mall."], C2.TL0 + .1, C2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, C2.PO0 + .2, C2.PO0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, C2.PO0 + 2.2, C2.END]]);
   deliveredCard(c, t, Y0, "SKAPA INLÄGG  ›", C2.TAP);
   /* steg 1: välj en bild */
@@ -762,14 +763,61 @@ function adContent2(c, G, t){
   /* steg 2: välj en mall på den valda bilden */
   tilesStage(c, t, Y0, C2.TL0, C2.TCL, 1, ["rs_dining", "rs_dining", "rs_dining"], ["Kommande", "Till salu", "Såld"], C2.PO0 - .1);
   statusPill(c, t, Y0, C2.PO0 + .2, C2.PO0 + 1.5, "Hämtar bostadens uppgifter", "Uppgifterna är hämtade", C2.PO0 + 2.1);
-  var pin = oQ(k3(t, C2.PO0 - .2, C2.PO0 + .8)), pa = rev(t, C2.PO0 - .2, .4)*(1 - k3(t, C2.END, C2.END + .45));
+  var pin = oQ(k3(t, C2.PO0 - .2, C2.PO0 + .8)), pa = rev(t, C2.PO0 - .2, .4)*(1 - ioC(k3(t, C2.END, C2.END + .9)));
   if(pa > .02){
-    var pw = G.is9 ? 50 : 46, ph = pw*1.25, px = 50 - pw/2, py = Y0 + 26 + (1 - pin)*12;
+    var pw = G.is9 ? 50 : 46, ph = pw*1.25, px = 50 - pw/2, py = Y0 + 26 + (1 - pin)*12 - ioC(k3(t, C2.END, C2.END + .9))*5;
     SHIM = t; drawPost(c, 1, px, py, pw, ph, "rs_dining", pa, ioC(k3(t, C2.FA, C2.FA + .7)), ioC(k3(t, C2.FC, C2.FC + .6)), ioC(k3(t, C2.FD, C2.FD + .7)));
   }
-  logoEnd(c, G, t, C2.LOGO, [["Content", 0], ["Studio.", 1]], [["Inlägg", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]]);
+  logoEnd(c, G, t, C2.LOGO, [["Content", 0], ["Studio.", 1]], "url");
 }
 function schedContent2(H){ H.click(C2.TAP, .4); H.click(C2.GCL, .35); H.click(C2.TCL, .4); H.soft("swish", C2.PO0, .1, .95, 1200) }
+
+
+/* låsskärmens bakgrundsbild: ett jordklot som stiger upp ur mörkret, med blå atmosfär och stadsljus */
+function lockWallpaper(c, G, t){
+  var H = G.H, gx = 50, gy = H*1.02, R = 62, i, seed = 7;
+  v3Fill(c, 0, 0, 100, H, "#02060b");
+  var sd = 3; for(i = 0; i < 70; i++){ sd = (sd*9301 + 49297) % 233280; var sx = sd/233280*100; sd = (sd*9301 + 49297) % 233280; var sy = sd/233280*H*.75; c.fillStyle = "rgba(255,255,255," + (.15 + .4*(sd % 7)/7).toFixed(2) + ")"; c.beginPath(); c.arc(sx, sy, .12 + (sd % 3)*.05, 0, 7); c.fill() }
+  var sky = c.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, "rgba(2,6,11,0)"); sky.addColorStop(.7, "rgba(4,20,32,.5)"); sky.addColorStop(1, "rgba(6,32,46,.8)"); c.fillStyle = sky; c.fillRect(0, 0, 100, H);
+  var gl = c.createRadialGradient(gx, gy, R*.9, gx, gy, R*1.28); gl.addColorStop(0, "rgba(90,190,255,.55)"); gl.addColorStop(.25, "rgba(50,130,200,.25)"); gl.addColorStop(1, "rgba(2,6,11,0)"); c.fillStyle = gl; c.fillRect(0, 0, 100, H);
+  var sp = c.createRadialGradient(gx - 18, gy - R*.55, R*.1, gx, gy, R); sp.addColorStop(0, "#14496a"); sp.addColorStop(.5, "#0a2d44"); sp.addColorStop(1, "#02101a"); c.fillStyle = sp; c.beginPath(); c.arc(gx, gy, R, 0, 7); c.fill();
+  c.save(); c.beginPath(); c.arc(gx, gy, R, 0, 7); c.clip();
+  c.strokeStyle = "rgba(120,200,255,.1)"; c.lineWidth = .14; for(i = 1; i < 9; i++){ c.beginPath(); c.ellipse(gx, gy, Math.abs(R*Math.cos(i*.2)) + .01, R, 0, 0, 7); c.stroke() }
+  var rnd = function(){ seed = (seed*9301 + 49297) % 233280; return seed/233280 };
+  for(i = 0; i < 90; i++){ var a = rnd()*Math.PI*2, r = Math.sqrt(rnd())*R*.96, x = gx + Math.cos(a)*r, y = gy - Math.abs(Math.sin(a))*r*.98 - 2; if(y > H) continue; c.fillStyle = "rgba(255,210,130," + (.25 + .55*rnd()).toFixed(2) + ")"; c.beginPath(); c.arc(x, y, .16 + .2*rnd(), 0, 7); c.fill() }
+  c.restore();
+  c.strokeStyle = "rgba(130,210,255,.7)"; c.lineWidth = .34; c.beginPath(); c.arc(gx, gy, R, Math.PI*1.12, Math.PI*1.88); c.stroke();
+  v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(2,6,11,.55)"], [1, "rgba(2,6,11,0)"]]);
+}
+function notisScene(c, G, t, NOF){
+  var H = G.H, S = SG(G), ia = 1 - k3(t, NOF - .3, NOF);
+  if(ia <= .01) return;
+  c.save(); c.globalAlpha = ia;
+  lockWallpaper(c, G, t);
+  var ca = rev(t, .05, .4), ty = S.y0 + 8;
+  v3Text(c, "Lördag 24 oktober", 50, ty, {size:3.3, weight:500, f:"sans", color:"#fff", align:"c", alpha:.85*ca});
+  v3Text(c, "9:41", 50, ty + 15, {size:15, weight:300, f:"sans", color:"#fff", align:"c", alpha:.95*ca});
+  var nin = oQ(k3(t, .25, .8)), tap = k3(t, 1.75, 1.93), pr = 1 - .035*Math.sin(tap*Math.PI), nw = 88, nx = 6, nh = 21.5, ny = lerp(-26, S.y0 + 31, nin);
+  if(nin > .01){
+    c.save(); c.translate(50, ny + nh/2); c.scale(pr, pr); c.translate(-50, -ny - nh/2);
+    c.save(); c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 9; c.shadowOffsetY = 1.4; c.fillStyle = "rgba(244,243,240,.92)"; rr(c, nx, ny, nw, nh, 5); c.fill(); c.restore();
+    c.fillStyle = "#101010"; rr(c, nx + 3.6, ny + 3.6, 8.4, 8.4, 2.2); c.fill();
+    v3Mark(c, nx + 5.6, ny + 5.5, 4.6, "#fff", C3.dotL, {reveal:1, dot:1, alpha:1});
+    v3Text(c, "VIEWLY", nx + 14.6, ny + 6.4, {size:2.6, weight:600, f:"sans", sp:.12, color:"#1c1c1e"});
+    v3Text(c, "nu", nx + nw - 4, ny + 6.4, {size:2.5, weight:400, f:"sans", color:"#6b6b70", align:"r"});
+    v3Text(c, "Dina foton är klara", nx + 14.6, ny + 11.8, {size:3.3, weight:600, f:"sans", color:"#1c1c1e"});
+    v3Text(c, "Storgatan 15, Helsingborg · 25 bilder levererade", nx + 14.6, ny + 16.4, {size:2.75, weight:400, f:"sans", color:"#3a3a3e"});
+    c.restore();
+    var cu = ioC(k3(t, 1.0, 1.7)), cxx = lerp(80, 56, cu), cyy = lerp(ny + nh + 26, ny + nh*.55, cu);
+    cursor(c, cxx, cyy, rev(t, .9, .25)*(1 - k3(t, 2.0, 2.3)), tap*(1 - k3(t, 1.93, 2.15)));
+  }
+  c.restore();
+}
+function withNotis(fn, NOF){ return function(c, G, t){ if(t >= NOF - .3) fn(c, G, Math.max(0, t - NOF)); notisScene(c, G, t, NOF) } }
+function notisSched(sc, NOF){ return function(H){
+  var Hs = {s:function(n, t, v, r){ H.s(n, t + NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + NOF, v, r, f) }, click:function(t, v){ H.click(t + NOF, v) }};
+  H.tone(1174.7, .32, .07, .8); H.tone(1568, .46, .06, 1.0); H.click(1.75, .35); sc(Hs);
+} }
 
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
@@ -804,8 +852,9 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
 })();
 
 (function(){
-  var defs = [["a10_reel2", "1c · Reel Studio, välj mall först", "Levererade bilder, Skapa Reel, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv i Reelen.", adReel2, schedReel2, R2.DUR, R2.LOGO, 11.2],
-              ["a10_cs2", "3b · Content Studio, välj bild och mall", "Levererade bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv.", adContent2, schedContent2, C2.DUR, C2.LOGO, 15.2]];
+  var NF = FL.NOF;
+  var defs = [["a10_reel2", "1c · Reel Studio, notis och välj mall först", "iPhone-notis (Dina foton är klara), 25 bilder, Skapa Reel, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv i Reelen.", withNotis(adReel2, NF), notisSched(schedReel2, NF), R2.DUR + NF, R2.LOGO + NF, 2.0],
+              ["a10_cs2", "3b · Content Studio, notis, välj bild och mall", "iPhone-notis (Dina foton är klara), 25 bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv.", withNotis(adContent2, NF), notisSched(schedContent2, NF), C2.DUR + NF, C2.LOGO + NF, 2.0]];
   defs.forEach(function(d){
     var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6] - .53, logo:true, vo:[]};
     comp.draw = function(c, G, t){ d[3](c, G, t) };
