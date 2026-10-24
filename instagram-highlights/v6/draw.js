@@ -292,26 +292,27 @@ function stDesign(sc, P, s, dcls){
      +'<div style="'+F+'font-size:'+(1.02*k)+'cqw;font-weight:600;letter-spacing:.05em;opacity:.85;white-space:nowrap">HELSINGBORG · 3 RUM · 74 M²</div></div>' };
   /* mallar i HTML: samma fyra layouter som i videorna, med egna (påhittade) loggor. w = postens bredd i cqw. */
   var tplHtml = function(i, w){
-    var u = w/40, X = function(v){ return (v*u).toFixed(2)+'cqw' }, ser = 'class="'+dcls+'"', mono = F;
-    var OFF = [['SOLVARA','#B08D57',0,'KOMMANDE','KOMMER SNART','#F3EFE7','#1C2B22'],['HAVSVIK','#C8CFC0',1,'TILL SALU','VISNING SÖN 13–14','#11151B','#F3EFE7'],['LINDÖ','#F1C9A8',2,'SÅLD','TACK FÖR FÖRTROENDET','#8F3A22','#F7EEE4'],['BERGVIK','#C8CFC0',3,'VISNING','VÄLKOMMEN','#1F4B39','#F3EFE7']][i];
-    var W = OFF[6], PL = OFF[5], line = 'rgba('+(i===0?'28,43,34':'255,255,255')+',.3)';
-    var mk = function(m, col, r){ var sz = r*2*u; var inner = m===0 ? '<circle cx="12" cy="12" r="9" fill="none" stroke="'+col+'" stroke-width="2"/><circle cx="15" cy="9.4" r="3.4" fill="'+col+'"/>'
-      : m===1 ? '<circle cx="12" cy="12" r="11" fill="'+col+'"/><path d="M5 10.5 Q8.5 7.5 12 10.5 T19 10.5 M5 15 Q8.5 12 12 15 T19 15" fill="none" stroke="'+PL+'" stroke-width="1.5" stroke-linecap="round"/>'
+    var L = w/100, X = function(v){ return (v*L).toFixed(2)+'cqw' }, ser = 'class="'+dcls+'"', mono = F, W = '#fff';
+    var OFF = [['SOLVARA','#D2B07A',0],['HAVSVIK','#C8CFC0',1],['LINDÖ','#F1C9A8',2],['BERGVIK','#C8CFC0',3]][i];
+    var mk = function(m, col, r){ var sz = r*2*L; var inner = m===0 ? '<circle cx="12" cy="12" r="9" fill="none" stroke="'+col+'" stroke-width="2"/><circle cx="15" cy="9.4" r="3.4" fill="'+col+'"/>'
+      : m===1 ? '<circle cx="12" cy="12" r="11" fill="'+col+'"/><path d="M5 10.5 Q8.5 7.5 12 10.5 T19 10.5 M5 15 Q8.5 12 12 15 T19 15" fill="none" stroke="#101010" stroke-width="1.5" stroke-linecap="round"/>'
       : m===2 ? '<rect x="3" y="3" width="18" height="18" rx="4" fill="none" stroke="'+col+'" stroke-width="2"/><text x="12" y="17.2" font-size="13" text-anchor="middle" fill="'+col+'" font-family="Georgia,serif">L</text>'
       : '<circle cx="12" cy="12" r="10" fill="none" stroke="'+col+'" stroke-width="2"/><path d="M12 6.5 L17.6 16.5 H6.4 Z" fill="'+col+'"/>';
       return '<svg viewBox="0 0 24 24" style="width:'+sz.toFixed(2)+'cqw;height:'+sz.toFixed(2)+'cqw;flex:0 0 auto">'+inner+'</svg>' };
-    var sm = function(t, o, ex){ return '<span style="'+mono+'font-size:'+X(o)+';font-weight:600;letter-spacing:.28em;color:'+W+';'+(ex||'')+'">'+t+'</span>' };
-    var hr = '<div style="height:1px;background:'+line+';margin:'+X(1)+' 0"></div>';
-    var stat = function(n, l, first){ return '<div style="flex:1;'+(first?'':'border-left:1px solid '+line+';padding-left:'+X(1.3)+';')+'"><div '+ser+' style="font-size:'+X(3.6)+';line-height:1.05">'+n+'</div><div style="'+mono+'font-size:'+X(.8)+';font-weight:600;letter-spacing:.2em;opacity:.64;margin-top:'+X(.3)+'">'+l+'</div></div>' };
-    var mid;
-    if(i === 2) mid = '<div '+ser+' style="font-size:'+X(7.6)+';line-height:1;font-style:italic;margin:'+X(.2)+' 0">Såld</div>';
-    else if(i === 3) mid = '<div style="display:flex;align-items:baseline;gap:'+X(1.6)+'"><div '+ser+' style="font-size:'+X(5.6)+';line-height:1.05">13–14</div>'+sm('SÖNDAG',.9,'opacity:.8')+'</div>';
-    else mid = '<div style="display:flex">'+stat('3','RUM',1)+stat('74','KVADRATMETER')+stat('1964','BYGGÅR')+'</div>';
-    return '<div style="position:absolute;left:3.5%;right:3.5%;bottom:3.5%;background:'+PL+';color:'+W+';border-radius:'+X(1.1)+';padding:'+X(1.7)+' '+X(1.7)+' '+X(1.6)+';box-sizing:border-box;box-shadow:0 '+X(.6)+' '+X(2)+' rgba(0,0,0,.42)">'
-      +'<div style="display:flex;justify-content:space-between;align-items:center">'+sm(OFF[3],.92,'opacity:.86')+sm('HELSINGBORG',.92,'opacity:.86')+'</div>'
-      +'<div '+ser+' style="font-size:'+X(4.8)+';line-height:1.05;margin:'+X(1)+' 0 '+X(.2)+';white-space:nowrap">Storgatan 15</div>'
-      +hr+mid+hr
-      +'<div style="display:flex;justify-content:space-between;align-items:center"><div style="display:flex;align-items:center;gap:'+X(1.1)+'">'+mk(OFF[2],OFF[1],1.05)+sm(OFF[0],.9,'letter-spacing:.34em')+'</div>'+sm(OFF[4],.8,'letter-spacing:.2em;opacity:.78')+'</div></div>';
+    var cap = function(t, sz, al, ex){ return '<div style="'+mono+'font-size:'+X(sz)+';font-weight:600;letter-spacing:.32em;color:'+W+';opacity:'+al+';text-align:center;white-space:nowrap;padding-left:.32em;'+(ex||'')+'">'+t+'</div>' };
+    var line = '<div style="width:'+X(10)+';height:1px;background:rgba(255,255,255,.55);margin:'+X(3)+' auto"></div>';
+    var itl = function(t, sz, al){ return '<div '+ser+' style="font-size:'+X(sz)+';font-style:italic;opacity:'+al+';text-align:center;white-space:nowrap;line-height:1.1">'+t+'</div>' };
+    var adr = '<div '+ser+' style="font-size:'+X(13.5)+';line-height:1;text-align:center;white-space:nowrap">Storgatan 15</div>';
+    var body;
+    if(i === 0) body = cap('KOMMANDE',2.3,.88,'margin-bottom:'+X(4.2))+adr+line+itl('Släpps vecka 12',4.4,.8);
+    else if(i === 1) body = cap('TILL SALU',2.3,.88,'margin-bottom:'+X(4.2))+adr+'<div style="height:'+X(3.4)+'"></div>'+cap('HELSINGBORG',2.6,.9)+line
+      +'<div style="display:flex;justify-content:center;gap:'+X(24)+'"><div style="text-align:center"><div '+ser+' style="font-size:'+X(6.8)+';line-height:1">3</div>'+cap('RUM',1.9,.64,'margin-top:'+X(1.6))+'</div><div style="text-align:center"><div '+ser+' style="font-size:'+X(6.8)+';line-height:1">74</div>'+cap('M²',1.9,.64,'margin-top:'+X(1.6))+'</div></div>';
+    else if(i === 2) body = '<div '+ser+' style="font-size:'+X(34)+';font-style:italic;line-height:.95;text-align:center">Såld</div>'+line+cap('STORGATAN 15  ·  HELSINGBORG',2.6,.92)+'<div style="height:'+X(2.6)+'"></div>'+cap('3 RUM  ·  74 M²',2.4,.78)+'<div style="height:'+X(5)+'"></div>'+itl('Tack för förtroendet',4.4,.82);
+    else body = cap('VISNING',2.3,.88,'margin-bottom:'+X(4.2))+adr+line+'<div '+ser+' style="font-size:'+X(12)+';line-height:1;text-align:center;white-space:nowrap">13–14</div>'+cap('SÖNDAG',2.3,.8,'margin-top:'+X(2.4))+'<div style="height:'+X(3)+'"></div>'+itl('Välkommen',4.4,.8);
+    return '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,7,7,.66),rgba(8,7,7,.5) 45%,rgba(8,7,7,.82))"></div>'
+      +'<div style="position:absolute;inset:'+X(5)+';border:1px solid rgba(255,255,255,.42)"></div>'
+      +'<div style="position:absolute;left:0;right:0;top:'+X(11.5)+';display:flex;flex-direction:column;align-items:center;gap:'+X(1.4)+'"><div style="display:flex;align-items:center;gap:'+X(2)+'">'+mk(OFF[2],OFF[1],2.4)+'<span style="'+mono+'font-size:'+X(2.5)+';font-weight:600;letter-spacing:.3em;color:'+W+';white-space:nowrap">'+OFF[0]+'</span></div><span style="'+mono+'font-size:'+X(1.5)+';font-weight:500;letter-spacing:.34em;color:'+W+';opacity:.6">MÄKLARHUS</span></div>'
+      +'<div style="position:absolute;left:0;right:0;top:60%;transform:translateY(-46%);color:'+W+'">'+body+'</div>';
   };
   var handles = function(l, t, w, h){ var d = '<span style="position:absolute;width:1.5cqw;height:1.5cqw;border-radius:50%;background:#fff;border:1px solid '+P.ink+';'; var o = '<div style="position:absolute;left:'+l+'%;top:'+t+'%;width:'+w+'%;height:'+h+'%;border:1px solid '+P.acc+'">'; [[0,0],[100,0],[0,100],[100,100]].forEach(function(q){ o += d+'left:calc('+q[0]+'% - .75cqw);top:calc('+q[1]+'% - .75cqw)"></span>' }); return o+'</div>' };
   if(sc === 'overview'){
@@ -354,11 +355,11 @@ function stDesign(sc, P, s, dcls){
     return card('<div style="padding:3cqw 3cqw 3.4cqw;display:flex;flex-direction:column;gap:2.6cqw">'
       +lab('Varumärkets färger')+'<div style="display:flex;gap:2cqw">'+cols+'</div>'
       +lab('Former')+'<div style="display:flex;gap:1.8cqw">'+shp+'</div>'
-      +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini(0,'rsDusk1')+mini(1,'rsDining')+mini(2,'rsChair')+'</div>'
+      +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini(0,'rsDusk1')+mini(1,'rsDining')+mini(2,'adBedroom')+'</div>'
       +'</div>', 'width:100%;overflow:hidden');
   }
   var post = function(w, h, keyb, idx){ return '<div style="position:relative;flex:0 0 auto;width:'+w+'cqw;height:'+h+'cqw;border-radius:1.6cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg(keyb)+'"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.3))"></div>'+tplHtml(idx, w)+'</div>' };
-  var PH4 = [[0,'rsDusk1'],[1,'rsDining'],[3,'rsKitchen'],[2,'rsChair']];
+  var PH4 = [[0,'rsDusk1'],[1,'rsDining'],[3,'rsChair'],[2,'adBedroom']];
   if(sc === 'cs_overview'){
     var rail2 = ['Bilder','Mall','Uppgifter','Varumärke','Format'].map(function(x, j){
       return '<div style="display:flex;flex-direction:column;align-items:center;gap:.7cqw;padding:1.3cqw 0;border-radius:1.6cqw;'+(j===0?'background:'+P.soft:'')+'"><span style="width:3.6cqw;height:3.6cqw;border-radius:.9cqw;border:1.5px solid '+P.ink+';opacity:.85"></span><span style="'+F+'font-size:1.3cqw;font-weight:600;color:'+P.ink+'">'+x+'</span></div>' }).join('');
@@ -371,7 +372,7 @@ function stDesign(sc, P, s, dcls){
         +lab('Format')+'<div style="display:flex;gap:1cqw">'+pill('4:5',true,'font-size:1.8cqw')+pill('1:1',false,'font-size:1.8cqw')+pill('9:16',false,'font-size:1.8cqw')+'</div>'
       +'</div>'
       +'<div style="flex:1;padding:2.6cqw 2cqw;display:flex;flex-direction:column;align-items:center;gap:1.6cqw">'
-        +'<div style="position:relative;width:29cqw;height:36.2cqw;border-radius:1.8cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg('rsDining')+'"></div>'+tplHtml(1, 29)+handles(5,55,90,38)+'</div>'
+        +'<div style="position:relative;width:29cqw;height:36.2cqw;border-radius:1.8cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg('rsDining')+'"></div>'+tplHtml(1, 29)+handles(10,43,80,42)+'</div>'
         +'<div style="'+F+'font-size:1.6cqw;font-weight:600;letter-spacing:.14em;color:'+P.mut+'">STORGATAN 15 · TILL SALU</div>'
       +'</div></div>', 'width:100%;overflow:hidden');
   }

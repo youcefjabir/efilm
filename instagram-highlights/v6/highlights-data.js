@@ -428,7 +428,7 @@ var HL = [
   st:[
    {p:"mark", m:"rsKitchen", k:"CONTENT STUDIO", h:"Inlägg direkt från leveransen.", s:"Välj en bild och en mall."},
    {p:"quiet", h:"Varje bostad är mer än en annons.", em:"Fyra faser, ett utseende.", s:"Kommande, till salu, visning och såld.", k:"20 — Content Studio"},
-   {p:"studio", sc:"cs_overview", m:"rsDusk1", k:"Så ser den ut", h:"Bild, mall och uppgifter på ett ställe.", s:"Välj en bild ur leveransen och en färdig mall."},
+   {p:"studio", sc:"cs_overview", m:"rsDining", k:"Så ser den ut", h:"Bild, mall och uppgifter på ett ställe.", s:"Välj en bild ur leveransen och en färdig mall."},
    {p:"studio", sc:"compare", m:"rsDusk1", k:"Content Studio", h:"Det som tog tid är redan gjort.", rows:["Öppna ett designprogram","Skriva in adress, rum och yta","Lägga in logga och färger","Byta storlek för varje format"], nu:"Välj bild och mall. <i>Klart.</i>", s:"Uppgifterna och varumärkesprofilen hämtas från leveransen."},
    {p:"studio", sc:"cs_phases", m:"rsDining", k:"Fyra faser", h:"Samma bostad, fyra inlägg.", s:"Kommande, till salu, visning och såld, i kontorets utseende."},
    {p:"system", k:"Mallen", h:"Fylls i av sig själv.", items:["Adress","Ort","Rum","Yta","Mäklare och logga"], s:"Inget att skriva, inget att formge."},
