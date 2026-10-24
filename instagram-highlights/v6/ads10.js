@@ -294,67 +294,67 @@ function sched2(H){ H.click(3.0, .4) }
 /* ---------- annons 3: så fungerar Content Studio (förklaringsvideo, utan röst) ----------
    Två steg: välj bild, välj mall. Sedan flödet: uppgifterna kopplas in i det valda inlägget. */
 var CX = {T2:3.7, CL1:1.45, CL2:5.9, T3:7.7, T5:12.7, LOGO:13.0, DUR:17.0};
-/* inläggen: ett fotografi, kraftig toning nedåt, öppen editorial typografi med hårfina linjer och kontorets logga */
+/* inläggen: mörkt foto, en tunn ram inuti, kontorets märke överst och centrerad editorial typografi */
 var PKIND = [
-  {tag:"KOMMANDE", right:"KOMMER SNART", acc:"#D2B07A", brand:"SOLVARA", mark:0, tint:null},
-  {tag:"TILL SALU", right:"VISNING SÖN 13–14", acc:"#C8CFC0", brand:"HAVSVIK", mark:1, tint:null},
-  {tag:"SÅLD", right:"TACK FÖR FÖRTROENDET", acc:"#F1C9A8", brand:"LINDÖ", mark:2, tint:"120,44,24"}
+  {brand:"SOLVARA", mark:0, acc:"#D2B07A"},
+  {brand:"HAVSVIK", mark:1, acc:"#C8CFC0"},
+  {brand:"LINDÖ", mark:2, acc:"#F1C9A8"}
 ];
 function postGeo(c, k, x, y, w, h){
-  var s = Math.min(w/100, h/125), g = {s:s, Wl:w/s, Hl:h/s, M:7}, yb = g.Hl - 62, M = g.M, inner = g.Wl - 2*M, addr = v3t("a8.re.addr"), F = v3t("a8.re.facts").split(" · ");
-  var T = function(lx, ly){ return [x + s*lx, y + s*ly] }, cityW = v3Measure(c, v3t("a8.re.city").toUpperCase(), {size:2.9, weight:600, f:"sans", sp:.3});
-  g.yb = yb; g.col = [M, M + inner*.36 + 3, M + inner*.68 + 3];
+  var s = Math.min(w/100, h/125), Wl = w/s, Hl = h/s, cy = Hl*.6, g = {s:s, Wl:Wl, Hl:Hl, cy:cy}, T = function(lx, ly){ return [x + s*lx, y + s*ly] };
+  var addr = v3t("a8.re.addr"), city = v3t("a8.re.city"), F = v3t("a8.re.facts").split(" · ");
   if(k === 2){
-    g.ay = yb + 36; g.dl = yb + 43.6;
-    var ls = {size:3.1, weight:600, f:"sans", sp:.2}, wr = v3Measure(c, F[0].toUpperCase(), ls), wd = v3Measure(c, F[0].toUpperCase() + "  ·  ", ls), wy = v3Measure(c, F[1].toUpperCase(), ls), wa = v3Measure(c, addr, {size:9.6});
-    g.tgt = [T(M + wa/2, g.ay - 3.2), T(g.Wl - M - cityW/2, yb + 5.4), T(M + wr/2, g.dl - 1), T(M + wd + wy/2, g.dl - 1)];
-  } else {
-    g.ay = yb + 20; var wa2 = v3Measure(c, addr, {size:11});
-    g.tgt = [T(M + wa2/2, g.ay - 3.6), T(g.Wl - M - cityW/2, yb + 5.4), T(g.col[0] + 3, yb + 38 - 3.6), T(g.col[1] + 4.4, yb + 38 - 3.6)];
-  }
+    var ls = {size:2.6, weight:600, f:"sans", sp:.32}, ls2 = {size:2.4, weight:600, f:"sans", sp:.3}, A = addr.toUpperCase(), C = city.toUpperCase();
+    var wl1 = v3Measure(c, A + "  ·  " + C, ls), x1 = Wl/2 - wl1/2, wad = v3Measure(c, A, ls), wa = v3Measure(c, A + "  ·  ", ls), wc = v3Measure(c, C, ls);
+    var r = F[0].toUpperCase(), q = F[1].toUpperCase(), wl2 = v3Measure(c, r + "  ·  " + q, ls2), x2 = Wl/2 - wl2/2, wr = v3Measure(c, r, ls2), wd = v3Measure(c, r + "  ·  ", ls2), wy = v3Measure(c, q, ls2);
+    g.tgt = [T(x1 + wad/2, cy + 15.8), T(x1 + wa + wc/2, cy + 15.8), T(x2 + wr/2, cy + 22.9), T(x2 + wd + wy/2, cy + 22.9)];
+  } else g.tgt = [T(Wl/2, cy - 4.5), T(Wl/2, cy + 7), T(Wl/2 - 13, cy + 21), T(Wl/2 + 13, cy + 21)];
   return g;
 }
 function drawPost(c, k, x, y, w, h, key, a, f1, f2){
   if(a <= .02) return;
-  var K = PKIND[k], g = postGeo(c, k, x, y, w, h), s = g.s, Wl = g.Wl, Hl = g.Hl, M = g.M, yb = g.yb, R = Wl - M, W = "#fff", F = v3t("a8.re.facts").split(" · "), addr = v3t("a8.re.addr");
+  var K = PKIND[k], g = postGeo(c, k, x, y, w, h), s = g.s, Wl = g.Wl, Hl = g.Hl, cy = g.cy, W = "#fff", mx = Wl/2, F = v3t("a8.re.facts").split(" · "), addr = v3t("a8.re.addr"), city = v3t("a8.re.city");
   f1 = f1 == null ? 1 : f1; f2 = f2 == null ? 1 : f2;
   c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.5)"; c.shadowBlur = 14; c.shadowOffsetY = 3; c.fillStyle = "#000"; rr(c, x, y, w, h, 1.5); c.fill(); c.shadowColor = "transparent";
   rr(c, x, y, w, h, 1.5); c.clip(); c.translate(x, y); c.scale(s, s);
   v3Photo(c, key, 0, 0, Wl, Hl, {pos:V3_POS[key]});
-  v3Grad(c, 0, Hl*.34, Wl, Hl*.66 + 1, [[0, "rgba(8,7,7,0)"], [.55, "rgba(8,7,7,.62)"], [1, "rgba(8,7,7,.92)"]]);
-  if(K.tint) v3Grad(c, 0, Hl*.42, Wl, Hl*.58 + 1, [[0, "rgba(" + K.tint + ",0)"], [1, "rgba(" + K.tint + ",.5)"]]);
-  var hr = function(yy, al){ c.save(); c.globalAlpha = a*al; c.fillStyle = W; c.fillRect(M, yy, Wl - 2*M, .3); c.restore() };
-  if(k !== 2) v3Text(c, K.tag, M, yb + 6.5, {size:2.9, weight:600, f:"sans", sp:.3, color:W, alpha:.86});
-  v3Text(c, v3t("a8.re.city").toUpperCase(), R, yb + 6.5, {size:2.9, weight:600, f:"sans", sp:.3, color:W, align:"r", alpha:.86*f2});
+  v3Fill(c, 0, 0, Wl, Hl, "#080707", .3);
+  v3Grad(c, 0, 0, Wl, Hl, [[0, "rgba(8,7,7,.34)"], [.45, "rgba(8,7,7,.06)"], [1, "rgba(8,7,7,.66)"]]);
+  c.save(); c.globalAlpha = a*.42; c.strokeStyle = W; c.lineWidth = .35; c.strokeRect(5, 5, Wl - 10, Hl - 10); c.restore();
+  /* kontorets märke, centrerat överst */
+  var bl = {size:2.5, weight:600, f:"sans", sp:.3}, bw = v3Measure(c, K.brand, bl), tot = 6.2 + bw, lx = mx - tot/2;
+  tplMark(c, K.mark, lx + 2.4, 17, 2.4, K.acc, "#101010");
+  v3Text(c, K.brand, lx + 7, 17.9, {size:2.5, weight:600, f:"sans", sp:.3, color:W, alpha:.95});
+  v3Text(c, "MÄKLARHUS", lx + 7, 22, {size:1.5, weight:500, f:"sans", sp:.34, color:W, alpha:.6});
+  var cap = function(t, yy, sz, al, f){ v3Text(c, t, mx, yy, {size:sz, weight:600, f:"sans", sp:.32, color:W, align:"c", alpha:al}) };
+  var bar = function(w0, yy, h0, f){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.24; c.fillStyle = W; rr(c, mx - w0/2, yy, w0, h0, h0*.28); c.fill(); c.restore() };
+  var hl = function(yy, w0){ c.save(); c.globalAlpha = a*.55; c.fillStyle = W; c.fillRect(mx - w0/2, yy, w0, .3); c.restore() };
   if(k === 2){
-    v3Text(c, "Såld", M - 1, yb + 25, {size:25, italic:true, color:W, alpha:1});
-    if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*.22; c.fillStyle = W; rr(c, M, g.ay - 8.4, 56, 9.6, 1.4); c.fill(); c.restore() }
-    v3Text(c, addr, M, g.ay, {size:9.6, color:W, alpha:f1});
-    if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*.2; c.fillStyle = W; rr(c, M, g.dl - 2.8, 52, 3.8, 1.1); c.fill(); c.restore() }
-    v3Text(c, F[0].toUpperCase() + "  ·  " + F[1].toUpperCase(), M, g.dl, {size:3.1, weight:600, f:"sans", sp:.2, color:W, alpha:.9*f2});
-    hr(yb + 48.4, .3);
+    v3Text(c, "Såld", mx, cy + 4, {size:34, italic:true, color:W, align:"c"});
+    hl(cy + 10.5, 10);
+    bar(60, cy + 11.8, 5.2, f1); cap(addr.toUpperCase() + "  ·  " + city.toUpperCase(), cy + 15.8, 2.6, .92*f1);
+    bar(40, cy + 19.4, 4.4, f2); cap(F[0].toUpperCase() + "  ·  " + F[1].toUpperCase(), cy + 22.9, 2.4, .78*f2);
+    v3Text(c, "Tack för förtroendet", mx, cy + 33, {size:4.4, italic:true, color:W, align:"c", alpha:.82});
   } else {
-    if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*.22; c.fillStyle = W; rr(c, M, g.ay - 9, 62, 10.6, 1.5); c.fill(); c.restore() }
-    v3Text(c, addr, M, g.ay, {size:11, color:W, alpha:f1});
-    hr(yb + 26, .3);
-    if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*.2; c.fillStyle = W; rr(c, M, yb + 31, 70, 8, 1.4); c.fill(); c.restore() }
-    [[F[0].split(" ")[0], "RUM"], [F[1].split(" ")[0], "KVADRATMETER"], ["1964", "BYGGÅR"]].forEach(function(r, q){
-      v3Text(c, r[0], g.col[q], yb + 38, {size:7.6, color:W, alpha:f2});
-      v3Text(c, r[1], g.col[q], yb + 43.6, {size:2.3, weight:600, f:"sans", sp:.22, color:W, alpha:.64*f2});
-      if(q){ c.save(); c.globalAlpha = a*f2*.3; c.fillStyle = W; c.fillRect(g.col[q] - 3.4, yb + 29, .3, 16.4); c.restore() }
-    });
-    hr(yb + 47.8, .3);
+    cap(k === 0 ? "KOMMANDE" : "TILL SALU", cy - 13.5, 2.3, .88);
+    bar(60, cy - 12, 12, f1); v3Text(c, addr, mx, cy, {size:13.5, color:W, align:"c", alpha:f1});
+    if(k === 0){
+      hl(cy + 6.6, 10); v3Text(c, "Släpps vecka 12", mx, cy + 15, {size:4.4, italic:true, color:W, align:"c", alpha:.8*f2});
+    } else {
+      bar(34, cy + 3.8, 4.6, f2); cap(city.toUpperCase(), cy + 8, 2.6, .9*f2); hl(cy + 12.6, 10);
+      [[F[0].split(" ")[0], "RUM", -13], [F[1].split(" ")[0], "M²", 13]].forEach(function(r){
+        v3Text(c, r[0], mx + r[2], cy + 23, {size:6.8, color:W, align:"c", alpha:f2});
+        v3Text(c, r[1], mx + r[2], cy + 28, {size:1.9, weight:600, f:"sans", sp:.3, color:W, align:"c", alpha:.64*f2});
+      });
+    }
   }
-  tplMark(c, K.mark, M + 3, yb + 54.4, 3, K.acc, "#101010");
-  v3Text(c, K.brand, M + 8.8, yb + 55.4, {size:2.9, weight:600, f:"sans", sp:.32, color:W, alpha:.95});
-  v3Text(c, K.right, R, yb + 55.4, {size:2.5, weight:600, f:"sans", sp:.18, color:W, align:"r", alpha:.8});
   c.restore();
 }
 function adContent(c, G, t){
   var H = G.H, S = SG(G), i, oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
   var addr = v3t("a8.re.addr"), city = v3t("a8.re.city"), F = v3t("a8.re.facts").split(" · ");
   bgLight(c, G, t);
-  var hs = 6.6, hy = Y0 + 7, PKEY = [GRID7[4], GRID7[0], GRID7[5]];
+  var hs = 6.6, hy = Y0 + 7, PKEY = [GRID7[4], GRID7[0], GRID7[2]];
   kline(c, [["Välj", 0], ["en", 0], ["bild.", 1]], hy, hs, t, .15, CX.T2 - .15);
   kline(c, [["Välj", 0], ["en", 0], ["mall.", 1]], hy, hs, t, CX.T2 + .25, CX.T3 - .2);
   kline(c, [["Uppgifterna", 0], ["fylls", 0], ["i", 1], ["själva.", 1]], hy, hs, t, CX.T3 + .3, CX.T5 - .2);
