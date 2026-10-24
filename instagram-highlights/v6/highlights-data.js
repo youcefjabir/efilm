@@ -409,11 +409,11 @@ var HL = [
   st:[
    {p:"mark", m:"dining", k:"REEL STUDIO", h:"Reels direkt från leveransen.", s:"Som Content Studio, fast i rörelse."},
    {p:"quiet", h:"Bilderna finns redan.", em:"Uppgifterna också.", s:"Mallen fylls i åt dig.", k:"19 — Reel Studio"},
-   {p:"product", m:"rsUiEditor", k:"Så ser den ut", h:"Mall, bilder och rörelse på ett ställe.", s:"Välj bilderna ur leveransen, så får Reelen kontorets mall."},
+   {p:"studio", sc:"overview", m:"kitchen", k:"Så ser den ut", h:"Mall, bilder och rörelse på ett ställe.", s:"Välj bilderna ur leveransen, så får Reelen kontorets mall."},
    {p:"system", k:"Mallen", h:"Fylls i av sig själv.", items:["Adress","Ort","Rum och yta","Mäklare"], s:"Uppgifterna hämtas från leveransen. Inget att skriva."},
-   {p:"product", m:"rsUiText", k:"Text", h:"Gör den till din.", s:"Skriv direkt i bilden. Typsnitt, storlek, färg och kopplade fält."},
-   {p:"product", m:"rsUiElement", k:"Varumärket", h:"Kontorets färger.", s:"Former, linjer och ramar i varumärkets färger, med ett klick."},
-   {p:"product", m:"rsUiRorelse", k:"Rörelse", h:"Varje element rör sig.", s:"Tona in och ut. Välj start, slut och hur mjukt det går."},
+   {p:"studio", sc:"text", m:"dining", k:"Text", h:"Gör den till din.", s:"Skriv direkt i bilden. Typsnitt, storlek, färg och kopplade fält."},
+   {p:"studio", sc:"brand", m:"living", k:"Varumärket", h:"Kontorets färger.", s:"Former, linjer och ramar i varumärkets färger, med ett klick."},
+   {p:"studio", sc:"motion", m:"dining", k:"Rörelse", h:"Varje element rör sig.", s:"Tona in och ut. Välj start, slut och hur mjukt det går."},
    {p:"cta", h:"Din Reel.", s:"I ditt varumärke.", k:"19 — Reel Studio"}
   ]}
 ];

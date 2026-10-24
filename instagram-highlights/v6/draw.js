@@ -274,6 +274,85 @@ var A = {
  }
 };
 
+
+/* =====================================================================
+   STUDIO — egna illustrationer som liknar Reel Studio (inga skärmbilder).
+   Fyra scener: overview (hela studion), text (verktygsraden och kopplade
+   fält), brand (färger, former och mallar), motion (rörelse och tidslinje).
+   ===================================================================== */
+function stDesign(sc, P, s, dcls){
+  var F = 'font-family:Montserrat,sans-serif;', sh = '', i;
+  var pill = function(t, on, extra){ return '<span style="'+F+'display:inline-flex;align-items:center;gap:.8cqw;white-space:nowrap;border:1px solid '+(on?P.acc:P.line)+';background:'+(on?P.acc:'transparent')+';color:'+(on?P.accT:P.ink)+';border-radius:5cqw;padding:1.1cqw 2.4cqw;font-size:2.1cqw;font-weight:600;letter-spacing:.04em;'+(extra||'')+'">'+t+'</span>' };
+  var lab = function(t, extra){ return '<div style="'+F+'font-size:1.75cqw;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:'+P.mut+';'+(extra||'')+'">'+t+'</div>' };
+  var photo = function(w, h, extra, inner){ return '<div style="position:relative;width:'+w+'cqw;height:'+h+'cqw;border-radius:2.2cqw;overflow:hidden;border:1px solid '+P.line+';'+(extra||'')+'"><div style="position:absolute;inset:0;'+bg(s.m, sid(s))+'"></div>'+(inner||'')+'</div>' };
+  var card = function(inner, extra){ return '<div style="background:'+P.card+';border:1px solid '+P.line+';border-radius:2.4cqw;'+(extra||'')+'">'+inner+'</div>' };
+  var tplCard = function(bgc, fgc, accc, lab2, left, top, w){ return '<div style="position:absolute;left:'+left+'%;top:'+top+'%;width:'+w+'%;background:'+bgc+';color:'+fgc+';border-radius:1.2cqw;padding:1.6cqw 1.8cqw;box-shadow:0 .6cqw 2cqw rgba(0,0,0,.35)">'
+     +'<div style="'+F+'font-size:1.25cqw;font-weight:700;letter-spacing:.2em;color:'+accc+'">'+lab2+'</div>'
+     +'<div class="'+dcls+'" style="font-size:3.7cqw;line-height:1.05;margin:.6cqw 0">Storgatan 15</div>'
+     +'<div style="'+F+'font-size:1.02cqw;font-weight:600;letter-spacing:.05em;opacity:.85;white-space:nowrap">HELSINGBORG · 3 RUM · 74 M²</div></div>' };
+  var handles = function(l, t, w, h){ var d = '<span style="position:absolute;width:1.5cqw;height:1.5cqw;border-radius:50%;background:#fff;border:1px solid '+P.ink+';'; var o = '<div style="position:absolute;left:'+l+'%;top:'+t+'%;width:'+w+'%;height:'+h+'%;border:1px solid '+P.acc+'">'; [[0,0],[100,0],[0,100],[100,100]].forEach(function(q){ o += d+'left:calc('+q[0]+'% - .75cqw);top:calc('+q[1]+'% - .75cqw)"></span>' }); return o+'</div>' };
+  if(sc === 'overview'){
+    var rail = ['Bilder','Text','Uppgifter','Element','Varumärke','Rörelse'].map(function(x, j){
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:.7cqw;padding:1.3cqw 0;border-radius:1.6cqw;'+(j===0?'background:'+P.soft:'')+'"><span style="width:3.6cqw;height:3.6cqw;border-radius:.9cqw;border:1.5px solid '+P.ink+';opacity:.85"></span><span style="'+F+'font-size:1.3cqw;font-weight:600;color:'+P.ink+'">'+x+'</span></div>' }).join('');
+    var nums = [2,3,4,5,6].map(function(x){ return '<span style="width:5.2cqw;height:5.2cqw;border-radius:50%;border:1px solid '+(x===5?P.acc:P.line)+';background:'+(x===5?P.acc:'transparent')+';color:'+(x===5?P.accT:P.ink)+';display:grid;place-items:center;'+F+'font-size:2cqw;font-weight:600">'+x+'</span>' }).join('');
+    var tr = function(w, l, on){ return '<div style="position:relative;height:2.4cqw;background:'+P.soft+';border-radius:1.2cqw"><div style="position:absolute;left:'+l+'%;width:'+w+'%;top:0;bottom:0;border-radius:1.2cqw;background:'+(on?P.acc:P.mut)+'"></div></div>' };
+    return card('<div style="display:flex;min-height:0">'
+      +'<div style="flex:0 0 13cqw;border-right:1px solid '+P.line+';padding:2cqw 1.2cqw;display:flex;flex-direction:column;gap:.6cqw">'+rail+'</div>'
+      +'<div style="flex:0 0 28cqw;border-right:1px solid '+P.line+';padding:2.6cqw 2.4cqw;display:flex;flex-direction:column;gap:2cqw">'
+        +lab('Antal bilder')+'<div style="display:flex;gap:1.2cqw">'+nums+'</div>'
+        +lab('Sekunder per bild')+'<div style="position:relative;height:.5cqw;background:'+P.line+';border-radius:1cqw"><span style="position:absolute;left:52%;top:-1.3cqw;width:3cqw;height:3cqw;border-radius:50%;background:'+P.acc+'"></span></div>'
+        +lab('Bildövergång')+pill('Mjuk övergång &nbsp;⌄', false, 'width:100%;box-sizing:border-box;justify-content:space-between;padding:1.8cqw 2.2cqw;border-radius:1.8cqw;font-size:2.1cqw')
+        +lab('Rörelse per bild')+'<div style="display:flex;gap:1.4cqw;align-items:center"><span style="width:6cqw;height:8.6cqw;border-radius:1cqw;overflow:hidden;position:relative"><span style="position:absolute;inset:0;'+bg(s.m, sid(s))+'"></span></span>'+pill('Zooma in &nbsp;⌄', false, 'flex:1;justify-content:space-between;border-radius:1.8cqw')+'</div>'
+      +'</div>'
+      +'<div style="flex:1;padding:2.4cqw 2cqw;display:flex;flex-direction:column;align-items:center;gap:2cqw">'
+        +photo(25, 44.5, '', tplCard('#F5F0E6','#1E3B2E','#B08D57','KOMMANDE',8,56,84)+handles(8,56,84,24))
+        +'<div style="width:100%;display:flex;flex-direction:column;gap:1cqw">'+tr(76,0,false)+tr(60,14,true)+'</div>'
+      +'</div></div>', 'width:100%;overflow:hidden');
+  }
+  if(sc === 'text'){
+    var tb = '<div style="display:flex;flex-wrap:wrap;gap:1.4cqw;align-items:center;padding:2cqw 2.4cqw;border-bottom:1px solid '+P.line+'">'
+      +pill('Adobe Caslon Pro &nbsp;⌄', false, 'font-size:2cqw')+pill('✦ Varumärke', false)
+      +pill('−&nbsp;&nbsp;64&nbsp;&nbsp;+', false)+'<span style="width:4.6cqw;height:4.6cqw;border-radius:50%;background:'+P.acc+'"></span>'
+      +pill('⛓ Koppla fält', true)+pill('Medium', false)+pill('AB', false)+pill('<i>I</i>', false)+pill('<u>U</u>', false)+'</div>';
+    var ch = ['Adress','Ort','Rum','Yta','Mäklare'].map(function(x, j){ return pill(x, j===0, 'font-size:2cqw') }).join('');
+    return card(tb
+      +'<div style="display:flex;gap:2.6cqw;padding:3cqw 2.6cqw 3.4cqw;align-items:flex-start">'
+        +photo(34, 60, '', handles(10,40,80,16)+'<div class="'+dcls+'" style="position:absolute;left:14%;top:44%;font-size:5.2cqw;color:#fff">Storgatan 15</div>'+'<div style="position:absolute;left:12%;top:60%;'+F+'font-size:1.5cqw;font-weight:600;letter-spacing:.12em;color:#fff;opacity:.9">HELSINGBORG · 3 RUM · 74 M²</div>')
+        +'<div style="flex:1;display:flex;flex-direction:column;gap:2.2cqw;padding-top:1cqw">'
+          +lab('Kopplat fält')+'<div style="display:flex;flex-wrap:wrap;gap:1.2cqw">'+ch+'</div>'
+          +'<div style="'+F+'font-size:2.1cqw;line-height:1.45;color:'+P.mut+'">Texten hämtar sitt innehåll från leveransen. Byts objekt följer uppgifterna med.</div>'
+          +lab('Typsnitt', 'margin-top:1cqw')+'<div class="'+dcls+'" style="font-size:7cqw;line-height:1;color:'+P.ink+'">Aa</div>'
+        +'</div></div>', 'width:100%;overflow:hidden');
+  }
+  if(sc === 'brand'){
+    var cols = ['#0F3D2E','#F3EFE7','#B08D57','#1C1C1E','#A4472A'].map(function(x){ return '<span style="width:9.4cqw;height:9.4cqw;border-radius:50%;background:'+x+';border:1px solid '+P.line+'"></span>' }).join('');
+    var shp = ['<span style="width:7cqw;height:4.6cqw;border:1.5px solid '+P.ink+';border-radius:.6cqw"></span>','<span style="width:5.6cqw;height:5.6cqw;border:1.5px solid '+P.ink+';border-radius:.6cqw"></span>','<span style="width:5.8cqw;height:5.8cqw;border:1.5px solid '+P.ink+';border-radius:50%"></span>','<svg viewBox="0 0 10 9" style="width:6cqw"><path d="M5 1 L9 8 H1 Z" fill="none" stroke="'+P.ink+'" stroke-width=".8"/></svg>','<span style="width:7cqw;height:0;border-top:1.5px solid '+P.ink+'"></span>'].map(function(x){ return '<span style="width:10.4cqw;height:10.4cqw;border-radius:1.6cqw;border:1px solid '+P.line+';display:grid;place-items:center">'+x+'</span>' }).join('');
+    var mini = function(bgc, fgc, accc, l2, ph){ return '<div style="flex:1;position:relative;height:36cqw;border-radius:1.8cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg(s.m, sid(s))+'"></div>'+tplCard(bgc,fgc,accc,l2,8,52,86)+'</div>' };
+    return card('<div style="padding:3cqw 3cqw 3.4cqw;display:flex;flex-direction:column;gap:2.6cqw">'
+      +lab('Varumärkets färger')+'<div style="display:flex;gap:2cqw">'+cols+'</div>'
+      +lab('Former')+'<div style="display:flex;gap:1.8cqw">'+shp+'</div>'
+      +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini('#F5F0E6','#1E3B2E','#B08D57','KOMMANDE')+mini('#14233A','#F3EFE7','#D9B56C','TILL SALU')+mini('#A4472A','#F7EEE4','#F1C9A8','SÅLD')+'</div>'
+      +'</div>', 'width:100%;overflow:hidden');
+  }
+  /* motion */
+  var sl = function(name, val, pos){ return '<div style="display:flex;flex-direction:column;gap:1.2cqw"><div style="display:flex;justify-content:space-between">'+lab(name)+'<span style="'+F+'font-size:1.9cqw;font-weight:600;color:'+P.mut+'">'+val+'</span></div><div style="position:relative;height:.5cqw;background:'+P.line+';border-radius:1cqw"><span style="position:absolute;left:0;width:'+pos+'%;top:0;bottom:0;background:'+P.acc+';border-radius:1cqw"></span><span style="position:absolute;left:calc('+pos+'% - 1.5cqw);top:-1.25cqw;width:3cqw;height:3cqw;border-radius:50%;background:'+P.acc+'"></span></div></div>' };
+  var track = function(name, l, w, on){ return '<div style="display:flex;align-items:center;gap:2cqw"><span style="'+F+'flex:0 0 14cqw;font-size:1.9cqw;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:'+(on?P.ink:P.mut)+'">'+name+'</span><span style="position:relative;flex:1;height:4cqw;background:'+P.soft+';border-radius:2cqw"><span style="position:absolute;left:'+l+'%;width:'+w+'%;top:0;bottom:0;background:'+(on?P.acc:P.mut)+';border-radius:2cqw;opacity:'+(on?1:.55)+'"></span></span></div>' };
+  return card('<div style="padding:3cqw 3cqw 3.4cqw;display:flex;flex-direction:column;gap:2.8cqw">'
+    +lab('Elementets rörelse')+pill('Tona in och ut &nbsp;⌄', false, 'width:100%;box-sizing:border-box;justify-content:space-between;padding:2cqw 2.6cqw;border-radius:2cqw;font-size:2.4cqw')
+    +sl('Start','0,7 s',6)+sl('Slut','17,4 s',100)+sl('Övergång','0,5 s',26)
+    +'<div style="height:1px;background:'+P.line+'"></div>'
+    +'<div style="position:relative;display:flex;flex-direction:column;gap:1.6cqw">'+track('Såld', 6, 94, true)+track('Kvadrat', 3, 97, false)+'<span style="position:absolute;left:34%;top:-1cqw;bottom:-1cqw;width:1.5px;background:'+P.ink+'"></span></div>'
+    +'</div>', 'width:100%;overflow:hidden');
+}
+A.studio = function(s,i,n){
+  var P = {ink:'#1C1C1E', mut:'#8A8580', line:'#D8D2CF', card:'#FAF8F7', acc:'#6E7266', accT:'#F2EFEF', soft:'#E8E3E0'};
+  return A.chrome(s.k,i,n,
+    '<div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:3.6cqw;min-height:0">'
+   +'<div class="a-d sm" style="'+dsize(s.h,8.4,SERIF)+'">'+esc(s.h)+'</div>'
+   +stDesign(s.sc, P, s, 'a-d')
+   +(s.s?'<div class="a-l" style="font-size:2.6cqw">'+esc(s.s)+'</div>':'')+'</div>');
+};
+
 /* ---------------------------------------------------------------- B · SKUGGA */
 var B = {
  shell:function(inner){ return '<div class="b">'+inner+'</div>' },
@@ -420,6 +499,17 @@ var B = {
     +'<div class="b-b" style="letter-spacing:.16em;text-transform:uppercase;font-size:2.3cqw;color:#98A088">'+esc(s.s)+'</div>'
     +'</div>'+B.foot(i,n));
  }
+};
+
+
+B.studio = function(s,i,n){
+  var P = {ink:'#EFEDE7', mut:'#85837C', line:'#2A2A27', card:'#171716', acc:'#98A088', accT:'#0E0E0D', soft:'#232321'};
+  return B.shell(
+    B.kick(s.k)
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+9)+'cqw"><div class="b-d" style="'+dsize(s.h,8.4,SERIF)+'">'+esc(s.h)+'</div></div>'
+   +'<div class="z" style="left:6cqw;right:6cqw;top:'+(SAFE.top+27)+'cqw">'+stDesign(s.sc, P, s, 'b-d')+'</div>'
+   +(s.s?'<div class="z" style="left:6cqw;right:6cqw;bottom:'+(SAFE.bot+7)+'cqw"><div class="b-b" style="font-size:2.6cqw">'+esc(s.s)+'</div></div>':'')
+   + B.foot(i,n));
 };
 
 var RENDER = {arkiv:A, skugga:B};

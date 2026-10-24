@@ -36,7 +36,8 @@ var PRIMS = [
   /* --- illustration: sambandet mellan delarna, som inte går att fotografera --- */
   {id:"orbit",     n:"Orbit",          d:"En nod i mitten och n satelliter. Vänd inåt matar delarna objektet, vänd utåt matar objektet delarna."},
   {id:"chain",     n:"Chain",          d:"Numrerade steg med förbindelser. Ett arbetsflöde där varje steg förenklar nästa."},
-  {id:"portal",    n:"Portal",         d:"Spritt blir samlat. Sex leverantörer till vänster, en yta till höger."}
+  {id:"portal",    n:"Portal",         d:"Spritt blir samlat. Sex leverantörer till vänster, en yta till höger."},
+  {id:"studio",    n:"Studio",         d:"Ritad illustration av Reel Studio: verktyg, kopplade fält, varumärke och rörelse. Inga skärmbilder."}
 ];
 
 /* ett representativt exempel per primitiv, för specimen-rutnätet */
