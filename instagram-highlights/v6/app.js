@@ -2107,7 +2107,7 @@ var SECTIONS=[
  {id:"ads7",     n:"Annonsserie",  num:"15", f:secAds7},
  {id:"ads8",     n:"Magasin",      num:"16", f:secAds8},
  {id:"ads9",     n:"Lansering",    num:"17", f:secAds9},
- {id:"ads10",    n:"Viewly Light", num:"18", f:secAds10}
+ {id:"ads10",    n:"Reel Studio", num:"18", f:secAds10}
 ];
 
 /* =====================================================================

@@ -12,7 +12,7 @@
    ===================================================================== */
 (function(){
 var A8 = window.A8K, K = window.A7K, SYS = A8.SYS, sTx = A8.sTx, sCard = A8.sCard, sPh = A8.sPh, sBtn = A8.sBtn, rev = A8.rev, clamp = A8.clamp, SG = A8.SG, GRID7 = A8.GRID7, rr = A8.rr;
-var BG = "#F2EFE9", INK = "#1C1C1E", MUT = "#6b6a66", GRN = "#2E7A4D";
+var BG = "#070606", INK = "#1C1C1E", MUT = "#6f6a65", GRN = "#2f3a2d", LIN = "#e9eadf";
 
 /* ---------- tider (röstens repliker styr allt) ---------- */
 var VO = [["r1", .35], ["r2", 2.9], ["r3", 5.9], ["r4", 8.9], ["r5", 11.2], ["r6", 14.7]];
@@ -25,33 +25,28 @@ function oQ(x){ x = tr1(x); return 1 - Math.pow(1 - x, 3) }
 function k3(t, a, b){ return tr1((t - a)/(b - a)) }
 function lerp(a, b, p){ return a + (b - a)*p }
 
-/* ---------- bakgrund: ljus, rutnät, mjuka glöd ---------- */
-function bgLight(c, G, t, boost){
-  var H = G.H, i; boost = boost || 0;
-  v3Fill(c, 0, 0, 100, H, BG);
-  var gl = [[16, H*.2, 48, "rgba(200,207,192,.9)"], [88, H*.58, 54, "rgba(166,196,170," + (.5 + .2*boost) + ")"], [38, H*.95, 52, "rgba(214,220,205,.9)"]];
-  gl.forEach(function(g, k){
-    var x = g[0] + Math.sin(t*.35 + k*2)*4, y = g[1] + Math.cos(t*.3 + k)*3, gr = c.createRadialGradient(x, y, 0, x, y, g[2]);
-    gr.addColorStop(0, g[3]); gr.addColorStop(1, "rgba(242,239,233,0)"); c.fillStyle = gr; c.fillRect(0, 0, 100, H);
-  });
-  c.save(); c.strokeStyle = "rgba(70,86,66,.07)"; c.lineWidth = .14; var s = 7.2; c.beginPath();
-  for(i = 0; i <= 100/s + 1; i++){ c.moveTo(i*s, 0); c.lineTo(i*s, H) }
-  for(i = 0; i <= H/s; i++){ c.moveTo(0, i*s); c.lineTo(100, i*s) }
-  c.stroke(); c.restore();
+/* ---------- bakgrund: mörkt foto som på sida 16 (fåtöljen), ram och mjuk toning ---------- */
+function bgLight(c, G, t){
+  var H = G.H;
+  v3Fill(c, 0, 0, 100, H, "#070606");
+  v3Photo(c, "rs_chair", 0, 0, 100, H, {scale:lerp(1.05, 1.12, k3(t, 0, 19)), pos:V3_POS.rs_chair, alpha:t < .4 ? ioC(k3(t, 0, .4)) : 1});
+  v3Fill(c, 0, 0, 100, H, "#0c0a0a", .76);
+  v3Grad(c, 0, 0, 100, H*.3, [[0, "rgba(8,7,7,.55)"], [1, "rgba(8,7,7,0)"]]);
+  v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5);
 }
 
 /* ---------- kinetisk text: ord glider in ur oskärpa, accentord i grönt ---------- */
 function kline(c, words, y, size, t, t0, t1, o){
-  o = o || {}; var st = o.st == null ? .1 : o.st, f = {size:size, weight:800, f:"sans", sp:-.015}, gap = size*.3, wd = [], tot = -gap, i;
-  words.forEach(function(w){ var m = v3Measure(c, w[0], f); wd.push(m); tot += m + gap });
-  if(tot > 88){ size = size*88/tot; f.size = size; gap = size*.3; wd = []; tot = -gap; words.forEach(function(w){ var m = v3Measure(c, w[0], f); wd.push(m); tot += m + gap }) }
+  o = o || {}; var st = o.st == null ? .1 : o.st, gap, wd = [], tot, i, mw = function(w){ return v3Measure(c, w[0], {size:size, italic:!!w[1]}) };
+  size = size*1.32; gap = size*.26; tot = -gap; words.forEach(function(w){ var m = mw(w); wd.push(m); tot += m + gap });
+  if(tot > 86){ size = size*86/tot; gap = size*.26; wd = []; tot = -gap; words.forEach(function(w){ var m = mw(w); wd.push(m); tot += m + gap }) }
   var x = 50 - tot/2, px = c.getTransform().a, out = k3(t, t1, t1 + .35);
   for(i = 0; i < words.length; i++){
     var p = ioC(k3(t, t0 + i*st, t0 + i*st + .5)), a = p*(1 - out);
     if(a > .01){
       var bl = (1 - p)*size*.5*px + out*size*.25*px;
       c.save(); if(bl > .2) c.filter = "blur(" + bl.toFixed(2) + "px)";
-      v3Text(c, words[i][0], x, y + (1 - p)*size*.35 - out*size*.18, {size:size, weight:800, f:"sans", sp:-.015, color:words[i][1] ? GRN : INK, alpha:a});
+      v3Text(c, words[i][0], x, y + (1 - p)*size*.35 - out*size*.18, {size:size, italic:!!words[i][1], color:words[i][1] ? "#d6dccb" : "#fff", alpha:a});
       c.restore();
     }
     x += wd[i] + gap;
@@ -61,7 +56,7 @@ function kline(c, words, y, size, t, t0, t1, o){
 /* ---------- svävande kort och mobil ---------- */
 function fcard(c, x, y, w, h, a, r, fill, lift){
   if(a <= .02) return; c.save(); c.globalAlpha = a;
-  c.shadowColor = "rgba(46,90,62,.26)"; c.shadowBlur = 14 + (lift || 0); c.shadowOffsetY = 3 + (lift || 0)*.2; c.fillStyle = fill || "#fff"; rr(c, x, y, w, h, r); c.fill(); c.restore();
+  c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 12 + (lift || 0); c.shadowOffsetY = 2 + (lift || 0)*.2; c.fillStyle = (fill && fill !== "#fff") ? fill : "#ECE8E4"; rr(c, x, y, w, h, r); c.fill(); c.restore();
 }
 function dotc(c, x, y, r, col, a){ if(a <= .02) return; c.save(); c.globalAlpha = a; c.fillStyle = col; c.beginPath(); c.arc(x, y, r, 0, 7); c.fill(); c.restore() }
 function cursor(c, x, y, a, press){
@@ -102,13 +97,13 @@ function link(c, txt, sx, sy, dx, dy, t, t0, dur, off){
   var bz = function(u){ var v = 1 - u; return [v*v*sx + 2*v*u*mx + u*u*dx, v*v*sy + 2*v*u*my + u*u*dy] };
   var la = .75*(1 - k3(p, 1.05, 1.5));
   if(la > .02){
-    c.save(); c.strokeStyle = GRN; c.globalAlpha = la; c.lineWidth = .32; c.lineCap = "round"; c.setLineDash([.7, 1.3]); c.beginPath();
+    c.save(); c.strokeStyle = LIN; c.globalAlpha = la; c.lineWidth = .32; c.lineCap = "round"; c.setLineDash([.7, 1.3]); c.beginPath();
     for(i = 0; i <= 24; i++){ q = bz(e*i/24); if(i) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]) } c.stroke(); c.setLineDash([]);
-    dotc(c, sx, sy, .8, GRN, 1); if(e > .98) dotc(c, dx, dy, 1.0, GRN, 1); c.restore();
+    dotc(c, sx, sy, .8, LIN, 1); if(e > .98) dotc(c, dx, dy, 1.0, LIN, 1); c.restore();
   }
   var pos = bz(e), al = Math.min(1, p*7)*(1 - k3(p, .98, 1.3)), sc = lerp(1, .8, e), w = v3Measure(c, txt, {size:2.4, weight:600, f:"sans"}) + 5;
   if(al <= .02) return;
-  c.save(); c.translate(pos[0], pos[1]); c.scale(sc, sc); sCard(c, -w/2, -2.6, w, 5.2, al, 2.6, "#fff", 4, GRN); sTx(c, txt, 0, 1.0, al, {size:2.4, weight:600, color:INK, align:"c"}); c.restore();
+  c.save(); c.translate(pos[0], pos[1]); c.scale(sc, sc); sCard(c, -w/2, -2.6, w, 5.2, al, 2.6, "#fff", 4, "#2f6a3a"); sTx(c, txt, 0, 1.0, al, {size:2.4, weight:600, color:INK, align:"c"}); c.restore();
 }
 
 /* ---------- annons 1: Reel Studio ---------- */
@@ -139,9 +134,9 @@ function adReel1(c, G, t){
     if(big > .02){
       var lev = rev(t, 1.6, .25), s1 = "FOTOGRAFERAS", s2 = "BILDERNA ÄR LEVERERADE", sw1 = v3Measure(c, s1, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw2 = v3Measure(c, s2, {size:2.1, weight:600, f:"sans", sp:.2}) + 10, sw = lerp(sw1, sw2, lev), sy0 = cyd + 5;
       sCard(c, x0, sy0, sw, 5.6, big, 2.8, "#F4F1EA", 0, "rgba(28,26,25,.12)");
-      dotc(c, x0 + 3.4, sy0 + 2.8, .95, lev > .5 ? GRN : "#b9822c", big);
+      dotc(c, x0 + 3.4, sy0 + 2.8, .95, lev > .5 ? "#2f6a3a" : "#b9822c", big);
       sTx(c, s1, x0 + 6, sy0 + 3.8, big*(1 - lev), {size:2.1, weight:600, color:MUT, sp:.2});
-      sTx(c, s2, x0 + 6, sy0 + 3.8, big*lev, {size:2.1, weight:600, color:GRN, sp:.2});
+      sTx(c, s2, x0 + 6, sy0 + 3.8, big*lev, {size:2.1, weight:600, color:"#2f6a3a", sp:.2});
       /* markeringar: uppgifterna lyser upp en och en */
       var aw = v3Measure(c, addr, {size:8.2}), hl = function(xa, ya, wa, ha, p){ if(p <= 0) return; c.save(); c.globalAlpha = big*(1 - k3(t, 5.2, 5.6))*.9; c.fillStyle = "rgba(46,122,77,.17)"; rr(c, xa, ya, wa*p, ha, ha*.3); c.fill(); c.restore() };
       hl(x0 - 1.2, cyd + 14.2, aw + 2.4, 9, ioC(k3(t, 3.1, 3.7)));
@@ -163,7 +158,7 @@ function adReel1(c, G, t){
     }
     if(sm > .02){
       var lv = "LEVERERAD", lw = v3Measure(c, lv, {size:1.9, weight:600, f:"sans", sp:.2}) + 8, px0 = cx0 + cw0 - 5 - lw;
-      sCard(c, px0, cyy + 3.6, lw, 5.2, sm, 2.6, "#E3F0E4", 0); dotc(c, px0 + 3, cyy + 6.2, .8, GRN, sm); sTx(c, lv, px0 + 5, cyy + 7.5, sm, {size:1.9, weight:600, color:GRN, sp:.2});
+      sCard(c, px0, cyy + 3.6, lw, 5.2, sm, 2.6, "#E3F0E4", 0); dotc(c, px0 + 3, cyy + 6.2, .8, "#2f6a3a", sm); sTx(c, lv, px0 + 5, cyy + 7.5, sm, {size:1.9, weight:600, color:"#2f6a3a", sp:.2});
       v3Text(c, addr, x0 - .4, cyy + 9.2, {size:5.8, color:INK, alpha:sm});
       sTx(c, cstr, x0 - .4, cyy + 14.2, sm, {size:2.0, weight:600, color:MUT, sp:.14});
     }
@@ -189,8 +184,8 @@ function adReel1(c, G, t){
   var ea = k3(t, LOGO_AT - .1, LOGO_AT + .5);
   if(ea > .01){
     var cy = H*.4, mh = 15, mw = mh*858.6/756.3, fs = 7.2, ww = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 3.4 + ww, lx = 50 - tot/2, lp = k3(t, LOGO_AT, LOGO_AT + .8);
-    v3Mark(c, lx, cy - mh/2, mh, INK, C3.oli, {reveal:lp, dot:1, alpha:ea});
-    v3Text(c, "VIEWLY", lx + mw + 3.4, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:INK, alpha:ea*k3(t, LOGO_AT + .15, LOGO_AT + .7)});
+    v3Mark(c, lx, cy - mh/2, mh, "#fff", C3.dotL, {reveal:lp, dot:1, alpha:ea});
+    v3Text(c, "VIEWLY", lx + mw + 3.4, cy + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:ea*k3(t, LOGO_AT + .15, LOGO_AT + .7)});
     kline(c, [["För", 0], ["mäklare", 0], ["som", 0], ["vill", 0], ["mer.", 1]], cy + 20, 5.2, t, LOGO_AT + .55, 99);
     var ua = k3(t, LOGO_AT + 1.5, LOGO_AT + 2.0), uw = v3Measure(c, "viewly.se", {size:3, weight:600, f:"sans", sp:.1}) + 12;
     if(ua > .02){ fcard(c, 50 - uw/2, cy + 28, uw, 8, ua, 4, "#fff", 0); sTx(c, "viewly.se", 50, cy + 33.2, ua, {size:3, weight:600, color:INK, align:"c", sp:.1}) }
@@ -257,7 +252,7 @@ function adExplain(c, G, t){
     if(dk > .02){
       var dy = Y0 + 14;
       fcard(c, 10, dy, 80, 17.5, dk, 3.2, "#fff", 0);
-      sCard(c, 10 + 80 - 5 - 24, dy + 3.6, 24, 5.2, dk, 2.6, "#E3F0E4", 0); dotc(c, 10 + 80 - 5 - 24 + 3, dy + 6.2, .8, GRN, dk); sTx(c, "LEVERERAD", 10 + 80 - 5 - 24 + 5, dy + 7.5, dk, {size:1.9, weight:600, color:GRN, sp:.2});
+      sCard(c, 10 + 80 - 5 - 24, dy + 3.6, 24, 5.2, dk, 2.6, "#E3F0E4", 0); dotc(c, 10 + 80 - 5 - 24 + 3, dy + 6.2, .8, "#2f6a3a", dk); sTx(c, "LEVERERAD", 10 + 80 - 5 - 24 + 5, dy + 7.5, dk, {size:1.9, weight:600, color:"#2f6a3a", sp:.2});
       v3Text(c, addr, 15.6, dy + 9.2, {size:5.8, color:INK, alpha:dk});
       sTx(c, cstr, 15.6, dy + 14.2, dk, {size:2.0, weight:600, color:MUT, sp:.14});
       var lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, ff = sc.w/100*1.5, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
@@ -270,7 +265,7 @@ function adExplain(c, G, t){
     pills.forEach(function(q, k){
       var t0 = EX.T3 + .5 + k*.35, pp = ioC(k3(t, t0, t0 + .45))*pm, al = pp; if(al <= .02) return;
       var px2 = q[1] < 50 ? 8 : 92, ww = v3Measure(c, q[0], {size:2.8, weight:700, f:"sans"}) + 8, py2 = pcy + phh*(.22 + k*.17) + Math.sin(t*1.4 + k)*.6, tx = q[1] < 50 ? px2 : px2 - ww, ex = q[1] < 50 ? sc.x - .5 : sc.x + sc.w + .5;
-      c.save(); c.globalAlpha = al*.7; c.strokeStyle = GRN; c.lineWidth = .3; c.setLineDash([.7, 1.3]); c.beginPath(); c.moveTo(q[1] < 50 ? tx + ww : tx, py2 + 2.8); c.lineTo(ex, py2 + 2.8); c.stroke(); c.setLineDash([]); dotc(c, ex, py2 + 2.8, .9, GRN, 1); c.restore();
+      c.save(); c.globalAlpha = al*.7; c.strokeStyle = LIN; c.lineWidth = .3; c.setLineDash([.7, 1.3]); c.beginPath(); c.moveTo(q[1] < 50 ? tx + ww : tx, py2 + 2.8); c.lineTo(ex, py2 + 2.8); c.stroke(); c.setLineDash([]); dotc(c, ex, py2 + 2.8, .9, LIN, 1); c.restore();
       fcard(c, tx + (1 - pp)*(q[1] < 50 ? -6 : 6), py2, ww, 5.6, al, 2.8, "#fff", 0); sTx(c, q[0], tx + (1 - pp)*(q[1] < 50 ? -6 : 6) + ww/2, py2 + 3.8, al, {size:2.8, weight:700, color:INK, align:"c"});
     });
     /* scen 4: tidslinje med spår */
@@ -291,10 +286,10 @@ function adExplain(c, G, t){
   var ea = k3(t, EX.LOGO - .1, EX.LOGO + .5);
   if(ea > .01){
     var cy2 = H*.4, mh = 15, mw = mh*858.6/756.3, fs = 7.2, ww2 = v3Measure(c, "VIEWLY", {size:fs, weight:500, f:"sans", sp:.3}) - .3*fs, tot = mw + 3.4 + ww2, lx = 50 - tot/2, lp = k3(t, EX.LOGO, EX.LOGO + .8);
-    v3Mark(c, lx, cy2 - mh/2, mh, INK, C3.oli, {reveal:lp, dot:1, alpha:ea});
-    v3Text(c, "VIEWLY", lx + mw + 3.4, cy2 + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:INK, alpha:ea*k3(t, EX.LOGO + .15, EX.LOGO + .7)});
-    kline(c, [["Reel", 1], ["Studio.", 1]], cy2 + 21, 6.2, t, EX.LOGO + .55, 99);
-    kline(c, [["Reels", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]], cy2 + 30, 3.9, t, EX.LOGO + 1.0, 99);
+    v3Mark(c, lx, cy2 - mh/2, mh, "#fff", C3.dotL, {reveal:lp, dot:1, alpha:ea});
+    v3Text(c, "VIEWLY", lx + mw + 3.4, cy2 + fs*.34, {size:fs, weight:500, f:"sans", sp:.3, color:"#fff", alpha:ea*k3(t, EX.LOGO + .15, EX.LOGO + .7)});
+    kline(c, [["Reel", 0], ["Studio.", 1]], cy2 + 22, 5.6, t, EX.LOGO + .55, 99);
+    kline(c, [["Reels", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]], cy2 + 30.5, 3.3, t, EX.LOGO + 1.0, 99);
   }
 }
 function sched2(H){
@@ -336,8 +331,8 @@ window.secAds10 = function(){
   if(V3S.fmt !== "916" && V3S.fmt !== "45") V3S.fmt = "916";
   var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350";
   setTimeout(v3Mount, 0);
-  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 18 · bygge 1</div><h2>Viewly Light</h2>'
-    + '<p>Ny stil efter referensen: ljus bakgrund med rutnät och mjuka glöd, fet text med ett grönt accentord, svävande kort och en mobil, kopplade fält och en svensk röst. Viewlys egna färger. Förslag, inget publicerat.</p></div>'
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 18 · bygge 2</div><h2>Reel Studio</h2>'
+    + '<p>Reel Studio i annonsspråket från sida 16: mörkt foto, serif, ljusa kort och en mobil med Reelen. Kopplade fält med prickade linjer. Annons 1 har svensk röst, annons 2 är utan röst. Förslag, inget publicerat.</p></div>'
     + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
     + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play" aria-label="Spela">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
@@ -349,7 +344,7 @@ window.secAds10 = function(){
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + comp.n + " · " + fn + ' · med röst</button></div></div></div>'
     + '<h3 class="a3sub">Manus och bild</h3><div class="a3copy">' + SCRIPT.map(function(s, i){ return '<div><b>' + (i + 1) + ' · ' + s[0] + '</b><p>' + s[1] + '</p></div>' }).join("") + '</div>'
     + '<details class="a3det"><summary>Underlag</summary><div class="a3und">'
-    + '<div><b>Stilen</b><p>Ljus bakgrund med rutnät och mjuka glöd, fet sans med ett accentord, svävande kort och mobil, prickade kopplingar mellan fält och en röst som läser raderna.</p></div>'
+    + '<div><b>Stilen</b><p>Samma språk som sida 16: mörkt foto, serif, ljusa kort med mjuka skuggor. Från referensen tas bara rörelsen: ord som glider in, kort som svävar och kopplade fält.</p></div>'
     + '<div><b>Rösten</b><p>Syntetisk svensk röst (ElevenLabs via Higgsfield). Lyssna igenom innan publicering och byt röst eller rad vid behov.</p></div>'
     + '<div><b>Påståenden</b><p>Inga siffror och inga löften om tid. Att det går fort syns på att bilderna och uppgifterna redan finns. Namn, märken och adress i mallarna är påhittade exempel. Reel Studio visas som under utveckling: publicera när det går att använda.</p></div></div></details></div>';
 };
