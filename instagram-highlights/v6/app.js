@@ -135,8 +135,10 @@ function rasterize(svg, w, h){
 }
 /* en ram i full Story-upplösning */
 function framePNG(html, w, h, bgc, extraCSS){
-  return rasterize(svgDoc(w, h,
-    '<foreignObject x="0" y="0" width="'+w+'" height="'+h+'">'+xhtml(html,w,h,bgc)+'</foreignObject>', extraCSS), w, h);
+  var doc = svgDoc(w, h,
+    '<foreignObject x="0" y="0" width="'+w+'" height="'+h+'">'+xhtml(html,w,h,bgc)+'</foreignObject>', extraCSS);
+  /* första passet värmer upp bilderna inuti SVG:n (vissa webbläsare ritar dem först då), andra passet är det som sparas */
+  return rasterize(doc, w, h).catch(function(){}).then(function(){ return rasterize(doc, w, h) });
 }
 /* Videoexportens overlay: riktningens grundyta måste bort, annars ligger
    ARKIV:s papper respektive SKUGGAs svarta bakom videorutan och täcker den.
