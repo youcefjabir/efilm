@@ -286,10 +286,10 @@ function stDesign(sc, P, s, dcls){
   var lab = function(t, extra){ return '<div style="'+F+'font-size:1.75cqw;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:'+P.mut+';'+(extra||'')+'">'+t+'</div>' };
   var photo = function(w, h, extra, inner){ return '<div style="position:relative;width:'+w+'cqw;height:'+h+'cqw;border-radius:2.2cqw;overflow:hidden;border:1px solid '+P.line+';'+(extra||'')+'"><div style="position:absolute;inset:0;'+bg(s.m, sid(s))+'"></div>'+(inner||'')+'</div>' };
   var card = function(inner, extra){ return '<div style="background:'+P.card+';border:1px solid '+P.line+';border-radius:2.4cqw;'+(extra||'')+'">'+inner+'</div>' };
-  var tplCard = function(bgc, fgc, accc, lab2, left, top, w){ return '<div style="position:absolute;left:'+left+'%;top:'+top+'%;width:'+w+'%;background:'+bgc+';color:'+fgc+';border-radius:1.2cqw;padding:1.6cqw 1.8cqw;box-shadow:0 .6cqw 2cqw rgba(0,0,0,.35)">'
-     +'<div style="'+F+'font-size:1.25cqw;font-weight:700;letter-spacing:.2em;color:'+accc+'">'+lab2+'</div>'
-     +'<div class="'+dcls+'" style="font-size:3.7cqw;line-height:1.05;margin:.6cqw 0">Storgatan 15</div>'
-     +'<div style="'+F+'font-size:1.02cqw;font-weight:600;letter-spacing:.05em;opacity:.85;white-space:nowrap">HELSINGBORG · 3 RUM · 74 M²</div></div>' };
+  var tplCard = function(bgc, fgc, accc, lab2, left, top, w, k){ k = k || 1; return '<div style="position:absolute;left:'+left+'%;top:'+top+'%;width:'+w+'%;background:'+bgc+';color:'+fgc+';border-radius:1.2cqw;padding:'+(1.6*k)+'cqw '+(1.8*k)+'cqw;box-sizing:border-box;box-shadow:0 .6cqw 2cqw rgba(0,0,0,.35)">'
+     +'<div style="'+F+'font-size:'+(1.25*k)+'cqw;font-weight:700;letter-spacing:.2em;color:'+accc+'">'+lab2+'</div>'
+     +'<div class="'+dcls+'" style="font-size:'+(3.7*k)+'cqw;line-height:1.05;margin:.6cqw 0;white-space:nowrap">Storgatan 15</div>'
+     +'<div style="'+F+'font-size:'+(1.02*k)+'cqw;font-weight:600;letter-spacing:.05em;opacity:.85;white-space:nowrap">HELSINGBORG · 3 RUM · 74 M²</div></div>' };
   var handles = function(l, t, w, h){ var d = '<span style="position:absolute;width:1.5cqw;height:1.5cqw;border-radius:50%;background:#fff;border:1px solid '+P.ink+';'; var o = '<div style="position:absolute;left:'+l+'%;top:'+t+'%;width:'+w+'%;height:'+h+'%;border:1px solid '+P.acc+'">'; [[0,0],[100,0],[0,100],[100,100]].forEach(function(q){ o += d+'left:calc('+q[0]+'% - .75cqw);top:calc('+q[1]+'% - .75cqw)"></span>' }); return o+'</div>' };
   if(sc === 'overview'){
     var rail = ['Bilder','Text','Uppgifter','Element','Varumärke','Rörelse'].map(function(x, j){
@@ -334,12 +334,38 @@ function stDesign(sc, P, s, dcls){
       +lab('Samma Reel, tre kontor')+'<div style="display:flex;gap:1.8cqw">'+mini('#F5F0E6','#1E3B2E','#B08D57','KOMMANDE','rsDusk1')+mini('#14233A','#F3EFE7','#D9B56C','TILL SALU','rsDining')+mini('#A4472A','#F7EEE4','#F1C9A8','SÅLD','rsChair')+'</div>'
       +'</div>', 'width:100%;overflow:hidden');
   }
+  var post = function(w, h, keyb, bgc, fgc, accc, l2){ return '<div style="position:relative;flex:0 0 auto;width:'+w+'cqw;height:'+h+'cqw;border-radius:1.6cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg(keyb)+'"></div><div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 45%,rgba(0,0,0,.42))"></div>'+tplCard(bgc,fgc,accc,l2,7,(h > w*1.2 ? 54 : 50),88,w < 24 ? .62 : (w < 32 ? .82 : 1))+'</div>' };
+  var PH4 = [['#F5F0E6','#1E3B2E','#B08D57','KOMMANDE','rsDusk1'],['#14233A','#F3EFE7','#D9B56C','TILL SALU','rsDining'],['#1F4B39','#F3EFE7','#C8CFC0','VISNING','rsKitchen'],['#A4472A','#F7EEE4','#F1C9A8','SÅLD','rsChair']];
+  if(sc === 'cs_overview'){
+    var rail2 = ['Bilder','Mall','Uppgifter','Varumärke','Format'].map(function(x, j){
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:.7cqw;padding:1.3cqw 0;border-radius:1.6cqw;'+(j===0?'background:'+P.soft:'')+'"><span style="width:3.6cqw;height:3.6cqw;border-radius:.9cqw;border:1.5px solid '+P.ink+';opacity:.85"></span><span style="'+F+'font-size:1.3cqw;font-weight:600;color:'+P.ink+'">'+x+'</span></div>' }).join('');
+    var ths = ['rsDusk1','rsDining','rsChair','rsKitchen','rsDusk2','rsFloor'].map(function(k, j){ return '<span style="position:relative;width:100%;aspect-ratio:1.25;border-radius:1.2cqw;overflow:hidden;'+(j===1?'outline:2px solid '+P.acc+';outline-offset:1px':'')+'"><span style="position:absolute;inset:0;'+bg(k)+'"></span></span>' }).join('');
+    return card('<div style="display:flex;min-height:0">'
+      +'<div style="flex:0 0 13cqw;border-right:1px solid '+P.line+';padding:2cqw 1.2cqw;display:flex;flex-direction:column;gap:.6cqw">'+rail2+'</div>'
+      +'<div style="flex:0 0 29cqw;border-right:1px solid '+P.line+';padding:2.6cqw 2.2cqw;display:flex;flex-direction:column;gap:1.8cqw">'
+        +lab('Välj bild')+'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.2cqw">'+ths+'</div>'
+        +lab('Välj mall')+'<div style="display:flex;flex-wrap:wrap;gap:1cqw">'+pill('Kommande',false,'font-size:1.8cqw')+pill('Till salu',true,'font-size:1.8cqw')+pill('Visning',false,'font-size:1.8cqw')+pill('Såld',false,'font-size:1.8cqw')+'</div>'
+        +lab('Format')+'<div style="display:flex;gap:1cqw">'+pill('4:5',true,'font-size:1.8cqw')+pill('1:1',false,'font-size:1.8cqw')+pill('9:16',false,'font-size:1.8cqw')+'</div>'
+      +'</div>'
+      +'<div style="flex:1;padding:2.6cqw 2cqw;display:flex;flex-direction:column;align-items:center;gap:1.6cqw">'
+        +'<div style="position:relative;width:29cqw;height:36.2cqw;border-radius:1.8cqw;overflow:hidden;border:1px solid '+P.line+'"><div style="position:absolute;inset:0;'+bg('rsDining')+'"></div>'+tplCard('#14233A','#F3EFE7','#D9B56C','TILL SALU',7,50,88)+handles(7,50,88,32)+'</div>'
+        +'<div style="'+F+'font-size:1.6cqw;font-weight:600;letter-spacing:.14em;color:'+P.mut+'">STORGATAN 15 · TILL SALU</div>'
+      +'</div></div>', 'width:100%;overflow:hidden');
+  }
+  if(sc === 'cs_phases'){
+    var cells = PH4.map(function(q){ return '<div style="display:flex;flex-direction:column;gap:1.4cqw;align-items:center">'+post(31, 38.75, q[4], q[0], q[1], q[2], q[3])+'</div>' });
+    return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3cqw;justify-items:center;width:100%">'+cells.join('')+'</div>';
+  }
+  if(sc === 'cs_formats'){
+    var fr = function(w, h, lab2){ return '<div style="display:flex;flex-direction:column;gap:1.6cqw;align-items:center">'+post(w, h, 'rsDining', '#14233A','#F3EFE7','#D9B56C','TILL SALU')+lab('<span style="letter-spacing:.14em">'+lab2+'</span>')+'</div>' };
+    return card('<div style="padding:4cqw 3cqw 3.4cqw;display:flex;gap:3.4cqw;align-items:flex-end;justify-content:center">'+fr(27, 33.75, '4:5 · Inlägg')+fr(27, 27, '1:1 · Kvadrat')+fr(19, 33.75, '9:16 · Story')+'</div>', 'width:100%;overflow:hidden');
+  }
   if(sc === 'compare'){
-    var rows = ['Öppna ett designprogram','Skriva in adress och uppgifter','Animera bilderna','Exportera','Anpassa för varje format'].map(function(x){
+    var rows = (s.rows || ['Öppna ett designprogram','Skriva in adress och uppgifter','Animera bilderna','Exportera','Anpassa för varje format']).map(function(x){
       return '<div style="display:flex;align-items:center;gap:2cqw;padding:1.8cqw 0;border-bottom:1px solid '+P.line+'"><span style="flex:0 0 2.6cqw;height:2.6cqw;border-radius:50%;border:1.5px solid '+P.mut+'"></span><span style="'+F+'font-size:2.5cqw;color:'+P.mut+';text-decoration:line-through;text-decoration-thickness:1.5px">'+x+'</span></div>' }).join('');
     return '<div style="display:flex;flex-direction:column;gap:2.6cqw;width:100%">'
       +card('<div style="padding:3cqw 3.4cqw 1.6cqw">'+lab('Förut')+'<div style="margin-top:1.2cqw">'+rows+'</div></div>')
-      +'<div style="background:'+P.acc+';color:'+P.accT+';border-radius:2.4cqw;padding:3.6cqw 3.4cqw 4cqw">'+lab('Nu','color:'+P.accT+';opacity:.75')+'<div class="'+dcls+'" style="font-size:8cqw;line-height:1.05;margin-top:1.6cqw">Välj bilderna. <i>Klart.</i></div></div></div>';
+      +'<div style="background:'+P.acc+';color:'+P.accT+';border-radius:2.4cqw;padding:3.6cqw 3.4cqw 4cqw">'+lab('Nu','color:'+P.accT+';opacity:.75')+'<div class="'+dcls+'" style="font-size:8cqw;line-height:1.05;margin-top:1.6cqw">'+(s.nu || 'Välj bilderna. <i>Klart.</i>')+'</div></div></div>';
   }
   /* motion */
   var sl = function(name, val, pos){ return '<div style="display:flex;flex-direction:column;gap:1.2cqw"><div style="display:flex;justify-content:space-between">'+lab(name)+'<span style="'+F+'font-size:1.9cqw;font-weight:600;color:'+P.mut+'">'+val+'</span></div><div style="position:relative;height:.5cqw;background:'+P.line+';border-radius:1cqw"><span style="position:absolute;left:0;width:'+pos+'%;top:0;bottom:0;background:'+P.acc+';border-radius:1cqw"></span><span style="position:absolute;left:calc('+pos+'% - 1.5cqw);top:-1.25cqw;width:3cqw;height:3cqw;border-radius:50%;background:'+P.acc+'"></span></div></div>' };

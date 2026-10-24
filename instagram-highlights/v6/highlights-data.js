@@ -417,4 +417,22 @@ var HL = [
    {p:"studio", sc:"motion", m:"rsDining", k:"Rörelse", h:"Varje element rör sig.", s:"Tona in och ut. Välj start, slut och hur mjukt det går."},
    {p:"cta", h:"Din Reel.", s:"I ditt varumärke.", k:"19 — Reel Studio"}
   ]}
+ ,
+
+ /* 20 — CONTENT STUDIO. Verktyget som skapar inlägg ur leveransen. Samma upplägg som
+    kapitel 19: ritade illustrationer av studion (inga skärmbilder) och inga
+    löften om tid eller antal. Ersätter den äldre beskrivningen i kapitel 10. */
+ {glyph:"formats", id:"contentstudio", num:"20", name:"CONTENT STUDIO", label:"Content Studio", cover:"rsKitchen",
+  q:"Kan jag göra inlägg av leveransen?",
+  why:"Nytt kapitel. Förklarar Content Studio med ritade illustrationer: bild, mall, ifyllda uppgifter, fyra faser och alla format.",
+  st:[
+   {p:"mark", m:"rsKitchen", k:"CONTENT STUDIO", h:"Inlägg direkt från leveransen.", s:"Välj en bild och en mall."},
+   {p:"quiet", h:"Varje bostad är mer än en annons.", em:"Fyra faser, ett utseende.", s:"Kommande, till salu, visning och såld.", k:"20 — Content Studio"},
+   {p:"studio", sc:"cs_overview", m:"rsDusk1", k:"Så ser den ut", h:"Bild, mall och uppgifter på ett ställe.", s:"Välj en bild ur leveransen och en färdig mall."},
+   {p:"studio", sc:"compare", m:"rsDusk1", k:"Content Studio", h:"Det som tog tid är redan gjort.", rows:["Öppna ett designprogram","Skriva in adress, rum och yta","Lägga in logga och färger","Byta storlek för varje format"], nu:"Välj bild och mall. <i>Klart.</i>", s:"Uppgifterna och varumärkesprofilen hämtas från leveransen."},
+   {p:"studio", sc:"cs_phases", m:"rsDining", k:"Fyra faser", h:"Samma bostad, fyra inlägg.", s:"Kommande, till salu, visning och såld, i kontorets utseende."},
+   {p:"system", k:"Mallen", h:"Fylls i av sig själv.", items:["Adress","Ort","Rum","Yta","Mäklare och logga"], s:"Inget att skriva, inget att formge."},
+   {p:"studio", sc:"cs_formats", m:"rsDining", k:"Format", h:"Ett inlägg, alla format.", s:"4:5, 1:1 och 9:16 från samma mall."},
+   {p:"cta", h:"Dina inlägg.", s:"I ditt varumärke.", k:"20 — Content Studio"}
+  ]}
 ];
