@@ -144,12 +144,12 @@ function adReel1(c, G, t){
       for(i = 0; i < 3; i++) hl(x0 + cp[i] - .8, cyd + 24.2, cwd[i] + 1.6, 3.9, ioC(k3(t, 3.9 + i*.28, 4.3 + i*.28)));
       v3Text(c, addr, x0, cyd + 21, {size:8.2, color:INK, alpha:big*rev(t, .3, .4)});
       sTx(c, cstr, x0, cyd + 26.8, big*rev(t, .45, .4), lbl);
-      var tw = (cw0 - 12 - 3*2)/4, th = tw*.92, ty = cyd + 30.5, THS = [GRID7[0], GRID7[1], GRID7[5], GRID7[4]];
+      var tw = (cw0 - 12 - 3*2)/4, th = tw*.8, ty = cyd + 30.5, THS = [GRID7[0], GRID7[1], GRID7[5], GRID7[4]];
       for(i = 0; i < 4; i++){
         var t0 = .5 + i*.25, ta = rev(t, t0, .25)*big, tx = x0 + i*(tw + 2), sc = lerp(.85, 1, oBack(k3(t, t0, t0 + .35)));
         c.save(); c.translate(tx + tw/2, ty + th/2); c.scale(sc, sc); sCard(c, -tw/2 - .4, -th/2 - .4, tw + .8, th + .8, ta, 1.4, "#fff", 2); sPh(c, THS[i], -tw/2, -th/2, tw, th, ta, 1.2, 1.14); c.restore();
       }
-      var bw = 52, by = ty + th + 4.2, bpress = k3(t, TAP, TAP + .22), ba = rev(t, 6.2, .4)*big;
+      var bw = 52, by = ty + th + 5, bpress = k3(t, TAP, TAP + .22), ba = rev(t, 6.2, .4)*big;
       if(ba > .02){ c.save(); c.translate(50, by + 4); var bs = 1 - .05*Math.sin(bpress*Math.PI); c.scale(bs, bs); c.translate(-50, -by - 4); fcard(c, 50 - bw/2, by, bw, 8, ba, 4, GRN, 0); sTx(c, "SKAPA REEL  ›", 50, by + 5.2, ba, {size:2.9, weight:700, color:"#fff", align:"c", sp:.14}); c.restore();
         var rp = k3(t, TAP, TAP + .6); if(rp > 0 && rp < 1){ c.save(); c.globalAlpha = big*(1 - rp)*.6; c.strokeStyle = GRN; c.lineWidth = .4; rr(c, 50 - bw/2 - rp*5, by - rp*5, bw + rp*10, 8 + rp*10, 4 + rp*5); c.stroke(); c.restore() }
         var cx1 = lerp(78, 50 + 4, ioC(k3(t, 6.55, 7.4))), cy1 = lerp(by + 22, by + 5.5, ioC(k3(t, 6.55, 7.4))) + Math.sin(k3(t, 6.55, 7.4)*Math.PI)*-3;
@@ -216,9 +216,9 @@ function adExplain(c, G, t){
   /* 1 · välj bilder: sex bilder, tre väljs, Skapa Reel */
   var ga = Math.min(1, rev(t, .1, .4))*(1 - k3(t, EX.T2 - .25, EX.T2 + .15)), enter = oQ(k3(t, 0, .8));
   if(ga > .02){
-    var cw = 80, cx = 10, ch = 56, cy = Y0 + 16 + (1 - enter)*12 - k3(t, EX.T2 - .25, EX.T2 + .15)*3;
+    var cw = 80, cx = 10, ch = 59, cy = Y0 + 15 + (1 - enter)*12 - k3(t, EX.T2 - .25, EX.T2 + .15)*3;
     fcard(c, cx, cy, cw, ch, ga, 3.2, "#fff", 0);
-    var x0 = cx + 6, tw = (cw - 12 - 2*2.4)/3, th = tw*.7, n = 0, SEL = [[0, 1.0], [1, 1.35], [5, 1.7]];
+    var x0 = cx + 6, tw = (cw - 12 - 2*2.4)/3, th = tw*.62, n = 0, SEL = [[0, 1.0], [1, 1.35], [5, 1.7]];
     SEL.forEach(function(q){ if(t >= q[1]) n++ });
     sTx(c, "VÄLJ BILDER", x0, cy + 6.4, ga*rev(t, .3, .4), {size:2.4, weight:700, sp:.2});
     sTx(c, n + " / 6 VALDA", cx + cw - 6, cy + 6.4, ga*rev(t, .3, .4), {size:2.4, weight:600, color:MUT, align:"r", sp:.16});
@@ -231,7 +231,7 @@ function adExplain(c, G, t){
         if(sp > .6) sTx(c, String(qi + 1), gx + 3.4, gy + 4.4, ga, {size:2.6, weight:700, color:"#fff", align:"c"});
       });
     }
-    var bw = 52, by = cy + ch - 14, bp = k3(t, 3.0, 3.22), ba = rev(t, 2.3, .4)*ga;
+    var bw = 52, by = cy + ch - 15.8, bp = k3(t, 3.0, 3.22), ba = rev(t, 2.3, .4)*ga;
     if(ba > .02){ c.save(); c.translate(50, by + 4); var bs = 1 - .05*Math.sin(bp*Math.PI); c.scale(bs, bs); c.translate(-50, -by - 4); fcard(c, 50 - bw/2, by, bw, 8, ba, 4, GRN, 0); sTx(c, "SKAPA REEL  ›", 50, by + 5.2, ba, {size:2.9, weight:700, color:"#fff", align:"c", sp:.14}); c.restore();
       var cx1 = lerp(80, 54, ioC(k3(t, 2.45, 3.0))), cy1 = lerp(by + 22, by + 5.5, ioC(k3(t, 2.45, 3.0)));
       cursor(c, cx1, cy1, ba*(1 - k3(t, 3.25, 3.5)), bp*(1 - k3(t, 3.25, 3.45)));
