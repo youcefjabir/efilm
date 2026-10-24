@@ -36,6 +36,27 @@ function bgLight(c, G, t){
   v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5);
 }
 
+
+/* ---------- bakgrund: ett mörkt jordklot (trådnät) som roterar sakta, med en liten markering över Skåne ---------- */
+function bgGlobe(c, G, t){
+  var H = G.H, R = 70, gx = 50, gy = H*.64, tilt = .42, rot = t*.16 + 3.2, D = Math.PI/180, i, j, pts;
+  v3Fill(c, 0, 0, 100, H, "#070606");
+  var gr = c.createRadialGradient(gx, gy, R*.2, gx, gy, R*1.25); gr.addColorStop(0, "rgba(120,140,115,.26)"); gr.addColorStop(.62, "rgba(60,74,58,.14)"); gr.addColorStop(1, "rgba(7,6,6,0)");
+  c.fillStyle = gr; c.fillRect(0, 0, 100, H);
+  var P = function(lat, lon){ var la = lat*D, lo = lon*D - rot, cx = Math.cos(la)*Math.sin(lo), cy = Math.sin(la)*Math.cos(tilt) - Math.cos(la)*Math.cos(lo)*Math.sin(tilt), z = Math.sin(la)*Math.sin(tilt) + Math.cos(la)*Math.cos(lo)*Math.cos(tilt); return [gx + R*cx, gy - R*cy, z] };
+  c.save(); c.lineCap = "round"; c.lineWidth = .16;
+  var seg = function(a, b){ var z = (a[2] + b[2])/2; if(z <= 0) return; c.strokeStyle = "rgba(214,220,203," + (.08 + .27*Math.pow(z, .8)).toFixed(3) + ")"; c.beginPath(); c.moveTo(a[0], a[1]); c.lineTo(b[0], b[1]); c.stroke() };
+  for(i = -75; i <= 75; i += 15){ var prev = P(i, -180); for(j = -180 + 4; j <= 180; j += 4){ var q = P(i, j); seg(prev, q); prev = q } }
+  for(j = -180; j < 180; j += 15){ var prev2 = P(-90, j); for(i = -90 + 4; i <= 90; i += 4){ var q2 = P(i, j); seg(prev2, q2); prev2 = q2 } }
+  for(i = -60; i <= 60; i += 15) for(j = -180; j < 180; j += 15){ var d = P(i, j); if(d[2] > .05){ c.fillStyle = "rgba(226,232,214," + (.1 + .5*d[2]).toFixed(3) + ")"; c.beginPath(); c.arc(d[0], d[1], .26, 0, 7); c.fill() } }
+  c.strokeStyle = "rgba(214,220,203,.2)"; c.lineWidth = .22; c.beginPath(); c.arc(gx, gy, R, 0, 7); c.stroke();
+  var sk = P(55.9, 13.5);
+  if(sk[2] > .1){ var pu = (t*.7) % 1; c.fillStyle = "rgba(240,244,232,.95)"; c.beginPath(); c.arc(sk[0], sk[1], .55, 0, 7); c.fill(); c.strokeStyle = "rgba(240,244,232," + (.6*(1 - pu)).toFixed(3) + ")"; c.lineWidth = .24; c.beginPath(); c.arc(sk[0], sk[1], .8 + pu*3.4, 0, 7); c.stroke() }
+  c.restore();
+  v3Grad(c, 0, 0, 100, H*.28, [[0, "rgba(7,6,6,.7)"], [1, "rgba(7,6,6,0)"]]);
+  v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, oQ(k3(t, .2, 1.8)), .5);
+}
+
 /* ---------- kinetisk text: ord glider in ur oskärpa, accentord i grönt ---------- */
 function kline(c, words, y, size, t, t0, t1, o){
   o = o || {}; var st = o.st == null ? .1 : o.st, gap, wd = [], tot, i, mw = function(w){ return v3Measure(c, w[0], {size:size, italic:!!w[1]}) };
@@ -700,7 +721,7 @@ var R2 = {TAP:3.05, TL0:3.95, TCL:6.0, PH0:7.2, RT0:7.9, CUTS:[0, 2.0, 4.0, 6.0,
 var RPH2 = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor"];
 function adReel2(c, G, t){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
-  bgLight(c, G, t);
+  bgGlobe(c, G, t);
   heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, R2.TAP - .3], [["Välj", "en"], ["mall."], R2.TL0 + .1, R2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, R2.RT0 + .1, R2.RT0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, R2.RT0 + 2.2, R2.RT0 + 5.4], [["En", "Reel", "i", "ditt"], ["eget", "varumärke."], R2.RT0 + 5.6, R2.PHO - .2]]);
   deliveredCard(c, t, Y0, "SKAPA REEL  ›", R2.TAP);
   tilesStage(c, t, Y0, R2.TL0, R2.TCL, 1, ["rs_dining", "rs_chair", "bedroom"], ["Kommande", "Till salu", "Såld"], R2.PH0 - .1);
@@ -720,7 +741,7 @@ var C2 = {TAP:3.05, G0:3.95, GCL:5.8, TL0:7.4, TCL:9.5, PO0:10.9, FA:12.9, FC:13
 var GRIDK = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
 function adContent2(c, G, t){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
-  bgLight(c, G, t);
+  bgGlobe(c, G, t);
   heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, C2.TAP - .3], [["Välj", "en"], ["bild."], C2.G0 + .1, C2.GCL + .9], [["Välj", "en"], ["mall."], C2.TL0 + .1, C2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, C2.PO0 + .2, C2.PO0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, C2.PO0 + 2.2, C2.END]]);
   deliveredCard(c, t, Y0, "SKAPA INLÄGG  ›", C2.TAP);
   /* steg 1: välj en bild */
