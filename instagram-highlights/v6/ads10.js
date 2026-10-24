@@ -192,13 +192,8 @@ function adReel1(c, G, t){
   }
 }
 
-function sched1(H){
-  var i, ph = [.5, .75, 1.0, 1.25];
-  ph.forEach(function(q){ H.soft("shutter", q, .2) });
-  H.soft("down", TAP, .22); H.soft("up", TAP + .085, .16);
-  CUTS.forEach(function(q, k){ H.soft("shutter", RT0 + q + (k ? 0 : .05), .24) });
-  for(i = 0; i < 4; i++) H.soft("tick2", 9.0 + i*.14 + .95, .05);
-}
+/* inga kameraljud och inga klickljud: bara rösten och loggans korta ton */
+function sched1(H){}
 
 
 /* ---------- annons 2: så fungerar Reel Studio (förklaringsvideo, utan röst) ---------- */
@@ -292,13 +287,7 @@ function adExplain(c, G, t){
     kline(c, [["Reels", 0], ["direkt", 0], ["från", 0], ["leveransen.", 0]], cy2 + 30.5, 3.3, t, EX.LOGO + 1.0, 99);
   }
 }
-function sched2(H){
-  [1.0, 1.35, 1.7].forEach(function(q){ H.soft("tick2", q, .12) });
-  H.soft("down", 3.0, .22); H.soft("up", 3.085, .16);
-  EX.CUTS.forEach(function(q, k){ H.soft("shutter", EX.RT0 + q + (k ? 0 : .05), .22) });
-  for(var i = 0; i < 4; i++){ H.soft("tick2", 4.5 + i*.14 + .95, .05); H.soft("tick2", EX.T3 + .5 + i*.35 + .2, .08) }
-  [0, 1, 2].forEach(function(k){ H.soft("tick2", EX.T4 + .6 + k*.3 + .3, .07) });
-}
+function sched2(H){}
 
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
