@@ -772,9 +772,9 @@ Object.keys(RV).forEach(function(k){ var V = RV[k]; V.PH0 = V.tap + .9; V.PO = V
 var RPH = [GRID7[0], GRID7[1], GRID7[4], GRID7[2], GRID7[3], GRID7[5]];
 /* tre mallar, tre kontor (påhittade namn och märken) och tre olika layouter: Kommande, Till salu, Såld */
 var TPL8 = [
-  {lab:"KOMMANDE", bg:"#F5F0E6", fg:"#1E3B2E", acc:"#B08D57", brand:"SOLVARA", mark:0},
-  {lab:"TILL SALU", bg:"#14233A", fg:"#F3EFE7", acc:"#D9B56C", brand:"HAVSVIK", mark:1},
-  {lab:"SÅLD", bg:"#A4472A", fg:"#F7EEE4", acc:"#F1C9A8", brand:"LINDÖ", mark:2}
+  {lab:"KOMMANDE", right:"KOMMER SNART", acc:"#D2B07A", brand:"SOLVARA", mark:0},
+  {lab:"TILL SALU", right:"VISNING SÖN 13–14", acc:"#C8CFC0", brand:"HAVSVIK", mark:1},
+  {lab:"SÅLD", right:"TACK FÖR FÖRTROENDET", acc:"#F1C9A8", brand:"LINDÖ", mark:2}
 ];
 function tplMark(c, m, x, y, r, col, bg){
   c.save(); c.strokeStyle = col; c.fillStyle = col; c.lineWidth = r*.16; c.lineCap = "round";
@@ -784,56 +784,43 @@ function tplMark(c, m, x, y, r, col, bg){
   c.restore();
 }
 function tplGeo(i, x, y, w, h, f, yk){
-  var g = {}; yk = yk || 1;
-  if(i === 0){ g.cx = x - 4*f; g.cy = y + h*.55*yk; g.cw = w*.80 + 4*f; g.ch = 36*f; g.px = x + 4.4*f; g.ax = g.px; g.ay = g.cy + 25*f; g.as = 7.8; g.al = "l"; g.dy = g.cy + 32.6*f; g.inner = g.cw - 12.8*f }
-  else if(i === 1){ g.mx = x + w*.43; g.cw = w*.72; g.cx = g.mx - g.cw/2; g.cy = y + h*.5*yk; g.ch = 41*f; g.ax = g.mx; g.ay = g.cy + 30.4*f; g.as = 6.8; g.al = "c"; g.dy = g.cy + 36.4*f }
-  else { g.px = x + 6*f; g.sy = y + h*.58*yk; g.ax = g.px + 3.4*f; g.ay = g.sy + 11.8*f; g.as = 5.4; g.al = "l"; g.dy = g.sy + 21*f }
+  yk = yk || 1; var g = {};
+  g.Bt = y + h*.5*yk; g.px = x + w*.07; g.inner = w*.86; g.ax = g.px; g.ay = g.Bt + 13.6*f; g.dy = g.Bt + 27*f;
+  g.col = [g.px, g.px + g.inner*.36 + 3*f, g.px + g.inner*.67 + 3*f]; g.cityX = x + w - w*.07; g.cityY = g.Bt + 4*f;
+  g.tgt = [[g.px + 14*f, g.ay - 3.4*f], [g.cityX - 8*f, g.cityY - 1*f], [g.col[0] + 2.5*f, g.dy - 2.4*f], [g.col[1] + 3.5*f, g.dy - 2.4*f]];
   return g;
 }
+/* mallarna: ett fotografi, en mjuk toning nedåt, öppen typografi med hårfina linjer. Kontorets logga längst ner. */
 function tplDraw(c, i, x, y, w, h, f, a, D, f1, f2, dyo, yk){
   if(a <= .02) return;
-  var T8 = TPL8[i], g = tplGeo(i, x, y, w, h, f, yk), cols = [D.city.toUpperCase(), D.facts[0].toUpperCase(), D.facts[1].toUpperCase()];
-  var bar = function(x0, y0, w0, h0, k){ c.save(); c.globalAlpha = a*k*.22; c.fillStyle = T8.fg; rr(c, x0, y0, w0, h0, h0*.3); c.fill(); c.restore() };
+  var T8 = TPL8[i], g = tplGeo(i, x, y, w, h, f, yk), Bt = g.Bt, R = g.px + g.inner, W = "#fff", rows = [[D.facts[0].split(" ")[0], "RUM"], [D.facts[1].split(" ")[0], "KVADRATMETER"], ["1964", "BYGGÅR"]];
+  var hr = function(yy, k){ c.save(); c.globalAlpha = a*k; c.fillStyle = W; c.fillRect(g.px, yy, g.inner, .2*f); c.restore() };
   c.save(); c.globalAlpha = a; c.translate(0, dyo || 0);
-  if(i === 0){
-    c.shadowColor = "rgba(0,0,0,.42)"; c.shadowBlur = 7; c.shadowOffsetY = 1.4; c.fillStyle = T8.bg; rr(c, g.cx, g.cy, g.cw, g.ch, 2.4*f); c.fill(); c.shadowColor = "transparent";
-    tplMark(c, 0, g.px + 2.2*f, g.cy + 6.4*f, 2.2*f, T8.acc, T8.bg);
-    v3Text(c, T8.brand, g.px + 6.2*f, g.cy + 7.2*f, {size:1.85*f, weight:600, f:"sans", sp:.36, color:T8.fg, alpha:.9});
-    c.fillStyle = T8.acc; c.fillRect(g.px, g.cy + 14*f, 3.2*f, .3*f);
-    v3Text(c, T8.lab, g.px + 4.8*f, g.cy + 15*f, {size:1.9*f, weight:700, f:"sans", sp:.3, color:T8.acc});
-    if(f1 < 1) bar(g.px, g.ay - 7*f, 46*f, 7.2*f, 1 - f1);
-    v3Text(c, D.addr, g.ax, g.ay, {size:g.as*f, color:T8.fg, alpha:f1});
-    c.globalAlpha = a*.3; c.fillStyle = T8.fg; c.fillRect(g.px, g.cy + 28*f, g.inner, .22*f); c.globalAlpha = a;
-    if(f2 < 1) bar(g.px, g.dy - 2.4*f, 56*f, 3*f, 1 - f2);
-    var offs = [0, .5, .78];
-    cols.forEach(function(s, q){ v3Text(c, s, g.px + offs[q]*g.inner, g.dy, {size:1.85*f, weight:600, f:"sans", sp:.1, color:T8.fg, alpha:f2*.9}); if(q){ c.save(); c.globalAlpha = a*f2*.3; c.fillStyle = T8.fg; c.fillRect(g.px + offs[q]*g.inner - 1.9*f, g.dy - 3.2*f, .2*f, 4.2*f); c.restore() } });
-  } else if(i === 1){
-    c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = 8; c.shadowOffsetY = 1.6; c.fillStyle = T8.bg; rr(c, g.cx, g.cy, g.cw, g.ch, 2.2*f); c.fill(); c.shadowColor = "transparent";
-    c.strokeStyle = T8.acc; c.globalAlpha = a*.55; c.lineWidth = .22*f; rr(c, g.cx + 1.5*f, g.cy + 1.5*f, g.cw - 3*f, g.ch - 3*f, 1.4*f); c.stroke(); c.globalAlpha = a;
-    tplMark(c, 1, g.mx, g.cy + 8*f, 2.5*f, T8.acc, T8.bg);
-    v3Text(c, T8.brand, g.mx, g.cy + 15.2*f, {size:1.8*f, weight:600, f:"sans", sp:.42, color:T8.fg, align:"c", alpha:.9});
-    var pw = v3Measure(c, T8.lab, {size:1.7*f, weight:700, f:"sans", sp:.28}) + 6*f, py = g.cy + 18.6*f; c.fillStyle = T8.acc; rr(c, g.mx - pw/2, py, pw, 5.2*f, 2.6*f); c.fill();
-    v3Text(c, T8.lab, g.mx, py + 3.6*f, {size:1.7*f, weight:700, f:"sans", sp:.28, color:T8.bg, align:"c"});
-    if(f1 < 1) bar(g.mx - 23*f, g.ay - 7*f, 46*f, 7.2*f, 1 - f1);
-    v3Text(c, D.addr, g.ax, g.ay, {size:g.as*f, color:T8.fg, align:"c", alpha:f1});
-    c.globalAlpha = a*.5; c.fillStyle = T8.acc; c.fillRect(g.mx - 5*f, g.cy + 32.8*f, 10*f, .24*f); c.globalAlpha = a;
-    if(f2 < 1) bar(g.mx - 28*f, g.dy - 2.4*f, 56*f, 3*f, 1 - f2);
-    v3Text(c, cols.join("  ·  "), g.mx, g.dy, {size:1.8*f, weight:600, f:"sans", sp:.1, color:T8.fg, align:"c", alpha:f2*.9});
+  v3Grad(c, x, Bt - 16*f, w, (y + h) - (Bt - 16*f) + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.76)"]]);
+  v3Text(c, T8.lab, g.px, Bt + 4*f, {size:1.65*f, weight:600, f:"sans", sp:.3, color:W, alpha:.84});
+  v3Text(c, D.city.toUpperCase(), R, Bt + 4*f, {size:1.65*f, weight:600, f:"sans", sp:.3, color:W, align:"r", alpha:.84*f2});
+  if(f1 < 1){ c.save(); c.globalAlpha = a*(1 - f1)*.24; c.fillStyle = W; rr(c, g.px, Bt + 7.4*f, 44*f, 7*f, 1.1*f); c.fill(); c.restore() }
+  v3Text(c, D.addr, g.px, g.ay, {size:7.2*f, color:W, alpha:f1});
+  hr(Bt + 17.4*f, .3);
+  if(i === 2){
+    v3Text(c, "Såld", g.px, Bt + 30.6*f, {size:11*f, italic:true, color:W, alpha:f2});
   } else {
-    v3Grad(c, x, y + h*.38*(yk || 1), w, h - h*.38*(yk || 1) + 1, [[0, "rgba(8,7,7,0)"], [.8, "rgba(8,7,7,.62)"], [1, "rgba(8,7,7,.66)"]]);
-    tplMark(c, 2, g.px + 2.2*f, g.sy - 21.6*f, 2.2*f, T8.fg, T8.bg);
-    v3Text(c, T8.brand, g.px + 6.2*f, g.sy - 20.8*f, {size:1.85*f, weight:600, f:"sans", sp:.36, color:T8.fg, alpha:.9});
-    v3Text(c, "Såld", g.px, g.sy, {size:17*f, italic:true, color:T8.fg});
-    c.shadowColor = "rgba(0,0,0,.3)"; c.shadowBlur = 5; c.shadowOffsetY = 1; c.fillStyle = T8.bg; rr(c, g.px, g.sy + 4*f, w*.68, 11.6*f, 1.6*f); c.fill(); c.shadowColor = "transparent";
-    if(f1 < 1) bar(g.px + 3.4*f, g.ay - 5*f, 40*f, 5.6*f, 1 - f1);
-    v3Text(c, D.addr, g.ax, g.ay, {size:g.as*f, italic:true, color:T8.fg, alpha:f1});
-    if(f2 < 1) bar(g.px, g.dy - 2.4*f, 54*f, 3*f, 1 - f2);
-    v3Text(c, cols.join("  ·  "), g.px, g.dy, {size:1.8*f, weight:600, f:"sans", sp:.12, color:T8.fg, alpha:f2*.92});
+    if(f2 < 1){ c.save(); c.globalAlpha = a*(1 - f2)*.22; c.fillStyle = W; rr(c, g.px, Bt + 21*f, 56*f, 7*f, 1.1*f); c.fill(); c.restore() }
+    rows.forEach(function(r, k){
+      var cx0 = g.col[k];
+      v3Text(c, r[0], cx0, g.dy, {size:5.2*f, color:W, alpha:f2});
+      v3Text(c, r[1], cx0, Bt + 30.8*f, {size:1.2*f, weight:600, f:"sans", sp:.22, color:W, alpha:.62*f2});
+      if(k){ c.save(); c.globalAlpha = a*f2*.3; c.fillStyle = W; c.fillRect(cx0 - 3*f, Bt + 19.4*f, .2*f, 13.4*f); c.restore() }
+    });
   }
+  hr(Bt + 34.8*f, .3);
+  tplMark(c, T8.mark, g.px + 1.9*f, Bt + 40.4*f, 1.9*f, T8.acc, "#101010");
+  v3Text(c, T8.brand, g.px + 5.6*f, Bt + 41.2*f, {size:1.6*f, weight:600, f:"sans", sp:.34, color:W, alpha:.94});
+  v3Text(c, T8.right, R, Bt + 41.2*f, {size:1.45*f, weight:600, f:"sans", sp:.2, color:W, align:"r", alpha:.78});
   c.restore();
 }
 function reelFrame(c, x, y, w, h, tr, o){
-  var f = w/100*1.5, ph = o.ph, seg = RSEG, fd = .5, a = o.a == null ? 1 : o.a, i;
+  var f = w/100*1.7, ph = o.ph, seg = RSEG, fd = .5, a = o.a == null ? 1 : o.a, i;
   var f1 = o.f1 == null ? 1 : o.f1, f2 = o.f2 == null ? 1 : o.f2, ia = rev(tr, .25, .6);
   if(a <= .02) return;
   c.save(); c.globalAlpha = a; rr(c, x, y, w, h, o.r || 0); c.clip();
@@ -932,9 +919,9 @@ function adReel(c, G, t, V){
     reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5));
   }
   /* kopplade fält: adress, ort, rum och yta flyger in i mallen */
-  var fs = sc2(), g0 = tplGeo(0, fs.x, fs.y, fs.w, fs.h, fs.w/100*1.5), ff = fs.w/100*1.5, aw = v3Measure(c, T("a8.re.addr"), {size:8.2}), wC = v3Measure(c, T("a8.re.city").toUpperCase(), cop), w1 = v3Measure(c, T("a8.re.city").toUpperCase() + "  ·  ", cop), w2 = v3Measure(c, T("a8.re.city").toUpperCase() + "  ·  " + P0[0].toUpperCase() + "  ·  ", cop), wR = v3Measure(c, P0[0].toUpperCase(), cop), wY = v3Measure(c, P0[1].toUpperCase(), cop);
+  var fs = sc2(), g0 = tplGeo(0, fs.x, fs.y, fs.w, fs.h, fs.w/100*1.7), ff = fs.w/100*1.7, aw = v3Measure(c, T("a8.re.addr"), {size:8.2}), wC = v3Measure(c, T("a8.re.city").toUpperCase(), cop), w1 = v3Measure(c, T("a8.re.city").toUpperCase() + "  ·  ", cop), w2 = v3Measure(c, T("a8.re.city").toUpperCase() + "  ·  " + P0[0].toUpperCase() + "  ·  ", cop), wR = v3Measure(c, P0[0].toUpperCase(), cop), wY = v3Measure(c, P0[1].toUpperCase(), cop);
   var tl = tap + .55, SRC = [[x0 + aw/2, cy0 + 22 - 3.4], [x0 + wC/2, cy0 + 27.6 - .8], [x0 + w1 + wR/2, cy0 + 27.6 - .8], [x0 + w2 + wY/2, cy0 + 27.6 - .8]], TXT = [T("a8.re.addr"), T("a8.re.city"), P0[0], P0[1]];
-  var inn = g0.inner, TGT = [[g0.ax + 12*ff, g0.ay - 3.2*ff], [g0.px + 5.5*ff, g0.dy - 1.2*ff], [g0.px + .5*inn + 4*ff, g0.dy - 1.2*ff], [g0.px + .78*inn + 4*ff, g0.dy - 1.2*ff]];
+  var TGT = g0.tgt;
   for(i = 0; i < 4; i++) chipPath(c, TXT[i], SRC[i][0], SRC[i][1] - cex*3, TGT[i][0], TGT[i][1], t, tl + i*.12, .9, (i - 1.5)*5);
   function sc2(){ var py3 = pcy + (1 - oQ(k3(t, tap + .55, tap + 1.3)))*8 + pout*6, b = pww*.028*1.3, ss = {x:pxx + b, y:py3 + b, w:pww - 2.6*pww*.028, h:phh - 2.6*pww*.028}; return ss }
   if(t >= PO + .5) twoPartFast(c, t, PO + .5, L + .05, T("a8.rl.f1"), T("a8.rl.f2"), G.is9 ? 12 : 10, S.y0 + S.h*.46);

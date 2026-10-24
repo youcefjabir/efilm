@@ -75,7 +75,7 @@ function phone2(c, x, y, w, h, a, rot){
 /* ---------- Reelen i mobilen: bilder med mjuka övertoningar, mallar som byter layout ---------- */
 function reelL(c, x, y, w, h, rt, a, r, f1, f2, ph, yk, cuts, swt){
   cuts = cuts || CUTS; swt = swt || SWT;
-  var f = w/100*1.5, i, ia = rev(rt, .25, .6), D = {addr:v3t("a8.re.addr"), city:v3t("a8.re.city"), facts:v3t("a8.re.facts").split(" · ")};
+  var f = w/100*1.7, i, ia = rev(rt, .25, .6), D = {addr:v3t("a8.re.addr"), city:v3t("a8.re.city"), facts:v3t("a8.re.facts").split(" · ")};
   if(a <= .02) return;
   c.save(); c.globalAlpha = a; rr(c, x, y, w, h, r || 0); c.clip(); v3Fill(c, x, y, w, h, "#000");
   for(i = 0; i < ph.length; i++){
@@ -173,10 +173,10 @@ function adReel1(c, G, t){
     reelL(c, sc.x, sc.y, sc.w, sc.h, rt, pa, sc.r, f1, f2, RPH, yk);
     A8.reelUI(c, sc.x, sc.y, sc.w, sc.h, pa, rev(rt, .3, .5));
     /* kopplade fält: uppgifterna i kortet överst flyger in i mallen */
-    var ff = sc.w/100*1.5, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner;
+    var ff = sc.w/100*1.7, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner;
     var xs = cx0 + 6 - .4, ay = Y0 + .5 + 9.2, cl = Y0 + .5 + 14.2, lb2 = {size:2.0, weight:600, f:"sans", sp:.14};
     var SRC = [[xs + v3Measure(c, addr, {size:5.8})/2, ay - 2.2], [xs + v3Measure(c, city.toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[0].toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  " + F[0].toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[1].toUpperCase(), lb2)/2, cl - .6]];
-    var TXT = [addr, city, F[0], F[1]], TGT = [[g0.ax + 12*ff, g0.ay - 3.2*ff], [g0.px + 5.5*ff, g0.dy - 1.2*ff], [g0.px + .5*inn + 4*ff, g0.dy - 1.2*ff], [g0.px + .78*inn + 4*ff, g0.dy - 1.2*ff]];
+    var TXT = [addr, city, F[0], F[1]], TGT = g0.tgt;
     var lo = 1 - pout;
     for(i = 0; i < 4; i++) link(c, TXT[i], SRC[i][0], SRC[i][1], TGT[i][0], TGT[i][1], t, 9.0 + i*.14, .95, (i - 1.5)*5);
   }
@@ -250,9 +250,9 @@ function adExplain(c, G, t){
       sCard(c, 10 + 80 - 5 - 24, dy + 3.6, 24, 5.2, dk, 2.6, "#E3F0E4", 0); dotc(c, 10 + 80 - 5 - 24 + 3, dy + 6.2, .8, "#2f6a3a", dk); sTx(c, "LEVERERAD", 10 + 80 - 5 - 24 + 5, dy + 7.5, dk, {size:1.9, weight:600, color:"#2f6a3a", sp:.2});
       v3Text(c, addr, 15.6, dy + 9.2, {size:5.8, color:INK, alpha:dk});
       sTx(c, cstr, 15.6, dy + 14.2, dk, {size:2.0, weight:600, color:MUT, sp:.14});
-      var lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, ff = sc.w/100*1.5, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
+      var lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, ff = sc.w/100*1.7, g0 = A8.tplGeo(0, sc.x, sc.y, sc.w, sc.h, ff, yk), inn = g0.inner, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
       var SRC = [[xs + v3Measure(c, addr, {size:5.8})/2, ay - 2.2], [xs + v3Measure(c, city.toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[0].toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  " + F[0].toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[1].toUpperCase(), lb2)/2, cl - .6]];
-      var TXT = [addr, city, F[0], F[1]], TGT = [[g0.ax + 12*ff, g0.ay - 3.2*ff], [g0.px + 5.5*ff, g0.dy - 1.2*ff], [g0.px + .5*inn + 4*ff, g0.dy - 1.2*ff], [g0.px + .78*inn + 4*ff, g0.dy - 1.2*ff]];
+      var TXT = [addr, city, F[0], F[1]], TGT = g0.tgt;
       for(i = 0; i < 4; i++) link(c, TXT[i], SRC[i][0], SRC[i][1], TGT[i][0], TGT[i][1], t, 4.5 + i*.14, .95, (i - 1.5)*5);
     }
     /* scen 3: verktygen svävar runt mobilen */
@@ -298,7 +298,7 @@ function drawPost(c, x, y, w, h, ti, key, a, f1, f2, yk){
   c.save(); c.globalAlpha = a; rr(c, x, y, w, h, 1.6); c.clip(); v3Photo(c, key, x, y, w, h, {pos:V3_POS[key]});
   v3Grad(c, x, y + h*.5, w, h*.5, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.45)"]]);
   var D = {addr:v3t("a8.re.addr"), city:v3t("a8.re.city"), facts:v3t("a8.re.facts").split(" · ")};
-  A8.tplDraw(c, ti, x, y, w, h, Math.min(w/100*1.5, .9), a, D, f1 == null ? 1 : f1, f2 == null ? 1 : f2, 0, yk || 1);
+  A8.tplDraw(c, ti, x, y, w, h, Math.min(w/100*1.7, .9), a, D, f1 == null ? 1 : f1, f2 == null ? 1 : f2, 0, (yk || 1)*.9);
   c.restore();
 }
 function adContent(c, G, t){
@@ -353,9 +353,9 @@ function adContent(c, G, t){
     v3Text(c, addr, 15.6, dy + 9.2, {size:5.8, color:INK, alpha:dk}); sTx(c, cstr, 15.6, dy + 14.2, dk, {size:2.0, weight:600, color:MUT, sp:.14});
     var f1 = ioC(k3(t, CX.T3 + 1.9, CX.T3 + 2.25)), f2 = ioC(k3(t, CX.T3 + 2.15, CX.T3 + 2.6));
     drawPost(c, px, py, pw, ph, 1, GRID7[1], pa3, f1, f2, 1);
-    var ff = Math.min(pw/100*1.5, .9), g1 = A8.tplGeo(1, px, py, pw, ph, ff, 1), lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
+    var ff = Math.min(pw/100*1.7, .9), g1 = A8.tplGeo(1, px, py, pw, ph, ff, .9), lb2 = {size:2.0, weight:600, f:"sans", sp:.14}, xs = 15.6, ay = dy + 9.2, cl = dy + 14.2;
     var SRC = [[xs + v3Measure(c, addr, {size:5.8})/2, ay - 2.2], [xs + v3Measure(c, city.toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[0].toUpperCase(), lb2)/2, cl - .6], [xs + v3Measure(c, city.toUpperCase() + "  ·  " + F[0].toUpperCase() + "  ·  ", lb2) + v3Measure(c, F[1].toUpperCase(), lb2)/2, cl - .6]];
-    var TXT = [addr, city, F[0], F[1]], TGT = [[g1.ax, g1.ay - 3.2*ff], [g1.mx - 13*ff, g1.dy - 1.2*ff], [g1.mx, g1.dy - 1.2*ff], [g1.mx + 13*ff, g1.dy - 1.2*ff]];
+    var TXT = [addr, city, F[0], F[1]], TGT = g1.tgt;
     for(i = 0; i < 4; i++) link(c, TXT[i], SRC[i][0], SRC[i][1], TGT[i][0], TGT[i][1], t, CX.T3 + .9 + i*.14, .95, (i - 1.5)*5);
   }
   /* 4 · alla format */
