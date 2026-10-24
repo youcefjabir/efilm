@@ -376,6 +376,9 @@ function stDesign(sc, P, s, dcls){
         +'<div style="'+F+'font-size:1.6cqw;font-weight:600;letter-spacing:.14em;color:'+P.mut+'">STORGATAN 15 · TILL SALU</div>'
       +'</div></div>', 'width:100%;overflow:hidden');
   }
+  if(sc === 'cs_hero'){
+    return '<div style="display:flex;justify-content:center;width:100%">'+post(56, 70, 'rsDusk1', 1)+'</div>';
+  }
   if(sc === 'cs_phases'){
     var cells = PH4.map(function(q){ return '<div style="display:flex;flex-direction:column;gap:1.4cqw;align-items:center">'+post(31, 38.75, q[1], q[0])+'</div>' });
     return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3cqw;justify-items:center;width:100%">'+cells.join('')+'</div>';
