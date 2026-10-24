@@ -435,6 +435,47 @@ function adContent(c, G, t){
 }
 function sched3(H){ H.click(CX.CL1, .35); H.click(CX.CL2, .35) }
 
+
+/* ---------- annons 1b: samma annons, men öppnar med en iPhone-notis ("Dina foton är klara") ---------- */
+var NOF = 4.0;
+function adReelNotis(c, G, t){
+  var H = G.H, S = SG(G), tf = t - NOF, flowT = Math.max(0, tf);
+  if(t >= NOF - .35) adReel1(c, G, flowT);
+  var ia = 1 - k3(t, NOF - .3, NOF);
+  if(ia <= .01) return;
+  c.save(); c.globalAlpha = ia;
+  v3Fill(c, 0, 0, 100, H, "#070606");
+  v3Photo(c, "rs_dusk2", 0, 0, 100, H, {scale:lerp(1.08, 1.14, k3(t, 0, 4)), pos:V3_POS.rs_dusk2, alpha:ioC(k3(t, 0, .4))});
+  v3Fill(c, 0, 0, 100, H, "#0c0a0a", .52);
+  v3Grad(c, 0, 0, 100, H*.4, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
+  /* låsskärmens klocka */
+  var ca = rev(t, .1, .5), ty = S.y0 + 8;
+  v3Text(c, "Lördag 24 oktober", 50, ty, {size:3.3, weight:500, f:"sans", color:"#fff", align:"c", alpha:.85*ca});
+  v3Text(c, "9:41", 50, ty + 15, {size:15, weight:300, f:"sans", color:"#fff", align:"c", alpha:.95*ca});
+  /* notisen glider ner */
+  var nin = oQ(k3(t, .75, 1.35)), tap = k3(t, 3.0, 3.18), pr = 1 - .035*Math.sin(tap*Math.PI), nw = 88, nx = 6, nh = 21.5, ny = lerp(-26, S.y0 + 31, nin);
+  if(nin > .01){
+    c.save(); c.translate(50, ny + nh/2); c.scale(pr, pr); c.translate(-50, -ny - nh/2);
+    c.save(); c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 9; c.shadowOffsetY = 1.4; c.fillStyle = "rgba(244,243,240,.9)"; rr(c, nx, ny, nw, nh, 5); c.fill(); c.restore();
+    c.fillStyle = "#101010"; rr(c, nx + 3.6, ny + 3.6, 8.4, 8.4, 2.2); c.fill();
+    v3Mark(c, nx + 5.6, ny + 5.5, 4.6, "#fff", C3.dotL, {reveal:1, dot:1, alpha:1});
+    v3Text(c, "VIEWLY", nx + 14.6, ny + 6.4, {size:2.6, weight:600, f:"sans", sp:.12, color:"#1c1c1e"});
+    v3Text(c, "nu", nx + nw - 4, ny + 6.4, {size:2.5, weight:400, f:"sans", color:"#6b6b70", align:"r"});
+    v3Text(c, "Dina foton är klara", nx + 14.6, ny + 11.8, {size:3.3, weight:600, f:"sans", color:"#1c1c1e"});
+    v3Text(c, "Storgatan 15, Helsingborg · 12 bilder levererade", nx + 14.6, ny + 16.4, {size:2.75, weight:400, f:"sans", color:"#3a3a3e"});
+    c.restore();
+    var cu = ioC(k3(t, 2.1, 2.95)), cxx = lerp(80, 56, cu), cyy = lerp(ny + nh + 30, ny + nh*.55, cu);
+    cursor(c, cxx, cyy, rev(t, 2.0, .3)*(1 - k3(t, 3.25, 3.55)), tap*(1 - k3(t, 3.18, 3.4)));
+  }
+  c.restore();
+}
+function schedNotis(H){
+  var Hs = {s:function(n, t, v, r){ H.s(n, t + NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + NOF, v, r, f) }, click:function(t, v){ H.click(t + NOF, v) }};
+  H.tone(1318.5, .82, .16, .9); H.tone(1568, .98, .14, .9); H.tone(2093, 1.16, .12, 1.2);
+  H.click(3.0, .3);
+  sched1(Hs);
+}
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return v3SfxLoad() }
@@ -458,6 +499,13 @@ reg10("a10_reel", "1 · Reel Studio", "Leveransen finns redan. Skapa Reel, malle
   comp.draw = function(c, G, t){ adContent(c, G, t) };
   comp.mix = K.makeMix(sched3); comp.loadAudio = function(){ return v3SfxLoad() };
   V3_COMPS.a10_cs = comp; V3_ADS10.push("a10_cs");
+})();
+
+(function(){
+  var comp = {n:"1b · Reel Studio med iPhone-notis", d:"Som annons 1, men öppnar med en iPhone-notis: Dina foton är klara. Utan röst, med notisljud och subtila datorklick.", group:"ads10", id:"a10_reeln", v:{id:"a10_reeln"}, dur:DUR + NOF, thumb:2.2, L:LOGO_AT - .53 + NOF, logo:true, vo:[]};
+  comp.draw = function(c, G, t){ adReelNotis(c, G, t) };
+  comp.mix = K.makeMix(schedNotis); comp.loadAudio = function(){ return v3SfxLoad() };
+  V3_COMPS.a10_reeln = comp; V3_ADS10.splice(1, 0, "a10_reeln");
 })();
 
 var SCRIPT = [
