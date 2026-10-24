@@ -1002,5 +1002,5 @@ window.secAds8 = function(){
     + '<div><b>Mallarna i annons 2 och 3</b><p>Orange, grön och editorial är egna nyanser och egna layouter som kan påminna om olika kontor. Inga namn, märken eller kedjornas egna mallar. Använd bara kontorets egna material med kontorets tillåtelse.</p></div>'
     + '<div><b>Bilder och ljud</b><p>Bara era egna bilder (sida 15 och sängen från Såld). Riktiga ljud, CC0. Ingen musik. De små bilderna för skymningsbild, planritning, solbana och karta är ritade illustrationer, inga riktiga leveranser.</p></div></div></details></div>';
 };
-window.A8K = {twoPart:twoPart, twoPartFast:twoPartFast, adInlagg:adInlagg, O8:O8, WEND8:WEND8, L8:L8, SYS:SYS, sTx:sTx, sCard:sCard, sPh:sPh, sBtn:sBtn, chk:chk, tplB:tplB, DO:DO, KB:KB, LABS:LABS, P:P, rev:rev, fz:fz, clamp:clamp, flyChip:flyChip, GRID7:GRID7, BR_G:BR_G, SG:SG, tplDraw:tplDraw, tplGeo:tplGeo, phoneBody:phoneBody, reelUI:reelUI, RSEG:RSEG, TPL8:TPL8, rr:rr};
+window.A8K = {twoPart:twoPart, twoPartFast:twoPartFast, adInlagg:adInlagg, O8:O8, WEND8:WEND8, L8:L8, SYS:SYS, sTx:sTx, sCard:sCard, sPh:sPh, sBtn:sBtn, chk:chk, tplB:tplB, DO:DO, KB:KB, LABS:LABS, P:P, rev:rev, fz:fz, clamp:clamp, flyChip:flyChip, GRID7:GRID7, BR_G:BR_G, SG:SG, tplDraw:tplDraw, tplGeo:tplGeo, phoneBody:phoneBody, reelUI:reelUI, RSEG:RSEG, TPL8:TPL8, tplMark:tplMark, rr:rr};
 })();
