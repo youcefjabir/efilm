@@ -348,34 +348,54 @@ var CARDK = [
   {bg:"#8F3A22", ink:"#F7EEE4", acc:"#F1C9A8", hair:"rgba(247,238,228,.32)"}
 ];
 /* Reel-mallar: ett kort (platta) i kontorets färg längst ner på fotot, elegant och luftigt */
+var PLACC = ["#E2CBA0", "#D8B57C", "#F1C9A8"];
 function cardOverlay(c, k, x, y, w, h, a, f1, f2, f3){
-  var K = PKIND[k], C = CARDK[k], s = Math.min(w/100, h/125), Wl = w/s, Hl = h/s, tall = Hl > 150, q = 1.22, cwA = tall ? Wl*.8 : Wl - 12, cxA = 6, ch = k === 2 ? 40 : 42, cbA = tall ? Hl*.765 : Hl - 7, cw = cwA/q, cx = 0, cy = -ch, cb = 0;
+  var K = PKIND[k], acc = PLACC[k], s = Math.min(w/100, h/125), Wl = w/s, Hl = h/s, tall = Hl > 150;
+  var pw = tall ? 78 : Wl - 12, ph = tall ? 62 : 54, px = tall ? 5 : (Wl - pw)/2, pb = tall ? Hl*.765 : Hl - 6, py = pb - ph, L = px + 5.5, R = px + pw - 5.5;
   var F = v3t("a8.re.facts").split(" · "), addr = v3t("a8.re.addr"), city = v3t("a8.re.city").toUpperCase();
   f1 = f1 == null ? 1 : f1; f2 = f2 == null ? 1 : f2; f3 = f3 == null ? f2 : f3;
   c.save(); c.translate(x, y); c.scale(s, s);
-  v3Grad(c, 0, Hl*.45, Wl, Hl*.55 + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7," + (.5*a).toFixed(3) + ")"]]);
-  c.save(); c.translate(cxA, cbA); c.scale(q, q);
-  c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.45)"; c.shadowBlur = 9/q; c.shadowOffsetY = 1.6; c.fillStyle = C.bg; rr(c, cx, cy, cw, ch, 3); c.fill(); c.shadowColor = "transparent";
-  c.globalAlpha = a*.4; c.strokeStyle = C.acc; c.lineWidth = .28; rr(c, cx + 1.3, cy + 1.3, cw - 2.6, ch - 2.6, 2); c.stroke(); c.restore();
-  var L = cx + 5.5, R = cx + cw - 5.5, bar = function(w0, yy, h0, f){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.16*(.72 + .28*Math.sin(SHIM*4.2)); c.fillStyle = C.ink; rr(c, L, yy, w0, h0, h0*.5); c.fill(); c.restore() };
-  c.save(); c.globalAlpha = a; tplMark(c, K.mark, L + 2.2, cy + 7.4, 2.2, C.acc, C.bg); c.restore();
-  v3Text(c, K.brand, L + 6.6, cy + 8.2, {size:2.3, weight:600, f:"sans", sp:.3, color:C.ink, alpha:.92*a});
-  var tw = v3Measure(c, K.tag || "", {size:1.9, weight:700, f:"sans", sp:.24});
-  var tg = ["KOMMANDE", "TILL SALU", "SÅLD"][k], tgw = v3Measure(c, tg, {size:1.9, weight:700, f:"sans", sp:.24}) + 6.4;
-  c.save(); c.globalAlpha = a*.9; c.strokeStyle = C.acc; c.lineWidth = .26; rr(c, R - tgw, cy + 4.2, tgw, 5.6, 2.8); c.stroke(); c.restore();
-  v3Text(c, tg, R - tgw/2, cy + 8, {size:1.9, weight:700, f:"sans", sp:.24, color:C.acc, align:"c", alpha:a});
+  v3Grad(c, 0, Hl*.42, Wl, Hl*.58 + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7," + (.55*a).toFixed(3) + ")"]]);
+  /* glasplatta: suddad bakgrund, mörk tint, ljus kant */
+  c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 10; c.shadowOffsetY = 2; c.fillStyle = "rgba(10,12,10,.3)"; rr(c, px, py, pw, ph, 4); c.fill(); c.restore();
+  try {
+    c.save(); rr(c, px, py, pw, ph, 4); c.clip();
+    var cv = c.canvas; c.setTransform(1, 0, 0, 1, 0, 0); c.globalAlpha = a; c.filter = "blur(" + Math.max(2, cv.width/1080*16).toFixed(1) + "px)"; c.drawImage(cv, 0, 0);
+    c.restore();
+  } catch(e){}
+  c.save(); c.globalAlpha = a; rr(c, px, py, pw, ph, 4); c.clip();
+  c.fillStyle = "rgba(11,13,11,.44)"; c.fillRect(px, py, pw, ph);
+  v3Grad(c, px, py, pw, ph*.5, [[0, "rgba(255,255,255,.13)"], [1, "rgba(255,255,255,0)"]]);
+  c.restore();
+  c.save(); c.globalAlpha = a*.55; c.strokeStyle = "rgba(255,255,255,.55)"; c.lineWidth = .28; rr(c, px, py, pw, ph, 4); c.stroke(); c.restore();
+  var bar = function(w0, yy, h0, f){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.2*(.72 + .28*Math.sin(SHIM*4.2)); c.fillStyle = "#fff"; rr(c, L, yy, w0, h0, h0*.5); c.fill(); c.restore() };
+  var r1 = py + 9;
+  c.save(); c.globalAlpha = a; tplMark(c, K.mark, L + 2.4, r1, 2.4, acc, "#101010"); c.restore();
+  v3Text(c, K.brand, L + 7.2, r1 + .9, {size:2.5, weight:600, f:"sans", sp:.3, color:"#fff", alpha:.95*a});
+  var tg = ["KOMMER SNART", "TILL SALU", "SÅLD"][k], tgw = v3Measure(c, tg, {size:1.9, weight:700, f:"sans", sp:.24}) + 9;
+  c.save(); c.globalAlpha = a*.95; c.strokeStyle = acc; c.lineWidth = .28; rr(c, R - tgw, r1 - 3, tgw, 6, 3); c.stroke(); c.fillStyle = acc; c.beginPath(); c.arc(R - tgw + 3.4, r1, .7, 0, 7); c.fill(); c.restore();
+  v3Text(c, tg, R - tgw/2 + 1.6, r1 + .9, {size:1.9, weight:700, f:"sans", sp:.24, color:acc, align:"c", alpha:a});
   if(k === 2){
-    v3Text(c, "Såld", L - .4, cy + 24, {size:13.5, italic:true, color:C.ink, alpha:a});
-    bar(34, cy + 17.2, 5, f1); v3Text(c, addr, R, cy + 21, {size:5.6, color:C.ink, align:"r", alpha:a, p:f1});
+    v3Text(c, "Såld", L - .4, py + 27.5, {size:15, italic:true, color:acc, alpha:a});
+    bar(30, py + 21.4, 5, f1); v3Text(c, addr, R, py + 26, {size:5.6, color:"#fff", align:"r", alpha:a, p:f1});
   } else {
-    bar(52, cy + 12.4, 9.4, f1); v3Text(c, addr, L, cy + 21.4, {size:10, color:C.ink, alpha:a, p:f1});
+    bar(52, py + 17.4, 10, f1); v3Text(c, addr, L, py + 27, {size:11.5, color:"#fff", alpha:a, p:f1});
   }
-  c.save(); c.globalAlpha = a*.35; c.fillStyle = C.ink; c.fillRect(L, cy + 28, cw - 11, .26); c.restore();
-  bar(24, cy + 32, 3.4, f2); v3Text(c, city, L, cy + 35.2, {size:2.3, weight:600, f:"sans", sp:.26, color:C.ink, alpha:.86*a, p:f2});
-  bar(26, cy + 32, 3.4, f3);
-  var fs = F[0].toUpperCase() + "  ·  " + F[1].toUpperCase();
-  v3Text(c, fs, R, cy + 35.2, {size:2.3, weight:600, f:"sans", sp:.22, color:C.ink, align:"r", alpha:.86*a, p:f3});
-  c.restore(); c.restore();
+  c.save(); c.globalAlpha = a*f2; c.fillStyle = acc; c.fillRect(L, py + 33.6, 5, .3); c.restore();
+  bar(24, py + 32.4, 3.4, f2); v3Text(c, city, L + 8, py + 35, {size:2.5, weight:600, f:"sans", sp:.26, color:"#fff", alpha:.85*a, p:f2});
+  c.save(); c.globalAlpha = a*.3; c.fillStyle = "#fff"; c.fillRect(L, py + 40.2, (pw - 11)*Math.min(1, f3*1.4), .24); c.restore();
+  var rooms = F[0].split(" "), yta = F[1].split(" "), ny = py + 53;
+  bar(18, py + 45, 7, f3); bar(18, py + 45, 7, f3);
+  v3Text(c, rooms[0], L, ny, {size:7.4, color:"#fff", alpha:a, p:f3}); v3Text(c, (rooms[1] || "").toUpperCase(), L, ny + 4.6, {size:1.9, weight:600, f:"sans", sp:.24, color:"#fff", alpha:.7*a*f3});
+  v3Text(c, yta[0], L + 19, ny, {size:7.4, color:"#fff", alpha:a, p:f3}); v3Text(c, (yta[1] || "").toUpperCase(), L + 19, ny + 4.6, {size:1.9, weight:600, f:"sans", sp:.24, color:"#fff", alpha:.7*a*f3});
+  var ag = a*f3;
+  if(ag > .02){
+    c.save(); c.globalAlpha = ag; c.strokeStyle = acc; c.lineWidth = .3; c.beginPath(); c.arc(R - 27, py + 49.6, 4.5, 0, 7); c.stroke(); c.restore();
+    v3Text(c, "A", R - 27, py + 51.6, {size:5, color:"#fff", align:"c", alpha:ag});
+    v3Text(c, "Anna Lindgren", R, py + 49, {size:2.9, weight:600, f:"sans", color:"#fff", align:"r", alpha:ag});
+    v3Text(c, "MÄKLARE", R, py + 53.4, {size:1.7, weight:600, f:"sans", sp:.22, color:"#fff", align:"r", alpha:.65*ag});
+  }
+  c.restore();
 }
 /* mallens text och ram, utan fotot. a = genomskinlighet (även för texten), f1 adress, f2 ort, f3 rum och yta (0 = tom plats, 1 = ifylld) */
 function postOverlay(c, k, x, y, w, h, a, f1, f2, f3){
