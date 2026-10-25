@@ -537,7 +537,7 @@ function adReelNotis(c, G, t){
   c.restore();
 }
 function schedNotis(H){
-  var Hs = {s:function(n, t, v, r){ H.s(n, t + NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + NOF, v, r, f) }, click:function(t, v){ H.click(t + NOF, v) }};
+  var Hs = {s:function(n, t, v, r){ H.s(n, t + NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + NOF, v, r, f) }, click:function(t, v){ H.click(t + NOF, v) }, tone:function(f, t, v, d){ H.tone(f, t + NOF, v, d) }};
   H.tone(1318.5, .82, .16, .9); H.tone(1568, .98, .14, .9); H.tone(2093, 1.16, .12, 1.2);
   H.click(3.0, .3);
   sched1(Hs);
@@ -848,7 +848,7 @@ function notisScene(c, G, t, NOF){
 }
 function withNotis(fn, NOF){ return function(c, G, t){ if(t >= NOF - .3) fn(c, G, Math.max(0, t - NOF)); notisScene(c, G, t, NOF) } }
 function notisSched(sc, NOF){ return function(H){
-  var Hs = {s:function(n, t, v, r){ H.s(n, t + NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + NOF, v, r, f) }, click:function(t, v){ H.click(t + NOF, v) }};
+  var Hs = {s:function(n, t, v, r){ H.s(n, t + NOF, v, r) }, soft:function(n, t, v, r, f){ H.soft(n, t + NOF, v, r, f) }, click:function(t, v){ H.click(t + NOF, v) }, tone:function(f, t, v, d){ H.tone(f, t + NOF, v, d) }};
   H.tone(1174.7, .32, .07, .8); H.tone(1568, .46, .06, 1.0); H.click(1.75, .35); sc(Hs);
 } }
 
@@ -1217,8 +1217,8 @@ function adEfter2(c, G, t){
 function schedEfter2(H){ var i; for(i = 0; i < E2R.length; i++) H.click(E2.R0 + i*E2.ST + .5, .13); H.tone(1174.7, E2DONE, .05, .9); H.tone(1568, E2DONE + .12, .04, 1.0) }
 
 /* statiska */
-function stBoard(c, G, t){ adBoard(c, G, 8.3); stLogo(c, G, G.H - G.bot - 4) }
-function stProfil(c, G, t){ adProfil(c, G, 8.6); stLogo(c, G, G.H - G.bot - 4) }
+function stBoard(c, G, t){ adBoard(c, G, 8.3); if(G.is9) stLogo(c, G, G.H - G.bot - 4) }
+function stProfil(c, G, t){ adProfil(c, G, 8.6); if(G.is9) stLogo(c, G, G.H - G.bot - 4) }
 function stMindre(c, G, t){
   var H = bgLightH(c, G), cy = H*.38;
   kline(c, [["Mindre", 0], ["jobb.", 0]], cy, 12, 9, 0, 99);
