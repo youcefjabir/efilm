@@ -756,13 +756,13 @@ function heads(c, t, Y0, list){
   });
 }
 /* ---- Reel Studio, välj mall först ---- */
-var R2 = {TAP:1.9, TL0:2.55, TCL:4.85, PH0:6.05, RT0:6.75, CUTS:[0, 2.0, 4.0, 6.0, 7.8], FA:8.75, FC:9.55, FD:10.25, PHO:15.05, LOGO:99, DUR:20.15};
+var R2 = {TAP:1.9, TL0:2.55, TCL:4.85, PH0:6.05, RT0:6.75, CUTS:[0, 2.0, 4.0, 6.0, 7.8], FA:8.75, FC:9.55, FD:10.25, PHO:16.65, LOGO:99, DUR:21.75};
 var RPH2 = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor"];
 function adReel2(c, G, t){ TSTYLE = "card"; try { adReel2i(c, G, t, R2, 0) } finally { TSTYLE = "ed" } }
 function adReel2i(c, G, t, R2, yoff){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy + yoff;
   bgLight(c, G, t);
-  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, R2.TAP - .3], [["Välj", "en"], ["mall."], R2.TL0 + .1, R2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, R2.RT0 + .1, R2.RT0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, R2.RT0 + 2.2, R2.RT0 + 5.4], [["En", "Reel", "i", "ditt"], ["eget", "varumärke."], R2.RT0 + 5.6, R2.PHO - .2]]);
+  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, R2.TAP - .3], [["Välj", "en"], ["mall."], R2.TL0 + .1, R2.TCL + .4], [["Mallen", "fyller", "sig", "själv."], null, R2.RT0 + 2.7, R2.RT0 + 5.0], [["En", "Reel", "i", "ditt"], ["eget", "varumärke."], R2.RT0 + 5.3, R2.RT0 + 7.4], [["Fotografering", "och", "verktyg"], ["i", "ett", "enda", "flöde."], R2.RT0 + 7.7, R2.PHO - .2]]);
   deliveredCard(c, t, Y0, "SKAPA REEL  ›", R2.TAP);
   tilesStage(c, t, Y0, R2.TL0, R2.TCL, 1, ["rs_dining", "rs_chair", "rs_kitchen"], ["Kommande", "Till salu", "Såld"], R2.PH0 - .1);
   statusPill(c, t, Y0, R2.RT0 + .1, R2.RT0 + 1.4, "Hämtar bostadens uppgifter", "Uppgifterna är hämtade", R2.RT0 + 2.0);
@@ -777,12 +777,12 @@ function adReel2i(c, G, t, R2, yoff){
 }
 function schedReel2(H){ H.click(R2.TAP, .4); H.click(R2.TCL, .4) }
 /* ---- Content Studio, välj bild och mall ---- */
-var C2 = {TAP:1.9, G0:2.55, GCL:4.65, TL0:5.85, TCL:7.95, PO0:9.35, FA:11.35, FC:12.15, FD:12.85, END:15.15, LOGO:99, DUR:20.25};
+var C2 = {TAP:1.9, G0:2.55, GCL:4.65, TL0:5.85, TCL:7.95, PO0:9.35, FA:11.35, FC:12.15, FD:12.85, END:16.75, LOGO:99, DUR:21.85};
 var GRIDK = ["rs_chair", "rs_dining", "rs_kitchen", "bedroom", "rs_floor", "rs_statue"];
 function adContent2(c, G, t){
   var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
   bgLight(c, G, t);
-  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, C2.TAP - .3], [["Välj", "en"], ["bild."], C2.G0 + .1, C2.GCL + .9], [["Välj", "en"], ["mall."], C2.TL0 + .1, C2.TCL + .4], [["Hämtar", "bostadens", "uppgifter."], null, C2.PO0 + .2, C2.PO0 + 1.9], [["Mallen", "fyller", "sig", "själv."], null, C2.PO0 + 2.2, C2.END]]);
+  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, C2.TAP - .3], [["Välj", "en"], ["bild."], C2.G0 + .1, C2.GCL + .9], [["Välj", "en"], ["mall."], C2.TL0 + .1, C2.TCL + .4], [["Mallen", "fyller", "sig", "själv."], null, C2.PO0 + 2.7, C2.PO0 + 4.6], [["Fotografering", "och", "verktyg"], ["i", "ett", "enda", "flöde."], C2.PO0 + 4.9, C2.END]]);
   deliveredCard(c, t, Y0, "SKAPA INLÄGG  ›", C2.TAP);
   /* steg 1: välj en bild */
   var ga = rev(t, C2.G0, .45)*(1 - k3(t, C2.GCL + .75, C2.GCL + 1.1));
