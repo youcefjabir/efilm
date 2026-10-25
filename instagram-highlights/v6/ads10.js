@@ -517,8 +517,8 @@ function adReelNotis(c, G, t){
   v3Grad(c, 0, 0, 100, H*.4, [[0, "rgba(8,7,7,.5)"], [1, "rgba(8,7,7,0)"]]);
   /* låsskärmens klocka */
   var ca = rev(t, .1, .5), ty = S.y0 + 8;
-  v3Text(c, "Lördag 24 oktober", 50, ty, {size:3.3, weight:500, f:"sans", color:"#fff", align:"c", alpha:.85*ca});
-  v3Text(c, "9:41", 50, ty + 15, {size:15, weight:300, f:"sans", color:"#fff", align:"c", alpha:.95*ca});
+  v3Text(c, NT.d, 50, ty, {size:3.3, weight:500, f:"sans", color:"#fff", align:"c", alpha:.85*ca});
+  v3Text(c, NT.t, 50, ty + 15, {size:15, weight:300, f:"sans", color:"#fff", align:"c", alpha:.95*ca});
   /* notisen glider ner */
   var nin = oQ(k3(t, .75, 1.35)), tap = k3(t, 3.0, 3.18), pr = 1 - .035*Math.sin(tap*Math.PI), nw = 88, nx = 6, nh = 21.5, ny = lerp(-26, S.y0 + 31, nin);
   if(nin > .01){
@@ -821,6 +821,7 @@ function lockWallpaper(c, G, t){
   v3Grad(c, 0, 0, 100, H*.34, [[0, "rgba(4,8,11,.62)"], [1, "rgba(4,8,11,0)"]]);
   v3Grad(c, 0, H*.62, 100, H*.38 + 1, [[0, "rgba(4,8,11,0)"], [1, "rgba(4,8,11,.55)"]]);
 }
+var NT = {d:"Lördag 24 oktober", t:"9:41"};
 function notisScene(c, G, t, NOF){
   var H = G.H, S = SG(G), ia = 1 - k3(t, NOF - .3, NOF);
   if(ia <= .01) return;
@@ -980,6 +981,97 @@ function stOffer(c, G, t){
   stBtn(c, G, cy + 46, 1); stLogo(c, G, H - G.bot - 4);
 }
 
+
+/* =====================================================================
+   V4: nytt koncept. Viewly är fotograf och marknadsavdelning i ett: "Du bokar. Resten är redan gjort."
+   ===================================================================== */
+var EF = {C0:2.7, TC:5.0, DONE:7.35, OUT:9.5, FIN:10.3, L:12.6};
+var EFROWS = ["Annonstext", "Planritning", "Bilder i alla format", "Mallar i kontorets grafik", "Inlägg · Kommer snart", "Inlägg · Till salu", "Inlägg · Visning", "Inlägg · Såld"];
+function efterCard(c, t, Y0, tc, done, fadeOut, enterT){
+  var cw = 82, cx = 9, rh = 6.3, ch = 14 + EFROWS.length*rh + 3.5, enter = oQ(k3(t, enterT, enterT + .9)), a = rev(t, enterT, .5)*(1 - k3(t, fadeOut, fadeOut + .6));
+  if(a <= .02) return;
+  var cy = Y0 + 19 + (1 - enter)*12 - k3(t, fadeOut, fadeOut + .6)*4, x0 = cx + 6, n = 0, i;
+  fcard(c, cx, cy, cw, ch, a, 3.2, "#fff", 0);
+  for(i = 0; i < EFROWS.length; i++) if(t >= tc + i*.28 + .12) n++;
+  var dn = k3(t, done, done + .4), cw1 = v3Measure(c, "ATT GÖRA", {size:2.1, weight:700, f:"sans", sp:.2}) + 9;
+  sCard(c, x0, cy + 5, cw1, 5.6, a*(1 - dn), 2.8, "#1C1C1E", 0); sTx(c, "ATT GÖRA", x0 + cw1/2, cy + 8.8, a*(1 - dn), {size:2.1, weight:700, color:"#fff", align:"c", sp:.2});
+  var cw2 = v3Measure(c, "REDAN GJORT", {size:2.1, weight:700, f:"sans", sp:.2}) + 13;
+  sCard(c, x0, cy + 5, cw2, 5.6, a*dn, 2.8, "#E3F0E4", 0); dotc(c, x0 + 3.4, cy + 7.8, .95, "#2f6a3a", a*dn); sTx(c, "REDAN GJORT", x0 + 6.2, cy + 8.8, a*dn, {size:2.1, weight:700, color:"#2f6a3a", sp:.2});
+  sTx(c, n + " / " + EFROWS.length, cx + cw - 6, cy + 8.8, a, {size:2.6, weight:700, color:dn > .5 ? "#2f6a3a" : MUT, align:"r", sp:.14});
+  for(i = 0; i < EFROWS.length; i++){
+    var ry = cy + 14 + i*rh, ra = rev(t, enterT + .2 + i*.09, .35)*a, tk = tc + i*.28, ck = oBack(k3(t, tk + .1, tk + .4));
+    if(i > 0){ c.save(); c.globalAlpha = ra*.55; c.fillStyle = "rgba(28,28,30,.1)"; c.fillRect(x0, ry, cw - 12, .25); c.restore() }
+    var cxx = x0 + 2.3, cyy = ry + rh/2;
+    c.save(); c.globalAlpha = ra; c.strokeStyle = "#9a948d"; c.lineWidth = .35; c.beginPath(); c.arc(cxx, cyy, 1.9, 0, 7); c.stroke(); c.restore();
+    if(ck > .01){ c.save(); c.globalAlpha = ra; c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(cxx, cyy, 2.05*Math.max(.01, Math.min(1.12, ck)), 0, 7); c.fill(); c.restore(); A8.chk(c, cxx, cyy + .1, 1.5, k3(t, tk + .1, tk + .4), "#fff", .45) }
+    sTx(c, EFROWS[i], x0 + 8, cyy + 1.2, ra, {size:3.3, weight:500, color:INK});
+  }
+}
+function adEfter(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy;
+  bgLight(c, G, t);
+  heads(c, t, Y0, [[["Efter", "fotograferingen"], ["börjar", "jobbet."], .25, EF.TC - .3], [["Allt", "det", "där."], ["Redan", "gjort."], EF.DONE + .1, EF.OUT]]);
+  efterCard(c, t, Y0, EF.TC, EF.DONE, EF.OUT, EF.C0);
+  kline(c, [["Du", 0], ["bokar.", 0]], Y0 + 28, 9, t, EF.FIN, EF.L - .5);
+  kline(c, [["Resten", 0], ["är", 0], ["redan", 1], ["gjort.", 1]], Y0 + 40, 9, t, EF.FIN + .9, EF.L - .5);
+}
+function schedEfter(H){ var i; for(i = 0; i < EFROWS.length; i++) H.click(EF.TC + i*.28 + .12, .13); H.tone(1174.7, EF.DONE, .05, .9); H.tone(1568, EF.DONE + .12, .04, 1.0) }
+
+/* fredag 16:40: notis, kampanjen skapas, fyra inlägg */
+var FR = {TAP:1.9, PS:2.5, PD:4.1, G0:4.5, OUT:9.3, FIN:9.9, L:12.4};
+var FRK = [["Kommer snart", 0, "rs_chair"], ["Till salu", 1, "rs_dining"], ["Visning", 0, "rs_kitchen"], ["Såld", 2, "rs_floor"]];
+function adFredag(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, i;
+  bgLight(c, G, t);
+  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, FR.TAP - .3], [["Hela", "kampanjen", "är", "klar."], null, FR.PD + .1, FR.OUT - .1]]);
+  deliveredCard(c, t, Y0, "SKAPA KAMPANJ  ›", FR.TAP);
+  statusPill(c, t, Y0, FR.PS, FR.PD, "Skapar kampanjen", "Kampanjen är klar", FR.OUT - .4);
+  var tw = G.is9 ? 24 : 20, th = tw*1.25, gap = 3, gx = 50 - tw - gap/2, gy = Y0 + 30, fo = 1 - k3(t, FR.OUT, FR.OUT + .5);
+  for(i = 0; i < 4; i++){
+    var t0 = FR.G0 + i*.22, p = oQ(k3(t, t0, t0 + .6)), a = rev(t, t0, .4)*fo; if(a <= .02) continue;
+    var x = gx + (i % 2)*(tw + gap), y = gy + Math.floor(i/2)*(th + 9) + (1 - p)*4;
+    SHIM = t; drawPost(c, FRK[i][1], x, y, tw, th, FRK[i][2], a, 1, 1, 1);
+    sTx(c, FRK[i][0].toUpperCase(), x + tw/2, y + th + 4.6, a, {size:2.2, weight:700, color:"#fff", align:"c", sp:.2});
+  }
+  kline(c, [["Hinn", 0], ["med", 0]], Y0 + 28, 9, t, FR.FIN, FR.L - .5);
+  kline(c, [["fredagen.", 1]], Y0 + 40, 9, t, FR.FIN + .8, FR.L - .5);
+}
+function schedFredag(H){ H.click(FR.TAP, .4); H.tone(1174.7, FR.PD, .05, .9); H.tone(1568, FR.PD + .12, .04, 1.0) }
+
+/* första bilden: tre riktiga Viewly-foton, en rad per bild */
+var FO = {B:[0, 3.7, 7.4], L:10.9};
+function adForsta(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, H = G.H, Yb = H*.76, keys = ["house", "terrace", "porch"], i;
+  v3Fill(c, 0, 0, 100, H, "#070606");
+  for(i = 0; i < 3; i++){
+    var a = i === 0 ? ioC(k3(t, 0, .5)) : ioC(k3(t, FO.B[i] - .3, FO.B[i] + .6));
+    if(a > .01) v3Photo(c, keys[i], 0, 0, 100, H, {scale:lerp(1.04, 1.13, k3(t, FO.B[i] - .3, FO.B[i] + 4.2)), pos:V3_POS[keys[i]], alpha:a});
+  }
+  v3Grad(c, 0, H*.46, 100, H*.54 + 1, [[0, "rgba(6,5,5,0)"], [1, "rgba(6,5,5,.82)"]]);
+  v3Grad(c, 0, 0, 100, H*.2, [[0, "rgba(6,5,5,.45)"], [1, "rgba(6,5,5,0)"]]);
+  v3Frame(c, 4, 4, 92, H - 8, "#fff", .3, oQ(k3(t, .2, 1.8)), .5);
+  var o = function(n){ return k3(t, FO.B[n] + 3.3, FO.B[n] + 3.7) };
+  kline(c, [["Första", 0], ["bilden", 0]], Yb - 10, 9.4, t, .5, FO.B[1] + .1);
+  kline(c, [["avgör.", 1]], Yb + 3, 9.4, t, 1.1, FO.B[1] + .1);
+  kline(c, [["Allt", 0], ["efter", 0], ["den", 0]], Yb - 10, 8.2, t, FO.B[1] + .7, FO.B[2] + .1);
+  kline(c, [["är", 0], ["redan", 1], ["gjort.", 1]], Yb + 3, 8.2, t, FO.B[1] + 1.2, FO.B[2] + .1);
+  kline(c, [["Du", 0], ["bokar.", 1]], Yb - 3, 10.4, t, FO.B[2] + .7, FO.L - .5);
+}
+function stEfter(c, G, t){
+  var H = bgLightH(c, G), cy = H*.4;
+  kline(c, [["Du", 0], ["bokar.", 0]], cy, 11, 9, 0, 99);
+  kline(c, [["Resten", 0], ["är", 0], ["redan", 1], ["gjort.", 1]], cy + 15, 8, 9, 0, 99);
+  stBtn(c, G, cy + 32, 1); stLogo(c, G, H - G.bot - 4);
+}
+function bgLightH(c, G){ bgLight(c, G, 5); return G.H }
+function stForsta(c, G, t){
+  var S = SG(G), H = G.H;
+  v3Fill(c, 0, 0, 100, H, "#070606"); v3Photo(c, "house", 0, 0, 100, H, {scale:1.08, pos:V3_POS.house});
+  v3Grad(c, 0, H*.4, 100, H*.6 + 1, [[0, "rgba(6,5,5,0)"], [1, "rgba(6,5,5,.88)"]]); v3Frame(c, 4, 4, 92, H - 8, "#fff", .3, 1, .5);
+  kline(c, [["Första", 0], ["bilden", 0]], S.y1 - 40, 9.4, 9, 0, 99); kline(c, [["avgör.", 1]], S.y1 - 27, 9.4, 9, 0, 99);
+  stBtn(c, G, S.y1 - 17, 1); stLogo(c, G, H - G.bot - 4);
+}
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return v3SfxLoad() }
@@ -1019,17 +1111,24 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
               ["a10_cs2", "3b · Content Studio, notis, välj bild och mall", "iPhone-notis (Dina foton är klara), 25 bilder, välj bild, välj mall, bostadens uppgifter hämtas och mallen fyller i sig själv. Slutar på Boka fotografering som blir Viewly.", withBook(adContent2, LC), notisSched(schedContent2, NF), NF + LC + END10, NF + LC, 2.0]];
   var BK = {b:"a7.btnB"};
   var withEnd = function(fn, L){ return function(c, G, t){ fn(c, G, Math.min(t, L)); if(t >= L) K.endSeq(c, G, t, L, BK) } };
+  var NT2 = function(fn){ return function(c, G, t){ NT = {d:"Fredag 23 oktober", t:"16:40"}; try { fn(c, G, t) } finally { NT = {d:"Lördag 24 oktober", t:"9:41"} } } };
   var more = [
-    ["a10_t20", "A · Tjugo sekunder", "Stoppur från 0:00 till 0:20: leverans, Skapa Reel, välj mall, uppgifter hämtas och fylls i, Reelen klar. Slutar på Boka fotografering.", withEnd(adT20, R3.LC), schedT20, R3.LC + END10, R3.LC, 12.2],
-    ["a10_many", "B · Så många du vill", "Ett rutnät fylls med inlägg i allt snabbare takt. Obegränsat antal inlägg från en leverans. Slutar på Boka fotografering.", withEnd(adMany, M2.END), schedMany, M2.END + END10, M2.END, 8.6],
-    ["a10_hampus", "C · Hampus", "Hampus Nilssons citat, kinetisk typografi och hela citatet. Slutar på Boka fotografering.", withEnd(adHampus, HM.END), function(H){}, HM.END + END10, HM.END, 3.2],
-    ["a10_offer", "D · Ett objekt. Sen bestämmer du.", "Erbjudandet med Hampus som stöd. Slutar på Boka fotografering.", withEnd(adOffer, OB.END), function(H){}, OB.END + END10, OB.END, 4.8],
-    ["a10_s20", "Statisk · 20 sekunder", "Jättestor 20 med knapp.", st20, function(H){}, 2, 0, 1],
-    ["a10_shamp", "Statisk · Hampus", "Citatet med knapp.", stHampus, function(H){}, 2, 0, 1],
-    ["a10_soffer", "Statisk · Ett objekt", "Erbjudandet med knapp.", stOffer, function(H){}, 2, 0, 1]
+    ["a10_efter", "A · Efteråt", "Checklistan med allt som annars görs efter fotograferingen bockas av av sig själv. Du bokar. Resten är redan gjort. Slutar på Boka fotografering.", withEnd(adEfter, EF.L), schedEfter, EF.L + END10, EF.L, 7.6],
+    ["a10_sf", "Statisk · Efteråt", "Du bokar. med knapp.", stEfter, function(H){}, 2, 0, 1],
+    ["a10_sfs", "Statisk · Första bilden", "Första bilden avgör. med knapp.", stForsta, function(H){}, 2, 0, 1]
   ];
   defs = defs.concat(more);
   defs.forEach(function(d){
+    var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6], vo:[]};
+    comp.draw = function(c, G, t){ d[3](c, G, t) };
+    comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
+    V3_COMPS[d[0]] = comp; V3_ADS10.push(d[0]);
+  });
+  var extra = [
+    ["a10_fredag", "B · Fredag 16:40", "Notis på låsskärmen en fredag eftermiddag, kampanjen skapas och fyra inlägg är klara. Hinn med fredagen. Slutar på Boka fotografering.", NT2(withBook(adFredag, FR.L)), notisSched(schedFredag, NF), NF + FR.L + END10, NF + FR.L, 6.2],
+    ["a10_forsta", "C · Första bilden avgör", "Tre riktiga Viewly-foton, en rad per bild: Första bilden avgör. Allt efter den är redan gjort. Du bokar. Slutar på Boka fotografering.", withEnd(adForsta, FO.L), function(H){}, FO.L + END10, FO.L, 4.5]
+  ];
+  extra.forEach(function(d){
     var comp = {n:d[1], d:d[2], group:"ads10", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6], vo:[]};
     comp.draw = function(c, G, t){ d[3](c, G, t) };
     comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
