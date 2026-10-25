@@ -1234,7 +1234,8 @@ function stMindre(c, G, t){
 var BGG = "#22261F";
 function g6(G){
   var is9 = G.is9;
-  return {is9:is9, y1:is9 ? 31 : 14, y2:is9 ? 43.5 : 23, ts:is9 ? 9.4 : 6.6, top:is9 ? 52 : 29, pw:is9 ? 57 : 46};
+  var off = is9 ? 26.4 : 0;
+  return {is9:is9, y1:off + 15.5, y2:off + 25, ts:7.4, top:off + 31.5, pw:44.6};
 }
 function statusBar(c, dark, a){
   var col = dark ? INK : "#fff", i;
