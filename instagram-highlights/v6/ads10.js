@@ -1041,7 +1041,7 @@ function schedFredag(H){ H.click(FR.TAP, .4); H.tone(1174.7, FR.PD, .05, .9); H.
 /* första bilden: tre riktiga Viewly-foton, en rad per bild */
 var FO = {B:[0, 3.7, 7.4], L:10.9};
 function adForsta(c, G, t){
-  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, H = G.H, Yb = H*.76, keys = ["house", "terrace", "porch"], i;
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, H = G.H, Yb = S.y1 - 10, keys = ["house", "terrace", "porch"], i;
   v3Fill(c, 0, 0, 100, H, "#070606");
   for(i = 0; i < 3; i++){
     var a = i === 0 ? ioC(k3(t, 0, .5)) : ioC(k3(t, FO.B[i] - .3, FO.B[i] + .6));
@@ -1070,6 +1070,161 @@ function stForsta(c, G, t){
   v3Grad(c, 0, H*.4, 100, H*.6 + 1, [[0, "rgba(6,5,5,0)"], [1, "rgba(6,5,5,.88)"]]); v3Frame(c, 4, 4, 92, H - 8, "#fff", .3, 1, .5);
   kline(c, [["Första", 0], ["bilden", 0]], S.y1 - 40, 9.4, 9, 0, 99); kline(c, [["avgör.", 1]], S.y1 - 27, 9.4, 9, 0, 99);
   stBtn(c, G, S.y1 - 17, 1); stLogo(c, G, H - G.bot - 4);
+}
+
+
+/* =====================================================================
+   V5, sida 19: "Mindre jobb. Mer varumärke." Fotograf och marknadsavdelning i ett.
+   ===================================================================== */
+window.V3_ADS11 = [];
+function ptsLen(pts){ var i, L = 0; for(i = 1; i < pts.length; i++) L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); return L }
+function polyP(c, pts, p){
+  if(p <= 0) return; var tot = ptsLen(pts)*Math.min(1, p), i, d; c.beginPath(); c.moveTo(pts[0][0], pts[0][1]);
+  for(i = 1; i < pts.length; i++){ d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); if(tot >= d){ c.lineTo(pts[i][0], pts[i][1]); tot -= d } else { var q = tot/d; c.lineTo(pts[i - 1][0] + (pts[i][0] - pts[i - 1][0])*q, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1])*q); break } }
+  c.stroke();
+}
+function chkDot(c, x, y, t, t0, r){
+  var p = k3(t, t0, t0 + .35); if(p <= 0) return;
+  c.save(); c.shadowColor = "rgba(0,0,0,.35)"; c.shadowBlur = 2; c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(x, y, r*Math.max(.01, Math.min(1.15, oBack(p))), 0, 7); c.fill(); c.restore();
+  A8.chk(c, x, y + .1, r*.72, p, "#fff", .5);
+}
+
+/* A: ett foto blir hela marknadsavdelningen */
+var BD = {HERO:2.0, HERO1:3.1, TX:3.5, PL:3.9, P0:4.3, FM:5.6, CK:6.5, HL:7.5, OUT:8.8, FIN:9.6, L:12.9};
+function boardG(G){ var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, s = G.is9 ? .84 : .92, Y0 = S.y0 + oy; return {S:S, Y0:Y0, s:s, by:Y0 + 12.5, H:G.H} }
+function adBoard(c, G, t){
+  var g = boardG(G), s = g.s, by = g.by, Y0 = g.Y0, H = g.H, S = g.S, i;
+  var p = ioC(k3(t, BD.HERO, BD.HERO1)), ex = ioC(k3(t, BD.OUT, BD.OUT + .7)), al = 1 - ex;
+  var gX = function(l){ return 50 + (l - 50)*s }, gY = function(l){ return by + l*s };
+  v3Fill(c, 0, 0, 100, H, "#070606");
+  if(p > .01){ c.save(); c.globalAlpha = p; bgLight(c, G, t); c.restore() }
+  c.save(); c.globalAlpha = al;
+  var hx = lerp(0, gX(8), p), hy = lerp(0, gY(0), p), hw = lerp(100, 55.2*s, p), hh = lerp(H, 42.4*s, p), hr = lerp(0, 1.8*s, p);
+  if(p > .2){ c.save(); c.globalAlpha = al*p; c.shadowColor = "rgba(0,0,0,.5)"; c.shadowBlur = 12; c.shadowOffsetY = 2; c.fillStyle = "#000"; rr(c, hx, hy, hw, hh, hr); c.fill(); c.restore() }
+  c.save(); rr(c, hx, hy, hw, hh, hr); c.clip();
+  v3Photo(c, "house", hx, hy, hw, hh, {scale:lerp(1.04, 1.1, k3(t, 0, 4)), pos:V3_POS.house, alpha:(t < .4 ? ioC(k3(t, 0, .4)) : 1)*al});
+  if(p < 1) v3Grad(c, hx, hy + hh*.4, hw, hh*.6 + 1, [[0, "rgba(6,5,5,0)"], [1, "rgba(6,5,5," + (.86*(1 - p)).toFixed(2) + ")"]]);
+  c.restore();
+  if(p < 1){ v3Frame(c, 4, 4, 92, H - 8, "#fff", .3*(1 - p), oQ(k3(t, .2, 1.8)), .5);
+    var Yb = S.y1 - 12;
+    c.save(); c.globalAlpha = al; kline(c, [["Fotograferingen", 0]], Yb - 9, 8.6, t, .5, BD.HERO + .1); kline(c, [["är", 0], ["gjord.", 1]], Yb + 4, 8.6, t, 1.0, BD.HERO + .1); c.restore() }
+  if(p > .6){
+    var tp = rev(t, BD.HERO1 - .2, .4)*al;
+    c.save(); c.translate(50, by); c.scale(s, s); c.translate(-50, 0);
+    var cap = function(txt, x, y, a){ var w = v3Measure(c, txt, {size:1.7, weight:700, f:"sans", sp:.16}) + 4; c.save(); c.globalAlpha = a; c.fillStyle = "rgba(8,7,7,.62)"; rr(c, x, y, w, 3.8, 1.9); c.fill(); c.restore(); sTx(c, txt, x + 2, y + 2.6, a, {size:1.7, weight:700, color:"#fff", sp:.16}) };
+    cap("25 BILDER · LEVERERADE", 10.4, 2.4, tp);
+    var tile = function(t0, x, y, w, h, label){ var a = rev(t, t0, .4)*al, r = (1 - oQ(k3(t, t0, t0 + .7)))*5; if(a <= .02) return null; fcard(c, x, y + r, w, h, a, 2, "#ECE8E4", 0); if(label) sTx(c, label, x + 2.4, y + r + 5.2, a, {size:1.7, weight:700, sp:.16, color:MUT}); return {a:a, y:y + r} };
+    var T1 = tile(BD.TX, 65.6, 0, 26.4, 20, "ANNONSTEXT");
+    if(T1){ var str = "Storgatan 15", n = Math.floor(str.length*k3(t, BD.TX + .3, BD.TX + 1.2)), a1 = T1.a;
+      v3Text(c, str.slice(0, n), 68, T1.y + 11.2, {size:4.4, color:INK, alpha:a1});
+      for(i = 0; i < 3; i++){ var bp = k3(t, BD.TX + 1.1 + i*.25, BD.TX + 1.7 + i*.25); c.save(); c.globalAlpha = a1; c.fillStyle = "rgba(28,28,30,.2)"; rr(c, 68, T1.y + 13.4 + i*1.9, (21.6 - (i === 2 ? 8 : 0))*bp, .8, .4); c.fill(); c.restore() }
+      if(Math.floor(t*2.2) % 2 === 0 && t < BD.TX + 3.4){ c.save(); c.globalAlpha = a1; c.fillStyle = "#2f6a3a"; c.fillRect(68 + v3Measure(c, str.slice(0, n), {size:4.4}) + .5, T1.y + 7.4, .5, 4.4); c.restore() } }
+    var T2 = tile(BD.PL, 65.6, 22.4, 26.4, 20, "PLANRITNING");
+    if(T2){ var X0 = 68.4, Y1 = T2.y + 8.4, W = 21, Hh = 9.4, pa2 = T2.a, d0 = BD.PL + .3;
+      c.save(); c.globalAlpha = pa2; c.strokeStyle = INK; c.lineWidth = .38; c.lineCap = "round"; c.lineJoin = "round";
+      polyP(c, [[X0, Y1], [X0 + W, Y1], [X0 + W, Y1 + Hh], [X0, Y1 + Hh], [X0, Y1]], k3(t, d0, d0 + 1.0));
+      polyP(c, [[X0 + W*.42, Y1], [X0 + W*.42, Y1 + Hh*.6]], k3(t, d0 + .8, d0 + 1.2));
+      polyP(c, [[X0 + W*.42, Y1 + Hh*.6], [X0 + W, Y1 + Hh*.6]], k3(t, d0 + 1.0, d0 + 1.5));
+      polyP(c, [[X0 + W*.72, Y1 + Hh*.6], [X0 + W*.72, Y1 + Hh]], k3(t, d0 + 1.3, d0 + 1.7));
+      c.restore() }
+    var PK = [[0, "rs_dining", "KOMMER SNART"], [1, "rs_chair", "TILL SALU"], [2, "rs_floor", "SÅLD"]];
+    for(i = 0; i < 3; i++){ var t0 = BD.P0 + i*.38, a = rev(t, t0, .4)*al, rs = (1 - oQ(k3(t, t0, t0 + .8)))*6; if(a <= .02) continue;
+      SHIM = t; drawPost(c, PK[i][0], 8 + i*28.8, 44.8 + rs, 26.4, 30, PK[i][1], a, 1, 1, 1); cap(PK[i][2], 9.6 + i*28.8, 44.8 + rs + 24.4, a) }
+    var FMT = ["4:5", "9:16", "1:1", "16:9", "A4"];
+    for(i = 0; i < 5; i++){ var t1 = BD.FM + i*.13, a = rev(t, t1, .3)*al, sc = lerp(.85, 1, oBack(k3(t, t1, t1 + .4))), cx = 8 + i*17.4 + 7.4; if(a <= .02) continue;
+      c.save(); c.translate(cx, 81.2); c.scale(sc, sc); fcard(c, -7.4, -4, 14.8, 8, a, 4, "#ECE8E4", 0); sTx(c, FMT[i], 0, 1, a, {size:2.7, weight:700, color:INK, align:"c", sp:.08}); c.restore() }
+    var cks = [[60.2, 4.4], [88.4, 3.8], [88.4, 26.2], [30.8, 48.4], [59.6, 48.4], [88.4, 48.4], [91.6, 78.2]];
+    if(al > .02) cks.forEach(function(q, k){ c.save(); c.globalAlpha = al; chkDot(c, q[0], q[1], t, BD.CK + k*.13, 2.5); c.restore() });
+    c.restore();
+  }
+  c.restore();
+  heads(c, t, Y0, [[["Resten", "gör", "sig", "själv."], null, BD.HERO1 - .1, BD.HL - .1], [["Allt", "klart."], null, BD.HL + .1, BD.OUT - .2]]);
+  kline(c, [["Mindre", 0], ["jobb.", 0]], Y0 + 30, 11, t, BD.FIN, BD.L - .5);
+  kline(c, [["Mer", 0], ["varumärke.", 1]], Y0 + 43.5, 11, t, BD.FIN + .7, BD.L - .5);
+  var sa = rev(t, BD.FIN + 1.9, .6)*(1 - k3(t, BD.L - .5, BD.L));
+  v3Text(c, "Fotograf och marknadsavdelning i ett.", 50, Y0 + 54, {size:3.5, weight:500, f:"sans", sp:.03, color:"#fff", align:"c", alpha:.85*sa});
+}
+function schedBoard(H){ var i; H.click(BD.TX, .1); H.click(BD.PL, .1); for(i = 0; i < 3; i++) H.click(BD.P0 + i*.38, .1); for(i = 0; i < 7; i++) H.click(BD.CK + i*.13, .1); H.tone(1174.7, BD.HL, .05, .9); H.tone(1568, BD.HL + .12, .04, 1.0) }
+
+/* B: fredag 16:40, notis, kampanjen och profilen som fylls */
+var PF = {TAP:1.9, PS:2.5, PD:4.0, C0:4.8, G0:5.4, OUT:9.5, FIN:10.1, L:13.0};
+var PFK = [["KOMMER SNART", 0, "rs_chair"], ["TILL SALU", 1, "rs_dining"], ["VISNING", 0, "rs_kitchen"], ["SÅLD", 2, "rs_floor"], ["TILL SALU", 1, "bedroom"], ["KOMMER SNART", 0, "rs_dining"]];
+function adProfil(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, s = G.is9 ? .84 : .9, i;
+  bgLight(c, G, t);
+  heads(c, t, Y0, [[["Bilderna", "är", "redan"], ["levererade."], .15, PF.TAP - .3], [["Kampanjen", "är", "klar."], null, PF.PD + .1, PF.C0 - .1], [["Ditt", "varumärke,"], ["på", "varje", "inlägg."], PF.C0 + .3, PF.OUT - .1]]);
+  deliveredCard(c, t, Y0, "SKAPA KAMPANJ  ›", PF.TAP);
+  statusPill(c, t, Y0, PF.PS, PF.PD, "Skapar kampanjen", "Kampanjen är klar", PF.C0 - .4);
+  var ci = oQ(k3(t, PF.C0, PF.C0 + .9)), a = rev(t, PF.C0, .5)*(1 - k3(t, PF.OUT, PF.OUT + .6));
+  if(a > .02){
+    c.save(); c.translate(50, Y0 + 18.5 + (1 - ci)*12); c.scale(s, s); c.translate(-50, 0);
+    fcard(c, 9, 0, 82, 79, a, 3.2, "#fff", 0);
+    c.save(); c.globalAlpha = a; c.fillStyle = GRN; c.beginPath(); c.arc(19, 9.6, 5.4, 0, 7); c.fill(); c.restore();
+    v3Text(c, "H", 19, 12.2, {size:7, color:"#fff", align:"c", alpha:a});
+    v3Text(c, "Anna Lindgren", 27.6, 8.4, {size:4.4, color:INK, alpha:a});
+    sTx(c, "FASTIGHETSMÄKLARE · HELSINGBORG", 27.6, 13, a, {size:1.9, weight:600, color:MUT, sp:.12});
+    fcard(c, 74, 5.2, 14, 6, a, 3, GRN, 0); sTx(c, "FÖLJ", 81, 9.2, a, {size:2.3, weight:700, color:"#fff", align:"c", sp:.16});
+    c.save(); c.globalAlpha = a*.5; c.fillStyle = "rgba(28,28,30,.12)"; c.fillRect(13, 17.4, 74, .25); c.restore();
+    for(i = 0; i < 6; i++){
+      var x = 14 + (i % 3)*25.6, y = 20.6 + Math.floor(i/3)*28.6, t0 = PF.G0 + i*.4, pa = rev(t, t0, .35), pp = oQ(k3(t, t0, t0 + .7));
+      c.save(); c.globalAlpha = a; c.fillStyle = "#E1DCD4"; rr(c, x, y, 24, 26.4, 1.4); c.fill(); c.restore();
+      if(pa > .02){ c.save(); var sc = lerp(1.12, 1, pp); c.translate(x + 12, y + 13.2); c.scale(sc, sc); c.translate(-x - 12, -y - 13.2); SHIM = t; drawPost(c, PFK[i][1], x, y, 24, 26.4, PFK[i][2], pa*a, 1, 1, 1);
+        var cw = v3Measure(c, PFK[i][0], {size:1.5, weight:700, f:"sans", sp:.14}) + 3.6; c.globalAlpha = pa*a; c.fillStyle = "rgba(8,7,7,.62)"; rr(c, x + 1.4, y + 21.4, cw, 3.4, 1.7); c.fill(); sTx(c, PFK[i][0], x + 3.2, y + 23.7, pa*a, {size:1.5, weight:700, color:"#fff", sp:.14}); c.restore() }
+    }
+    c.restore();
+  }
+  kline(c, [["Hinn", 0], ["med", 0], ["fredagen.", 0]], Y0 + 30, 9.6, t, PF.FIN, PF.L - .5);
+  kline(c, [["Bygg", 0], ["varumärket.", 1]], Y0 + 43, 9.6, t, PF.FIN + .8, PF.L - .5);
+}
+function schedProfil(H){ var i; H.click(PF.TAP, .4); H.tone(1174.7, PF.PD, .05, .9); H.tone(1568, PF.PD + .12, .04, 1.0); for(i = 0; i < 6; i++) H.click(PF.G0 + i*.4, .09) }
+
+/* C: efteråt, med varumärke */
+var E2 = {C0:2.4, R0:3.2, ST:.62, OUT:8.9, FIN:9.7, L:13.0};
+var E2R = [["Annonstext", "Skriven utifrån bostadens uppgifter"], ["Planritning", "Ritad och färdig"], ["Bilder i alla format", "4:5 · 9:16 · 1:1 · 16:9 · A4"], ["Kampanjen", "Kommer snart, Till salu, Visning, Såld"], ["Kontorets mallar", "I era färger, med ert märke"], ["Ditt varumärke", "På varje bild, varje gång"]];
+var E2DONE = E2.R0 + 5*E2.ST + .6;
+function adEfter2(c, G, t){
+  var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2, Y0 = S.y0 + oy, s = G.is9 ? .85 : .92, i;
+  bgLight(c, G, t);
+  heads(c, t, Y0, [[["Efter", "fotograferingen"], ["börjar", "jobbet."], .25, E2DONE - .1], [["Allt", "det", "där."], ["Redan", "gjort."], E2DONE + .1, E2.OUT]]);
+  var ci = oQ(k3(t, E2.C0, E2.C0 + .9)), a = rev(t, E2.C0, .5)*(1 - k3(t, E2.OUT, E2.OUT + .6));
+  if(a > .02){
+    c.save(); c.translate(50, Y0 + 17.5 + (1 - ci)*12 - k3(t, E2.OUT, E2.OUT + .6)*4); c.scale(s, s); c.translate(-50, 0);
+    var cw = 82, ch = 78.5, dn = k3(t, E2DONE, E2DONE + .4);
+    fcard(c, 9, 0, cw, ch, a, 3.2, "#fff", 0);
+    c.save(); c.globalAlpha = a; rr(c, 14, 3.6, 11.5, 10.4, 1.4); c.clip(); v3Photo(c, "house", 14, 3.6, 11.5, 10.4, {pos:V3_POS.house}); c.restore();
+    v3Text(c, "Storgatan 15", 28, 9.2, {size:5, color:INK, alpha:a});
+    sTx(c, "HELSINGBORG · 25 BILDER", 28, 13, a, {size:1.9, weight:600, color:MUT, sp:.14});
+    var w1 = v3Measure(c, "ATT GÖRA", {size:2, weight:700, f:"sans", sp:.2}) + 8, w2 = v3Measure(c, "REDAN GJORT", {size:2, weight:700, f:"sans", sp:.2}) + 12;
+    sCard(c, 91 - 5 - w1, 5, w1, 5.6, a*(1 - dn), 2.8, "#1C1C1E", 0); sTx(c, "ATT GÖRA", 91 - 5 - w1/2, 8.8, a*(1 - dn), {size:2, weight:700, color:"#fff", align:"c", sp:.2});
+    sCard(c, 91 - 5 - w2, 5, w2, 5.6, a*dn, 2.8, "#E3F0E4", 0); dotc(c, 91 - 5 - w2 + 3.4, 7.8, .95, "#2f6a3a", a*dn); sTx(c, "REDAN GJORT", 91 - 5 - w2 + 6.2, 8.8, a*dn, {size:2, weight:700, color:"#2f6a3a", sp:.2});
+    c.save(); c.globalAlpha = a*.5; c.fillStyle = "rgba(28,28,30,.12)"; c.fillRect(13, 17, 74, .25); c.restore();
+    for(i = 0; i < E2R.length; i++){
+      var ry = 18.4 + i*9.6, ra = rev(t, E2.C0 + .25 + i*.08, .35)*a, tp = E2.R0 + i*E2.ST, ck = k3(t, tp + .5, tp + .85), cxx = 20, cyy = ry + 4.8;
+      var act = (t >= tp && t < tp + .55) ? 1 : 0;
+      if(act){ c.save(); c.globalAlpha = ra*.9; c.fillStyle = "rgba(47,106,58,.07)"; rr(c, 12, ry + .6, 76, 8.4, 1.6); c.fill(); c.restore() }
+      if(i > 0){ c.save(); c.globalAlpha = ra*.5; c.fillStyle = "rgba(28,28,30,.1)"; c.fillRect(13, ry, 74, .25); c.restore() }
+      c.save(); c.globalAlpha = ra; c.strokeStyle = "#9a948d"; c.lineWidth = .35; c.beginPath(); c.arc(cxx, cyy, 2.5, 0, 7); c.stroke(); c.restore();
+      if(act){ c.save(); c.globalAlpha = ra; c.strokeStyle = "#2f6a3a"; c.lineWidth = .6; c.lineCap = "round"; c.beginPath(); c.arc(cxx, cyy, 2.5, t*7, t*7 + 4.2); c.stroke(); c.restore() }
+      if(ck > 0){ c.save(); c.globalAlpha = ra; c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(cxx, cyy, 2.7*Math.max(.01, Math.min(1.12, oBack(ck))), 0, 7); c.fill(); c.restore(); c.save(); c.globalAlpha = ra; A8.chk(c, cxx, cyy + .1, 1.9, ck, "#fff", .5); c.restore() }
+      sTx(c, E2R[i][0], 26.4, ry + 4.1, ra, {size:3.5, weight:700, color:INK});
+      sTx(c, E2R[i][1], 26.4, ry + 7.5, ra, {size:2.3, weight:500, color:MUT});
+    }
+    c.restore();
+  }
+  kline(c, [["Mindre", 0], ["jobb.", 0]], Y0 + 30, 11, t, E2.FIN, E2.L - .5);
+  kline(c, [["Mer", 0], ["varumärke.", 1]], Y0 + 43.5, 11, t, E2.FIN + .7, E2.L - .5);
+}
+function schedEfter2(H){ var i; for(i = 0; i < E2R.length; i++) H.click(E2.R0 + i*E2.ST + .5, .13); H.tone(1174.7, E2DONE, .05, .9); H.tone(1568, E2DONE + .12, .04, 1.0) }
+
+/* statiska */
+function stBoard(c, G, t){ adBoard(c, G, 8.3); stLogo(c, G, G.H - G.bot - 4) }
+function stProfil(c, G, t){ adProfil(c, G, 8.6); stLogo(c, G, G.H - G.bot - 4) }
+function stMindre(c, G, t){
+  var H = bgLightH(c, G), cy = H*.38;
+  kline(c, [["Mindre", 0], ["jobb.", 0]], cy, 12, 9, 0, 99);
+  kline(c, [["Mer", 0], ["varumärke.", 1]], cy + 14.5, 12, 9, 0, 99);
+  v3Text(c, "Fotograf och marknadsavdelning i ett.", 50, cy + 25, {size:3.5, weight:500, f:"sans", sp:.03, color:"#fff", align:"c", alpha:.85});
+  stBtn(c, G, cy + 32, 1); stLogo(c, G, H - G.bot - 4);
 }
 
 /* ---------- registrering ---------- */
@@ -1134,7 +1289,47 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
     comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
     V3_COMPS[d[0]] = comp; V3_ADS10.push(d[0]);
   });
+  var defs11 = [
+    ["a11_board", "A · Ett foto. Hela marknadsavdelningen.", "Det levererade fotot blir ett bräde: annonstext, planritning, kampanj i kontorets mallar och alla format gör sig själva. Mindre jobb. Mer varumärke. Slutar på Boka fotografering.", withEnd(adBoard, BD.L), schedBoard, BD.L + END10, BD.L, 7.9],
+    ["a11_profil", "B · Fredag 16:40, din profil", "Notis en fredag eftermiddag, kampanjen skapas och profilen fylls med inlägg i kontorets grafik. Hinn med fredagen. Bygg varumärket. Slutar på Boka fotografering.", NT2(withBook(adProfil, PF.L)), notisSched(schedProfil, NF), NF + PF.L + END10, NF + PF.L, NF + 8.7],
+    ["a11_efter", "C · Efteråt, nu med varumärke", "Checklistan som bockas av av sig själv, nu med mallar och varumärke som två av raderna. Mindre jobb. Mer varumärke. Slutar på Boka fotografering.", withEnd(adEfter2, E2.L), schedEfter2, E2.L + END10, E2.L, 7.4],
+    ["a11_sb", "Statisk · Brädet", "Brädet med allt klart.", stBoard, function(H){}, 2, 0, 1],
+    ["a11_sp", "Statisk · Profilen", "Profilen med sex inlägg.", stProfil, function(H){}, 2, 0, 1],
+    ["a11_sm", "Statisk · Mindre jobb", "Mindre jobb. Mer varumärke. med knapp.", stMindre, function(H){}, 2, 0, 1]
+  ];
+  defs11.forEach(function(d){
+    var comp = {n:d[1], d:d[2], group:"ads11", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6], vo:[]};
+    comp.draw = function(c, G, t){ d[3](c, G, t) };
+    comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
+    V3_COMPS[d[0]] = comp; V3_ADS11.push(d[0]);
+  });
 })();
+
+var SCRIPT11 = [
+  ["Fotograferingen är gjord.", "Det levererade fotot fyller bilden. Rubrik: Fotograferingen är gjord."],
+  ["Resten gör sig själv.", "Fotot flyttar in i ett bräde. Annonstext skrivs, planritning ritas, tre inlägg i kontorets mallar och alla format dyker upp."],
+  ["Allt klart.", "Varje del bockas av med ett mjukt klick."],
+  ["Mindre jobb. Mer varumärke.", "Slutraden, med Fotograf och marknadsavdelning i ett. Därefter Boka fotografering."]
+];
+window.secAds11 = function(){
+  if(V3_ADS11.indexOf(V3S.comp) < 0){ V3S.comp = "a11_board"; V3S.t = V3_COMPS.a11_board.thumb; V3S.playing = false; v3StopSound() }
+  if(V3S.fmt !== "916" && V3S.fmt !== "45") V3S.fmt = "916";
+  var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350";
+  setTimeout(v3Mount, 0);
+  return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 19 · bygge 1</div><h2>Mindre jobb. Mer varumärke.</h2>'
+    + '<p>Ny riktning: Viewly är fotograf och marknadsavdelning i ett. Annonserna visar att allt efter fotograferingen redan är gjort och att varumärket byggs på köpet. Utan röst och utan priser, med bara diskreta klick. Förslag, inget publicerat.</p></div>'
+    + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
+    + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
+    + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play" aria-label="Spela">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
+    + '<div class="a3scrubw"><input type="range" id="v3scrub" min="0" max="1000" value="' + Math.round(V3S.t/comp.dur*1000) + '" aria-label="Tid"></div>'
+    + '<span class="mono" id="v3time"></span></div></div>'
+    + '<div class="a3panel"><div class="a3h">Annons</div><div class="a3segs col">' + V3_ADS11.map(function(id){ return v3Seg("comp", id, V3_COMPS[id].n, V3S.comp === id) }).join("") + '</div>'
+    + '<div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde 4:5", V3S.fmt === "45") + '</div>'
+    + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
+    + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + comp.n + " · " + fn + '</button></div></div></div>'
+    + '<h3 class="a3sub">Manus och bild</h3><div class="a3copy">' + SCRIPT11.map(function(s, i){ return '<div><b>' + (i + 1) + ' · ' + s[0] + '</b><p>' + s[1] + '</p></div>' }).join("") + '</div></div>';
+};
+
 
 var SCRIPT = [
   ["Bilderna är redan levererade.", "Rubrik: Bilderna är redan levererade. Kortet visar leveransen med fyra bilder."],
