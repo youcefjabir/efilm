@@ -348,50 +348,58 @@ var CARDK = [
   {bg:"#8F3A22", ink:"#F7EEE4", acc:"#F1C9A8", hair:"rgba(247,238,228,.32)"}
 ];
 /* Reel-mallar: ett kort (platta) i kontorets färg längst ner på fotot, elegant och luftigt */
-/* Reel-mallar: ett kontors tre mallar. Ren typografi på fotot (Kommande), ett platt färgfält med logotyp (Till salu) och en stor Såld-bild. Texterna kommer från v3t, så de går att ändra. */
+/* Reel-mallar som plattor i samma stil som Skåne-annonsen: kräm-platta med orange flik (Till salu), polaroidkort (Kommande) och grönt kort (Såld).
+   Plattorna ligger i Reelens mitt, ovanför Instagrams gränssnitt längst ner. Alla texter kommer från v3t och går att ändra. */
+var PLPH = "rs_dining", PLOR = "#F2681C", PLGR = "#1F4B39";
 function cardOverlay(c, k, x, y, w, h, a, f1, f2, f3){
-  var s = Math.min(w/100, h/125), Wl = w/s, Hl = h/s, tall = Hl > 150, B = tall ? Hl*.765 : Hl - 9, L = 8, R = tall ? 83 : Wl - 8;
-  var F = v3t("a8.re.facts").split(" · "), addr = v3t("a8.re.addr"), city = String(v3t("a8.re.city")).toUpperCase(), off = String(v3t("a11.office")), osub = String(v3t("a11.officesub")), agent = String(v3t("a11.agent"));
-  var tagK = ["tpl.kommande", "tpl.tillsalu", "tpl.sald"], CREAM = "#EFEDE7", SAGE = "#C8CFC0", mk = 1;
+  var s = Math.min(w/100, h/125), Wl = w/s, Hl = h/s, tall = Hl > 150, X0 = tall ? 6 : (Wl - 88)/2, CW = 88;
+  var F = String(v3t("a8.re.facts")).split(" · "), addr = String(v3t("a8.re.addr")), city = String(v3t("a8.re.city")), agent = String(v3t("a11.agent"));
+  var ini = agent.split(" ").map(function(q){ return q.charAt(0) }).join("").toUpperCase().slice(0, 2), CREAM = "#FBF7F0";
   f1 = f1 == null ? 1 : f1; f2 = f2 == null ? 1 : f2; f3 = f3 == null ? f2 : f3;
   c.save(); c.translate(x, y); c.scale(s, s);
-  var bar = function(w0, yy, f){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.3*(.7 + .3*Math.sin(SHIM*4.2)); c.fillStyle = "#fff"; rr(c, L, yy, w0, 1.1, .55); c.fill(); c.restore() };
-  var brand = function(yy, col, right){
-    var nm = off.toUpperCase(), fs = 2.5, nw = v3Measure(c, nm, {size:fs, weight:600, f:"sans", sp:.3}), bx = right ? R - nw - 7 : L;
-    c.save(); c.globalAlpha = a; tplMark(c, mk, bx + 2.3, yy - 1, 2.3, col, "#101010"); c.restore();
-    v3Text(c, nm, bx + 7, yy, {size:fs, weight:600, f:"sans", sp:.3, color:col, alpha:.96*a});
-  };
-  if(k === 0){
-    v3Grad(c, 0, Hl*.36, Wl, Hl*.64 + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7," + (.78*a).toFixed(3) + ")"]]);
-    v3Grad(c, 0, 0, Wl, Hl*.2, [[0, "rgba(8,7,7," + (.35*a).toFixed(3) + ")"], [1, "rgba(8,7,7,0)"]]);
-    c.save(); c.globalAlpha = a; c.fillStyle = "#fff"; c.fillRect(L, B - 62.6, 7, .35); c.restore();
-    v3Text(c, String(v3t(tagK[0])).toUpperCase(), L + 10.5, B - 61.4, {size:2.7, weight:600, f:"sans", sp:.36, color:"#fff", alpha:a});
-    bar(56, B - 43, f1); v3Text(c, addr, L - .4, B - 40, {size:15, color:"#fff", alpha:a, p:f1});
-    bar(24, B - 31.6, f2); v3Text(c, city, L, B - 30.4, {size:2.7, weight:600, f:"sans", sp:.34, color:"#fff", alpha:.88*a, p:f2});
-    v3Text(c, String(v3t("a11.soon")), R, B - 30.2, {size:4.6, italic:true, color:"#fff", align:"r", alpha:.88*a*f2});
-    c.save(); c.globalAlpha = a*.5; c.fillStyle = "#fff"; c.fillRect(L, B - 21.5, (R - L)*Math.min(1, f3*1.3), .25); c.restore();
-    bar(40, B - 13.8, f3); v3Text(c, (F[0] + "     " + F[1]).toUpperCase(), L, B - 12.5, {size:2.7, weight:600, f:"sans", sp:.26, color:"#fff", alpha:.94*a, p:f3});
-    brand(B - 1.5, "#fff", false);
-    v3Text(c, agent.toUpperCase(), R, B - 1.5, {size:2.2, weight:500, f:"sans", sp:.26, color:"#fff", align:"r", alpha:.7*a});
-  } else if(k === 1){
-    v3Grad(c, 0, Hl*.5, Wl, Hl*.5 + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7," + (.28*a).toFixed(3) + ")"]]);
-    var bt = Hl - (tall ? 56 : 46);
-    c.save(); c.globalAlpha = a; c.fillStyle = "#1F392F"; c.fillRect(0, bt, Wl, Hl - bt); c.fillStyle = "rgba(239,237,231,.4)"; c.fillRect(0, bt, Wl, .3); c.restore();
-    var tg = String(v3t(tagK[1])).toUpperCase(), tgw = v3Measure(c, tg, {size:2.3, weight:700, f:"sans", sp:.28}) + 9;
-    c.save(); c.globalAlpha = a; c.fillStyle = CREAM; rr(c, L, bt + 6, tgw, 6.4, 3.2); c.fill(); c.restore();
-    v3Text(c, tg, L + tgw/2 + .4, bt + 10.5, {size:2.3, weight:700, f:"sans", sp:.28, color:"#1c1c1e", align:"c", alpha:a});
-    brand(bt + 10, SAGE, true);
-    bar(54, bt + 20, f1); v3Text(c, addr, L - .3, bt + 25.6, {size:13, color:CREAM, alpha:a, p:f1});
-    bar(46, bt + 34, f3); v3Text(c, city + "     " + (F[0] + "     " + F[1]).toUpperCase(), L, bt + 35.4, {size:2.6, weight:600, f:"sans", sp:.26, color:SAGE, alpha:.95*a, p:f3});
+  v3Fill(c, 0, 0, Wl, Hl, "#080707", .1*a);
+  v3Grad(c, 0, 0, Wl, Hl*.22, [[0, "rgba(8,7,7," + (.3*a).toFixed(3) + ")"], [1, "rgba(8,7,7,0)"]]);
+  var sk = function(xx, yy, w0, f, col){ if(f >= 1) return; c.save(); c.globalAlpha = a*(1 - f)*.2*(.72 + .28*Math.sin(SHIM*4.2)); c.fillStyle = col; rr(c, xx, yy, w0, 1.3, .65); c.fill(); c.restore() };
+  var lab = String(v3t(["tpl.kommande", "tpl.tillsalu", "tpl.sald"][k]));
+  if(k === 1){
+    var ct = tall ? Hl*.4 : 66, ch = 46, rt = ct - 19;
+    c.save(); c.globalAlpha = a; c.translate(0, (1 - f1)*0); c.fillStyle = PLOR; c.beginPath(); c.moveTo(X0 + 6, rt); c.lineTo(X0 + 38, rt); c.lineTo(X0 + 38, ct + 1); c.lineTo(X0 + 22, ct - 4.2); c.lineTo(X0 + 6, ct + 1); c.closePath(); c.shadowColor = "rgba(0,0,0,.3)"; c.shadowBlur = 5; c.fill(); c.restore();
+    v3Text(c, lab, X0 + 22, rt + 10.4, {size:4.4, weight:600, f:"sans", color:"#fff", align:"c", alpha:a});
+    c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.34)"; c.shadowBlur = 10; c.shadowOffsetY = 2; c.fillStyle = CREAM; rr(c, X0, ct, CW, ch, 1.8); c.fill(); c.restore();
+    sk(X0 + 6, ct + 9, 46, f1, "#1c1c1e"); v3Text(c, addr, X0 + 6, ct + 14.4, {size:8.4, weight:700, f:"sans", color:"#1c1c1e", alpha:a, p:f1});
+    sk(X0 + 6, ct + 18.4, 22, f2, "#1c1c1e"); v3Text(c, city.toUpperCase(), X0 + 6, ct + 20.8, {size:2.9, weight:500, f:"sans", sp:.2, color:"#8c867e", alpha:a, p:f2});
+    c.save(); c.globalAlpha = a*f2; c.fillStyle = PLOR; c.fillRect(X0 + 6, ct + 25, 26*f2, .9); c.restore();
+    sk(X0 + 6, ct + 31, 40, f3, PLOR); v3Text(c, F.join(" · "), X0 + 6, ct + 34, {size:4.6, weight:600, f:"sans", color:PLOR, alpha:a, p:f3});
+    v3Text(c, agent, X0 + 6, ct + 40.6, {size:3.5, weight:500, f:"sans", color:"#6a655e", alpha:a*f3});
+    c.save(); c.globalAlpha = a*f3; c.fillStyle = PLOR; c.beginPath(); c.arc(X0 + CW - 11, ct + 30, 5.4, 0, 7); c.fill(); c.restore();
+    v3Text(c, ini, X0 + CW - 11, ct + 31.5, {size:3.7, weight:700, f:"sans", color:"#fff", align:"c", alpha:a*f3});
+  } else if(k === 0){
+    var et = tall ? Hl*.3 : 8, eh = tall ? 88 : 108, ink = "#1c1c1e";
+    c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.36)"; c.shadowBlur = 11; c.shadowOffsetY = 2.4; c.fillStyle = "#F4F0E8"; rr(c, X0, et, CW, eh, 1.8); c.fill(); c.restore();
+    c.save(); c.globalAlpha = a*.4; c.strokeStyle = ink; c.lineWidth = .28; c.strokeRect(X0 + 2.4, et + 2.4, CW - 4.8, eh - 4.8); c.restore();
+    v3Text(c, lab.toUpperCase(), X0 + 6, et + 9, {size:2.6, weight:700, f:"sans", sp:.3, color:ink, alpha:a});
+    v3Text(c, city.toUpperCase(), X0 + CW - 6, et + 9, {size:2.6, weight:500, f:"sans", sp:.3, color:"#5f5a55", align:"r", alpha:a*f2});
+    c.save(); c.globalAlpha = a*.5; c.fillStyle = ink; c.fillRect(X0 + 6, et + 12, CW - 12, .25); c.restore();
+    var pw2 = CW - 12, ph2 = tall ? 36 : 40;
+    c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.18)"; c.shadowBlur = 4; c.fillStyle = "#fff"; c.fillRect(X0 + 6, et + 16, pw2, ph2 + 2.8); c.restore();
+    c.save(); c.globalAlpha = a; c.beginPath(); c.rect(X0 + 7.4, et + 17.4, pw2 - 2.8, ph2); c.clip(); v3Photo(c, PLPH, X0 + 7.4, et + 17.4, pw2 - 2.8, ph2, {scale:1.12, pos:V3_POS[PLPH] || [.5, .5]}); c.restore();
+    var ay = et + 16 + ph2 + 14;
+    sk(X0 + 6, ay - 8, 48, f1, ink); v3Text(c, addr, X0 + 6, ay, {size:11.5, italic:true, color:ink, alpha:a, p:f1});
+    c.save(); c.globalAlpha = a*.5; c.fillStyle = ink; c.fillRect(X0 + 6, ay + 4, CW - 12, .25); c.restore();
+    sk(X0 + 6, ay + 9, 36, f3, ink); v3Text(c, F.join(" · ").toUpperCase(), X0 + 6, ay + 11, {size:2.7, weight:600, f:"sans", sp:.22, color:ink, alpha:a, p:f3});
+    v3Text(c, agent, X0 + CW - 6, ay + 11.4, {size:3.7, italic:true, color:"#5f5a55", align:"r", alpha:a*f3});
   } else {
-    v3Fill(c, 0, 0, Wl, Hl, "#080707", .42*a);
-    v3Grad(c, 0, Hl*.4, Wl, Hl*.6 + 1, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7," + (.6*a).toFixed(3) + ")"]]);
-    var sy = tall ? Hl*.52 : Hl*.5;
-    v3Text(c, String(v3t(tagK[2])), L - 1, sy, {size:38, italic:true, color:CREAM, alpha:a});
-    bar(50, sy + 8, f1); v3Text(c, (addr + "   ·   " + city).toUpperCase(), L, sy + 9.4, {size:2.9, weight:600, f:"sans", sp:.3, color:"#fff", alpha:.92*a, p:f1});
-    v3Text(c, String(v3t("tpl.tack")), L, sy + 19, {size:5.4, italic:true, color:"#fff", alpha:.86*a*f2});
-    brand(B - 1.5, "#fff", false);
-    v3Text(c, agent.toUpperCase(), R, B - 1.5, {size:2.2, weight:500, f:"sans", sp:.26, color:"#fff", align:"r", alpha:.7*a});
+    var gt = tall ? Hl*.34 : 30, gh = tall ? 62 : 70;
+    c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.4)"; c.shadowBlur = 11; c.shadowOffsetY = 2.4; c.fillStyle = PLGR; rr(c, X0, gt, CW, gh, 1.8); c.fill(); c.restore();
+    c.save(); c.globalAlpha = a*.3; c.strokeStyle = "#F3EFE7"; c.lineWidth = .3; c.strokeRect(X0 + 2.4, gt + 2.4, CW - 4.8, gh - 4.8); c.restore();
+    var lw = v3Measure(c, lab.toUpperCase(), {size:2.9, weight:700, f:"sans", sp:.26}) + 12;
+    c.save(); c.globalAlpha = a; c.fillStyle = "#F3EFE7"; rr(c, 50 - lw/2 + (X0 - 6)*0 , gt + 8, lw, 7.4, 3.7); c.fill(); c.restore();
+    v3Text(c, lab.toUpperCase(), 50, gt + 13, {size:2.9, weight:700, f:"sans", sp:.26, color:PLGR, align:"c", alpha:a});
+    sk(50 - 24, gt + 24, 48, f1, "#F3EFE7"); v3Text(c, addr, 50, gt + 32, {size:11, color:"#F3EFE7", align:"c", alpha:a, p:f1});
+    v3Text(c, city.toUpperCase(), 50, gt + 38.6, {size:2.8, weight:500, f:"sans", sp:.3, color:"rgba(243,239,231,.85)", align:"c", alpha:a*f2});
+    c.save(); c.globalAlpha = a*f2*.7; c.fillStyle = "#F3EFE7"; c.fillRect(50 - 6, gt + 42.6, 12, .3); c.restore();
+    sk(50 - 20, gt + 47, 40, f3, "#F3EFE7"); v3Text(c, F.join(" · "), 50, gt + 50, {size:3.4, weight:500, f:"sans", color:"rgba(243,239,231,.92)", align:"c", alpha:a, p:f3});
+    v3Text(c, agent, 50, gt + 56.4, {size:3.7, italic:true, color:"rgba(243,239,231,.78)", align:"c", alpha:a*f3});
   }
   c.restore();
 }
@@ -436,7 +444,7 @@ function postOverlay(c, k, x, y, w, h, a, f1, f2, f3){
   c.restore();
 }
 function drawPost(c, k, x, y, w, h, key, a, f1, f2, f3){
-  if(a <= .02) return;
+  if(a <= .02) return; PLPH = key;
   c.save(); c.globalAlpha = a; c.shadowColor = "rgba(0,0,0,.5)"; c.shadowBlur = 14; c.shadowOffsetY = 3; c.fillStyle = "#000"; rr(c, x, y, w, h, 1.5); c.fill(); c.shadowColor = "transparent";
   rr(c, x, y, w, h, 1.5); c.clip(); v3Photo(c, key, x, y, w, h, {pos:V3_POS[key]});
   c.restore();
@@ -575,6 +583,7 @@ function reelF(c, x, y, w, h, rt, a, r, fa, fc, fd, ph, cuts, swt, tk){
     var s0 = cuts[i], s1 = cuts[i + 1] == null ? s0 + 3 : cuts[i + 1], pa = i === 0 ? 1 : k3(rt, s0, s0 + .55); if(pa <= .01) continue;
     v3Photo(c, ph[i], x, y, w, h, {scale:lerp(1.05, 1.15, k3(rt, s0, s1 + .5)), pos:V3_POS[ph[i]], alpha:ioC(pa)});
   }
+  for(i = 0; i < ph.length; i++) if(rt >= cuts[i]) PLPH = ph[i];
   var ti = fixed ? tk : (rt >= swt[1] ? 2 : rt >= swt[0] ? 1 : 0), tp = (fixed || !ti) ? 1 : ioC(k3(rt - swt[ti - 1], 0, .7)), fil = fixed || !ti;
   SHIM = rt;
   if(!fixed && ti > 0 && tp < 1) postOverlay(c, ti - 1, x, y, w, h, a*ia*(1 - tp), 1, 1, 1);
