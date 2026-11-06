@@ -1114,6 +1114,9 @@ var TX11 = {
   "a11.b.h1":["Fotograferingen", "A · bild 1, rad 1"], "a11.b.h2":["är gjord.", "A · bild 1, rad 2"], "a11.b.l1":["Resten gör sig själv.", "A · rubrik medan brädet fylls"], "a11.b.l2":["Allt klart.", "A · rubrik när allt är klart"], "a11.b.f1":["Mindre jobb.", "A · slutrad 1"], "a11.b.f2":["Mer varumärke.", "A · slutrad 2"], "a11.b.sub":["Fotograf och marknadsavdelning i ett.", "A · raden under slutrubriken"],
   "a11.p.h1":["Bilderna är redan", "B · rubrik 1, rad 1"], "a11.p.h2":["levererade.", "B · rubrik 1, rad 2"], "a11.p.l1":["Kampanjen är klar.", "B · rubrik 2"], "a11.p.m1":["Ditt varumärke,", "B · rubrik 3, rad 1"], "a11.p.m2":["på varje inlägg.", "B · rubrik 3, rad 2"], "a11.p.f1":["Hinn med fredagen.", "B · slutrad 1"], "a11.p.f2":["Bygg varumärket.", "B · slutrad 2"],
   "a11.e.h1":["Efter fotograferingen", "C · rubrik 1, rad 1"], "a11.e.h2":["börjar jobbet.", "C · rubrik 1, rad 2"], "a11.e.d1":["Allt det där.", "C · rubrik 2, rad 1"], "a11.e.d2":["Redan gjort.", "C · rubrik 2, rad 2"], "a11.e.f1":["Mindre jobb.", "C · slutrad 1"], "a11.e.f2":["Mer varumärke.", "C · slutrad 2"],
+  "a11.q.lbl":["MÄKLARE OM VIEWLY", "Förtroende · liten rad överst"], "a11.q.pull1":["…mycket uppskattat", "Förtroende · utdrag, rad 1"], "a11.q.pull2":["av mina kunder.", "Förtroende · utdrag, rad 2"],
+  "a11.q.full":["Snabb och smidig hantering genom hela processen, från bokning till leverans av färdigt material. Resultatet håller genomgående hög kvalitet och har varit mycket uppskattat av mina kunder.", "Förtroende · hela citatet"], "a11.q.name":["Hampus Nilsson", "Förtroende · namn"], "a11.q.role":["Mäklare · Fastighetsbyrån Landskrona", "Förtroende · titel och kontor"], "a11.q.stars":["5", "Förtroende · antal stjärnor (0–5)"], "a11.q.tag":["KUNDOMDÖME", "Förtroende · etikett på kortet"],
+  "a11.t.h1":["Därför kan du", "Förtroende · lista, rubrik rad 1"], "a11.t.h2":["lita på oss.", "Förtroende · lista, rubrik rad 2"], "a11.t.r1":["Utbildade fotografer", "Förtroende · punkt 1"], "a11.t.s1":["Bostadsfotografering är vårt hantverk", "Förtroende · punkt 1, text"], "a11.t.r2":["Drönarlicens", "Förtroende · punkt 2"], "a11.t.s2":["För luftbilder och filmklipp", "Förtroende · punkt 2, text"], "a11.t.r3":["Utvecklat med mäklare", "Förtroende · punkt 3"], "a11.t.s3":["Med stöd i forskning, marknadsdata och samarbete med mäklare", "Förtroende · punkt 3, text"],
   "a11.e.r1":["Annonstext", "C · rad 1, rubrik"], "a11.e.s1":["Skriven utifrån bostadens uppgifter", "C · rad 1, text"], "a11.e.r2":["Planritning", "C · rad 2, rubrik"], "a11.e.s2":["Ritad och färdig", "C · rad 2, text"], "a11.e.r3":["Bilder i alla format", "C · rad 3, rubrik"], "a11.e.s3":["4:5 · 9:16 · 1:1 · 16:9 · A4", "C · rad 3, text"],
   "a11.e.r4":["Kampanjen", "C · rad 4, rubrik"], "a11.e.s4":["Kommer snart, Till salu, Visning, Såld", "C · rad 4, text"], "a11.e.r5":["Kontorets mallar", "C · rad 5, rubrik"], "a11.e.s5":["I era färger, med ert märke", "C · rad 5, text"], "a11.e.r6":["Ditt varumärke", "C · rad 6, rubrik"], "a11.e.s6":["På varje bild, varje gång", "C · rad 6, text"]
 };
@@ -1485,6 +1488,73 @@ function adPostP(c, G, t){
 }
 function schedPostP(H){ H.tone(1174.7, CP.nt + .1, .06, .8); H.tone(1568, CP.nt + .25, .05, .9); H.click(CP.tn, .35); H.click(CP.tb, .35); H.click(CP.ti, .35); H.click(CP.tt, .35); H.tone(1174.7, CP.fdone, .05, .9); H.tone(1568, CP.fdone + .12, .04, 1.0) }
 
+
+/* =====================================================================
+   Förtroende: citat från mäklare och sakliga skäl att lita på oss. Alla texter går att ändra. Bara riktiga omdömen ska in här.
+   ===================================================================== */
+function wrap6(c, text, maxW, o){
+  var ws = String(text).split(" "), lines = [], cur = "";
+  ws.forEach(function(w){ var tt = cur ? cur + " " + w : w; if(cur && v3Measure(c, tt, o) > maxW){ lines.push(cur); cur = w } else cur = tt });
+  if(cur) lines.push(cur); return lines;
+}
+function starsRow(c, cx, y, n, sz, col, al, prog){
+  var i, gap = sz*1.25, x0 = cx - (n - 1)*gap/2;
+  for(i = 0; i < n; i++){ var p = prog == null ? 1 : oBack(k3(prog, i*.12, i*.12 + .4)); if(p <= .01) continue; c.save(); c.translate(x0 + i*gap, y); c.scale(p, p); v3Text(c, "★", 0, 0, {size:sz, weight:500, f:"sans", color:col, align:"c", alpha:al*Math.min(1, p)}); c.restore() }
+}
+function qG(G){ var S = SG(G), oy = G.is9 ? 0 : (S.h - 83.6)/2; return {S:S, Y0:S.y0 + oy} }
+function stQ1(c, G, t){
+  var g = qG(G), Y0 = g.Y0, H = bgLightH(c, G), n = Math.max(0, Math.min(5, parseInt(v3t("a11.q.stars"), 10) || 0));
+  v3Text(c, String(v3t("a11.q.lbl")), 50, Y0 + 5, {size:2.6, weight:600, f:"sans", sp:.36, color:"#fff", align:"c", alpha:.8});
+  v3Text(c, "“", 50, Y0 + 30, {size:28, italic:true, color:"#d6dccb", align:"c", alpha:.9});
+  kline(c, W6("a11.q.pull1", 0), Y0 + 44, 9.2, 9, 0, 99); kline(c, W6("a11.q.pull2", 1), Y0 + 57, 9.2, 9, 0, 99);
+  starsRow(c, 50, Y0 + 68, n, 3.6, "#EFEDE7", .95);
+  v3Text(c, String(v3t("a11.q.name")), 50, Y0 + 79, {size:4.6, weight:700, f:"sans", color:"#fff", align:"c"});
+  v3Text(c, String(v3t("a11.q.role")), 50, Y0 + 85, {size:3, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.78});
+  stLogo(c, G, H - G.bot - 4);
+}
+function stQ2(c, G, t){
+  var g = qG(G), Y0 = g.Y0, H = G.H, n = Math.max(0, Math.min(5, parseInt(v3t("a11.q.stars"), 10) || 0));
+  v3Fill(c, 0, 0, 100, H, "#070606"); v3Photo(c, "house", 0, 0, 100, H, {scale:1.1, pos:V3_POS.house}); v3Fill(c, 0, 0, 100, H, "#080707", .5);
+  v3Frame(c, 4, 4, 92, H - 8, "#fff", .26, 1, .5);
+  var qo = {size:5.6, color:INK}, lines = wrap6(c, "“" + v3t("a11.q.full") + "”", 68, qo), lh = 8, ch = 38 + lines.length*lh, cy = Y0 + Math.max(2, (83.6 - ch)/2 - 2);
+  fcard(c, 8, cy, 84, ch, 1, 2.4, "#FBF7F0", 0);
+  sTx(c, String(v3t("a11.q.tag")), 14, cy + 9, 1, {size:2.5, weight:700, color:INK, sp:.28});
+  starsRow(c, 86 - (n - 1)*2.4, cy + 9.6, n, 3, "#1c1c1e", .9);
+  c.save(); c.globalAlpha = .45; c.fillStyle = INK; c.fillRect(14, cy + 14, 72, .25); c.restore();
+  lines.forEach(function(l, i){ v3Text(c, l, 14, cy + 25 + i*lh, {size:5.6, color:INK}) });
+  var by = cy + 25 + (lines.length - 1)*lh + 8;
+  c.save(); c.globalAlpha = .45; c.fillStyle = INK; c.fillRect(14, by - 3, 72, .25); c.restore();
+  sTx(c, String(v3t("a11.q.name")).toUpperCase(), 14, by + 5, 1, {size:3, weight:700, color:INK, sp:.2});
+  sTx(c, String(v3t("a11.q.role")).toUpperCase(), 14, by + 10, 1, {size:2.2, weight:600, color:MUT, sp:.16});
+  if(G.is9) stLogo(c, G, H - G.bot - 4);
+}
+function stQ3(c, G, t){
+  var g = qG(G), Y0 = g.Y0, H = bgLightH(c, G), i;
+  kline(c, W6("a11.t.h1", 0), Y0 + 11, 8, 9, 0, 99); kline(c, W6("a11.t.h2", 1), Y0 + 23, 8, 9, 0, 99);
+  for(i = 1; i <= 3; i++){
+    var y = Y0 + 32 + (i - 1)*17.5, sub = wrap6(c, v3t("a11.t.s" + i), 60, {size:2.7, weight:500, f:"sans"});
+    fcard(c, 8, y, 84, 15.4, 1, 2.4, "#ECE8E4", 0);
+    c.save(); c.fillStyle = "#2f6a3a"; c.beginPath(); c.arc(17.4, y + 7.7, 3.4, 0, 7); c.fill(); c.restore(); A8.chk(c, 17.4, y + 7.8, 2.3, 1, "#fff", .55);
+    sTx(c, String(v3t("a11.t.r" + i)), 25, y + (sub.length > 1 ? 6 : 7), 1, {size:4, weight:700, color:INK});
+    sub.slice(0, 2).forEach(function(l, k){ sTx(c, l, 25, y + (sub.length > 1 ? 10.2 : 11.6) + k*3.4, 1, {size:2.7, weight:500, color:MUT}) });
+  }
+  stLogo(c, G, H - G.bot - 4);
+}
+var QA = {L:11.4};
+function adQuoteA(c, G, t){
+  var g = qG(G), Y0 = g.Y0, n = Math.max(0, Math.min(5, parseInt(v3t("a11.q.stars"), 10) || 0));
+  bgLight(c, G, t);
+  v3Text(c, String(v3t("a11.q.lbl")), 50, Y0 + 5, {size:2.6, weight:600, f:"sans", sp:.36, color:"#fff", align:"c", alpha:.8*rev(t, .2, .6)*(1 - k3(t, QA.L - .5, QA.L))});
+  var qp = oBack(k3(t, .3, .9)), fo = 1 - k3(t, QA.L - .5, QA.L);
+  c.save(); c.translate(50, Y0 + 30); c.scale(Math.max(.01, qp), Math.max(.01, qp)); v3Text(c, "“", 0, 0, {size:28, italic:true, color:"#d6dccb", align:"c", alpha:.9*Math.min(1, qp)*fo*(1 - k3(t, 4.4, 4.9))}); c.restore();
+  kline(c, W6("a11.q.pull1", 0), Y0 + 44, 9.2, t, .9, 4.7); kline(c, W6("a11.q.pull2", 1), Y0 + 57, 9.2, t, 1.4, 4.7);
+  var lines = wrap6(c, v3t("a11.q.full"), 80, {size:4.8}), i;
+  lines.forEach(function(l, k){ var a = rev(t, 5.1 + k*.36, .6)*fo; if(a > .01) v3Text(c, l, 50, Y0 + 25 + k*6.6, {size:4.8, color:"#fff", align:"c", alpha:a, p:rev(t, 5.1 + k*.36, .8)}) });
+  starsRow(c, 50, Y0 + 68, n, 3.6, "#EFEDE7", .95*fo, Math.max(0, t - 2.4));
+  v3Text(c, String(v3t("a11.q.name")), 50, Y0 + 79, {size:4.6, weight:700, f:"sans", color:"#fff", align:"c", alpha:rev(t, 3.2, .6)*fo});
+  v3Text(c, String(v3t("a11.q.role")), 50, Y0 + 85, {size:3, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.78*rev(t, 3.5, .6)*fo});
+}
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return v3SfxLoad() }
@@ -1554,6 +1624,10 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
     ["a11_sb", "Statisk · Brädet", "Brädet med allt klart.", stBoard, function(H){}, 2, 0, 1],
     ["a11_sp", "Statisk · Profilen", "Profilen med sex inlägg.", stProfil, function(H){}, 2, 0, 1],
     ["a11_sm", "Statisk · Mindre jobb", "Mindre jobb. Mer varumärke. med knapp.", stMindre, function(H){}, 2, 0, 1],
+    ["a11_q1", "Förtroende · Citat på foto", "Utdraget ur Hampus Nilssons omdöme som stor typografi på fåtöljfotot, med stjärnor, namn och titel. Still för story.", stQ1, function(H){}, 2, 0, 1],
+    ["a11_q2", "Förtroende · Hela citatet", "Hela omdömet på ett kräm-kort över ett mörkt foto, med stjärnor, namn och titel. Still för story.", stQ2, function(H){}, 2, 0, 1],
+    ["a11_q3", "Förtroende · Därför kan du lita på oss", "Tre sakliga skäl från viewly.se: utbildade fotografer, drönarlicens och utvecklat med mäklare. Still för story.", stQ3, function(H){}, 2, 0, 1],
+    ["a11_q4", "Förtroende · Citatet animerat", "Citatet växer fram: utdraget, stjärnorna som poppar, sedan hela omdömet. Därefter Boka fotografering.", withEnd(adQuoteA, QA.L), function(H){ var i; for(i = 0; i < 5; i++) H.click(2.4 + i*.12, .08) }, QA.L + END10, QA.L, 4.8],
     ["a11_tpl", "Statisk · Reel-mallarna", "Kontorets tre Reel-mallar: Kommande, Till salu och Såld.", stTpl, function(H){}, 2, 0, 1]
   ];
   defs11.forEach(function(d){
