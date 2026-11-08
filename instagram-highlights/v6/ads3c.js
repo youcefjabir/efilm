@@ -40,7 +40,7 @@ function v3DrawComp(canvas, wpx, compId, fmt, t){
   c.clearRect(0, 0, 100, G.H);
   V3_COMPS[compId].draw(c, G, t, v3O());
 }
-function v3Dims(fmt){ return fmt === "916" ? [1080, 1920] : fmt === "169" ? [1920, 1080] : fmt === "11" ? [1080, 1080] : [1080, 1350] }
+function v3Dims(fmt){ return fmt === "43" ? [1600, 1200] : fmt === "916" ? [1080, 1920] : fmt === "169" ? [1920, 1080] : fmt === "11" ? [1080, 1080] : [1080, 1350] }
 
 /* ---------------------------------------------------------------------
    LJUD — ett litet piano och diskreta ljudeffekter, syntetiserat i

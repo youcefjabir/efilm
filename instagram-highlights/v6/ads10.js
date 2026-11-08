@@ -1114,6 +1114,7 @@ var TX11 = {
   "a11.b.h1":["Fotograferingen", "A · bild 1, rad 1"], "a11.b.h2":["är gjord.", "A · bild 1, rad 2"], "a11.b.l1":["Resten gör sig själv.", "A · rubrik medan brädet fylls"], "a11.b.l2":["Allt klart.", "A · rubrik när allt är klart"], "a11.b.f1":["Mindre jobb.", "A · slutrad 1"], "a11.b.f2":["Mer varumärke.", "A · slutrad 2"], "a11.b.sub":["Fotograf och marknadsavdelning i ett.", "A · raden under slutrubriken"],
   "a11.p.h1":["Bilderna är redan", "B · rubrik 1, rad 1"], "a11.p.h2":["levererade.", "B · rubrik 1, rad 2"], "a11.p.l1":["Kampanjen är klar.", "B · rubrik 2"], "a11.p.m1":["Ditt varumärke,", "B · rubrik 3, rad 1"], "a11.p.m2":["på varje inlägg.", "B · rubrik 3, rad 2"], "a11.p.f1":["Hinn med fredagen.", "B · slutrad 1"], "a11.p.f2":["Bygg varumärket.", "B · slutrad 2"],
   "a11.e.h1":["Efter fotograferingen", "C · rubrik 1, rad 1"], "a11.e.h2":["börjar jobbet.", "C · rubrik 1, rad 2"], "a11.e.d1":["Allt det där.", "C · rubrik 2, rad 1"], "a11.e.d2":["Redan gjort.", "C · rubrik 2, rad 2"], "a11.e.f1":["Mindre jobb.", "C · slutrad 1"], "a11.e.f2":["Mer varumärke.", "C · slutrad 2"],
+  "a11.s.addr":["Albinsgatan 5A", "Studio-mockup · adress"], "a11.s.city":["HELSINGBORG", "Studio-mockup · ort"], "a11.s.tag":["TILL SALU", "Studio-mockup · etikett"], "a11.s.f1n":["3", "Studio-mockup · fakta 1, tal"], "a11.s.f1l":["RUM OCH KÖK", "Studio-mockup · fakta 1, text"], "a11.s.f2n":["74", "Studio-mockup · fakta 2, tal"], "a11.s.f2l":["KVADRATMETER", "Studio-mockup · fakta 2, text"], "a11.s.f3n":["2012", "Studio-mockup · fakta 3, tal"], "a11.s.f3l":["BYGGÅR", "Studio-mockup · fakta 3, text"], "a11.s.show":["VISNING SÖN 13–14", "Studio-mockup · visning"], "a11.s.office":["HAVSVIK", "Studio-mockup · kontorets namn"], "a11.s.osub":["MÄKLARHUS", "Studio-mockup · kontorets undertext"],
   "a11.q.lbl":["MÄKLARE OM VIEWLY", "Förtroende · liten rad överst"], "a11.q.pull1":["…mycket uppskattat", "Förtroende · utdrag, rad 1"], "a11.q.pull2":["av mina kunder.", "Förtroende · utdrag, rad 2"],
   "a11.q.full":["Snabb och smidig hantering genom hela processen, från bokning till leverans av färdigt material. Resultatet håller genomgående hög kvalitet och har varit mycket uppskattat av mina kunder.", "Förtroende · hela citatet"], "a11.q.name":["Hampus Nilsson", "Förtroende · namn"], "a11.q.role":["Mäklare · Fastighetsbyrån Landskrona", "Förtroende · titel och kontor"], "a11.q.stars":["5", "Förtroende · antal stjärnor (0–5)"], "a11.q.tag":["KUNDOMDÖME", "Förtroende · etikett på kortet"],
   "a11.t.h1":["Därför kan du", "Förtroende · lista, rubrik rad 1"], "a11.t.h2":["lita på oss.", "Förtroende · lista, rubrik rad 2"], "a11.t.r1":["Utbildade fotografer", "Förtroende · punkt 1"], "a11.t.s1":["Bostadsfotografering är vårt hantverk", "Förtroende · punkt 1, text"], "a11.t.r2":["Drönarlicens", "Förtroende · punkt 2"], "a11.t.s2":["För luftbilder och filmklipp", "Förtroende · punkt 2, text"], "a11.t.r3":["Utvecklat med mäklare", "Förtroende · punkt 3"], "a11.t.s3":["Med stöd i forskning, marknadsdata och samarbete med mäklare", "Förtroende · punkt 3, text"],
@@ -1555,6 +1556,165 @@ function adQuoteA(c, G, t){
   v3Text(c, String(v3t("a11.q.role")), 50, Y0 + 85, {size:3, weight:500, f:"sans", sp:.04, color:"#fff", align:"c", alpha:.78*rev(t, 3.5, .6)*fo});
 }
 
+
+/* =====================================================================
+   V9: Reel Studio som lugn mockup (webbkort 4:3) i stil med Content Studio-bilden: titel, sidlist, flikar, arbetsyta och en panel.
+   Det enda som rör sig är själva reelen (9:16): bilder, adress, fakta och kontorets logga.
+   ===================================================================== */
+var SMP = ["house", "rs_chair", "rs_dining", "rs_kitchen", "bedroom"], SMG = "#353A2F", SMLN = "rgba(28,28,30,.12)", SMBG = "#FFFFFF";
+var SM = {START:.9, SEG:2.2, R:13.8, DUR:17.0};
+function sm(c, s, x, y, sz, a, o){ o = o || {}; sTx(c, s, x, y, a == null ? 1 : a, {size:sz, weight:o.w || 500, color:o.c || INK, align:o.al || "l", sp:o.sp || 0}) }
+function smBox(c, x, y, w, h, r, fill, stroke, shadow){
+  c.save(); if(shadow){ c.shadowColor = "rgba(40,36,30,.14)"; c.shadowBlur = shadow; c.shadowOffsetY = shadow*.18 } c.fillStyle = fill; rr(c, x, y, w, h, r); c.fill(); c.shadowColor = "transparent";
+  if(stroke){ c.strokeStyle = stroke; c.lineWidth = .2; rr(c, x, y, w, h, r); c.stroke() } c.restore();
+}
+function smPill(c, x, y, w, h, label, on, sz){
+  smBox(c, x, y, w, h, h/2, on ? SMG : "#fff", on ? null : SMLN, on ? 0 : 1.2); sm(c, label, x + w/2, y + h/2 + sz*.36, sz, 1, {al:"c", c:on ? "#fff" : INK, w:500});
+}
+function smIcon(c, kind, cx, cy, col, sc){
+  if(sc){ c.save(); c.translate(cx, cy); c.scale(sc, sc); smIcon(c, kind, 0, 0, col); c.restore(); return }
+  c.save(); c.strokeStyle = col; c.fillStyle = col; c.lineWidth = .26; c.lineCap = "round"; c.lineJoin = "round";
+  if(kind === 0){ rr(c, cx - 1.9, cy - 1.8, 3.8, 1.8, .4); c.stroke(); rr(c, cx - 1.9, cy + .4, 1.7, 1.5, .4); c.stroke(); rr(c, cx + .1, cy + .4, 1.8, 1.5, .4); c.stroke() }
+  else if(kind === 1){ rr(c, cx - 1.9, cy - 1.7, 3.8, 3.4, .6); c.stroke(); c.beginPath(); c.arc(cx - .7, cy - .5, .4, 0, 7); c.stroke(); c.beginPath(); c.moveTo(cx - 1.9, cy + 1); c.lineTo(cx - .5, cy - .1); c.lineTo(cx + .4, cy + .7); c.lineTo(cx + 1, cy + .2); c.lineTo(cx + 1.9, cy + .9); c.stroke() }
+  else if(kind === 2){ c.restore(); v3Text(c, "T", cx, cy + 1.5, {size:4.2, weight:500, color:col, align:"c"}); return }
+  else if(kind === 3){ c.beginPath(); c.ellipse(cx, cy - 1.3, 1.6, .7, 0, 0, 7); c.stroke(); c.beginPath(); c.moveTo(cx - 1.6, cy - 1.3); c.lineTo(cx - 1.6, cy + 1.3); c.moveTo(cx + 1.6, cy - 1.3); c.lineTo(cx + 1.6, cy + 1.3); c.stroke(); c.beginPath(); c.ellipse(cx, cy + 1.3, 1.6, .7, 0, 0, Math.PI); c.stroke(); c.beginPath(); c.ellipse(cx, cy, 1.6, .7, 0, 0, Math.PI); c.stroke() }
+  else if(kind === 4){ rr(c, cx - 1.6, cy - 1.6, 3.2, 3.2, .5); c.stroke() }
+  else { c.beginPath(); c.arc(cx, cy, 1.9, 0, 7); c.stroke(); [[-.7, -.6], [.6, -.7], [.9, .3]].forEach(function(p){ c.beginPath(); c.arc(cx + p[0], cy + p[1], .24, 0, 7); c.fill() }) }
+  c.restore();
+}
+
+/* själva reelen, ritad i en stående 100 x 177,78-yta */
+function smReel(c, rt){
+  var W = 100, H = 177.78, i, seg = SM.SEG, CREAM = "#EFEDE7";
+  v3Fill(c, 0, 0, W, H, "#070606");
+  for(i = 0; i < 5; i++){
+    var s0 = i*seg, pa = i === 0 ? 1 : k3(rt, s0 - .05, s0 + .55); if(pa <= .01) continue;
+    v3Photo(c, SMP[i], 0, 0, W, H, {scale:lerp(1.05, 1.17, k3(rt, s0 - .3, s0 + seg + .7)), pos:V3_POS[SMP[i]], alpha:ioC(pa)});
+  }
+  v3Grad(c, 0, H*.14, W, H*.56, [[0, "rgba(8,7,7,0)"], [1, "rgba(8,7,7,.82)"]]); v3Grad(c, 0, 0, W, H*.18, [[0, "rgba(8,7,7,.38)"], [1, "rgba(8,7,7,0)"]]);
+  var ov = (1 - k3(rt, 10.6, 11.1)), R = function(a, d){ return rev(rt, a, d) };
+  if(ov > .01){
+    c.save(); c.globalAlpha = ov*R(.3, .5); c.fillStyle = "#fff"; c.fillRect(8, 62.4, 7*R(.3, .6), .3); c.restore();
+    v3Text(c, String(v3t("a11.s.tag")), 17.5, 63.6, {size:2.8, weight:600, f:"sans", sp:.36, color:"#fff", alpha:ov*R(.3, .5)});
+    v3Text(c, String(v3t("a11.s.city")), 92, 63.6, {size:2.8, weight:600, f:"sans", sp:.36, color:"#fff", align:"r", alpha:ov*R(.45, .5)});
+    v3Text(c, String(v3t("a11.s.addr")), 7.4, 82, {size:14, color:"#fff", alpha:ov*R(.6, .5), p:R(.6, .9)});
+    c.save(); c.globalAlpha = ov*.5; c.fillStyle = "#fff"; c.fillRect(8, 88, 84*R(1.0, .8), .25); c.restore();
+    var xs = [8, 38.5, 66], ks = ["1", "2", "3"];
+    for(i = 0; i < 3; i++){
+      var q = R(1.5 + i*.22, .55);
+      v3Text(c, String(v3t("a11.s.f" + ks[i] + "n")), xs[i], 102.4, {size:7.4, color:"#fff", alpha:ov*q, p:q});
+      v3Text(c, String(v3t("a11.s.f" + ks[i] + "l")), xs[i], 108.4, {size:1.9, weight:600, f:"sans", sp:.26, color:"#fff", alpha:.72*ov*q});
+      if(i){ c.save(); c.globalAlpha = ov*q*.32; c.fillStyle = "#fff"; c.fillRect(xs[i] - 3.6, 94.6, .25, 15.4); c.restore() }
+    }
+    c.save(); c.globalAlpha = ov*.5; c.fillStyle = "#fff"; c.fillRect(8, 113, 84*R(2.3, .8), .25); c.restore();
+    var la = ov*R(2.6, .6);
+    c.save(); c.globalAlpha = la; tplMark(c, 1, 10.2, 119.8, 2.3, CREAM, "#101010"); c.restore();
+    v3Text(c, String(v3t("a11.s.office")), 15.4, 120.8, {size:2.6, weight:600, f:"sans", sp:.38, color:"#fff", alpha:la});
+    v3Text(c, String(v3t("a11.s.show")), 92, 120.8, {size:2.3, weight:600, f:"sans", sp:.22, color:"#fff", align:"r", alpha:.88*la});
+  }
+  var wp = ioC(k3(rt, 10.9, 11.9));
+  if(wp > .001){
+    c.save(); c.beginPath(); c.arc(W/2, H*.46, wp*135, 0, 7); c.clip(); v3Fill(c, 0, 0, W, H, "#1F392F");
+    var lp = oBack(k3(rt, 11.5, 12.3)), cy = H*.44;
+    c.save(); c.translate(W/2, cy - 8); c.scale(Math.max(.01, lp), Math.max(.01, lp)); tplMark(c, 1, 0, 0, 8.4, CREAM, "#1F392F"); c.restore();
+    v3Text(c, String(v3t("a11.s.office")), W/2 + 1.6, cy + 12, {size:8.4, weight:600, f:"sans", sp:.5, color:CREAM, align:"c", alpha:R(12.0, .6), p:R(12.0, 1.0)});
+    c.save(); c.globalAlpha = R(12.4, .6)*.5; c.fillStyle = CREAM; c.fillRect(W/2 - 15*R(12.4, .8), cy + 17.4, 30*R(12.4, .8), .25); c.restore();
+    v3Text(c, String(v3t("a11.s.osub")), W/2 + 1, cy + 23.6, {size:2.8, weight:500, f:"sans", sp:.6, color:CREAM, align:"c", alpha:.74*R(12.7, .6)});
+    c.restore();
+  }
+}
+
+function adStudio(c, G, t){
+  var i, rt = Math.max(0, Math.min(SM.R, t - SM.START)), ti = rt >= 11.0 ? 5 : Math.min(4, Math.floor(rt/SM.SEG));
+  v3Fill(c, 0, 0, 100, 75, SMBG);
+  /* fönstret */
+  [0, 1, 2].forEach(function(k){ c.save(); c.fillStyle = "#DCDCDA"; c.beginPath(); c.arc(2.7 + k*2.6, 3.1, .9, 0, 7); c.fill(); c.restore() });
+  c.save(); c.fillStyle = SMLN; c.fillRect(0, 6.2, 100, .2); c.fillRect(0, 13.3, 100, .2); c.restore();
+  sm(c, "Reel - " + String(v3t("a11.s.addr")), 2.1, 10.9, 2.3, 1, {w:700});
+  [[73.2, 0], [78.1, 1]].forEach(function(b){ smBox(c, b[0], 8, 4.4, 4.4, 1.4, "#fff", SMLN, 1.2); c.save(); c.strokeStyle = INK; c.lineWidth = .28; c.lineCap = "round"; c.lineJoin = "round"; var cx = b[0] + 2.2, cy = 10.2, d = b[1] ? -1 : 1;
+    c.beginPath(); c.arc(cx, cy + .2, 1.1, Math.PI*(b[1] ? .1 : .9), Math.PI*(b[1] ? 1.5 : 1.9), !!b[1]); c.stroke(); c.beginPath(); c.moveTo(cx - d*1.5, cy - .5); c.lineTo(cx - d*1.1, cy - 1.4); c.moveTo(cx - d*1.5, cy - .5); c.lineTo(cx - d*.6, cy - .3); c.stroke(); c.restore() });
+  smBox(c, 82, 7.6, 16.4, 5.2, 1.6, SMG, null, 0);
+  c.save(); c.strokeStyle = "#fff"; c.lineWidth = .28; c.lineCap = "round"; c.lineJoin = "round"; c.beginPath(); c.moveTo(85.6, 9.4); c.lineTo(85.6, 11); c.lineTo(88.6, 11); c.lineTo(88.6, 9.4); c.moveTo(87.1, 8.4); c.lineTo(87.1, 10.2); c.moveTo(86.4, 9.6); c.lineTo(87.1, 10.4); c.lineTo(87.8, 9.6); c.stroke(); c.restore();
+  sm(c, "Ladda ner", 89.7, 10.8, 1.6, 1, {c:"#fff", w:600});
+  /* sidlist */
+  c.save(); c.fillStyle = SMLN; c.fillRect(10.2, 13.3, .2, 61.7); c.restore();
+  var L = ["Mallar", "Bilder", "Text", "Uppgifter", "Element", "Varumärke"];
+  smBox(c, .9, 15, 8.6, 10.6, 1.6, "#EEEDEA", null, 0);
+  for(i = 0; i < 6; i++){ var cy = 15.2 + i*9.9; smIcon(c, i, 5.2, cy + 3.7, i === 0 ? INK : "#3a3a3e"); sm(c, L[i], 5.2, cy + 8.2, 1.3, 1, {al:"c", c:i === 0 ? INK : "#4a4a4e", w:500}) }
+  /* arbetsytan */
+  c.save(); c.fillStyle = "#F7F7F8"; c.fillRect(10.4, 13.5, 63.6, 61.5); c.restore();
+  smPill(c, 12.6, 15.8, 11.4, 4.6, "Reel 9:16", true, 1.6); smPill(c, 25.2, 15.8, 11.4, 4.6, "Story 9:16", false, 1.6); smPill(c, 37.8, 15.8, 10.6, 4.6, "Inlägg 4:5", false, 1.6); smPill(c, 49.6, 15.8, 11.4, 4.6, "Kvadrat 1:1", false, 1.6);
+  var rh = 49.6, rw = rh*9/16, rx = 42.2 - rw/2, ry = 22.4;
+  c.save(); c.shadowColor = "rgba(30,26,20,.3)"; c.shadowBlur = 10; c.shadowOffsetY = 2; c.fillStyle = "#000"; rr(c, rx, ry, rw, rh, 1.1); c.fill(); c.restore();
+  c.save(); rr(c, rx, ry, rw, rh, 1.1); c.clip(); c.translate(rx, ry); c.scale(rw/100, rw/100); smReel(c, rt); c.restore();
+  /* högerpanel */
+  c.save(); c.fillStyle = SMLN; c.fillRect(74, 13.3, .2, 61.7); c.restore();
+  sm(c, "BILDER", 76.6, 19.4, 1.5, 1, {w:700, c:"#4a4a4e", sp:.1});
+  var tx0 = 76.6, tw = 3.2, tg = .4;
+  for(i = 0; i < 6; i++){
+    var x = tx0 + i*(tw + tg), on = i === ti;
+    if(i < 5) sPh(c, SMP[i], x, 21.6, tw, 4.8, 1, .5, 1.12); else { smBox(c, x, 21.6, tw, 4.8, .5, "#1F392F", null, 0); c.save(); tplMark(c, 1, x + tw/2, 24, 1, "#EFEDE7", "#1F392F"); c.restore() }
+    c.save(); c.strokeStyle = on ? INK : "rgba(28,28,30,.14)"; c.lineWidth = on ? .4 : .16; rr(c, x - .15, 21.45, tw + .3, 5.1, .6); c.stroke(); c.restore();
+  }
+  c.save(); c.fillStyle = SMLN; c.fillRect(76.6, 29.6, 21.4, .2); c.restore();
+  sm(c, "EXPORTERA", 76.6, 34.6, 1.5, 1, {w:700, c:"#4a4a4e", sp:.1});
+  ["Reel 9:16", "Story 9:16", "Inlägg 4:5"].forEach(function(l, k){ var y = 38.4 + k*4.4; smBox(c, 76.6, y, 2.8, 2.8, .7, SMG, null, 0); c.save(); c.strokeStyle = "#fff"; c.lineWidth = .3; c.lineCap = "round"; c.lineJoin = "round"; c.beginPath(); c.moveTo(77.3, y + 1.45); c.lineTo(77.9, y + 2.0); c.lineTo(78.8, y + .9); c.stroke(); c.restore(); sm(c, l, 80.4, y + 2.2, 1.7, 1, {c:"#3a3a3e"}) });
+  c.save(); c.fillStyle = SMLN; c.fillRect(76.6, 52.4, 21.4, .2); c.restore();
+  sm(c, "VARUMÄRKE", 76.6, 57.4, 1.5, 1, {w:700, c:"#4a4a4e", sp:.1});
+  ["Kontorets logotyp, färger och", "typsnitt är låsta i mallen."].forEach(function(l, k){ sm(c, l, 76.6, 61.6 + k*3.2, 1.45, 1, {c:"#6a655e"}) });
+  var lf = k3(t, SM.DUR - .5, SM.DUR); if(lf > 0){ c.save(); c.globalAlpha = lf; c.fillStyle = SMBG; c.fillRect(0, 0, 100, 75); c.restore() }
+  var fi = 1 - k3(t, 0, .4); if(fi > 0){ c.save(); c.globalAlpha = fi; c.fillStyle = SMBG; c.fillRect(0, 0, 100, 75); c.restore() }
+}
+function schedStudio(H){}
+
+/* =====================================================================
+   V9b: Mäklarportalen som mockup (webbkort 4:3): översikten, med bokning, appar, branding och fakturering inom räckhåll.
+   ===================================================================== */
+function stPortal(c, G, t){
+  var i, GRY = "#6E7266", BG = "#F1EFEC";
+  v3Fill(c, 0, 0, 100, 75, BG);
+  [0, 1, 2].forEach(function(k){ c.save(); c.fillStyle = "#D6D5D1"; c.beginPath(); c.arc(2.5 + k*2.5, 2.8, .85, 0, 7); c.fill(); c.restore() });
+  c.save(); c.fillStyle = "rgba(28,28,30,.1)"; c.fillRect(0, 5.6, 100, .2); c.restore();
+  /* sidomeny */
+  smBox(c, 1, 7, 18.4, 66.6, 2, "#fff", null, 1.4);
+  v3Mark(c, 3.2, 9.2, 2.6, "#101010", C3.dotL, {reveal:1, dot:1, alpha:1}); v3Text(c, "VIEWLY", 7.2, 11.2, {size:1.7, weight:500, f:"sans", sp:.28, color:"#101010"});
+  sm(c, "HUVUDMENY", 3, 16.8, 1.05, 1, {c:"#4a4a4e", sp:.26, w:500});
+  var M1 = ["Översikt", "Beställningar", "Appar och abonnemang", "Katalog", "Branding"], M2 = ["Konto & inställningar", "Team", "Köphistorik", "Kontorsfakturor"], yy = 18.6;
+  smBox(c, 1.8, yy, 16.8, 3.8, 1, "#EEEDEA", null, 0);
+  M1.forEach(function(l, k){
+    if(k === 2){ smIcon(c, 4, 4.2, yy + 2.5, "#5a5a5e", .5); sm(c, "Appar och", 6.2, yy + 1.9, 1.2, 1, {c:"#2a2a2e"}); sm(c, "abonnemang", 6.2, yy + 3.9, 1.2, 1, {c:"#2a2a2e"}); yy += 5.8; return }
+    smIcon(c, [4, 3, 4, 1, 5][k], 4.2, yy + 1.9, "#5a5a5e", .5); sm(c, l, 6.2, yy + 2.4, 1.25, 1, {c:"#2a2a2e", w:k === 0 ? 600 : 500}); yy += 4.1;
+  });
+  sm(c, "KONTO & KONTOR", 3, yy + 4.2, 1.05, 1, {c:"#4a4a4e", sp:.26});
+  yy += 6.4; M2.forEach(function(l, k){ smIcon(c, [5, 3, 4, 3][k], 4.2, yy + 1.9, "#5a5a5e", .5); sm(c, l, 6.2, yy + 2.4, 1.25, 1, {c:"#2a2a2e"}); yy += 4.1 });
+  c.save(); c.fillStyle = SMLN; c.fillRect(2, 66, 15.6, .2); c.restore();
+  smIcon(c, 4, 4.2, 68.4, "#5a5a5e", .5); sm(c, "Startsida", 6.2, 68.9, 1.25, 1, {c:"#2a2a2e"}); smIcon(c, 5, 4.2, 71.2, "#5a5a5e", .5); sm(c, "Hjälp", 6.2, 71.7, 1.25, 1, {c:"#2a2a2e"});
+  /* huvudyta */
+  sm(c, "Översikt", 21.4, 10.4, 2.2, 1, {w:600}); smPill(c, 82.4, 7.4, 10.8, 4.2, "Startsida", false, 1.35); smBox(c, 94.2, 7.4, 4.2, 4.2, 2.1, "#fff", null, 0); sm(c, "MA", 96.3, 10.1, 1.1, 1, {al:"c", w:600});
+  c.save(); c.fillStyle = "rgba(28,28,30,.08)"; c.fillRect(20, 13, 80, .2); c.restore();
+  /* hjältekort med foto */
+  c.save(); rr(c, 21, 14.8, 77.4, 25.6, 2.2); c.clip(); v3Photo(c, "house", 21, 14.8, 77.4, 25.6, {scale:1.2, pos:[.5, .62]}); v3Fill(c, 21, 14.8, 77.4, 25.6, "#0c0a0a", .18); v3Grad(c, 21, 14.8, 77.4, 25.6, [[0, "rgba(8,7,7,.25)"], [1, "rgba(8,7,7,.45)"]]); c.restore();
+  sm(c, "ER MÄKLARBYRÅ", 23.8, 20.4, 1.35, 1, {c:"rgba(255,255,255,.85)", sp:.3, w:600}); v3Text(c, "Hej, Anna", 23.6, 25.4, {size:3.6, weight:400, f:"sans", color:"#fff"}); sm(c, "anna@maklarbyra.se", 23.8, 28.2, 1.4, 1, {c:"rgba(255,255,255,.65)"});
+  c.save(); c.fillStyle = "rgba(20,18,16,.5)"; rr(c, 23, 30.4, 33.4, 8.4, 1.4); c.fill(); rr(c, 58, 29.8, 38.6, 9, 1.4); c.fill(); c.strokeStyle = "rgba(255,255,255,.18)"; c.lineWidth = .15; rr(c, 23, 30.4, 33.4, 8.4, 1.4); c.stroke(); rr(c, 58, 29.8, 38.6, 9, 1.4); c.stroke(); c.restore();
+  sm(c, "ORDRAR", 24.8, 33, 1.1, 1, {c:"rgba(255,255,255,.7)", sp:.28, w:600}); v3Text(c, "2", 24.8, 36.6, {size:3.4, weight:500, f:"sans", color:"#fff"}); sm(c, "pågående", 27.4, 36.5, 1.2, 1, {c:"rgba(255,255,255,.7)"});
+  c.save(); c.strokeStyle = "rgba(255,255,255,.4)"; c.lineWidth = .3; c.beginPath(); c.arc(52, 34.6, 2.1, 0, 7); c.stroke(); c.strokeStyle = "#fff"; c.beginPath(); c.arc(52, 34.6, 2.1, -Math.PI/2, -Math.PI/2 + 1.3); c.stroke(); c.restore();
+  sm(c, "NÄSTA FOTOGRAFERING", 59.8, 32.4, 1.1, 1, {c:"rgba(255,255,255,.7)", sp:.28, w:600});
+  smBox(c, 59.6, 33.8, 4, 4, .9, "rgba(255,255,255,.14)", null, 0); sm(c, "Albinsgatan 5A, Helsingborg", 65, 35.4, 1.4, 1, {c:"#fff", w:600}); sm(c, "Torsdag kl. 14.00 · Bekräftad", 65, 37.6, 1.2, 1, {c:"rgba(255,255,255,.7)"});
+  /* snabbval */
+  var QA = [["Ny beställning", "Boka fotografering", 4], ["Förbered intag", "Nytt eller sparat förslag", 3], ["SoMe Studio", "Inlägg på sekunder", 1], ["Annonsskrivaren", "Skriv och optimera", 5]];
+  QA.forEach(function(q, k){ var x = 21 + k*19.7; smBox(c, x, 42.4, 18.6, 7.4, 1.6, "#fff", SMLN, 1); smBox(c, x + 1.2, 44.1, 4, 4, 1.1, "#F1EFEC", null, 0); smIcon(c, q[2], x + 3.2, 46.1, "#5a5a5e", .55); sm(c, q[0], x + 6, 45.6, 1.3, 1, {w:700}); sm(c, q[1], x + 6, 47.7, 1.0, 1, {c:"#6f6a65"}) });
+  /* beställningar */
+  sm(c, "Dina beställningar", 21.2, 54, 2, 1, {w:500}); smBox(c, 42.2, 51.4, 19, 3.8, 1.9, "#fff", SMLN, 0); smPill(c, 42.5, 51.7, 8.4, 3.2, "Mina ordrar", true, 1.2); sm(c, "Hela kontoret", 52, 53.9, 1.2, 1, {c:"#4a4a4e"}); sm(c, "Se alla", 63.6, 53.9, 1.3, 1, {c:"#2a6fd6", w:500});
+  smBox(c, 21, 56.4, 77.4, 17, 2, "#fff", SMLN, 1);
+  sm(c, "OBJEKT", 23.6, 59.8, 1.05, 1, {c:"#6f6a65", sp:.24, w:600}); sm(c, "PRODUKTION", 52, 59.8, 1.05, 1, {c:"#6f6a65", sp:.24, w:600}); sm(c, "STATUS", 72, 59.8, 1.05, 1, {c:"#6f6a65", sp:.24, w:600});
+  [["Albinsgatan 5A, Helsingborg", "rs_dining", "Levererad"], ["Storgatan 15, Landskrona", "house", "Bokad"]].forEach(function(r, k){
+    var y = 61.4 + k*5.8; c.save(); c.fillStyle = SMLN; c.fillRect(21.4, y - .4, 76.6, .15); c.restore();
+    sPh(c, r[1], 23.4, y + .6, 3.8, 3.8, 1, .7, 1.2); sm(c, r[0], 28.2, y + 3.3, 1.5, 1, {w:700});
+    smBox(c, 52, y + 1, 8.6, 3, 1.5, "#1c1c1e", null, 0); sm(c, "FOTOPAKET", 56.3, y + 3.1, 1.0, 1, {al:"c", c:"#fff", w:700, sp:.12});
+    smBox(c, 72, y + 1, 6.6, 3, 1.5, r[2] === "Levererad" ? "#E5F0E4" : "#F2ECDD", null, 0); sm(c, r[2], 75.3, y + 3.1, 1.15, 1, {al:"c", c:r[2] === "Levererad" ? "#2f6a3a" : "#8a6a1f", w:500});
+  });
+}
+
 /* ---------- registrering ---------- */
 window.V3_ADS10 = [];
 function loadAudio10(){ return v3SfxLoad() }
@@ -1628,6 +1788,7 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
     ["a11_q2", "Förtroende · Hela citatet", "Hela omdömet på ett kräm-kort över ett mörkt foto, med stjärnor, namn och titel. Still för story.", stQ2, function(H){}, 2, 0, 1],
     ["a11_q3", "Förtroende · Därför kan du lita på oss", "Tre sakliga skäl från viewly.se: utbildade fotografer, drönarlicens och utvecklat med mäklare. Still för story.", stQ3, function(H){}, 2, 0, 1],
     ["a11_q4", "Förtroende · Citatet animerat", "Citatet växer fram: utdraget, stjärnorna som poppar, sedan hela omdömet. Därefter Boka fotografering.", withEnd(adQuoteA, QA.L), function(H){ var i; for(i = 0; i < 5; i++) H.click(2.4 + i*.12, .08) }, QA.L + END10, QA.L, 4.8],
+    ["a11_portal", "Statisk · Mäklarportalen (webbkort 4:3)", "Översikten i mäklarportalen som mockup: bokning, appar, branding och fakturering i sidomenyn, nästa fotografering, SoMe Studio och Annonsskrivaren. Format Webb 4:3.", stPortal, function(H){}, 2, 0, 1],
     ["a11_tpl", "Statisk · Reel-mallarna", "Kontorets tre Reel-mallar: Kommande, Till salu och Såld.", stTpl, function(H){}, 2, 0, 1]
   ];
   defs11.forEach(function(d){
@@ -1636,6 +1797,12 @@ reg10("a10_reel", "1 · Reel Studio", "25 bilder är levererade. Skapa Reel, kon
     comp.mix = K.makeMix(d[4]); comp.loadAudio = function(){ return v3SfxLoad() };
     V3_COMPS[d[0]] = comp; V3_ADS11.push(d[0]);
   });
+
+  (function(){
+    var comp = {n:"F · Reel Studio, mockup (webbkort 4:3)", d:"Reel Studio som lugn mockup för webbkortet Sociala medier för mäklare, i samma stil som Content Studio-bilden. Bara reelen rör sig: stående 9:16 med bilder, adress, fakta och kontorets logga. Format Webb 4:3, 1600 × 1200, utan ljud.", group:"ads11", id:"a11_studio", v:{id:"a11_studio"}, dur:SM.DUR, thumb:7, L:SM.DUR, vo:[], logo:true};
+    comp.draw = function(c, G, t){ adStudio(c, G, t) }; comp.mix = K.makeMix(schedStudio); comp.loadAudio = function(){ return v3SfxLoad() };
+    V3_COMPS.a11_studio = comp; V3_ADS11.unshift("a11_studio");
+  })();
   ([["a11_reelp", "D · Reel Studio i mobilen", "Slät mörkgrön bakgrund, titeln Från foto till färdig Reel och hela flödet i mobilen: notis, Skapa Reel, välj mall, uppgifterna hämtas, Reelen fylls i. Därefter Fotografering och verktyg i ett enda flöde och Boka fotografering.", withEnd(adReelP, RP.L), schedReelP, RP.L + END10, RP.L, 12.2],
    ["a11_postp", "E · Content Studio i mobilen", "Slät mörkgrön bakgrund, titeln Från foto till färdigt inlägg och hela flödet i mobilen: notis, Skapa inlägg, välj bild, välj mall, uppgifterna hämtas, inlägget fylls i. Därefter Fotografering och verktyg i ett enda flöde och Boka fotografering.", withEnd(adPostP, CP.L), schedPostP, CP.L + END10, CP.L, 13.0]]).forEach(function(d){
     var comp = {n:d[1], d:d[2], group:"ads11", id:d[0], v:{id:d[0]}, dur:d[5], thumb:d[7], L:d[6], vo:[]};
@@ -1653,8 +1820,8 @@ var SCRIPT11 = [
 ];
 window.secAds11 = function(){
   if(V3_ADS11.indexOf(V3S.comp) < 0){ V3S.comp = "a11_board"; V3S.t = V3_COMPS.a11_board.thumb; V3S.playing = false; v3StopSound() }
-  if(V3S.fmt !== "916" && V3S.fmt !== "45") V3S.fmt = "916";
-  var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : "4:5 · 1080 × 1350";
+  if(V3S.fmt !== "916" && V3S.fmt !== "45" && V3S.fmt !== "43") V3S.fmt = "916";
+  var comp = V3_COMPS[V3S.comp], fn = V3S.fmt === "916" ? "9:16 · 1080 × 1920" : V3S.fmt === "43" ? "4:3 · 1600 × 1200" : "4:5 · 1080 × 1350";
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 19 · bygge 1</div><h2>Mindre jobb. Mer varumärke.</h2>'
     + '<p>Ny riktning: Viewly är fotograf och marknadsavdelning i ett. Annonserna visar att allt efter fotograferingen redan är gjort och att varumärket byggs på köpet. Utan röst och utan priser, med bara diskreta klick. Förslag, inget publicerat.</p></div>'
@@ -1687,13 +1854,13 @@ window.secAds10 = function(){
   setTimeout(v3Mount, 0);
   return '<div class="a3page"><div class="a3head"><div class="eyebrow">Ads · 18 · bygge 2</div><h2>Reel Studio</h2>'
     + '<p>Reel Studio i annonsspråket från sida 16: mörkt foto, serif, ljusa kort och en mobil med Reelen. Kopplade fält med prickade linjer. Annons 1 har svensk röst, annons 2 är utan röst. Förslag, inget publicerat.</p></div>'
-    + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : "w45") + '">'
+    + '<div class="a3work"><div class="a3stagewrap ' + (V3S.fmt === "916" ? "w916" : V3S.fmt === "43" ? "w169" : "w45") + '">'
     + '<canvas id="v3stage" class="a3cv a3stage"></canvas>'
     + '<div class="a3ctl2"><button class="a3play" type="button" data-a3="play" id="v3play" aria-label="Spela">' + (V3S.playing ? "❚❚" : "▶") + '</button>'
     + '<div class="a3scrubw"><input type="range" id="v3scrub" min="0" max="1000" value="' + Math.round(V3S.t/comp.dur*1000) + '" aria-label="Tid"></div>'
     + '<span class="mono" id="v3time"></span></div></div>'
     + '<div class="a3panel"><div class="a3h">Annons</div><div class="a3segs col">' + V3_ADS10.map(function(id){ return v3Seg("comp", id, V3_COMPS[id].n, V3S.comp === id) }).join("") + '</div>'
-    + '<div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde 4:5", V3S.fmt === "45") + '</div>'
+    + '<div class="a3h">Format</div><div class="a3segs">' + v3Seg("fmt", "916", "Reel 9:16", V3S.fmt === "916") + v3Seg("fmt", "45", "Flöde 4:5", V3S.fmt === "45") + v3Seg("fmt", "43", "Webb 4:3", V3S.fmt === "43") + '</div>'
     + '<div class="a3h">Ljud</div><div class="a3segs">' + v3Seg("sound", "1", "På", V3S.sound) + v3Seg("sound", "0", "Av", !V3S.sound) + '</div>'
     + '<div class="a3h">Ladda ner</div><div class="a3segs col"><button class="a3seg dl" type="button" data-a3="mp4">MP4 · ' + comp.n + " · " + fn + ' · med röst</button></div></div></div>'
     + '<h3 class="a3sub">Manus och bild</h3><div class="a3copy">' + SCRIPT.map(function(s, i){ return '<div><b>' + (i + 1) + ' · ' + s[0] + '</b><p>' + s[1] + '</p></div>' }).join("") + '</div>'
